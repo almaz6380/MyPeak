@@ -202,7 +202,17 @@
     "recommended": "Recommended",
     "custom": "Custom",
     "confirmDeleteMeal": "Really delete this meal?",
-    "mealDeleted": "Meal deleted"
+    "mealDeleted": "Meal deleted",
+    "scanBarcode": "Scan barcode",
+    "scanBarcodeDesc": "Scan a product with your camera",
+    "scanHint": "Hold the barcode inside the frame",
+    "startingCamera": "Starting camera...",
+    "lookingUpBarcode": "Looking up product...",
+    "barcodeNotFound": "Product not found",
+    "barcodeNotFoundDesc": "This barcode is not in the database. You can enter the product manually.",
+    "scanAgain": "Scan again",
+    "cameraError": "Camera error",
+    "cameraPermissionDenied": "Camera access was denied. Please allow access in your browser settings."
   },
   "library": {
     "title": "Library",

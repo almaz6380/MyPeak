@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Clock, UtensilsCrossed, PenLine } from 'lucide-react';
+import { ArrowLeft, Clock, UtensilsCrossed, PenLine, ScanBarcode } from 'lucide-react';
 import FoodSearch from './FoodSearch';
 import PortionPicker from './PortionPicker';
+import BarcodeScanner from './BarcodeScanner';
 import { useAuth } from '../../context/AuthContext';
 import { saveNutritionEntry, getRecentFoods, getCustomMeals, logCustomMeal } from '../../data/nutritionStorage';
 
@@ -13,6 +14,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
   const [recentFoods, setRecentFoods] = useState([]);
   const [customMeals, setCustomMeals] = useState([]);
   const [showManual, setShowManual] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
   const lang = i18n.language || language;
 
   useEffect(() => {
@@ -68,6 +70,19 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
     );
   }
 
+  // Barcode scanner
+  if (showScanner) {
+    return (
+      <BarcodeScanner
+        onScanned={(food) => {
+          setShowScanner(false);
+          setSelectedFood(food);
+        }}
+        onClose={() => setShowScanner(false)}
+      />
+    );
+  }
+
   // Manual entry form
   if (showManual) {
     return (
@@ -92,19 +107,34 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
         </div>
       </div>
 
-      {/* Manual Entry Button */}
-      <button
-        onClick={() => setShowManual(true)}
-        className="w-full mb-4 flex items-center gap-3 px-4 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-      >
-        <div className="w-9 h-9 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-          <PenLine className="w-4.5 h-4.5 text-primary-600 dark:text-primary-400" />
-        </div>
-        <div className="text-left">
-          <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{t('nutrition.manualEntry')}</p>
-          <p className="text-xs text-slate-400 dark:text-slate-500">{t('nutrition.manualEntryDesc')}</p>
-        </div>
-      </button>
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <button
+          onClick={() => setShowScanner(true)}
+          className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+        >
+          <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0">
+            <ScanBarcode className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div className="text-left min-w-0">
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{t('nutrition.scanBarcode')}</p>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">{t('nutrition.scanBarcodeDesc')}</p>
+          </div>
+        </button>
+
+        <button
+          onClick={() => setShowManual(true)}
+          className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+        >
+          <div className="w-9 h-9 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0">
+            <PenLine className="w-4.5 h-4.5 text-primary-600 dark:text-primary-400" />
+          </div>
+          <div className="text-left min-w-0">
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{t('nutrition.manualEntry')}</p>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">{t('nutrition.manualEntryDesc')}</p>
+          </div>
+        </button>
+      </div>
 
       {/* Custom Meals */}
       {customMeals.length > 0 && (

@@ -38,3 +38,29 @@
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
 }
+
+@keyframes scan-line {
+  0% { top: 10%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 85%; opacity: 0; }
+}
+
+.animate-scan-line {
+  animation: scan-line 2s ease-in-out infinite;
+}
+
+/* Override html5-qrcode default UI */
+#barcode-reader {
+  border: none !important;
+}
+#barcode-reader video {
+  object-fit: cover !important;
+  border-radius: 0 !important;
+}
+#barcode-reader__scan_region {
+  min-height: 100% !important;
+}
+#barcode-reader__dashboard {
+  display: none !important;
+}

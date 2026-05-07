@@ -202,7 +202,17 @@
     "recommended": "Empfohlen",
     "custom": "Benutzerdefiniert",
     "confirmDeleteMeal": "Mahlzeit wirklich löschen?",
-    "mealDeleted": "Mahlzeit gelöscht"
+    "mealDeleted": "Mahlzeit gelöscht",
+    "scanBarcode": "Barcode scannen",
+    "scanBarcodeDesc": "Produkt per Kamera scannen",
+    "scanHint": "Halte den Barcode in den Rahmen",
+    "startingCamera": "Kamera wird gestartet...",
+    "lookingUpBarcode": "Produkt wird gesucht...",
+    "barcodeNotFound": "Produkt nicht gefunden",
+    "barcodeNotFoundDesc": "Dieser Barcode ist nicht in der Datenbank. Du kannst das Produkt manuell eingeben.",
+    "scanAgain": "Nochmal scannen",
+    "cameraError": "Kamera-Fehler",
+    "cameraPermissionDenied": "Kamerazugriff wurde verweigert. Bitte erlaube den Zugriff in deinen Browser-Einstellungen."
   },
   "library": {
     "title": "Bibliothek",
