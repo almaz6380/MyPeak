@@ -1,0 +1,59 @@
+import { Routes, Route } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Loader2 } from 'lucide-react';
+import { useAuth } from './context/AuthContext';
+import BottomNav from './components/BottomNav';
+import TrainingPage from './pages/TrainingPage';
+import NutritionPage from './pages/NutritionPage';
+import LibraryPage from './pages/LibraryPage';
+import ProfilePage from './pages/ProfilePage';
+import AuthPage from './pages/auth/AuthPage';
+import UpdatePasswordPage from './pages/auth/UpdatePasswordPage';
+import OnboardingPage from './pages/onboarding/OnboardingPage';
+
+export default function App() {
+  const { user, profile, loading } = useAuth();
+  const { t } = useTranslation();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-surface-dark flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <Routes>
+      <Route path="/auth/update-password" element={<UpdatePasswordPage />} />
+      <Route
+        path="*"
+        element={
+          !user ? (
+            <AuthPage />
+          ) : !profile?.onboarding_completed ? (
+            <OnboardingPage />
+          ) : (
+            <AppShell />
+          )
+        }
+      />
+    </Routes>
+  );
+}
+
+function AppShell() {
+  return (
+    <>
+      <main className="min-h-screen max-w-lg mx-auto pb-20">
+        <Routes>
+          <Route path="/" element={<TrainingPage />} />
+          <Route path="/nutrition" element={<NutritionPage />} />
+          <Route path="/library" element={<LibraryPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+        </Routes>
+      </main>
+      <BottomNav />
+    </>
+  );
+}

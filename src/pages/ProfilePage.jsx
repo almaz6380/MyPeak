@@ -1,0 +1,417 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
+import { saveSetting } from '../data/settingsStorage';
+import { supabase } from '../lib/supabase';
+import { Moon, Sun, Globe, Weight, LogOut, User, ChevronRight, Pencil, X, Check, Loader2 } from 'lucide-react';
+
+export default function ProfilePage() {
+  const { t, i18n } = useTranslation();
+  const { darkMode, toggleDarkMode } = useTheme();
+  const { user, profile, signOut, refreshProfile } = useAuth();
+  const [weightUnit, setWeightUnit] = useState(() => localStorage.getItem('weightUnit') || 'kg');
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
+  const [editField, setEditField] = useState(null); // which field is being edited
+  const [editValue, setEditValue] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'de' ? 'en' : 'de';
+    i18n.changeLanguage(newLang);
+    localStorage.setItem('language', newLang);
+    if (user) saveSetting(user.id, 'language', newLang);
+  };
+
+  const toggleWeightUnit = () => {
+    const newUnit = weightUnit === 'kg' ? 'lbs' : 'kg';
+    setWeightUnit(newUnit);
+    localStorage.setItem('weightUnit', newUnit);
+    if (user) saveSetting(user.id, 'weightUnit', newUnit);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  const openEdit = (field, currentValue) => {
+    setEditField(field);
+    setEditValue(currentValue ?? '');
+  };
+
+  const closeEdit = () => {
+    setEditField(null);
+    setEditValue(null);
+    setSaving(false);
+  };
+
+  const saveEdit = async () => {
+    if (!user || editField === null) return;
+    setSaving(true);
+    await supabase
+      .from('profiles')
+      .update({ [editField]: editValue, updated_at: new Date().toISOString() })
+      .eq('id', user.id);
+    await refreshProfile();
+    closeEdit();
+  };
+
+  // Display helpers
+  const genderLabel = (val) => {
+    const map = { male: t('onboarding.male'), female: t('onboarding.female'), diverse: t('onboarding.diverse') };
+    return map[val] || '—';
+  };
+
+  const goalLabel = (val) => {
+    const map = { muscle_gain: t('onboarding.muscleGain'), maintenance: t('onboarding.maintenance'), weight_loss: t('onboarding.weightLoss') };
+    return map[val] || '—';
+  };
+
+  const activityLabel = (val) => {
+    const map = { sedentary: t('onboarding.sedentary'), moderate: t('onboarding.moderate'), very_active: t('onboarding.veryActive') };
+    return map[val] || '—';
+  };
+
+  const experienceLabel = (val) => {
+    const map = { beginner: t('onboarding.beginner'), intermediate: t('onboarding.intermediate'), pro: t('onboarding.pro') };
+    return map[val] || '—';
+  };
+
+  return (
+    <div className="p-4 pb-24">
+      <h1 className="text-2xl font-bold mb-6">{t('profile.title')}</h1>
+
+      {/* User header */}
+      {profile?.name && (
+        <div className="flex items-center gap-4 mb-6 p-4 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm">
+          <div className="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+            <User className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+          </div>
+          <div>
+            <p className="text-lg font-semibold text-slate-900 dark:text-white">{profile.name}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{user?.email}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Personal Data */}
+      {profile && (
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden mb-4">
+          <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 px-4 pt-4 pb-2">
+            {t('profile.personalData')}
+          </h2>
+
+          <ProfileDataRow
+            label={t('onboarding.name').replace('?', '')}
+            value={profile.name || '—'}
+            onClick={() => openEdit('name', profile.name)}
+          />
+          <ProfileDataRow
+            label={t('onboarding.gender')}
+            value={genderLabel(profile.gender)}
+            onClick={() => openEdit('gender', profile.gender)}
+          />
+          <ProfileDataRow
+            label={t('onboarding.age')}
+            value={profile.age ? `${profile.age} ${t('onboarding.years')}` : '—'}
+            onClick={() => openEdit('age', profile.age)}
+          />
+          <ProfileDataRow
+            label={t('onboarding.weight')}
+            value={profile.weight_kg ? `${profile.weight_kg} kg` : '—'}
+            onClick={() => openEdit('weight_kg', profile.weight_kg)}
+          />
+          <ProfileDataRow
+            label={t('onboarding.height')}
+            value={profile.height_cm ? `${profile.height_cm} ${t('onboarding.heightCm')}` : '—'}
+            onClick={() => openEdit('height_cm', profile.height_cm)}
+          />
+          <ProfileDataRow
+            label={t('onboarding.goal').replace('?', '')}
+            value={goalLabel(profile.goal)}
+            onClick={() => openEdit('goal', profile.goal)}
+          />
+          <ProfileDataRow
+            label={t('onboarding.activityLevel')}
+            value={activityLabel(profile.activity_level)}
+            onClick={() => openEdit('activity_level', profile.activity_level)}
+          />
+          <ProfileDataRow
+            label={t('onboarding.experience')}
+            value={experienceLabel(profile.experience)}
+            onClick={() => openEdit('experience', profile.experience)}
+            last
+          />
+        </div>
+      )}
+
+      {/* App Settings */}
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden mb-4">
+        <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 px-4 pt-4 pb-2">
+          {t('profile.settings')}
+        </h2>
+
+        <SettingRow
+          icon={darkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+          label={t('profile.darkMode')}
+          action={
+            <button
+              onClick={() => toggleDarkMode(user?.id)}
+              className={`relative w-12 h-7 rounded-full transition-colors ${darkMode ? 'bg-primary-500' : 'bg-slate-300'}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${darkMode ? 'translate-x-5' : ''}`} />
+            </button>
+          }
+        />
+
+        <SettingRow
+          icon={<Globe className="w-5 h-5" />}
+          label={t('profile.language')}
+          action={
+            <button
+              onClick={toggleLanguage}
+              className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-sm font-medium"
+            >
+              {i18n.language === 'de' ? 'Deutsch' : 'English'}
+            </button>
+          }
+        />
+
+        <SettingRow
+          icon={<Weight className="w-5 h-5" />}
+          label={t('profile.units')}
+          action={
+            <button
+              onClick={toggleWeightUnit}
+              className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-sm font-medium"
+            >
+              {weightUnit === 'kg' ? t('profile.kg') : t('profile.lbs')}
+            </button>
+          }
+          last
+        />
+      </div>
+
+      {/* Sign Out */}
+      <button
+        onClick={() => setShowSignOutConfirm(true)}
+        className="w-full flex items-center justify-center gap-2 py-3.5 text-red-500 hover:text-red-600 font-medium rounded-2xl bg-white dark:bg-surface-dark-alt shadow-sm transition-colors"
+      >
+        <LogOut className="w-5 h-5" />
+        {t('auth.signOut')}
+      </button>
+
+      {/* Sign Out Confirmation */}
+      {showSignOutConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <p className="text-center font-semibold mb-4">{t('auth.signOut')}?</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowSignOutConfirm(false)}
+                className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium text-sm transition-colors"
+              >
+                {t('auth.signOut')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editField && (
+        <EditModal
+          field={editField}
+          value={editValue}
+          onChange={setEditValue}
+          onSave={saveEdit}
+          onClose={closeEdit}
+          saving={saving}
+          t={t}
+        />
+      )}
+    </div>
+  );
+}
+
+function ProfileDataRow({ label, value, onClick, last = false }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${last ? '' : 'border-b border-slate-100 dark:border-slate-700'}`}
+    >
+      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{label}</span>
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-slate-500 dark:text-slate-400">{value}</span>
+        <Pencil className="w-3.5 h-3.5 text-slate-400" />
+      </div>
+    </button>
+  );
+}
+
+function SettingRow({ icon, label, action, last = false }) {
+  return (
+    <div className={`flex items-center justify-between px-4 py-3.5 ${last ? '' : 'border-b border-slate-100 dark:border-slate-700'}`}>
+      <div className="flex items-center gap-3 text-slate-700 dark:text-slate-200">
+        <span className="text-primary-500">{icon}</span>
+        <span className="font-medium">{label}</span>
+      </div>
+      {action}
+    </div>
+  );
+}
+
+function EditModal({ field, value, onChange, onSave, onClose, saving, t }) {
+  const fieldConfig = {
+    name: { type: 'text', title: t('profile.editName'), placeholder: t('onboarding.namePlaceholder') },
+    gender: {
+      type: 'selection',
+      title: t('profile.editGender'),
+      options: [
+        { value: 'male', label: t('onboarding.male') },
+        { value: 'female', label: t('onboarding.female') },
+        { value: 'diverse', label: t('onboarding.diverse') },
+      ],
+    },
+    age: { type: 'number', title: t('profile.editAge'), min: 14, max: 100, step: 1, unit: t('onboarding.years') },
+    weight_kg: { type: 'number', title: t('profile.editWeight'), min: 30, max: 300, step: 0.5, unit: 'kg', decimal: true },
+    height_cm: { type: 'number', title: t('profile.editHeight'), min: 120, max: 230, step: 1, unit: t('onboarding.heightCm') },
+    goal: {
+      type: 'selection',
+      title: t('profile.editGoal'),
+      options: [
+        { value: 'muscle_gain', label: t('onboarding.muscleGain') },
+        { value: 'maintenance', label: t('onboarding.maintenance') },
+        { value: 'weight_loss', label: t('onboarding.weightLoss') },
+      ],
+    },
+    activity_level: {
+      type: 'selection',
+      title: t('profile.editActivity'),
+      options: [
+        { value: 'sedentary', label: t('onboarding.sedentary'), desc: t('onboarding.sedentaryDesc') },
+        { value: 'moderate', label: t('onboarding.moderate'), desc: t('onboarding.moderateDesc') },
+        { value: 'very_active', label: t('onboarding.veryActive'), desc: t('onboarding.veryActiveDesc') },
+      ],
+    },
+    experience: {
+      type: 'selection',
+      title: t('profile.editExperience'),
+      options: [
+        { value: 'beginner', label: t('onboarding.beginner'), desc: t('onboarding.beginnerDesc') },
+        { value: 'intermediate', label: t('onboarding.intermediate'), desc: t('onboarding.intermediateDesc') },
+        { value: 'pro', label: t('onboarding.pro'), desc: t('onboarding.proDesc') },
+      ],
+    },
+  };
+
+  const config = fieldConfig[field];
+  if (!config) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-end justify-center z-50">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-t-3xl p-6 w-full max-w-lg shadow-xl animate-slide-up">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white">{config.title}</h3>
+          <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Content */}
+        {config.type === 'text' && (
+          <input
+            type="text"
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={config.placeholder}
+            autoFocus
+            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+          />
+        )}
+
+        {config.type === 'number' && (
+          <div className="flex items-center justify-center gap-4 py-4">
+            <button
+              onClick={() => {
+                const next = Math.max(config.min, parseFloat(((value || config.min) - config.step).toFixed(1)));
+                onChange(next);
+              }}
+              className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-2xl font-bold flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700"
+            >
+              -
+            </button>
+            <div className="text-center">
+              <input
+                type="number"
+                step={config.step}
+                value={config.decimal ? parseFloat(value || config.min).toFixed(1) : (value || config.min)}
+                onChange={(e) => {
+                  const v = config.decimal ? parseFloat(e.target.value) : parseInt(e.target.value);
+                  if (!isNaN(v)) onChange(Math.min(config.max, Math.max(config.min, v)));
+                }}
+                className="w-24 text-center text-4xl font-bold bg-transparent text-slate-900 dark:text-white focus:outline-none"
+              />
+              <p className="text-slate-500 dark:text-slate-400 text-sm">{config.unit}</p>
+            </div>
+            <button
+              onClick={() => {
+                const next = Math.min(config.max, parseFloat(((value || config.min) + config.step).toFixed(1)));
+                onChange(next);
+              }}
+              className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-2xl font-bold flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700"
+            >
+              +
+            </button>
+          </div>
+        )}
+
+        {config.type === 'selection' && (
+          <div className="flex flex-col gap-2">
+            {config.options.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => onChange(opt.value)}
+                className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+                  value === opt.value
+                    ? 'border-primary-600 bg-primary-50 dark:bg-primary-900/20'
+                    : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark hover:border-slate-300 dark:hover:border-slate-600'
+                }`}
+              >
+                <p className={`font-semibold ${value === opt.value ? 'text-primary-700 dark:text-primary-400' : 'text-slate-900 dark:text-white'}`}>
+                  {opt.label}
+                </p>
+                {opt.desc && (
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{opt.desc}</p>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Save button */}
+        <button
+          onClick={onSave}
+          disabled={saving || (config.type === 'text' && !(value || '').trim())}
+          className="w-full mt-6 py-3.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white font-semibold rounded-2xl flex items-center justify-center gap-2 transition-colors"
+        >
+          {saving ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <>
+              <Check className="w-5 h-5" />
+              {t('common.save')}
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
