@@ -108,12 +108,84 @@ CREATE POLICY "Users can manage their own exercises"
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
 
--- 6. Trigger: Automatisch Profile + Settings bei neuer Registrierung anlegen
+-- 6. Nutrition Entries (einzelne Lebensmittel-Eintraege pro Tag/Mahlzeit)
+CREATE TABLE nutrition_entries (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  date date NOT NULL,
+  meal_slot text NOT NULL DEFAULT 'snack' CHECK (meal_slot IN ('breakfast', 'lunch', 'dinner', 'snack')),
+  food_name text NOT NULL,
+  brand text,
+  serving_size numeric NOT NULL DEFAULT 100,
+  serving_unit text NOT NULL DEFAULT 'g' CHECK (serving_unit IN ('g', 'ml', 'piece', 'portion')),
+  calories numeric NOT NULL DEFAULT 0,
+  protein numeric NOT NULL DEFAULT 0,
+  carbs numeric NOT NULL DEFAULT 0,
+  fat numeric NOT NULL DEFAULT 0,
+  fiber numeric DEFAULT 0,
+  sugar numeric DEFAULT 0,
+  source text DEFAULT 'manual' CHECK (source IN ('manual', 'openfoodfacts', 'custom_meal', 'local_db')),
+  source_id text,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE nutrition_entries ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage their own nutrition entries"
+  ON nutrition_entries FOR ALL
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
+
+CREATE INDEX idx_nutrition_entries_user_date ON nutrition_entries(user_id, date DESC);
+
+-- 7. Custom Meals (gespeicherte Mahlzeit-Vorlagen)
+CREATE TABLE custom_meals (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  name text NOT NULL,
+  items jsonb NOT NULL DEFAULT '[]'::jsonb,
+  total_calories numeric NOT NULL DEFAULT 0,
+  total_protein numeric NOT NULL DEFAULT 0,
+  total_carbs numeric NOT NULL DEFAULT 0,
+  total_fat numeric NOT NULL DEFAULT 0,
+  deleted_at timestamptz,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE custom_meals ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage their own custom meals"
+  ON custom_meals FOR ALL
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
+
+CREATE INDEX idx_custom_meals_user ON custom_meals(user_id);
+
+-- 8. Nutrition Goals (taegliche Kalorien-/Makro-Ziele, 1 Zeile pro User)
+CREATE TABLE nutrition_goals (
+  user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  calories numeric NOT NULL DEFAULT 2000,
+  protein numeric NOT NULL DEFAULT 150,
+  carbs numeric NOT NULL DEFAULT 250,
+  fat numeric NOT NULL DEFAULT 70,
+  tdee numeric,
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE nutrition_goals ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage their own nutrition goals"
+  ON nutrition_goals FOR ALL
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
+
+-- 9. Trigger: Automatisch Profile + Settings + Nutrition Goals bei neuer Registrierung anlegen
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS trigger AS $$
 BEGIN
   INSERT INTO profiles (id) VALUES (NEW.id);
   INSERT INTO user_settings (user_id) VALUES (NEW.id);
+  INSERT INTO nutrition_goals (user_id) VALUES (NEW.id);
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

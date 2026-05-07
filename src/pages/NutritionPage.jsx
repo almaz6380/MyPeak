@@ -1,36 +1,135 @@
+import { useState } from 'react';
+import DailyOverview from './nutrition/DailyOverview';
+import AddFoodEntry from './nutrition/AddFoodEntry';
+import TDEECalculator from './nutrition/TDEECalculator';
+import CustomMealsList from './nutrition/CustomMealsList';
+import CustomMealBuilder from './nutrition/CustomMealBuilder';
+import PortionPicker from './nutrition/PortionPicker';
+import { useAuth } from '../context/AuthContext';
+import { updateNutritionEntry } from '../data/nutritionStorage';
 import { useTranslation } from 'react-i18next';
-import { Apple, Plus } from 'lucide-react';
 
 export default function NutritionPage() {
-  const { t } = useTranslation();
+  const { user } = useAuth();
+  const { i18n } = useTranslation();
+  const lang = i18n.language || 'de';
 
+  const [view, setView] = useState('home');
+  const [activeMealSlot, setActiveMealSlot] = useState('breakfast');
+  const [activeDate, setActiveDate] = useState(formatDate(new Date()));
+  const [editingEntry, setEditingEntry] = useState(null);
+  const [editMeal, setEditMeal] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  function refresh() {
+    setRefreshKey((k) => k + 1);
+    setView('home');
+  }
+
+  // Add Food
+  function handleAddFood(slot, date) {
+    setActiveMealSlot(slot);
+    setActiveDate(date);
+    setView('addFood');
+  }
+
+  // Edit Entry
+  function handleEditEntry(entry) {
+    setEditingEntry(entry);
+    setView('editEntry');
+  }
+
+  async function handleUpdateEntry(foodData) {
+    if (!editingEntry) return;
+    await updateNutritionEntry(user.id, editingEntry.id, {
+      serving_size: foodData.serving_size,
+      calories: foodData.calories,
+      protein: foodData.protein,
+      carbs: foodData.carbs,
+      fat: foodData.fat,
+    });
+    setEditingEntry(null);
+    refresh();
+  }
+
+  // Views
+  if (view === 'addFood') {
+    return (
+      <AddFoodEntry
+        mealSlot={activeMealSlot}
+        date={activeDate}
+        language={lang}
+        onBack={() => setView('home')}
+        onSaved={refresh}
+      />
+    );
+  }
+
+  if (view === 'editEntry' && editingEntry) {
+    return (
+      <PortionPicker
+        food={{
+          nameDE: editingEntry.food_name,
+          nameEN: editingEntry.food_name,
+          brand: editingEntry.brand,
+          servingSize: editingEntry.serving_size,
+          servingUnit: editingEntry.serving_unit,
+          calories: calcPer100(editingEntry.calories, editingEntry.serving_size),
+          protein: calcPer100(editingEntry.protein, editingEntry.serving_size),
+          carbs: calcPer100(editingEntry.carbs, editingEntry.serving_size),
+          fat: calcPer100(editingEntry.fat, editingEntry.serving_size),
+        }}
+        language={lang}
+        initialServing={editingEntry.serving_size}
+        editMode
+        onConfirm={handleUpdateEntry}
+        onClose={() => { setEditingEntry(null); setView('home'); }}
+      />
+    );
+  }
+
+  if (view === 'tdee') {
+    return <TDEECalculator onBack={() => setView('home')} onSaved={refresh} />;
+  }
+
+  if (view === 'customMeals') {
+    return (
+      <CustomMealsList
+        onBack={() => setView('home')}
+        onCreateMeal={() => { setEditMeal(null); setView('buildMeal'); }}
+        onEditMeal={(meal) => { setEditMeal(meal); setView('buildMeal'); }}
+      />
+    );
+  }
+
+  if (view === 'buildMeal') {
+    return (
+      <CustomMealBuilder
+        editMeal={editMeal}
+        language={lang}
+        onBack={() => setView('customMeals')}
+        onSaved={() => { setEditMeal(null); setView('customMeals'); }}
+      />
+    );
+  }
+
+  // Default: Daily Overview
   return (
-    <div className="p-4 pb-24">
-      <h1 className="text-2xl font-bold mb-6">{t('nutrition.title')}</h1>
-
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-5 shadow-sm mb-4">
-        <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">{t('nutrition.today')}</h2>
-        <div className="flex justify-between text-center">
-          <MacroCircle label="kcal" value="0" max="2000" color="text-primary-500" />
-          <MacroCircle label="Protein" value="0g" max="150g" color="text-blue-500" />
-          <MacroCircle label="Carbs" value="0g" max="250g" color="text-amber-500" />
-          <MacroCircle label="Fat" value="0g" max="70g" color="text-rose-500" />
-        </div>
-      </div>
-
-      <button className="w-full border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-4 flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:border-primary-400 hover:text-primary-500 transition-colors">
-        <Plus className="w-5 h-5" />
-        {t('nutrition.meals')}
-      </button>
-    </div>
+    <DailyOverview
+      key={refreshKey}
+      onAddFood={handleAddFood}
+      onEditEntry={handleEditEntry}
+      onOpenTDEE={() => setView('tdee')}
+      onOpenCustomMeals={() => setView('customMeals')}
+    />
   );
 }
 
-function MacroCircle({ label, value, color }) {
-  return (
-    <div className="flex flex-col items-center gap-1">
-      <span className={`text-xl font-bold ${color}`}>{value}</span>
-      <span className="text-xs text-slate-500 dark:text-slate-400">{label}</span>
-    </div>
-  );
+function formatDate(date) {
+  return date.toISOString().split('T')[0];
+}
+
+function calcPer100(value, servingSize) {
+  if (!servingSize || servingSize === 0) return value;
+  return Math.round((value / servingSize) * 100 * 10) / 10;
 }
