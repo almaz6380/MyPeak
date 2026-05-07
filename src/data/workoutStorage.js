@@ -101,7 +101,7 @@ export async function getExerciseHistory(userId, exerciseId) {
   const history = [];
   for (const workout of workouts) {
     for (const exercise of workout.exercises) {
-      if (exercise.exerciseId === exerciseId) {
+      if (exercise.exerciseId === exerciseId && exercise.sets) {
         history.push({
           date: workout.date,
           sets: exercise.sets,
@@ -117,13 +117,64 @@ export async function getPersonalRecord(userId, exerciseId) {
   let maxWeight = 0;
   let maxVolume = 0;
   for (const entry of history) {
+    if (!entry.sets) continue;
     for (const set of entry.sets) {
       if (set.weight > maxWeight) maxWeight = set.weight;
-      const volume = set.weight * set.reps;
+      const volume = (set.weight || 0) * (set.reps || 0);
       if (volume > maxVolume) maxVolume = volume;
     }
   }
   return { maxWeight, maxVolume };
+}
+
+export async function getCardioRecord(userId, exerciseId) {
+  const workouts = await getWorkouts(userId);
+  let maxDistance = 0;
+  let bestPace = Infinity;
+  for (const w of workouts) {
+    if (w.type !== 'cardio') continue;
+    for (const ex of w.exercises) {
+      if (ex.exerciseId !== exerciseId) continue;
+      if (ex.distance > maxDistance) maxDistance = ex.distance;
+      if (ex.distance > 0 && ex.duration > 0) {
+        const pace = ex.duration / (ex.distance / 1000);
+        if (pace < bestPace) bestPace = pace;
+      }
+    }
+  }
+  return { maxDistance, bestPace: bestPace === Infinity ? 0 : bestPace };
+}
+
+// ── Plan Type Helper ─────────────────────────────────────
+
+export function getPlanType(plan) {
+  if (Array.isArray(plan.days)) return 'strength';
+  return plan.days?.type || 'strength';
+}
+
+export async function getCustomPlansByType(userId, type) {
+  const all = await getCustomPlans(userId);
+  return all.filter((p) => getPlanType(p) === type);
+}
+
+export async function updateCustomPlan(userId, planId, plan) {
+  const { data, error } = await supabase
+    .from('custom_plans')
+    .update({ name: plan.name, days: plan.days })
+    .eq('id', planId)
+    .eq('user_id', userId)
+    .select()
+    .single();
+
+  // Update localStorage cache
+  const cached = JSON.parse(localStorage.getItem('customPlans') || '[]');
+  const idx = cached.findIndex((p) => p.id === planId);
+  if (idx >= 0) {
+    cached[idx] = { id: planId, name: plan.name, days: plan.days };
+    localStorage.setItem('customPlans', JSON.stringify(cached));
+  }
+
+  return { data, error };
 }
 
 // ── Custom Plans ──────────────────────────────────────────

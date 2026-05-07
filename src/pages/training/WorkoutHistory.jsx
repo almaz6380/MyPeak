@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Calendar, Dumbbell, TrendingUp, ChevronDown, ChevronUp, GitCompareArrows, X, ArrowUpRight, ArrowDownRight, Minus, Loader2, Trash2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Dumbbell, TrendingUp, ChevronDown, ChevronUp, GitCompareArrows, X, ArrowUpRight, ArrowDownRight, Minus, Loader2, Trash2, BarChart3 } from 'lucide-react';
 import { getWorkouts, deleteWorkout } from '../../data/workoutStorage';
 import { useAuth } from '../../context/AuthContext';
+import { getExerciseById } from '../../data/exercises';
+import MuscleGroupIcon from '../../components/icons/MuscleGroupIcon';
+import useProgressComparison from '../../hooks/useProgressComparison';
+import ExerciseLineGraph from '../../components/progress/ExerciseLineGraph';
 
 export default function WorkoutHistory({ onBack }) {
   const { t } = useTranslation();
@@ -24,6 +28,9 @@ export default function WorkoutHistory({ onBack }) {
   const [compareSelection, setCompareSelection] = useState([]);
   const [showComparison, setShowComparison] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [graphExercise, setGraphExercise] = useState(null);
+  const progress = useProgressComparison(user?.id);
+  const weeklyWorkouts = progress.getWorkoutsByWeek();
 
   const handleDeleteWorkout = async (workoutId) => {
     await deleteWorkout(user.id, workoutId);
@@ -47,14 +54,16 @@ export default function WorkoutHistory({ onBack }) {
   const totalVolume = (exercises) => {
     let vol = 0;
     for (const ex of exercises) {
+      if (!ex.sets) continue;
       for (const set of ex.sets) {
-        vol += set.weight * set.reps;
+        vol += (set.weight || 0) * (set.reps || 0);
       }
     }
     return vol.toLocaleString();
   };
 
   const bestSet = (sets) => {
+    if (!sets || sets.length === 0) return null;
     let best = sets[0];
     for (const s of sets) {
       if (s.weight > best.weight || (s.weight === best.weight && s.reps > best.reps)) {
@@ -209,6 +218,46 @@ export default function WorkoutHistory({ onBack }) {
     );
   }
 
+  // Exercise graph view
+  if (graphExercise) {
+    const weeklyData = progress.getWeeklyHistory(graphExercise.exerciseId);
+    const graphData = weeklyData.map((w) => ({
+      label: w.week.split('-W')[1],
+      value: w.maxWeight,
+    }));
+
+    return (
+      <div className="p-4 pb-24">
+        <div className="flex items-center gap-3 mb-6">
+          <button onClick={() => setGraphExercise(null)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-2xl font-bold">{t(graphExercise.nameKey)}</h1>
+        </div>
+
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+          <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">
+            {t('training.exerciseGraph')} — {t('training.maxWeightLabel')} ({t(`training.${weightUnit}`)})
+          </h2>
+          <ExerciseLineGraph data={graphData} unit={t(`training.${weightUnit}`)} />
+        </div>
+
+        {/* Weekly breakdown */}
+        <div className="flex flex-col gap-2">
+          {weeklyData.slice().reverse().map((w, i) => (
+            <div key={i} className="bg-white dark:bg-surface-dark-alt rounded-xl p-3 shadow-sm flex items-center justify-between">
+              <span className="text-sm font-medium">{t('training.calendarWeek', { week: w.week.split('-W')[1] })}</span>
+              <div className="flex items-center gap-3 text-sm">
+                <span className="font-semibold">{w.maxWeight} {t(`training.${weightUnit}`)}</span>
+                <span className="text-xs text-slate-400">{t('training.totalVolume')}: {w.totalVolume.toLocaleString()}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 pb-24">
       <div className="flex items-center gap-3 mb-6">
@@ -254,8 +303,20 @@ export default function WorkoutHistory({ onBack }) {
           <p>{t('training.noHistory')}</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
-          {workouts.map((workout) => {
+        <div className="flex flex-col gap-4">
+          {weeklyWorkouts.map((week) => (
+            <div key={week.weekYear}>
+              {/* Week header */}
+              <div className="flex items-center justify-between mb-2 px-1">
+                <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">
+                  {t('training.calendarWeek', { week: week.weekNumber })}
+                </span>
+                <span className="text-xs text-slate-400">
+                  {week.start.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} – {week.end.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                </span>
+              </div>
+              <div className="flex flex-col gap-3">
+          {week.workouts.map((workout) => {
             const isExpanded = expandedId === workout.id;
             const isSelected = compareSelection.includes(workout.id);
 
@@ -299,19 +360,39 @@ export default function WorkoutHistory({ onBack }) {
 
                   {/* Summary line */}
                   <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-                    <span>{workout.exercises.length} {t('training.exercises')}</span>
-                    <span>·</span>
-                    <span>{t('training.totalVolume')}: {totalVolume(workout.exercises)} {t(`training.${weightUnit}`)}</span>
+                    {(!workout.type || workout.type === 'strength') ? (
+                      <>
+                        <span>{workout.exercises.length} {t('training.exercises')}</span>
+                        <span>·</span>
+                        <span>{t('training.totalVolume')}: {totalVolume(workout.exercises)} {t(`training.${weightUnit}`)}</span>
+                      </>
+                    ) : workout.type === 'cardio' ? (
+                      <>
+                        <span>{t('training.cardio')}</span>
+                        <span>·</span>
+                        <span>{workout.exercises[0]?.distance ? `${workout.exercises[0].distance} ${t('training.distanceKm')}` : ''}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>{t(`training.${workout.type}`)}</span>
+                        <span>·</span>
+                        <span>{workout.exercises[0]?.rounds || '?'} {t('training.rounds')}</span>
+                      </>
+                    )}
                   </div>
 
                   {/* Compact exercise list (collapsed) */}
                   {!isExpanded && (
                     <div className="mt-2 flex flex-wrap gap-1.5">
-                      {workout.exercises.map((ex, i) => (
-                        <span key={i} className="text-xs bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-md">
-                          {t(ex.nameKey)}
-                        </span>
-                      ))}
+                      {workout.exercises.map((ex, i) => {
+                        const exData = getExerciseById(ex.exerciseId);
+                        return (
+                          <span key={i} className="text-xs bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                            <MuscleGroupIcon group={exData?.muscleGroup} size={14} className="text-primary-400" />
+                            {t(ex.nameKey)}
+                          </span>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -322,14 +403,37 @@ export default function WorkoutHistory({ onBack }) {
                     <div className="flex flex-col gap-3">
                       {workout.exercises.map((ex, i) => {
                         const best = bestSet(ex.sets);
+                        const isStrength = ex.sets && ex.sets.length > 0;
                         return (
                           <div key={i}>
                             <div className="flex items-center justify-between mb-1.5">
-                              <span className="font-medium text-sm">{t(ex.nameKey)}</span>
-                              <span className="text-xs text-primary-500 font-medium">
-                                {t('training.bestSet')}: {best.weight}{t(`training.${weightUnit}`)} x {best.reps}
-                              </span>
+                              <button onClick={(e) => { e.stopPropagation(); setGraphExercise({ exerciseId: ex.exerciseId, nameKey: ex.nameKey }); }} className="font-medium text-sm flex items-center gap-1.5 hover:text-primary-500 transition-colors">
+                                <MuscleGroupIcon group={(getExerciseById(ex.exerciseId) || {}).muscleGroup || workout.type} size={16} className="text-primary-400" />
+                                {t(ex.nameKey)}
+                                <BarChart3 className="w-3 h-3 text-slate-400" />
+                              </button>
+                              {isStrength && best && (
+                                <span className="text-xs text-primary-500 font-medium">
+                                  {t('training.bestSet')}: {best.weight}{t(`training.${weightUnit}`)} x {best.reps}
+                                </span>
+                              )}
                             </div>
+                            {/* Cardio details */}
+                            {ex.duration != null && !isStrength && (
+                              <div className="flex gap-4 text-xs text-slate-600 dark:text-slate-400">
+                                <span>{Math.floor(ex.duration / 60)} {t('training.min')}</span>
+                                {ex.distance > 0 && <span>{ex.distance} {t('training.distanceKm')}</span>}
+                              </div>
+                            )}
+                            {/* HIIT/Circuit details */}
+                            {ex.rounds != null && (
+                              <div className="flex gap-4 text-xs text-slate-600 dark:text-slate-400">
+                                <span>{ex.rounds} {t('training.rounds')}</span>
+                                <span>{ex.workTime}s {t('training.work')} / {ex.restTime}s {t('training.rest')}</span>
+                              </div>
+                            )}
+                            {/* Strength set details */}
+                            {isStrength && (
                             <div className="grid grid-cols-[2rem_1fr_1fr] gap-1 text-xs">
                               <span className="text-slate-400 text-center font-medium">#</span>
                               <span className="text-slate-400 text-center">{t('training.weight')}</span>
@@ -342,6 +446,7 @@ export default function WorkoutHistory({ onBack }) {
                                 </div>
                               ))}
                             </div>
+                            )}
                           </div>
                         );
                       })}
@@ -351,6 +456,9 @@ export default function WorkoutHistory({ onBack }) {
               </div>
             );
           })}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

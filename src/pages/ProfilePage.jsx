@@ -15,6 +15,7 @@ export default function ProfilePage() {
   const [editField, setEditField] = useState(null); // which field is being edited
   const [editValue, setEditValue] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'de' ? 'en' : 'de';
@@ -43,15 +44,22 @@ export default function ProfilePage() {
     setEditField(null);
     setEditValue(null);
     setSaving(false);
+    setSaveError(null);
   };
 
   const saveEdit = async () => {
     if (!user || editField === null) return;
     setSaving(true);
-    await supabase
+    setSaveError(null);
+    const { error } = await supabase
       .from('profiles')
       .update({ [editField]: editValue, updated_at: new Date().toISOString() })
       .eq('id', user.id);
+    if (error) {
+      setSaveError(error.message);
+      setSaving(false);
+      return;
+    }
     await refreshProfile();
     closeEdit();
   };
@@ -233,6 +241,7 @@ export default function ProfilePage() {
           onSave={saveEdit}
           onClose={closeEdit}
           saving={saving}
+          error={saveError}
           t={t}
         />
       )}
@@ -267,7 +276,7 @@ function SettingRow({ icon, label, action, last = false }) {
   );
 }
 
-function EditModal({ field, value, onChange, onSave, onClose, saving, t }) {
+function EditModal({ field, value, onChange, onSave, onClose, saving, error, t }) {
   const fieldConfig = {
     name: { type: 'text', title: t('profile.editName'), placeholder: t('onboarding.namePlaceholder') },
     gender: {
@@ -315,10 +324,10 @@ function EditModal({ field, value, onChange, onSave, onClose, saving, t }) {
   if (!config) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-end justify-center z-50">
-      <div className="bg-white dark:bg-surface-dark-alt rounded-t-3xl p-6 w-full max-w-lg shadow-xl animate-slide-up">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl w-full max-w-sm shadow-xl max-h-[80vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 shrink-0">
           <h3 className="text-lg font-bold text-slate-900 dark:text-white">{config.title}</h3>
           <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
             <X className="w-5 h-5" />
@@ -326,91 +335,95 @@ function EditModal({ field, value, onChange, onSave, onClose, saving, t }) {
         </div>
 
         {/* Content */}
-        {config.type === 'text' && (
-          <input
-            type="text"
-            value={value || ''}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={config.placeholder}
-            autoFocus
-            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          />
-        )}
-
-        {config.type === 'number' && (
-          <div className="flex items-center justify-center gap-4 py-4">
-            <button
-              onClick={() => {
-                const next = Math.max(config.min, parseFloat(((value || config.min) - config.step).toFixed(1)));
-                onChange(next);
-              }}
-              className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-2xl font-bold flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700"
-            >
-              -
-            </button>
-            <div className="text-center">
-              <input
-                type="number"
-                step={config.step}
-                value={config.decimal ? parseFloat(value || config.min).toFixed(1) : (value || config.min)}
-                onChange={(e) => {
-                  const v = config.decimal ? parseFloat(e.target.value) : parseInt(e.target.value);
-                  if (!isNaN(v)) onChange(Math.min(config.max, Math.max(config.min, v)));
-                }}
-                className="w-24 text-center text-4xl font-bold bg-transparent text-slate-900 dark:text-white focus:outline-none"
-              />
-              <p className="text-slate-500 dark:text-slate-400 text-sm">{config.unit}</p>
-            </div>
-            <button
-              onClick={() => {
-                const next = Math.min(config.max, parseFloat(((value || config.min) + config.step).toFixed(1)));
-                onChange(next);
-              }}
-              className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-2xl font-bold flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700"
-            >
-              +
-            </button>
-          </div>
-        )}
-
-        {config.type === 'selection' && (
-          <div className="flex flex-col gap-2">
-            {config.options.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => onChange(opt.value)}
-                className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
-                  value === opt.value
-                    ? 'border-primary-600 bg-primary-50 dark:bg-primary-900/20'
-                    : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark hover:border-slate-300 dark:hover:border-slate-600'
-                }`}
-              >
-                <p className={`font-semibold ${value === opt.value ? 'text-primary-700 dark:text-primary-400' : 'text-slate-900 dark:text-white'}`}>
-                  {opt.label}
-                </p>
-                {opt.desc && (
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{opt.desc}</p>
-                )}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Save button */}
-        <button
-          onClick={onSave}
-          disabled={saving || (config.type === 'text' && !(value || '').trim())}
-          className="w-full mt-6 py-3.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white font-semibold rounded-2xl flex items-center justify-center gap-2 transition-colors"
-        >
-          {saving ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <>
-              <Check className="w-5 h-5" />
-              {t('common.save')}
-            </>
+        <div className="px-6 overflow-y-auto flex-1 min-h-0">
+          {config.type === 'text' && (
+            <input
+              type="text"
+              value={value || ''}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder={config.placeholder}
+              autoFocus
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
           )}
-        </button>
+
+          {config.type === 'number' && (
+            <div className="flex items-center justify-center gap-4 py-4">
+              <button
+                onClick={() => {
+                  const next = Math.max(config.min, parseFloat(((value || config.min) - config.step).toFixed(1)));
+                  onChange(next);
+                }}
+                className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-2xl font-bold flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700"
+              >
+                -
+              </button>
+              <div className="text-center">
+                <input
+                  type="number"
+                  step={config.step}
+                  value={config.decimal ? parseFloat(value || config.min).toFixed(1) : (value || config.min)}
+                  onChange={(e) => {
+                    const v = config.decimal ? parseFloat(e.target.value) : parseInt(e.target.value);
+                    if (!isNaN(v)) onChange(Math.min(config.max, Math.max(config.min, v)));
+                  }}
+                  className="w-24 text-center text-4xl font-bold bg-transparent text-slate-900 dark:text-white focus:outline-none"
+                />
+                <p className="text-slate-500 dark:text-slate-400 text-sm">{config.unit}</p>
+              </div>
+              <button
+                onClick={() => {
+                  const next = Math.min(config.max, parseFloat(((value || config.min) + config.step).toFixed(1)));
+                  onChange(next);
+                }}
+                className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-2xl font-bold flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700"
+              >
+                +
+              </button>
+            </div>
+          )}
+
+          {config.type === 'selection' && (
+            <div className="flex flex-col gap-2">
+              {config.options.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => onChange(opt.value)}
+                  className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
+                    value === opt.value
+                      ? 'border-primary-600 bg-primary-50 dark:bg-primary-900/20'
+                      : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark hover:border-slate-300 dark:hover:border-slate-600'
+                  }`}
+                >
+                  <p className={`font-semibold ${value === opt.value ? 'text-primary-700 dark:text-primary-400' : 'text-slate-900 dark:text-white'}`}>
+                    {opt.label}
+                  </p>
+                  {opt.desc && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{opt.desc}</p>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Save button — always visible */}
+        <div className="px-6 pt-4 pb-6 shrink-0">
+          <button
+            onClick={onSave}
+            disabled={saving || (config.type === 'text' && !(value || '').trim())}
+            className="w-full py-3.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white font-semibold rounded-2xl flex items-center justify-center gap-2 transition-colors"
+          >
+            {saving ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <>
+                <Check className="w-5 h-5" />
+                {t('common.save')}
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

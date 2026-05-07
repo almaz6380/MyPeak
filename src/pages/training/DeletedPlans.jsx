@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, RotateCcw, Loader2, Trash2 } from 'lucide-react';
 import { getDeletedCustomPlans, restoreCustomPlan, permanentDeleteCustomPlan } from '../../data/workoutStorage';
 import { getHiddenDefaultPlans, restoreDefaultPlan, permanentDeleteDefaultPlan, getPermanentDeletedDefaultPlans } from '../../data/settingsStorage';
-import { defaultPlans } from './TrainingPlans';
+import { allDefaultPlans } from '../../data/defaultPlans';
+import { getPlanType } from '../../data/workoutStorage';
 import { useAuth } from '../../context/AuthContext';
 
 export default function DeletedPlans({ onBack }) {
@@ -26,7 +27,7 @@ export default function DeletedPlans({ onBack }) {
     }
   }, [user]);
 
-  const hiddenDefaults = defaultPlans.filter((p) => hiddenDefaultIds.includes(p.id));
+  const hiddenDefaults = allDefaultPlans.filter((p) => hiddenDefaultIds.includes(p.id));
 
   const handleRestoreCustom = async (planId) => {
     await restoreCustomPlan(user.id, planId);
@@ -79,7 +80,10 @@ export default function DeletedPlans({ onBack }) {
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-lg truncate">{plan.name}</h3>
                   <p className="text-sm text-slate-500 dark:text-slate-400">
-                    {plan.days.length} {plan.days.length === 1 ? 'Tag' : 'Tage'}
+                    {Array.isArray(plan.days)
+                      ? `${plan.days.length} ${plan.days.length === 1 ? 'Tag' : 'Tage'}`
+                      : (plan.days?.type || 'strength').toUpperCase()
+                    }
                   </p>
                 </div>
                 <div className="flex items-center gap-2 ml-3 flex-shrink-0">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Search } from 'lucide-react';
 import exercises, { muscleGroups } from '../../data/exercises';
+import MuscleGroupIcon from '../../components/icons/MuscleGroupIcon';
 
 export default function ExerciseLibrary({ onBack, onSelect, selectionMode = false }) {
   const { t } = useTranslation();
@@ -75,11 +76,16 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
             }`}
           >
             <div className="flex items-center justify-between">
-              <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{t(ex.nameKey)}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  {t(`muscleGroups.${ex.muscleGroup}`)} · {t(`equipment.${ex.equipment}`)}
-                </p>
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center flex-shrink-0">
+                  <MuscleGroupIcon group={ex.muscleGroup || ex.type} size={24} className="text-primary-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate">{t(ex.nameKey)}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    {t(`muscleGroups.${ex.muscleGroup}`)} · {t(`equipment.${ex.equipment}`)}
+                  </p>
+                </div>
               </div>
               {selectionMode && (
                 <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 ml-3 flex items-center justify-center ${
