@@ -5,9 +5,11 @@
 Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Tracking in einer einzigen, übersichtlichen App vereint. Die App soll trotz vieler Features einfach zu bedienen und nicht überfüllt sein.
 
 **App-Name:** MyPeak
+**Live-URL:** https://my-peak.vercel.app
+**Git-Repository:** https://github.com/almaz6380/MyPeak
 **Zielplattform:** Web-App → PWA → später App Store (iOS + Android)
 **Sprachen:** Mehrsprachig (Deutsch + Englisch)
-**Geschäftsmodell:** Kostenlos mit Premium-Features (Freemium)
+**Geschäftsmodell:** Freemium mit 7 Tagen kostenloser Testphase
 **Zielgruppe:** Fitnessstudio-Besucher (Geräte + freie Gewichte), Anfänger bis Fortgeschrittene
 
 ---
@@ -29,19 +31,20 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Onboarding-Daten werden in Supabase `profiles`-Tabelle gespeichert
 - [x] Automatische Weiterleitung zur Haupt-App nach Onboarding
 - [x] Trigger erstellt automatisch Profile + Settings bei neuer Registrierung
+- [x] Profil mit allen Daten änderbar (Gewicht, Größe, Ziel etc.)
 
 ### Phase 2: Training-Tracking — FERTIG
-- [x] Übungsbibliothek mit 34 Übungen (Beschreibungen, Muskelgruppe, Equipment)
-- [x] Workout starten: Auswahl zwischen Trainingsplan oder freiem Workout
-- [x] Vorgefertigte Trainingspläne (Push/Pull/Legs, Upper/Lower, 5er-Split) mit voreingestellten Sätzen/Wdh
+- [x] Übungsbibliothek mit Beschreibungen, Muskelgruppe, Equipment
+- [x] Krafttraining: Sätze/Wiederholungen/Gewicht loggen mit Echtzeit-Timer
+- [x] Cardio/HIIT/Zirkeltraining/Kampfsport mit Timer-System
+- [x] Vorgefertigte Trainingspläne für alle Trainingsbereiche
 - [x] Eigene Trainingspläne erstellen, speichern und löschen
-- [x] Sätze/Wiederholungen/Gewicht loggen mit Echtzeit-Timer
+- [x] Workout starten: Auswahl zwischen Trainingsplan oder freiem Workout
 - [x] Workout beenden (speichert) vs. Workout verwerfen (löscht) — klar getrennte Aktionen
-- [x] Leeres Workout nach Beenden optional als neuen Plan speichern
 - [x] Während des Workouts jederzeit Übungen hinzufügen/entfernen
 - [x] PR-Erkennung (Neuer persönlicher Rekord)
 - [x] Workout-Verlauf mit aufklappbaren Details (alle Sätze pro Übung)
-- [x] Workout-Vergleichsfunktion (2 Workouts nebeneinander, Fortschritt pro Übung mit +/- kg)
+- [x] Workout-Vergleichsfunktion (wird später überarbeitet)
 - [x] Muskelgruppen-Filter und Suchfunktion in der Übungsbibliothek
 
 ### Phase 3–6: Noch offen (siehe Bauplan unten)
@@ -54,6 +57,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - **Styling:** Tailwind CSS (Mobile-first)
 - **i18n:** react-i18next (DE + EN)
 - **Backend:** Supabase (Auth + PostgreSQL-Datenbank)
+- **Hosting:** Vercel (automatisches Deployment über GitHub)
 - **Datenspeicherung:** Supabase (Cloud) + localStorage (Cache/Fallback)
 - **Icons:** Lucide React
 - **Schrift:** Inter (Google Fonts)
@@ -161,23 +165,33 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 
 ### Phase 2: Training-Tracking (Kernfeature) — FERTIG
 - [x] Übungsbibliothek mit Beschreibungen
+- [x] Krafttraining: Sätze/Wiederholungen/Gewicht loggen mit Timer
+- [x] Cardio/HIIT/Zirkeltraining/Kampfsport mit Timer-System
 - [x] Workout starten: Plan wählen oder freies Workout mit eigener Übungsauswahl
 - [x] Trainingshistorie mit aufklappbaren Details + Vergleichsfunktion
 - [x] Progress-Erkennung und PR-Anzeige
-- [x] Vorgefertigte Trainingspläne mit voreingestellten Sätzen/Wdh
+- [x] Vorgefertigte Trainingspläne für alle Trainingsbereiche
 - [x] Eigene Trainingspläne erstellen, speichern, löschen
 - [ ] Eigene Übungen erstellen (UI vorhanden, Speicherlogik im Storage bereit)
 - [ ] Notizen und Bilder pro Übung
-- [ ] Bewertungssystem für Übungen
+- [ ] YouTube-Videos bei Übungen einbetten (Ausführung zeigen)
+- [ ] Vergleichssystem Design überarbeiten
 
 ### Phase 3: Ernährungs-Tracking — OFFEN
+- [ ] Lebensmittel-Suche (Datenbank)
 - [ ] Mahlzeiten manuell eingeben
 - [ ] Eigene Meals erstellen und speichern
 - [ ] Tägliche Kalorien- und Makro-Übersicht
 - [ ] TDEE-/Kalorienverbrauch-Rechner
 - [ ] Barcode-Scanner (Premium)
+- [ ] Foto von Nährwerttabelle per KI auslesen (Premium)
+- [ ] Fehlende Barcode-Produkte an Open Food Facts übermitteln
 - [ ] KI-Ernährungsplan (Premium)
-- [ ] Kochbuch / Rezeptsammlung
+
+### Phase 3.5: KI-Coach — OFFEN (nur Premium)
+- [ ] KI-Coach mit gestuftem Modell-Einsatz (Haiku für einfache Fragen, besseres Modell für komplexe)
+- [ ] Blutwerte-Einordnung mit Arzt-Hinweis
+- [ ] Abo-Modell mit 7 Tagen kostenloser Testphase
 
 ### Phase 4: Wissensbibliothek — OFFEN
 - [ ] Block: Training-Wissen
@@ -197,27 +211,21 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 
 ---
 
-## Bekannte Bugs & offene Verbesserungen
+## Offene Verbesserungen & nächste Schritte
 
-### UI/UX-Fixes
-- [ ] "Leeres Workout" umbenennen in "Freies Workout" (überall in der App + Übersetzungen)
-- [ ] Vorgefertigte Trainingspläne dürfen NICHT löschbar sein (nur eigene Pläne löschbar)
-- [ ] Abgeschlossene Trainings im Verlauf löschbar machen (mit Bestätigungsdialog)
-- [ ] Gewicht im Onboarding soll Dezimalzahlen erlauben (z.B. 75,5 kg)
-
-### Neue Features (Phase 2 Erweiterungen)
-- [ ] Cardio/HIIT/Zirkeltraining als Trainingsarten hinzufügen
-- [ ] Bilder/Illustrationen bei Übungen in der Bibliothek hinzufügen
-- [ ] YouTube-Videos bei Übungen einbetten (Ausführung zeigen)
+### Phase 2 Erweiterungen
+- [ ] YouTube-Videos bei Übungen einbetten
 - [ ] Individuelle Notizen pro Übung (z.B. Geräte-Einstellungen, persönliche Tipps)
+- [ ] Vergleichssystem Design überarbeiten
+- [ ] Eigene Übungen erstellen
 
 ### Backend/Infrastruktur
 - [ ] Bestätigungs-E-Mail anpassen (eigenes Design) — erfordert Custom SMTP in Supabase
 
 ### Empfohlene nächste Schritte
-1. **Bugs fixen:** UI/UX-Fixes aus der Liste oben
-2. **Phase 2 erweitern:** Cardio, Bilder, Videos, Notizen
-3. **Phase 3 starten:** Ernährungs-Tracking (Mahlzeiten eingeben, Makro-Übersicht mit Tageszielen)
+1. **Phase 3 starten:** Ernährungs-Tracking (Lebensmittel-Suche, Barcode-Scanner, Makro-Übersicht)
+2. **KI-Coach:** Premium-Feature mit gestuftem Modell-Einsatz
+3. **Abo-Modell:** Freemium mit 7 Tagen kostenloser Testphase
 4. **Phase 4 starten:** Wissensbibliothek mit Inhalten füllen
 
 ---
@@ -232,12 +240,13 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 - Wissensbibliothek
 - Progress-Tracking
 
-**Premium (monatliches Abo):**
+**Premium (monatliches Abo, 7 Tage kostenlose Testphase):**
+- KI-Coach (Haiku für einfache Fragen, besseres Modell für komplexe)
+- Blutwerte-Einordnung (mit Arzt-Hinweis)
 - Barcode-Scanner
+- Foto von Nährwerttabelle per KI auslesen
 - KI-Ernährungsplan
-- KI-Übungsvideos
 - Detaillierte Analysen und Statistiken
-- Kochbuch / Rezeptsammlung
 
 ---
 
