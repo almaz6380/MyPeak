@@ -212,7 +212,8 @@
     "barcodeNotFoundDesc": "This barcode is not in the database. You can enter the product manually.",
     "scanAgain": "Scan again",
     "cameraError": "Camera error",
-    "cameraPermissionDenied": "Camera access was denied. Please allow access in your browser settings."
+    "cameraPermissionDenied": "Camera access was denied. Please allow access in your browser settings.",
+    "noCameraFound": "No camera found. Please make sure your device has a camera."
   },
   "library": {
     "title": "Library",

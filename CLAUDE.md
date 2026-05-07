@@ -47,7 +47,23 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Workout-Vergleichsfunktion (wird später überarbeitet)
 - [x] Muskelgruppen-Filter und Suchfunktion in der Übungsbibliothek
 
-### Phase 3–6: Noch offen (siehe Bauplan unten)
+### Phase 3: Ernährungs-Tracking — FERTIG
+- [x] Lebensmittel-Suche (150 lokale Lebensmittel + Open Food Facts API)
+- [x] Mahlzeiten manuell eingeben (Name, Marke, Portion, Makros)
+- [x] Eigene Meals erstellen, speichern, bearbeiten und löschen (Soft-Delete)
+- [x] Tägliche Kalorien- und Makro-Übersicht mit SVG-Ringen (kcal, Protein, Carbs, Fat)
+- [x] TDEE-Rechner (Mifflin-St Jeor Formel, vorbefüllt mit Profildaten)
+- [x] Makro-Ziele manuell editierbar (nicht nur über TDEE)
+- [x] Barcode-Scanner per Kamera (html5-qrcode + Open Food Facts API)
+- [x] 4 Mahlzeit-Slots (Frühstück, Mittagessen, Abendessen, Snacks)
+- [x] Zuletzt verwendete Lebensmittel für Schnellzugriff
+- [x] Custom Calendar für Datumsauswahl (kein nativer Browser-Picker)
+- [x] Farbcodierte Makro-Badges bei jedem Eintrag (P/C/F als Pills)
+- [x] PortionPicker mit Live-Makro-Berechnung und +/- Buttons
+- [x] Supabase-Tabellen: nutrition_entries, custom_meals, nutrition_goals
+- [x] Vollständige DE/EN Übersetzungen (~70 Keys)
+
+### Phase 3.5–6: Noch offen (siehe Bauplan unten)
 
 ---
 
@@ -59,6 +75,8 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - **Backend:** Supabase (Auth + PostgreSQL-Datenbank)
 - **Hosting:** Vercel (automatisches Deployment über GitHub)
 - **Datenspeicherung:** Supabase (Cloud) + localStorage (Cache/Fallback)
+- **Barcode-Scanner:** html5-qrcode (Open Source, kamerabaisert)
+- **Lebensmittel-API:** Open Food Facts (kostenlos, keine API-Keys)
 - **Icons:** Lucide React
 - **Schrift:** Inter (Google Fonts)
 
@@ -78,10 +96,22 @@ src/
 │       ├── ExerciseLibrary.jsx   # Übungsbibliothek mit Filter + Suche
 │       ├── TrainingPlans.jsx     # Vorgefertigte + eigene Pläne
 │       └── WorkoutHistory.jsx    # Verlauf mit Details + Vergleichsfunktion
+│   └── nutrition/
+│       ├── DailyOverview.jsx     # Tagesansicht mit Makro-Ringen + Mahlzeit-Slots
+│       ├── AddFoodEntry.jsx      # Food-Eingabe-Flow (Suche, Scanner, Manuell)
+│       ├── FoodSearch.jsx        # Suche lokal + Open Food Facts API
+│       ├── PortionPicker.jsx     # Portionsgröße mit Live-Makro-Berechnung
+│       ├── BarcodeScanner.jsx    # Kamera-basierter Barcode-Scanner
+│       ├── MacroRing.jsx         # SVG-Kreisdiagramm für Makros
+│       ├── TDEECalculator.jsx    # TDEE-Rechner (Mifflin-St Jeor)
+│       ├── CustomMealsList.jsx   # Gespeicherte Mahlzeiten verwalten
+│       └── CustomMealBuilder.jsx # Mahlzeit aus mehreren Foods zusammenstellen
 ├── data/
 │   ├── exercises.js              # 34 Übungen mit Muskelgruppe + Equipment
 │   ├── workoutStorage.js         # Supabase CRUD für Workouts + Migration von localStorage
-│   └── settingsStorage.js        # Supabase CRUD für User-Settings
+│   ├── settingsStorage.js        # Supabase CRUD für User-Settings
+│   ├── nutritionStorage.js       # Supabase CRUD für Nutrition (Entries, Meals, Goals)
+│   └── foodDatabase.js           # 150 lokale Lebensmittel + Open Food Facts API
 ├── lib/
 │   └── supabase.js               # Supabase Client (URL + Anon Key aus .env)
 ├── i18n/
@@ -101,6 +131,9 @@ src/
 - **workouts** — Workout-Verlauf (exercises als JSONB)
 - **custom_plans** — Eigene Trainingspläne (days als JSONB)
 - **custom_exercises** — Eigene Übungen
+- **nutrition_entries** — Lebensmittel-Einträge pro Tag/Mahlzeit (date, meal_slot, food_name, serving_size, calories, protein, carbs, fat, source)
+- **custom_meals** — Gespeicherte Mahlzeit-Vorlagen (name, items als JSONB, Gesamtmakros, Soft-Delete)
+- **nutrition_goals** — Tägliche Kalorien-/Makro-Ziele pro User (1 Zeile, Upsert)
 
 ---
 
@@ -177,13 +210,17 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 - [ ] YouTube-Videos bei Übungen einbetten (Ausführung zeigen)
 - [ ] Vergleichssystem Design überarbeiten
 
-### Phase 3: Ernährungs-Tracking — OFFEN
-- [ ] Lebensmittel-Suche (Datenbank)
-- [ ] Mahlzeiten manuell eingeben
-- [ ] Eigene Meals erstellen und speichern
-- [ ] Tägliche Kalorien- und Makro-Übersicht
-- [ ] TDEE-/Kalorienverbrauch-Rechner
-- [ ] Barcode-Scanner (Premium)
+### Phase 3: Ernährungs-Tracking — FERTIG
+- [x] Lebensmittel-Suche (150 lokale Foods + Open Food Facts API)
+- [x] Mahlzeiten manuell eingeben
+- [x] Eigene Meals erstellen und speichern
+- [x] Tägliche Kalorien- und Makro-Übersicht (SVG-Ringe)
+- [x] TDEE-/Kalorienverbrauch-Rechner (Mifflin-St Jeor)
+- [x] Makro-Ziele manuell editierbar
+- [x] Barcode-Scanner per Kamera (html5-qrcode + Open Food Facts)
+- [x] Custom Calendar für Datumsauswahl
+- [x] Zuletzt verwendete Lebensmittel
+- [x] Farbcodierte Makro-Badges (P/C/F Pills)
 - [ ] Foto von Nährwerttabelle per KI auslesen (Premium)
 - [ ] Fehlende Barcode-Produkte an Open Food Facts übermitteln
 - [ ] KI-Ernährungsplan (Premium)
@@ -223,8 +260,8 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 - [ ] Bestätigungs-E-Mail anpassen (eigenes Design) — erfordert Custom SMTP in Supabase
 
 ### Empfohlene nächste Schritte
-1. **Phase 3 starten:** Ernährungs-Tracking (Lebensmittel-Suche, Barcode-Scanner, Makro-Übersicht)
-2. **KI-Coach:** Premium-Feature mit gestuftem Modell-Einsatz
+1. **Phase 3 Erweiterungen:** Foto-KI für Nährwerttabellen, KI-Ernährungsplan
+2. **Phase 3.5 starten:** KI-Coach (Premium-Feature mit gestuftem Modell-Einsatz)
 3. **Abo-Modell:** Freemium mit 7 Tagen kostenloser Testphase
 4. **Phase 4 starten:** Wissensbibliothek mit Inhalten füllen
 
@@ -243,7 +280,6 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 **Premium (monatliches Abo, 7 Tage kostenlose Testphase):**
 - KI-Coach (Haiku für einfache Fragen, besseres Modell für komplexe)
 - Blutwerte-Einordnung (mit Arzt-Hinweis)
-- Barcode-Scanner
 - Foto von Nährwerttabelle per KI auslesen
 - KI-Ernährungsplan
 - Detaillierte Analysen und Statistiken
@@ -270,5 +306,5 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 - Affiliate-Links müssen als Werbung gekennzeichnet sein
 - Einheiten (kg/Pfund, kcal/kJ) müssen umschaltbar sein
 - Übersetzungen: Korrekte Umlaute verwenden (ä, ö, ü), NICHT ae, oe, ue
-- Supabase-Tabellen: workouts, custom_plans, custom_exercises, profiles, user_settings
+- Supabase-Tabellen: workouts, custom_plans, custom_exercises, profiles, user_settings, nutrition_entries, custom_meals, nutrition_goals
 - Umgebungsvariablen: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY (in .env)

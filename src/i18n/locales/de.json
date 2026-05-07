@@ -212,7 +212,8 @@
     "barcodeNotFoundDesc": "Dieser Barcode ist nicht in der Datenbank. Du kannst das Produkt manuell eingeben.",
     "scanAgain": "Nochmal scannen",
     "cameraError": "Kamera-Fehler",
-    "cameraPermissionDenied": "Kamerazugriff wurde verweigert. Bitte erlaube den Zugriff in deinen Browser-Einstellungen."
+    "cameraPermissionDenied": "Kamerazugriff wurde verweigert. Bitte erlaube den Zugriff in deinen Browser-Einstellungen.",
+    "noCameraFound": "Keine Kamera gefunden. Bitte stelle sicher, dass dein Gerät eine Kamera hat."
   },
   "library": {
     "title": "Bibliothek",
