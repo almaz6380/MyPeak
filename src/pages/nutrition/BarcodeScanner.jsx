@@ -1,42 +1,31 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { X, ScanBarcode, Loader2, AlertCircle } from 'lucide-react';
-
-const BARCODE_FORMATS = [
-  Html5QrcodeSupportedFormats.EAN_13,
-  Html5QrcodeSupportedFormats.EAN_8,
-  Html5QrcodeSupportedFormats.UPC_A,
-  Html5QrcodeSupportedFormats.UPC_E,
-  Html5QrcodeSupportedFormats.CODE_128,
-  Html5QrcodeSupportedFormats.CODE_39,
-];
 
 export default function BarcodeScanner({ onScanned, onClose }) {
   const { t } = useTranslation();
   const [status, setStatus] = useState('starting');
   const [errorMsg, setErrorMsg] = useState('');
-  const scannerRef = useRef(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const streamRef = useRef(null);
+  const animFrameRef = useRef(null);
   const isProcessingRef = useRef(false);
   const isMountedRef = useRef(true);
+  const barcodeDetectorRef = useRef(null);
 
-  const stopScanner = useCallback(async () => {
-    const scanner = scannerRef.current;
-    if (!scanner) return;
-    try {
-      const state = scanner.getState();
-      if (state === 2) { // SCANNING
-        await scanner.stop();
-      }
-    } catch {
-      // ignore
+  const stopCamera = useCallback(() => {
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
     }
-    try {
-      scanner.clear();
-    } catch {
-      // ignore
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
     }
-    scannerRef.current = null;
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
   }, []);
 
   const lookupBarcode = useCallback(async (barcode) => {
@@ -48,7 +37,6 @@ export default function BarcodeScanner({ onScanned, onClose }) {
         `https://world.openfoodfacts.org/api/v2/product/${barcode}.json`
       );
       const json = await res.json();
-
       if (!isMountedRef.current) return;
 
       if (json.status === 1 && json.product) {
@@ -80,98 +68,174 @@ export default function BarcodeScanner({ onScanned, onClose }) {
     }
   }, [onScanned]);
 
-  const startScanner = useCallback(async () => {
-    // Clean up any existing scanner first
-    await stopScanner();
-
+  const startCamera = useCallback(async () => {
+    stopCamera();
     if (!isMountedRef.current) return;
     setStatus('starting');
     isProcessingRef.current = false;
 
     try {
-      const scanner = new Html5Qrcode('barcode-reader', {
-        formatsToSupport: BARCODE_FORMATS,
-        verbose: false,
+      // Request camera — browser remembers permission for the origin
+      // Using facingMode constraint directly (no getCameras() call = no extra permission prompt)
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          // Request no zoom (wide angle)
+          zoom: { ideal: 1.0 },
+          focusMode: { ideal: 'continuous' },
+        },
+        audio: false,
       });
-      scannerRef.current = scanner;
 
-      // Get available cameras and pick the back camera
-      const cameras = await Html5Qrcode.getCameras();
-      if (!cameras || cameras.length === 0) {
-        throw new Error('NoCameraFound');
+      if (!isMountedRef.current) {
+        stream.getTracks().forEach((t) => t.stop());
+        return;
       }
 
-      // Prefer back/environment camera
-      const backCamera = cameras.find(
-        (c) => c.label.toLowerCase().includes('back') || c.label.toLowerCase().includes('rear') || c.label.toLowerCase().includes('environment')
-      );
-      const cameraId = backCamera ? backCamera.id : cameras[cameras.length - 1].id;
+      streamRef.current = stream;
 
-      await scanner.start(
-        cameraId,
-        {
-          fps: 15,
-          qrbox: (viewfinderWidth, viewfinderHeight) => {
-            // Use 80% of width, aspect ratio ~2:1 for barcodes
-            const w = Math.min(Math.floor(viewfinderWidth * 0.85), 350);
-            const h = Math.min(Math.floor(w * 0.45), Math.floor(viewfinderHeight * 0.3));
-            return { width: w, height: h };
+      // Apply zoom=1 via track constraints if supported
+      const videoTrack = stream.getVideoTracks()[0];
+      if (videoTrack) {
+        try {
+          const capabilities = videoTrack.getCapabilities?.();
+          if (capabilities?.zoom) {
+            await videoTrack.applyConstraints({ advanced: [{ zoom: capabilities.zoom.min }] });
+          }
+        } catch {
+          // zoom constraint not supported — fine
+        }
+      }
+
+      const video = videoRef.current;
+      if (!video) return;
+      video.srcObject = stream;
+      await video.play();
+
+      // Initialize BarcodeDetector (native API, available in Chrome/Edge/Safari 17+)
+      // Falls back to html5-qrcode if not available
+      if ('BarcodeDetector' in window) {
+        const formats = await BarcodeDetector.getSupportedFormats();
+        const wantedFormats = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39']
+          .filter((f) => formats.includes(f));
+        if (wantedFormats.length > 0) {
+          barcodeDetectorRef.current = new BarcodeDetector({ formats: wantedFormats });
+        }
+      }
+
+      // If no native BarcodeDetector, load html5-qrcode as fallback
+      if (!barcodeDetectorRef.current) {
+        const { Html5Qrcode, Html5QrcodeSupportedFormats } = await import('html5-qrcode');
+        // We'll use the canvas-based decode method instead
+        barcodeDetectorRef.current = {
+          _html5qr: new Html5Qrcode('barcode-fallback-reader', {
+            formatsToSupport: [
+              Html5QrcodeSupportedFormats.EAN_13,
+              Html5QrcodeSupportedFormats.EAN_8,
+              Html5QrcodeSupportedFormats.UPC_A,
+              Html5QrcodeSupportedFormats.UPC_E,
+              Html5QrcodeSupportedFormats.CODE_128,
+              Html5QrcodeSupportedFormats.CODE_39,
+            ],
+            verbose: false,
+          }),
+          async detect(source) {
+            // html5-qrcode scanFile expects a File, we'll use canvas approach
+            const canvas = document.createElement('canvas');
+            canvas.width = source.videoWidth || source.width;
+            canvas.height = source.videoHeight || source.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(source, 0, 0);
+            try {
+              const blob = await new Promise((r) => canvas.toBlob(r, 'image/jpeg', 0.8));
+              const file = new File([blob], 'frame.jpg', { type: 'image/jpeg' });
+              const text = await this._html5qr.scanFile(file, false);
+              return [{ rawValue: text }];
+            } catch {
+              return [];
+            }
           },
-          disableFlip: false,
-        },
-        (decodedText) => {
-          // Prevent multiple triggers
-          if (isProcessingRef.current) return;
-          isProcessingRef.current = true;
+        };
+      }
 
-          // Stop scanner, then look up
-          stopScanner().then(() => lookupBarcode(decodedText));
-        },
-        () => {} // ignore scan failures
-      );
-
-      if (isMountedRef.current) setStatus('scanning');
+      if (isMountedRef.current) {
+        setStatus('scanning');
+        scanLoop();
+      }
     } catch (err) {
-      console.error('Scanner error:', err);
+      console.error('Camera error:', err);
       if (!isMountedRef.current) return;
-
       const errStr = err?.toString?.() || '';
       if (errStr.includes('NotAllowedError') || errStr.includes('Permission')) {
         setStatus('error');
         setErrorMsg(t('nutrition.cameraPermissionDenied'));
-      } else if (errStr.includes('NoCameraFound') || errStr.includes('NotFoundError')) {
-        setStatus('error');
-        setErrorMsg(t('nutrition.noCameraFound'));
       } else {
         setStatus('error');
         setErrorMsg(t('nutrition.cameraError'));
       }
     }
-  }, [stopScanner, lookupBarcode, t]);
+  }, [stopCamera, t]);
+
+  function scanLoop() {
+    if (!isMountedRef.current || isProcessingRef.current) return;
+
+    const video = videoRef.current;
+    const detector = barcodeDetectorRef.current;
+    if (!video || !detector || video.readyState < 2) {
+      animFrameRef.current = requestAnimationFrame(scanLoop);
+      return;
+    }
+
+    detector
+      .detect(video)
+      .then((barcodes) => {
+        if (!isMountedRef.current || isProcessingRef.current) return;
+        if (barcodes && barcodes.length > 0) {
+          const code = barcodes[0].rawValue;
+          if (code) {
+            isProcessingRef.current = true;
+            stopCamera();
+            lookupBarcode(code);
+            return;
+          }
+        }
+        // Continue scanning
+        animFrameRef.current = requestAnimationFrame(scanLoop);
+      })
+      .catch(() => {
+        if (isMountedRef.current && !isProcessingRef.current) {
+          animFrameRef.current = requestAnimationFrame(scanLoop);
+        }
+      });
+  }
 
   useEffect(() => {
     isMountedRef.current = true;
-
-    // Small delay to let the DOM render the container
-    const timer = setTimeout(() => startScanner(), 100);
-
+    const timer = setTimeout(() => startCamera(), 50);
     return () => {
       isMountedRef.current = false;
       clearTimeout(timer);
-      stopScanner();
+      stopCamera();
     };
   }, []);
 
   function handleRetry() {
-    startScanner();
+    isProcessingRef.current = false;
+    startCamera();
   }
 
   function handleClose() {
-    stopScanner().then(() => onClose());
+    stopCamera();
+    onClose();
   }
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col">
+      {/* Hidden fallback container for html5-qrcode */}
+      <div id="barcode-fallback-reader" className="hidden" />
+
       {/* Header */}
       <div className="relative z-10 flex items-center justify-between px-4 pt-4 pb-2" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
         <div className="flex items-center gap-2 text-white">
@@ -188,18 +252,19 @@ export default function BarcodeScanner({ onScanned, onClose }) {
 
       {/* Camera View */}
       <div className="flex-1 relative overflow-hidden">
-        <div id="barcode-reader" className="absolute inset-0" />
+        <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full object-cover"
+          playsInline
+          muted
+          autoPlay
+        />
 
         {/* Scanning Overlay */}
         {status === 'scanning' && (
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-            {/* Darkened edges */}
-            <div className="absolute inset-0 bg-black/40" />
-            {/* Clear center window */}
-            <div className="relative z-10 w-[85%] max-w-[350px] aspect-[2.2/1]">
-              {/* Cut-out effect */}
-              <div className="absolute -inset-[2000px] bg-black/40" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' }} />
-              <div className="relative w-full h-full bg-transparent rounded-2xl" style={{ boxShadow: '0 0 0 2000px rgba(0,0,0,0.45)' }}>
+            <div className="relative z-10 w-[85%] max-w-[340px] aspect-[2.2/1]">
+              <div className="relative w-full h-full rounded-2xl" style={{ boxShadow: '0 0 0 2000px rgba(0,0,0,0.5)' }}>
                 {/* Corner decorators */}
                 <div className="absolute -top-0.5 -left-0.5 w-10 h-10 border-t-[3px] border-l-[3px] border-primary-400 rounded-tl-xl" />
                 <div className="absolute -top-0.5 -right-0.5 w-10 h-10 border-t-[3px] border-r-[3px] border-primary-400 rounded-tr-xl" />
