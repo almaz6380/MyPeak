@@ -67,8 +67,10 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Custom Calendar für Datumsauswahl (kein nativer Browser-Picker)
 - [x] Farbcodierte Makro-Badges bei jedem Eintrag (P/C/F als Pills)
 - [x] PortionPicker mit Live-Makro-Berechnung und +/- Buttons
-- [x] Supabase-Tabellen: nutrition_entries, custom_meals, nutrition_goals
-- [x] Vollständige DE/EN Übersetzungen (~70 Keys)
+- [x] Wasser-Tracking: eigener Bereich mit Fortschrittsbalken, +250ml/+500ml Quick-Buttons, eigene Menge
+- [x] Wasserziel editierbar im Goal-Editor (Default 3L)
+- [x] Supabase-Tabellen: nutrition_entries, custom_meals, nutrition_goals, water_entries
+- [x] Vollständige DE/EN Übersetzungen (~80 Keys)
 
 ### PWA-Setup — FERTIG
 - [x] manifest.json mit App-Name, Icons, standalone display
@@ -149,7 +151,8 @@ src/
 - **custom_exercises** — Eigene Übungen
 - **nutrition_entries** — Lebensmittel-Einträge pro Tag/Mahlzeit (date, meal_slot, food_name, serving_size, calories, protein, carbs, fat, source)
 - **custom_meals** — Gespeicherte Mahlzeit-Vorlagen (name, items als JSONB, Gesamtmakros, Soft-Delete)
-- **nutrition_goals** — Tägliche Kalorien-/Makro-Ziele pro User (1 Zeile, Upsert)
+- **nutrition_goals** — Tägliche Kalorien-/Makro-/Wasser-Ziele pro User (1 Zeile, Upsert)
+- **water_entries** — Flüssigkeitseinträge pro Tag (date, amount_ml)
 
 ---
 
@@ -236,10 +239,11 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 - [x] Tägliche Kalorien- und Makro-Übersicht (SVG-Ringe)
 - [x] TDEE-/Kalorienverbrauch-Rechner (Mifflin-St Jeor)
 - [x] Makro-Ziele manuell editierbar
-- [x] Barcode-Scanner per Kamera (html5-qrcode + Open Food Facts)
+- [x] Barcode-Scanner per Kamera (Quagga2 + Open Food Facts)
 - [x] Custom Calendar für Datumsauswahl
 - [x] Zuletzt verwendete Lebensmittel
 - [x] Farbcodierte Makro-Badges (P/C/F Pills)
+- [x] Wasser-Tracking mit Fortschrittsbalken + Quick-Add Buttons
 - [ ] Foto von Nährwerttabelle per KI auslesen (Premium)
 - [ ] Fehlende Barcode-Produkte an Open Food Facts übermitteln
 - [ ] KI-Ernährungsplan (Premium)
