@@ -258,10 +258,13 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 - [ ] Blutwerte-Einordnung mit Arzt-Hinweis
 - [ ] Abo-Modell mit 7 Tagen kostenloser Testphase
 
-### Phase 4: Wissensbibliothek — OFFEN
+### Phase 4: Wissensbibliothek — IN ARBEIT
+- [x] Peptide-Bibliothek: 20 Peptide in 5 Kategorien (Heilung, GH, Fettabbau, Anti-Aging, Kognition)
+- [x] Kurzfassung pro Peptid (Wirkung, Dosierung, Nebenwirkungen)
+- [ ] Ausführliche E-Books pro Peptid mit Studien (teilweise fertig, Rest offen)
 - [ ] Block: Training-Wissen
 - [ ] Block: Ernährungs-Wissen
-- [ ] Block: Supplements & Peptide (mit Affiliate-Links)
+- [ ] Block: Supplemente
 - [ ] Block: Blutwerte (Erklärungen, Normalwerte, Verbesserungstipps)
 
 ### Phase 5: Integrationen & Polish — OFFEN
@@ -316,11 +319,14 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 ## Design-Richtlinien
 
 - **Oberstes Prinzip:** Nicht überfüllt, einfach zu bedienen trotz vieler Features
-- **Logo:** Zigzag-Blitz-Pfeil (Indigo→Violett Gradient) mit "MyPeak" Text über dem Pfeil (unterbricht ihn sauber). Zentriert oben in allen Tab-Headern (pt-12 für Notch) + Favicon + PWA-Icon. Komponente: `src/components/MyPeakLogo.jsx`
-- **Stil:** Modern, clean — Indigo als Primärfarbe, abgerundete Karten, weiche Schatten
-- **Navigation:** Bottom-Navigation mit 4 Hauptbereichen (Training, Ernährung, Bibliothek, Profil)
+- **Logo:** Goldener Zigzag-Chart-Pfeil auf schwarzem Hintergrund mit "MyPeak FITNESS" Text. Zentriert oben in allen Tab-Headern (pt-12 für Notch) + Favicon + PWA-Icon. Komponente: `src/components/MyPeakLogo.jsx`
+- **Farbpalette Dark Mode (Standard):** Hintergrund #0a0a0a / #1a1a1a (Karten), Akzentfarbe Gold #fbbf24, Texte Cremeweiß #fef3c7, sekundäre Texte gedämpftes Gold
+- **Farbpalette Light Mode:** Hintergrund #ffffff / #f5f5f5, Akzentfarbe dunkleres Gold #b45309, Texte Schwarz/Dunkelgrau
+- **Primary-Farben:** Gold-Palette (primary-400: #fbbf24, primary-500: #f59e0b, primary-600: #d97706)
+- **Stil:** Modern, clean — Gold als Primärfarbe, abgerundete Karten, weiche Schatten
+- **Navigation:** Bottom-Navigation mit 4 Hauptbereichen (Training, Ernährung, Bibliothek, Profil), aktiver Tab in Gold
 - **Responsiv:** Mobile-first, muss auf dem Handy perfekt funktionieren
-- **Dark Mode:** Vollständig unterstützt, umschaltbar im Profil
+- **Dark Mode:** Standard beim ersten Öffnen, umschaltbar im Profil
 
 ---
 
