@@ -180,76 +180,6 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
         </div>
       </div>
 
-      {/* Water Tracker */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Droplets className="w-5 h-5 text-cyan-500" />
-            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('nutrition.water')}</h2>
-          </div>
-          <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
-            {(waterTotal / 1000).toFixed(1)}{t('nutrition.liters')} / {((goals.water_ml || 3000) / 1000).toFixed(1)}{t('nutrition.liters')}
-          </span>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="w-full h-3 bg-slate-100 dark:bg-slate-700 rounded-full mb-3 overflow-hidden">
-          <div
-            className="h-full bg-cyan-500 rounded-full transition-all duration-300"
-            style={{ width: `${Math.min(100, (waterTotal / (goals.water_ml || 3000)) * 100)}%` }}
-          />
-        </div>
-
-        {/* Quick Add Buttons */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleRemoveWater}
-            className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-red-400 transition-colors"
-          >
-            <Minus className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => handleAddWater(250)}
-            className="flex-1 py-2 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 text-sm font-medium hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-colors"
-          >
-            +250ml
-          </button>
-          <button
-            onClick={() => handleAddWater(500)}
-            className="flex-1 py-2 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 text-sm font-medium hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-colors"
-          >
-            +500ml
-          </button>
-          <button
-            onClick={() => setShowWaterInput(!showWaterInput)}
-            className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-          >
-            {t('nutrition.customAmount')}
-          </button>
-        </div>
-
-        {/* Custom Water Input */}
-        {showWaterInput && (
-          <div className="flex items-center gap-2 mt-3">
-            <input
-              type="number"
-              inputMode="numeric"
-              value={customWaterAmount}
-              onChange={(e) => setCustomWaterAmount(e.target.value)}
-              placeholder="ml"
-              className="flex-1 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            />
-            <button
-              onClick={handleCustomWaterAdd}
-              disabled={!customWaterAmount || parseInt(customWaterAmount) <= 0}
-              className="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-600 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white text-sm font-medium transition-colors"
-            >
-              {t('nutrition.add')}
-            </button>
-          </div>
-        )}
-      </div>
-
       {/* Meal Slots */}
       {MEAL_SLOTS.map((slot) => {
         const slotEntries = entries.filter((e) => e.meal_slot === slot);
@@ -309,6 +239,50 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
           </div>
         );
       })}
+
+      {/* Water Tracker */}
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Droplets className="w-5 h-5 text-cyan-500" />
+            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('nutrition.water')}</h2>
+          </div>
+          <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
+            {(waterTotal / 1000).toFixed(1)}{t('nutrition.liters')} / {((goals.water_ml || 3000) / 1000).toFixed(1)}{t('nutrition.liters')}
+          </span>
+        </div>
+
+        <div className="w-full h-3 bg-slate-100 dark:bg-slate-700 rounded-full mb-3 overflow-hidden">
+          <div
+            className="h-full bg-cyan-500 rounded-full transition-all duration-300"
+            style={{ width: `${Math.min(100, (waterTotal / (goals.water_ml || 3000)) * 100)}%` }}
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button onClick={handleRemoveWater} className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-red-400 transition-colors">
+            <Minus className="w-4 h-4" />
+          </button>
+          <button onClick={() => handleAddWater(250)} className="flex-1 py-2 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 text-sm font-medium hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-colors">
+            +250ml
+          </button>
+          <button onClick={() => handleAddWater(500)} className="flex-1 py-2 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 text-sm font-medium hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-colors">
+            +500ml
+          </button>
+          <button onClick={() => setShowWaterInput(!showWaterInput)} className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            {t('nutrition.customAmount')}
+          </button>
+        </div>
+
+        {showWaterInput && (
+          <div className="flex items-center gap-2 mt-3">
+            <input type="number" inputMode="numeric" value={customWaterAmount} onChange={(e) => setCustomWaterAmount(e.target.value)} placeholder="ml" className="flex-1 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+            <button onClick={handleCustomWaterAdd} disabled={!customWaterAmount || parseInt(customWaterAmount) <= 0} className="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-600 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white text-sm font-medium transition-colors">
+              {t('nutrition.add')}
+            </button>
+          </div>
+        )}
+      </div>
 
       {!goals.tdee && (
         <button
