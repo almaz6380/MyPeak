@@ -120,6 +120,30 @@ const exercises = [
   { id: 'kihon-basics', type: 'martial-arts', martialArtsCategory: 'karate', nameKey: 'exercises.kihonBasics', descKey: 'exercises.kihonBasicsDesc' },
   { id: 'kumite-sparring', type: 'martial-arts', martialArtsCategory: 'karate', nameKey: 'exercises.kumiteSparring', descKey: 'exercises.kumiteSparringDesc' },
   { id: 'makiwara-training', type: 'martial-arts', martialArtsCategory: 'karate', nameKey: 'exercises.makiwaraTraining', descKey: 'exercises.makiwaraTrainingDesc' },
+
+  // Judo
+  { id: 'uchikomi-drill', type: 'martial-arts', martialArtsCategory: 'judo', nameKey: 'exercises.uchikomiDrill', descKey: 'exercises.uchikomiDrillDesc' },
+  { id: 'nagekomi', type: 'martial-arts', martialArtsCategory: 'judo', nameKey: 'exercises.nagekomi', descKey: 'exercises.nagekomiDesc' },
+  { id: 'newaza-drill', type: 'martial-arts', martialArtsCategory: 'judo', nameKey: 'exercises.newazaDrill', descKey: 'exercises.newazaDrillDesc' },
+  { id: 'randori', type: 'martial-arts', martialArtsCategory: 'judo', nameKey: 'exercises.randori', descKey: 'exercises.randoriDesc' },
+
+  // BJJ (Brazilian Jiu-Jitsu)
+  { id: 'guard-passing', type: 'martial-arts', martialArtsCategory: 'bjj', nameKey: 'exercises.guardPassing', descKey: 'exercises.guardPassingDesc' },
+  { id: 'sweep-drill', type: 'martial-arts', martialArtsCategory: 'bjj', nameKey: 'exercises.sweepDrill', descKey: 'exercises.sweepDrillDesc' },
+  { id: 'submission-flow', type: 'martial-arts', martialArtsCategory: 'bjj', nameKey: 'exercises.submissionFlow', descKey: 'exercises.submissionFlowDesc' },
+  { id: 'bjj-rolling', type: 'martial-arts', martialArtsCategory: 'bjj', nameKey: 'exercises.bjjRolling', descKey: 'exercises.bjjRollingDesc' },
+
+  // Taekwondo
+  { id: 'poomsae', type: 'martial-arts', martialArtsCategory: 'taekwondo', nameKey: 'exercises.poomsae', descKey: 'exercises.poomsaeDesc' },
+  { id: 'turning-kick-drill', type: 'martial-arts', martialArtsCategory: 'taekwondo', nameKey: 'exercises.turningKickDrill', descKey: 'exercises.turningKickDrillDesc' },
+  { id: 'sparring-tkd', type: 'martial-arts', martialArtsCategory: 'taekwondo', nameKey: 'exercises.sparringTkd', descKey: 'exercises.sparringTkdDesc' },
+  { id: 'board-breaking', type: 'martial-arts', martialArtsCategory: 'taekwondo', nameKey: 'exercises.boardBreaking', descKey: 'exercises.boardBreakingDesc' },
+
+  // Wrestling
+  { id: 'single-leg-drill', type: 'martial-arts', martialArtsCategory: 'wrestling', nameKey: 'exercises.singleLegDrill', descKey: 'exercises.singleLegDrillDesc' },
+  { id: 'double-leg-drill', type: 'martial-arts', martialArtsCategory: 'wrestling', nameKey: 'exercises.doubleLegDrill', descKey: 'exercises.doubleLegDrillDesc' },
+  { id: 'wrestling-conditioning', type: 'martial-arts', martialArtsCategory: 'wrestling', nameKey: 'exercises.wrestlingConditioning', descKey: 'exercises.wrestlingConditioningDesc' },
+  { id: 'mat-returns', type: 'martial-arts', martialArtsCategory: 'wrestling', nameKey: 'exercises.matReturns', descKey: 'exercises.matReturnsDesc' },
 ];
 
 export default exercises;

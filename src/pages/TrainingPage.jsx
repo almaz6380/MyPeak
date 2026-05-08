@@ -556,15 +556,24 @@ function TrainingTypeCard({ icon, label, desc, color, onClick }) {
 
 function BoxingGlovesIcon({ className }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 11c0-3.3 2.7-6 6-6h1a3 3 0 0 1 3 3v2a2 2 0 0 1-2 2H9" />
-      <path d="M4 11v3a4 4 0 0 0 4 4h1" />
-      <path d="M9 18v2" />
-      <path d="M4 11a2 2 0 0 1 0-4" />
-      <path d="M14 13c0-3.3 2.7-6 6-6" />
-      <path d="M20 7v4a4 4 0 0 1-4 4h-2" />
-      <path d="M14 15v3" />
-      <circle cx="7" cy="11" r="1" fill="currentColor" stroke="none" />
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      {/* Left glove */}
+      <path d="M3.5 8.5C3.5 6 5.5 4 8 4c1.8 0 3.2 1 3.8 2.5.3.7.2 1.5.2 2.3v1.7c0 1-.3 1.8-1 2.5-.5.5-1.2.8-2 1v1.5c0 .8-.7 1.5-1.5 1.5H6c-.8 0-1.5-.7-1.5-1.5V14c-1.2-.5-2-1.7-2-3.2V8.5z" opacity="0.85" />
+      {/* Left glove thumb */}
+      <path d="M3.5 8.5c-.8 0-1.5.5-1.5 1.2v1.1c0 .7.7 1.2 1.5 1.2" opacity="0.65" />
+      {/* Right glove */}
+      <path d="M13 10.5c0-2.5 2-4.5 4.5-4.5 1.8 0 3.2 1 3.8 2.5.3.7.2 1.5.2 2.3v1.7c0 1-.3 1.8-1 2.5-.5.5-1.2.8-2 1v1.5c0 .8-.7 1.5-1.5 1.5h-1.5c-.8 0-1.5-.7-1.5-1.5V16c-1.2-.5-2-1.7-2-3.2v-2.3z" opacity="0.85" />
+      {/* Right glove thumb */}
+      <path d="M13 10.5c-.8 0-1.5.5-1.5 1.2v1.1c0 .7.7 1.2 1.5 1.2" opacity="0.65" />
+      {/* Laces left */}
+      <rect x="5.5" y="7" width="4" height="0.8" rx="0.4" opacity="0.4" />
+      <rect x="5.5" y="8.5" width="4" height="0.8" rx="0.4" opacity="0.4" />
+      {/* Laces right */}
+      <rect x="15" y="9" width="4" height="0.8" rx="0.4" opacity="0.4" />
+      <rect x="15" y="10.5" width="4" height="0.8" rx="0.4" opacity="0.4" />
+      {/* Wrist bands */}
+      <rect x="5" y="14.5" width="5" height="1.5" rx="0.5" opacity="0.5" />
+      <rect x="14.5" y="16.5" width="5" height="1.5" rx="0.5" opacity="0.5" />
     </svg>
   );
 }
@@ -954,6 +963,10 @@ function MartialArtsSetup({ onBack, onStart, t }) {
     { key: 'kickboxing', label: t('plans.kickboxing') },
     { key: 'mma', label: t('plans.mma') },
     { key: 'karate', label: t('plans.karate') },
+    { key: 'judo', label: t('plans.judo') },
+    { key: 'bjj', label: t('plans.bjj') },
+    { key: 'taekwondo', label: t('plans.taekwondo') },
+    { key: 'wrestling', label: t('plans.wrestling') },
   ];
 
   const presets = [
