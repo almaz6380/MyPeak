@@ -557,19 +557,20 @@ function TrainingTypeCard({ icon, label, desc, color, onClick }) {
 function BoxingGlovesIcon({ className }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      {/* Glove body — side view, rounded fist shape */}
-      <path d="M7 7c0-2 1.5-4 4.5-4C14.5 3 17 5.5 17 9v2c0 2.5-1.5 4-4 4H9.5C7.5 15 7 13.5 7 12V7z" fill="currentColor" opacity="0.15" />
-      <path d="M7 7c0-2 1.5-4 4.5-4C14.5 3 17 5.5 17 9v2c0 2.5-1.5 4-4 4H9.5C7.5 15 7 13.5 7 12V7z" />
-      {/* Thumb */}
-      <path d="M7 8.5C5.5 8.5 5 9.5 5 10.5s.5 2 2 2" />
-      {/* Wrist cuff */}
-      <rect x="8" y="15" width="7" height="3" rx="1" fill="currentColor" opacity="0.15" />
-      <rect x="8" y="15" width="7" height="3" rx="1" />
-      {/* Wrist opening */}
-      <path d="M10 18v2.5" />
-      <path d="M13 18v2.5" />
-      {/* Knuckle line */}
-      <path d="M9 8h6" opacity="0.5" />
+      {/* Glove body — left fist punching right, side view */}
+      <path d="M4 10c0-3 2-5.5 5.5-5.5S15 7 15 10v1.5c0 2-1 3.5-3.5 3.5H7c-2 0-3-1.5-3-3.5V10z" fill="currentColor" opacity="0.12" />
+      <path d="M4 10c0-3 2-5.5 5.5-5.5S15 7 15 10v1.5c0 2-1 3.5-3.5 3.5H7c-2 0-3-1.5-3-3.5V10z" />
+      {/* Thumb — pointing up/forward on top */}
+      <path d="M13 7.5c1.5-.5 2.5 0 2.5 1.5s-1 2-2.5 2" />
+      {/* Knuckle area — front of fist facing right */}
+      <path d="M4 8v5" strokeWidth="2" opacity="0.3" />
+      {/* Wrist/cuff */}
+      <path d="M7 15h5.5" />
+      <rect x="7" y="15.5" width="5.5" height="3" rx="1" fill="currentColor" opacity="0.12" />
+      <rect x="7" y="15.5" width="5.5" height="3" rx="1" />
+      {/* Arm going right */}
+      <path d="M9 18.5v2" />
+      <path d="M11 18.5v2" />
     </svg>
   );
 }
