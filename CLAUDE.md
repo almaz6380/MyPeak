@@ -63,6 +63,13 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Supabase-Tabellen: nutrition_entries, custom_meals, nutrition_goals
 - [x] Vollständige DE/EN Übersetzungen (~70 Keys)
 
+### PWA-Setup — FERTIG
+- [x] manifest.json mit App-Name, Icons, standalone display
+- [x] Service Worker (network-first strategy)
+- [x] PWA-Icons (192px + 512px)
+- [x] apple-touch-icon + apple-mobile-web-app-status-bar-style
+- [x] App auf Homescreen installierbar → Kamera-Berechtigung bleibt dauerhaft
+
 ### Phase 3.5–6: Noch offen (siehe Bauplan unten)
 
 ---
@@ -75,8 +82,9 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - **Backend:** Supabase (Auth + PostgreSQL-Datenbank)
 - **Hosting:** Vercel (automatisches Deployment über GitHub)
 - **Datenspeicherung:** Supabase (Cloud) + localStorage (Cache/Fallback)
-- **Barcode-Scanner:** html5-qrcode (Open Source, kamerabaisert)
+- **Barcode-Scanner:** html5-qrcode (Open Source, kamerabasiert)
 - **Lebensmittel-API:** Open Food Facts (kostenlos, keine API-Keys)
+- **PWA:** manifest.json + Service Worker (installierbar auf Homescreen)
 - **Icons:** Lucide React
 - **Schrift:** Inter (Google Fonts)
 
