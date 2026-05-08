@@ -54,7 +54,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Tägliche Kalorien- und Makro-Übersicht mit SVG-Ringen (kcal, Protein, Carbs, Fat)
 - [x] TDEE-Rechner (Mifflin-St Jeor Formel, vorbefüllt mit Profildaten)
 - [x] Makro-Ziele manuell editierbar (nicht nur über TDEE)
-- [x] Barcode-Scanner per Kamera (html5-qrcode + Open Food Facts API)
+- [x] Barcode-Scanner per Kamera (Quagga2 + Open Food Facts API)
 - [x] 4 Mahlzeit-Slots (Frühstück, Mittagessen, Abendessen, Snacks)
 - [x] Zuletzt verwendete Lebensmittel für Schnellzugriff
 - [x] Custom Calendar für Datumsauswahl (kein nativer Browser-Picker)
@@ -82,7 +82,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - **Backend:** Supabase (Auth + PostgreSQL-Datenbank)
 - **Hosting:** Vercel (automatisches Deployment über GitHub)
 - **Datenspeicherung:** Supabase (Cloud) + localStorage (Cache/Fallback)
-- **Barcode-Scanner:** html5-qrcode (Open Source, kamerabasiert)
+- **Barcode-Scanner:** Quagga2 (Open Source, optimiert für 1D-Barcodes)
 - **Lebensmittel-API:** Open Food Facts (kostenlos, keine API-Keys)
 - **PWA:** manifest.json + Service Worker (installierbar auf Homescreen)
 - **Icons:** Lucide React
