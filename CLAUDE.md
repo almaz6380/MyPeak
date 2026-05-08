@@ -313,7 +313,7 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 ## Design-Richtlinien
 
 - **Oberstes Prinzip:** Nicht überfüllt, einfach zu bedienen trotz vieler Features
-- **Logo:** Zigzag-Blitz-Pfeil (Indigo→Violett Gradient) mit "MyPeak" Text über dem Pfeil (unterbricht ihn sauber). In allen Tab-Headern + Favicon + PWA-Icon. Komponente: `src/components/MyPeakLogo.jsx`
+- **Logo:** Zigzag-Blitz-Pfeil (Indigo→Violett Gradient) mit "MyPeak" Text über dem Pfeil (unterbricht ihn sauber). Zentriert oben in allen Tab-Headern (pt-12 für Notch) + Favicon + PWA-Icon. Komponente: `src/components/MyPeakLogo.jsx`
 - **Stil:** Modern, clean — Indigo als Primärfarbe, abgerundete Karten, weiche Schatten
 - **Navigation:** Bottom-Navigation mit 4 Hauptbereichen (Training, Ernährung, Bibliothek, Profil)
 - **Responsiv:** Mobile-first, muss auf dem Handy perfekt funktionieren
