@@ -1,36 +1,23 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Html5Qrcode } from 'html5-qrcode';
+import Quagga from '@ericblade/quagga2';
 import { X, ScanBarcode, Loader2, AlertCircle } from 'lucide-react';
 
 export default function BarcodeScanner({ onScanned, onClose }) {
   const { t } = useTranslation();
   const [status, setStatus] = useState('starting');
   const [errorMsg, setErrorMsg] = useState('');
-  const scannerRef = useRef(null);
-  const nativeLoopRef = useRef(null);
   const isProcessingRef = useRef(false);
   const isMountedRef = useRef(true);
+  const quaggaRunningRef = useRef(false);
 
-  const cleanup = useCallback(async () => {
-    // Stop native scan loop
-    if (nativeLoopRef.current) {
-      clearInterval(nativeLoopRef.current);
-      nativeLoopRef.current = null;
+  const stopQuagga = useCallback(() => {
+    if (quaggaRunningRef.current) {
+      Quagga.offDetected();
+      Quagga.stop();
+      quaggaRunningRef.current = false;
     }
-    // Stop html5-qrcode
-    const s = scannerRef.current;
-    scannerRef.current = null;
-    if (!s) return;
-    try { await s.stop(); } catch { /* */ }
-    try { s.clear(); } catch { /* */ }
   }, []);
-
-  const onBarcodeFound = useCallback((barcode) => {
-    if (isProcessingRef.current) return;
-    isProcessingRef.current = true;
-    cleanup().then(() => lookupBarcode(barcode));
-  }, [cleanup]);
 
   const lookupBarcode = useCallback(async (barcode) => {
     if (!isMountedRef.current) return;
@@ -68,95 +55,122 @@ export default function BarcodeScanner({ onScanned, onClose }) {
     }
   }, [onScanned]);
 
-  const startScanner = useCallback(async () => {
-    await cleanup();
+  const startScanner = useCallback(() => {
+    stopQuagga();
     if (!isMountedRef.current) return;
 
-    const container = document.getElementById('barcode-reader');
-    if (container) container.innerHTML = '';
+    // Clear any leftover DOM from previous runs
+    const container = document.getElementById('scanner-container');
+    if (container) {
+      container.querySelectorAll('video, canvas').forEach((el) => el.remove());
+    }
 
     setStatus('starting');
     isProcessingRef.current = false;
 
-    try {
-      const scanner = new Html5Qrcode('barcode-reader', { verbose: false });
-      scannerRef.current = scanner;
-
-      await scanner.start(
-        { facingMode: 'environment' },
-        {
-          fps: 15,
-          qrbox: (vw, vh) => ({
-            width: Math.floor(Math.min(vw * 0.9, 400)),
-            height: Math.floor(Math.min(vh * 0.25, 180)),
-          }),
+    Quagga.init(
+      {
+        inputStream: {
+          name: 'Live',
+          type: 'LiveStream',
+          target: '#scanner-container',
+          constraints: {
+            facingMode: 'environment',
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
         },
-        // html5-qrcode success callback (ZXing-based, slower but reliable fallback)
-        (decodedText) => onBarcodeFound(decodedText),
-        () => {}
-      );
-
-      if (!isMountedRef.current) return;
-      setStatus('scanning');
-
-      // PARALLEL: Start native BarcodeDetector loop on the video element (much faster)
-      startNativeScanLoop();
-
-    } catch (err) {
-      console.error('Scanner error:', err);
-      if (!isMountedRef.current) return;
-      setStatus('error');
-      const s = err?.toString?.() || '';
-      setErrorMsg(
-        s.includes('NotAllowedError') || s.includes('Permission')
-          ? t('nutrition.cameraPermissionDenied')
-          : t('nutrition.cameraError')
-      );
-    }
-  }, [cleanup, onBarcodeFound, t]);
-
-  function startNativeScanLoop() {
-    if (!('BarcodeDetector' in window)) return;
-
-    // Check if barcode formats are supported
-    BarcodeDetector.getSupportedFormats().then((formats) => {
-      const wanted = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39']
-        .filter((f) => formats.includes(f));
-      if (wanted.length === 0) return;
-
-      const detector = new BarcodeDetector({ formats: wanted });
-
-      // Scan every 100ms using the video element html5-qrcode created
-      nativeLoopRef.current = setInterval(async () => {
-        if (isProcessingRef.current || !isMountedRef.current) return;
-
-        const video = document.querySelector('#barcode-reader video');
-        if (!video || video.readyState < 2) return;
-
-        try {
-          const barcodes = await detector.detect(video);
-          if (barcodes.length > 0 && barcodes[0].rawValue) {
-            onBarcodeFound(barcodes[0].rawValue);
-          }
-        } catch {
-          // detect can fail if video not ready
+        decoder: {
+          readers: [
+            'ean_reader',
+            'ean_8_reader',
+            'upc_reader',
+            'upc_e_reader',
+            'code_128_reader',
+            'code_39_reader',
+          ],
+          multiple: false,
+        },
+        locate: true,
+        frequency: 15,
+      },
+      (err) => {
+        if (err) {
+          console.error('Quagga init error:', err);
+          if (!isMountedRef.current) return;
+          setStatus('error');
+          const s = err?.toString?.() || '';
+          setErrorMsg(
+            s.includes('NotAllowedError') || s.includes('Permission')
+              ? t('nutrition.cameraPermissionDenied')
+              : t('nutrition.cameraError')
+          );
+          return;
         }
-      }, 100);
-    }).catch(() => {});
-  }
+
+        if (!isMountedRef.current) return;
+
+        Quagga.start();
+        quaggaRunningRef.current = true;
+        setStatus('scanning');
+
+        // Style the video element Quagga creates
+        const video = document.querySelector('#scanner-container video');
+        if (video) {
+          video.style.width = '100%';
+          video.style.height = '100%';
+          video.style.objectFit = 'cover';
+        }
+        const canvas = document.querySelector('#scanner-container canvas');
+        if (canvas) {
+          canvas.style.position = 'absolute';
+          canvas.style.top = '0';
+          canvas.style.left = '0';
+          canvas.style.width = '100%';
+          canvas.style.height = '100%';
+        }
+      }
+    );
+
+    // Use a confidence check: require the same barcode detected 2x consecutively
+    let lastCode = '';
+    let confirmCount = 0;
+
+    Quagga.onDetected((result) => {
+      if (isProcessingRef.current || !isMountedRef.current) return;
+
+      const code = result?.codeResult?.code;
+      if (!code) return;
+
+      // Confidence check — require 2 consecutive identical reads
+      if (code === lastCode) {
+        confirmCount++;
+      } else {
+        lastCode = code;
+        confirmCount = 1;
+      }
+
+      if (confirmCount >= 2) {
+        isProcessingRef.current = true;
+        stopQuagga();
+        lookupBarcode(code);
+      }
+    });
+  }, [stopQuagga, lookupBarcode, t]);
 
   useEffect(() => {
     isMountedRef.current = true;
-    const timer = setTimeout(startScanner, 150);
+    const timer = setTimeout(startScanner, 100);
     return () => {
       isMountedRef.current = false;
       clearTimeout(timer);
-      cleanup();
+      stopQuagga();
     };
   }, []);
 
   function handleClose() {
-    cleanup().then(onClose);
+    stopQuagga();
+    onClose();
   }
 
   return (
@@ -174,7 +188,22 @@ export default function BarcodeScanner({ onScanned, onClose }) {
 
       {/* Camera */}
       <div className="flex-1 relative overflow-hidden">
-        <div id="barcode-reader" style={{ width: '100%', minHeight: '100%' }} />
+        <div id="scanner-container" className="absolute inset-0" />
+
+        {/* Scan overlay */}
+        {status === 'scanning' && (
+          <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-10">
+            <div className="relative w-[85%] max-w-[340px] aspect-[2.2/1]">
+              <div className="relative w-full h-full rounded-2xl" style={{ boxShadow: '0 0 0 2000px rgba(0,0,0,0.45)' }}>
+                <div className="absolute -top-0.5 -left-0.5 w-10 h-10 border-t-[3px] border-l-[3px] border-primary-400 rounded-tl-xl" />
+                <div className="absolute -top-0.5 -right-0.5 w-10 h-10 border-t-[3px] border-r-[3px] border-primary-400 rounded-tr-xl" />
+                <div className="absolute -bottom-0.5 -left-0.5 w-10 h-10 border-b-[3px] border-l-[3px] border-primary-400 rounded-bl-xl" />
+                <div className="absolute -bottom-0.5 -right-0.5 w-10 h-10 border-b-[3px] border-r-[3px] border-primary-400 rounded-br-xl" />
+                <div className="absolute left-3 right-3 h-0.5 bg-primary-400 shadow-[0_0_8px_rgba(129,140,248,0.6)] animate-scan-line" />
+              </div>
+            </div>
+          </div>
+        )}
 
         {status === 'loading' && (
           <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-3 z-20">

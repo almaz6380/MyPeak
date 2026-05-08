@@ -55,10 +55,17 @@
   animation: scan-line 2s ease-in-out infinite;
 }
 
-/* html5-qrcode minimal styling */
-#barcode-reader {
-  border: none !important;
-}
-#barcode-reader video {
+/* Quagga scanner container */
+#scanner-container > video {
+  width: 100% !important;
+  height: 100% !important;
   object-fit: cover !important;
+}
+#scanner-container > canvas.drawingBuffer {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
 }
