@@ -230,9 +230,10 @@
   },
   "library": {
     "title": "Bibliothek",
-    "training": "Training-Wissen",
-    "nutrition": "Ernährungs-Wissen",
-    "supplements": "Supplements",
+    "training": "Training",
+    "nutrition": "Ernährung",
+    "supplements": "Supplemente",
+    "peptides": "Peptide",
     "bloodwork": "Blutwerte"
   },
   "profile": {

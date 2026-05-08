@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { BookOpen, Dumbbell, Apple, Pill, Droplets } from 'lucide-react';
+import { BookOpen, Dumbbell, Apple, Pill, Droplets, Syringe } from 'lucide-react';
 import MyPeakLogo from '../components/MyPeakLogo';
 
 export default function LibraryPage() {
@@ -9,6 +9,7 @@ export default function LibraryPage() {
     { icon: <Dumbbell className="w-6 h-6" />, label: t('library.training'), color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' },
     { icon: <Apple className="w-6 h-6" />, label: t('library.nutrition'), color: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' },
     { icon: <Pill className="w-6 h-6" />, label: t('library.supplements'), color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400' },
+    { icon: <Syringe className="w-6 h-6" />, label: t('library.peptides'), color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400' },
     { icon: <Droplets className="w-6 h-6" />, label: t('library.bloodwork'), color: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' },
   ];
 
