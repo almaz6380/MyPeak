@@ -121,7 +121,7 @@ export default function OnboardingPage() {
           <button
             onClick={handleNext}
             disabled={!canProceed() || loading}
-            className="flex-1 py-3.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white font-semibold rounded-2xl flex items-center justify-center gap-2 transition-colors"
+            className="flex-1 py-3.5 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold rounded-2xl flex items-center justify-center gap-2 transition-colors"
           >
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -153,14 +153,14 @@ function SelectionCard({ selected, onClick, icon, label, description }) {
       onClick={onClick}
       className={`w-full p-4 rounded-2xl border-2 text-left transition-all ${
         selected
-          ? 'border-primary-600 bg-primary-50 dark:bg-primary-900/20'
+          ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
           : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark-alt hover:border-slate-300 dark:hover:border-slate-600'
       }`}
     >
       <div className="flex items-center gap-3">
         {icon && <div className={`${selected ? 'text-primary-600' : 'text-slate-400'}`}>{icon}</div>}
         <div>
-          <p className={`font-semibold ${selected ? 'text-primary-700 dark:text-primary-400' : 'text-slate-900 dark:text-white'}`}>
+          <p className={`font-semibold ${selected ? 'text-primary-500 dark:text-primary-400' : 'text-slate-900 dark:text-white'}`}>
             {label}
           </p>
           {description && (

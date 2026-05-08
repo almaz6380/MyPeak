@@ -106,7 +106,7 @@ export default function TDEECalculator({ onBack, onSaved }) {
                   onClick={() => setGender(g)}
                   className={`flex-1 py-2 rounded-xl text-sm font-medium transition-all ${
                     gender === g
-                      ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 ring-2 ring-primary-500'
+                      ? 'bg-primary-100 dark:bg-primary-900/20 text-primary-500 dark:text-primary-400 ring-2 ring-primary-400'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                   }`}
                 >
@@ -124,7 +124,7 @@ export default function TDEECalculator({ onBack, onSaved }) {
               inputMode="numeric"
               value={age}
               onChange={(e) => setAge(parseInt(e.target.value) || 0)}
-              className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-400"
             />
           </div>
 
@@ -136,7 +136,7 @@ export default function TDEECalculator({ onBack, onSaved }) {
               inputMode="decimal"
               value={weight}
               onChange={(e) => setWeight(parseFloat(e.target.value) || 0)}
-              className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-400"
             />
           </div>
 
@@ -148,7 +148,7 @@ export default function TDEECalculator({ onBack, onSaved }) {
               inputMode="numeric"
               value={height}
               onChange={(e) => setHeight(parseInt(e.target.value) || 0)}
-              className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-400"
             />
           </div>
         </div>
@@ -164,13 +164,13 @@ export default function TDEECalculator({ onBack, onSaved }) {
               onClick={() => setActivityLevel(opt.value)}
               className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
                 activityLevel === opt.value
-                  ? 'border-primary-600 bg-primary-50 dark:bg-primary-900/20'
+                  ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
                   : 'border-slate-200 dark:border-slate-700'
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className={`text-sm font-semibold ${activityLevel === opt.value ? 'text-primary-700 dark:text-primary-400' : 'text-slate-700 dark:text-slate-200'}`}>
+                  <p className={`text-sm font-semibold ${activityLevel === opt.value ? 'text-primary-500 dark:text-primary-400' : 'text-slate-700 dark:text-slate-200'}`}>
                     {t(opt.labelKey)}
                   </p>
                   <p className="text-xs text-slate-400 dark:text-slate-500">{t(opt.descKey)}</p>
@@ -192,12 +192,12 @@ export default function TDEECalculator({ onBack, onSaved }) {
               onClick={() => setGoal(opt.value)}
               className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
                 goal === opt.value
-                  ? 'border-primary-600 bg-primary-50 dark:bg-primary-900/20'
+                  ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
                   : 'border-slate-200 dark:border-slate-700'
               }`}
             >
               <div className="flex items-center justify-between">
-                <p className={`text-sm font-semibold ${goal === opt.value ? 'text-primary-700 dark:text-primary-400' : 'text-slate-700 dark:text-slate-200'}`}>
+                <p className={`text-sm font-semibold ${goal === opt.value ? 'text-primary-500 dark:text-primary-400' : 'text-slate-700 dark:text-slate-200'}`}>
                   {t(opt.labelKey)}
                 </p>
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-lg ${
@@ -233,7 +233,7 @@ export default function TDEECalculator({ onBack, onSaved }) {
 
         <div className="bg-primary-50 dark:bg-primary-900/20 rounded-xl p-4 text-center mb-4">
           <p className="text-xs text-primary-500 dark:text-primary-400">{t('nutrition.dailyGoal')}</p>
-          <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">{calculations.dailyCalories}</p>
+          <p className="text-3xl font-bold text-primary-500 dark:text-primary-400">{calculations.dailyCalories}</p>
           <p className="text-sm text-primary-500 dark:text-primary-400">kcal</p>
         </div>
 
@@ -260,7 +260,7 @@ export default function TDEECalculator({ onBack, onSaved }) {
         className={`w-full py-3.5 rounded-2xl font-semibold transition-colors flex items-center justify-center gap-2 ${
           saved
             ? 'bg-green-500 text-white'
-            : 'bg-primary-600 hover:bg-primary-700 text-white'
+            : 'bg-primary-500 hover:bg-primary-600 text-white'
         }`}
       >
         {saved ? (

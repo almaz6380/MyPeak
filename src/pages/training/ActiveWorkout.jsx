@@ -226,7 +226,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
                       value={set.weight}
                       onChange={(e) => ctx.updateSet(exIdx, setIdx, 'weight', e.target.value)}
                       placeholder="0"
-                      className={`w-full px-2 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border ${borderColor} text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-500`}
+                      className={`w-full px-2 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border ${borderColor} text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-400`}
                     />
                     <input
                       type="number"
@@ -234,7 +234,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
                       value={set.reps}
                       onChange={(e) => ctx.updateSet(exIdx, setIdx, 'reps', e.target.value)}
                       placeholder="0"
-                      className={`w-full px-2 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border ${borderColor} text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-500`}
+                      className={`w-full px-2 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border ${borderColor} text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-400`}
                     />
                     <button onClick={() => ctx.removeSet(exIdx, setIdx)} className="flex items-center justify-center text-slate-300 hover:text-red-400">
                       <Trash2 className="w-3.5 h-3.5" />
@@ -282,7 +282,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
           <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 w-full max-w-sm shadow-xl">
             <p className="text-center font-semibold mb-2">{t('training.noValidSets')}</p>
             <p className="text-center text-sm text-slate-500 dark:text-slate-400 mb-4">{t('training.noValidSetsDesc')}</p>
-            <button onClick={() => setShowNoValidSets(false)} className="w-full py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-medium text-sm">OK</button>
+            <button onClick={() => setShowNoValidSets(false)} className="w-full py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-medium text-sm">OK</button>
           </div>
         </div>
       )}
@@ -295,10 +295,10 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
             </div>
             <p className="text-center font-semibold mb-1">{t('training.saveAsPlan')}</p>
             <p className="text-center text-sm text-slate-500 dark:text-slate-400 mb-4">{t('training.saveAsPlanDesc')}</p>
-            <input type="text" value={planName} onChange={(e) => setPlanName(e.target.value)} placeholder={t('training.savePlanName')} className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 mb-4" />
+            <input type="text" value={planName} onChange={(e) => setPlanName(e.target.value)} placeholder={t('training.savePlanName')} className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 mb-4" />
             <div className="flex gap-3">
               <button onClick={handleSkipSavePlan} className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm">{t('training.no')}</button>
-              <button onClick={handleSaveAsPlan} disabled={!planName.trim()} className="flex-1 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white font-medium text-sm">{t('training.yes')}</button>
+              <button onClick={handleSaveAsPlan} disabled={!planName.trim()} className="flex-1 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-medium text-sm">{t('training.yes')}</button>
             </div>
           </div>
         </div>

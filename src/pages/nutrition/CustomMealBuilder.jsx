@@ -108,7 +108,7 @@ export default function CustomMealBuilder({ onBack, onSaved, editMeal = null, la
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder={t('nutrition.mealNamePlaceholder')}
-          className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
         />
       </div>
 
@@ -154,7 +154,7 @@ export default function CustomMealBuilder({ onBack, onSaved, editMeal = null, la
       {items.length > 0 && (
         <div className="grid grid-cols-4 gap-2 mb-4">
           <div className="bg-primary-50 dark:bg-primary-900/20 rounded-xl p-2.5 text-center">
-            <p className="text-sm font-bold text-primary-600 dark:text-primary-400">{Math.round(totals.calories)}</p>
+            <p className="text-sm font-bold text-primary-500 dark:text-primary-400">{Math.round(totals.calories)}</p>
             <p className="text-[10px] text-primary-500 dark:text-primary-400">kcal</p>
           </div>
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-2.5 text-center">
@@ -179,7 +179,7 @@ export default function CustomMealBuilder({ onBack, onSaved, editMeal = null, la
         className={`w-full py-3.5 rounded-2xl font-semibold transition-colors flex items-center justify-center gap-2 ${
           saved
             ? 'bg-green-500 text-white'
-            : 'bg-primary-600 hover:bg-primary-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white'
+            : 'bg-primary-500 hover:bg-primary-600 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white'
         }`}
       >
         {saved ? (

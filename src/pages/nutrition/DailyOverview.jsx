@@ -126,7 +126,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
           onClick={() => setShowCalendar(true)}
           className={`flex-1 py-2.5 rounded-xl text-sm font-semibold text-center shadow-sm transition-colors ${
             isToday
-              ? 'bg-primary-600 text-white'
+              ? 'bg-primary-500 text-white'
               : 'bg-white dark:bg-surface-dark-alt text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
         >
@@ -143,7 +143,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
         {!isToday && (
           <button
             onClick={() => setSelectedDate(formatDate(new Date()))}
-            className="px-3 py-2.5 rounded-xl bg-primary-600 text-white text-xs font-semibold shadow-sm hover:bg-primary-700 transition-colors whitespace-nowrap"
+            className="px-3 py-2.5 rounded-xl bg-primary-500 text-white text-xs font-semibold shadow-sm hover:bg-primary-600 transition-colors whitespace-nowrap"
           >
             {t('nutrition.today')}
           </button>
@@ -173,7 +173,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
         <div className="mt-3 text-center">
           {totals.calories <= goals.calories ? (
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              <span className="font-semibold text-primary-600 dark:text-primary-400">{Math.round(goals.calories - totals.calories)}</span>{' '}
+              <span className="font-semibold text-primary-500 dark:text-primary-400">{Math.round(goals.calories - totals.calories)}</span>{' '}
               kcal {t('nutrition.remaining')}
             </p>
           ) : (
@@ -293,7 +293,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
           onClick={onOpenTDEE}
           className="w-full border-2 border-dashed border-primary-300 dark:border-primary-700 rounded-2xl p-4 text-center hover:border-primary-400 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-colors"
         >
-          <p className="text-sm font-semibold text-primary-600 dark:text-primary-400">{t('nutrition.goalPrompt')}</p>
+          <p className="text-sm font-semibold text-primary-500 dark:text-primary-400">{t('nutrition.goalPrompt')}</p>
           <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{t('nutrition.goalPromptDesc')}</p>
         </button>
       )}
@@ -415,9 +415,9 @@ function CalendarModal({ selectedDate, onSelect, onClose, lang, t }) {
                   !cell.current
                     ? 'text-slate-200 dark:text-slate-700 cursor-default'
                     : isSelected
-                    ? 'bg-primary-600 text-white font-bold shadow-md shadow-primary-500/30'
+                    ? 'bg-primary-500 text-white font-bold shadow-md shadow-primary-500/30'
                     : isToday
-                    ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-semibold'
+                    ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-500 dark:text-primary-400 font-semibold'
                     : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium'
                 }`}
               >
@@ -440,7 +440,7 @@ function CalendarModal({ selectedDate, onSelect, onClose, lang, t }) {
           </button>
           <button
             onClick={() => onSelect(todayStr)}
-            className="flex-1 py-2.5 rounded-xl bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 transition-colors"
+            className="flex-1 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-semibold hover:bg-primary-600 transition-colors"
           >
             {t('nutrition.today')}
           </button>
@@ -479,14 +479,14 @@ function GoalEditorModal({ goals, onSave, onClose, t }) {
           </button>
         </div>
         <div className="px-6 space-y-3">
-          <GoalField label={`${t('nutrition.calories')} (kcal)`} value={calories} onChange={setCalories} color="bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800 focus:ring-primary-500" />
+          <GoalField label={`${t('nutrition.calories')} (kcal)`} value={calories} onChange={setCalories} color="bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800 focus:ring-primary-400" />
           <GoalField label={`${t('nutrition.protein')} (g)`} value={protein} onChange={setProtein} color="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 focus:ring-blue-500" />
           <GoalField label={`${t('nutrition.carbs')} (g)`} value={carbs} onChange={setCarbs} color="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 focus:ring-amber-500" />
           <GoalField label={`${t('nutrition.fat')} (g)`} value={fat} onChange={setFat} color="bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 focus:ring-rose-500" />
           <GoalField label={`${t('nutrition.water')} (ml)`} value={waterMl} onChange={setWaterMl} color="bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-800 focus:ring-cyan-500" />
         </div>
         <div className="px-6 pt-5 pb-6">
-          <button onClick={handleSave} className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
+          <button onClick={handleSave} className="w-full py-3 bg-primary-500 hover:bg-primary-500 text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
             <Check className="w-4 h-4" />
             {t('common.save')}
           </button>

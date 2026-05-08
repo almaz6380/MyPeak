@@ -56,7 +56,7 @@ export default function PortionPicker({ food, onConfirm, onClose, initialServing
           <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">{t('nutrition.per100g')}</p>
           <div className="flex justify-between text-center">
             <div>
-              <p className="text-sm font-bold text-primary-600 dark:text-primary-400">{food.calories}</p>
+              <p className="text-sm font-bold text-primary-500 dark:text-primary-400">{food.calories}</p>
               <p className="text-[10px] text-slate-400">kcal</p>
             </div>
             <div>
@@ -112,7 +112,7 @@ export default function PortionPicker({ food, onConfirm, onClose, initialServing
         <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
           <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-3">{t('nutrition.perServing')}</p>
           <div className="grid grid-cols-4 gap-2">
-            <MacroCard label="kcal" value={macros.calories} color="bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400" />
+            <MacroCard label="kcal" value={macros.calories} color="bg-primary-50 dark:bg-primary-900/20 text-primary-500 dark:text-primary-400" />
             <MacroCard label={t('nutrition.protein')} value={`${macros.protein}g`} color="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400" />
             <MacroCard label={t('nutrition.carbs')} value={`${macros.carbs}g`} color="bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400" />
             <MacroCard label={t('nutrition.fat')} value={`${macros.fat}g`} color="bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400" />
@@ -123,7 +123,7 @@ export default function PortionPicker({ food, onConfirm, onClose, initialServing
       {/* Confirm Button */}
       <button
         onClick={handleConfirm}
-        className="w-full py-3.5 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white rounded-2xl font-semibold transition-colors mt-4"
+        className="w-full py-3.5 bg-primary-500 hover:bg-primary-600 active:bg-primary-800 text-white rounded-2xl font-semibold transition-colors mt-4"
       >
         {editMode ? t('common.save') : t('nutrition.add')}
       </button>

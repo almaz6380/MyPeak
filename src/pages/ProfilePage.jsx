@@ -96,8 +96,8 @@ export default function ProfilePage() {
       {/* User header */}
       {profile?.name && (
         <div className="flex items-center gap-4 mb-6 p-4 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm">
-          <div className="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-            <User className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+          <div className="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center">
+            <User className="w-6 h-6 text-primary-500 dark:text-primary-400" />
           </div>
           <div>
             <p className="text-lg font-semibold text-slate-900 dark:text-white">{profile.name}</p>
@@ -347,7 +347,7 @@ function EditModal({ field, value, onChange, onSave, onClose, saving, error, t }
               onChange={(e) => onChange(e.target.value)}
               placeholder={config.placeholder}
               autoFocus
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-lg focus:outline-none focus:ring-2 focus:ring-primary-400"
             />
           )}
 
@@ -395,11 +395,11 @@ function EditModal({ field, value, onChange, onSave, onClose, saving, error, t }
                   onClick={() => onChange(opt.value)}
                   className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
                     value === opt.value
-                      ? 'border-primary-600 bg-primary-50 dark:bg-primary-900/20'
+                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
                       : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
-                  <p className={`font-semibold ${value === opt.value ? 'text-primary-700 dark:text-primary-400' : 'text-slate-900 dark:text-white'}`}>
+                  <p className={`font-semibold ${value === opt.value ? 'text-primary-500 dark:text-primary-400' : 'text-slate-900 dark:text-white'}`}>
                     {opt.label}
                   </p>
                   {opt.desc && (
@@ -416,7 +416,7 @@ function EditModal({ field, value, onChange, onSave, onClose, saving, error, t }
           <button
             onClick={onSave}
             disabled={saving || (config.type === 'text' && !(value || '').trim())}
-            className="w-full py-3.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white font-semibold rounded-2xl flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-3.5 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold rounded-2xl flex items-center justify-center gap-2 transition-colors"
           >
             {saving ? (
               <Loader2 className="w-5 h-5 animate-spin" />

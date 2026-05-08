@@ -81,7 +81,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search..."
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
         />
       </div>
 
@@ -118,7 +118,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
               key={ex.id}
               onClick={() => selectionMode ? toggleSelect(ex.id) : null}
               className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-sm transition-all ${
-                selected.includes(ex.id) ? 'ring-2 ring-primary-500' : ''
+                selected.includes(ex.id) ? 'ring-2 ring-primary-400' : ''
               }`}
             >
               <div className="flex items-center justify-between">
@@ -165,7 +165,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
         <div className="fixed bottom-20 left-0 right-0 px-4 pb-2">
           <button
             onClick={handleConfirm}
-            className="w-full max-w-lg mx-auto block bg-primary-600 hover:bg-primary-700 text-white rounded-2xl py-3.5 font-semibold text-center shadow-lg transition-colors dark:bg-primary-500 dark:hover:bg-primary-600"
+            className="w-full max-w-lg mx-auto block bg-primary-500 hover:bg-primary-600 text-white rounded-2xl py-3.5 font-semibold text-center shadow-lg transition-colors bg-primary-500 hover:bg-primary-600"
           >
             {t('training.addExercise')} ({selected.length})
           </button>
@@ -200,7 +200,7 @@ function CreateExerciseModal({ onSave, onClose, t }) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={t('training.exerciseNamePlaceholder')}
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
             />
           </div>
 
@@ -247,7 +247,7 @@ function CreateExerciseModal({ onSave, onClose, t }) {
           <button
             onClick={() => name.trim() && onSave({ name: name.trim(), muscleGroup, equipment })}
             disabled={!name.trim()}
-            className="w-full py-3 bg-primary-600 hover:bg-primary-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-3 bg-primary-500 hover:bg-primary-600 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
           >
             <Check className="w-4 h-4" />
             {t('common.save')}

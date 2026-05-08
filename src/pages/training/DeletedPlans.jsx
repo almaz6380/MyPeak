@@ -89,7 +89,7 @@ export default function DeletedPlans({ onBack }) {
                 <div className="flex items-center gap-2 ml-3 flex-shrink-0">
                   <button
                     onClick={() => handleRestoreCustom(plan.id)}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 text-sm font-medium hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-500 dark:text-primary-400 text-sm font-medium hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors"
                   >
                     <RotateCcw className="w-4 h-4" />
                     {t('plans.restore')}
@@ -116,7 +116,7 @@ export default function DeletedPlans({ onBack }) {
                 <div className="flex items-center gap-2 ml-3 flex-shrink-0">
                   <button
                     onClick={() => handleRestoreDefault(plan.id)}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 text-sm font-medium hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-500 dark:text-primary-400 text-sm font-medium hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors"
                   >
                     <RotateCcw className="w-4 h-4" />
                     {t('plans.restore')}

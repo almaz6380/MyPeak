@@ -27,7 +27,7 @@ export default function ResetPasswordForm({ onSwitchToLogin }) {
         </p>
         <button
           onClick={onSwitchToLogin}
-          className="text-primary-600 dark:text-primary-400 font-medium hover:underline"
+          className="text-primary-500 dark:text-primary-400 font-medium hover:underline"
         >
           {t('auth.login')}
         </button>
@@ -58,14 +58,14 @@ export default function ResetPasswordForm({ onSwitchToLogin }) {
           onChange={(e) => setEmail(e.target.value)}
           placeholder={t('auth.email')}
           required
-          className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent"
         />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3.5 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white font-semibold rounded-2xl transition-colors flex items-center justify-center gap-2"
+        className="w-full py-3.5 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold rounded-2xl transition-colors flex items-center justify-center gap-2"
       >
         {loading && <Loader2 className="w-5 h-5 animate-spin" />}
         {t('auth.sendResetLink')}

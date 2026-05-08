@@ -85,8 +85,8 @@ export default function PostWorkoutSummary({ exercises, prs = {}, duration, user
         )}
         {newExercises > 0 && (
           <div className="flex-1 bg-primary-50 dark:bg-primary-900/20 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">{newExercises}</p>
-            <p className="text-xs text-primary-600 dark:text-primary-400">{t('training.noLastData')}</p>
+            <p className="text-2xl font-bold text-primary-500 dark:text-primary-400">{newExercises}</p>
+            <p className="text-xs text-primary-500 dark:text-primary-400">{t('training.noLastData')}</p>
           </div>
         )}
       </div>
@@ -164,7 +164,7 @@ export default function PostWorkoutSummary({ exercises, prs = {}, duration, user
 
       <button
         onClick={onDismiss}
-        className="w-full bg-primary-600 hover:bg-primary-700 text-white rounded-2xl py-3.5 font-semibold transition-colors dark:bg-primary-500"
+        className="w-full bg-primary-500 hover:bg-primary-600 text-white rounded-2xl py-3.5 font-semibold transition-colors dark:bg-primary-500"
       >
         {t('training.continue')}
       </button>

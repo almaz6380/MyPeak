@@ -210,7 +210,7 @@ export default function WorkoutHistory({ onBack }) {
               <p className="text-xs text-slate-400">{t(`training.${weightUnit}`)}</p>
             </div>
             <div className="text-center">
-              <p className="text-lg font-bold text-primary-600 dark:text-primary-400">{totalVolume(newer.exercises)}</p>
+              <p className="text-lg font-bold text-primary-500 dark:text-primary-400">{totalVolume(newer.exercises)}</p>
               <p className="text-xs text-slate-400">{t(`training.${weightUnit}`)}</p>
             </div>
           </div>
@@ -287,7 +287,7 @@ export default function WorkoutHistory({ onBack }) {
           <button
             onClick={startCompare}
             disabled={compareSelection.length < 2}
-            className="px-4 py-1.5 rounded-lg bg-primary-600 hover:bg-primary-700 disabled:opacity-40 text-white text-sm font-medium transition-colors dark:bg-primary-500"
+            className="px-4 py-1.5 rounded-lg bg-primary-500 hover:bg-primary-600 disabled:opacity-40 text-white text-sm font-medium transition-colors dark:bg-primary-500"
           >
             {t('training.compare')}
           </button>
@@ -327,7 +327,7 @@ export default function WorkoutHistory({ onBack }) {
                 onClick={() => compareMode ? toggleCompareSelect(workout.id) : null}
                 className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm transition-all ${
                   compareMode ? 'cursor-pointer' : ''
-                } ${isSelected ? 'ring-2 ring-primary-500' : ''}`}
+                } ${isSelected ? 'ring-2 ring-primary-400' : ''}`}
               >
                 {/* Header — always visible */}
                 <div
@@ -596,14 +596,14 @@ function EditWorkoutModal({ workout, onSave, onClose, t, weightUnit }) {
                       inputMode="decimal"
                       value={set.weight}
                       onChange={(e) => updateSet(exIdx, setIdx, 'weight', e.target.value)}
-                      className="w-full px-2 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-2 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-400"
                     />
                     <input
                       type="number"
                       inputMode="decimal"
                       value={set.reps}
                       onChange={(e) => updateSet(exIdx, setIdx, 'reps', e.target.value)}
-                      className="w-full px-2 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-2 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-400"
                     />
                     <button onClick={() => removeSet(exIdx, setIdx)} className="text-slate-300 hover:text-red-400">
                       <Trash2 className="w-3.5 h-3.5" />
@@ -623,7 +623,7 @@ function EditWorkoutModal({ workout, onSave, onClose, t, weightUnit }) {
         <div className="px-5 pt-3 pb-5 shrink-0 border-t border-slate-100 dark:border-slate-700">
           <button
             onClick={handleSave}
-            className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
           >
             <Check className="w-4 h-4" />
             {t('common.save')}

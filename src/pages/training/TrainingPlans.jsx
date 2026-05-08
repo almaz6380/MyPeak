@@ -224,13 +224,13 @@ export default function TrainingPlans({ onBack, onStartPlan, onStartHiit, onStar
           <>
             <div className="mb-4">
               <label className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">{t('plans.planName')}</label>
-              <input type="text" value={newStrengthPlan.name} onChange={(e) => setNewStrengthPlan((p) => ({ ...p, name: e.target.value }))} placeholder={t('plans.enterPlanName')} className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <input type="text" value={newStrengthPlan.name} onChange={(e) => setNewStrengthPlan((p) => ({ ...p, name: e.target.value }))} placeholder={t('plans.enterPlanName')} className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
             </div>
             <div className="flex flex-col gap-3 mb-4">
               {newStrengthPlan.days.map((day, i) => (
                 <div key={i} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
                   <div className="flex items-center gap-2 mb-3">
-                    <input type="text" value={day.name} onChange={(e) => updateDayName(i, e.target.value)} placeholder={t('plans.enterDayName')} className="flex-1 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                    <input type="text" value={day.name} onChange={(e) => updateDayName(i, e.target.value)} placeholder={t('plans.enterDayName')} className="flex-1 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
                     <button onClick={() => removeDay(i)} className="p-2 text-slate-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
                   </div>
                   <button onClick={() => setSelectingDayIdx(i)} className="w-full text-sm text-primary-500 hover:text-primary-600 font-medium py-2 rounded-lg bg-slate-50 dark:bg-slate-800 transition-colors">
@@ -242,7 +242,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onStartHiit, onStar
             <button onClick={addDay} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:border-primary-400 hover:text-primary-500 transition-colors mb-4">
               <Plus className="w-4 h-4" /><span className="text-sm font-medium">{t('plans.addDay')}</span>
             </button>
-            <button onClick={saveStrengthPlan} disabled={!newStrengthPlan.name.trim() || newStrengthPlan.days.length === 0} className="w-full bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white rounded-2xl py-3.5 font-semibold transition-colors dark:bg-primary-500">{t('plans.savePlan')}</button>
+            <button onClick={saveStrengthPlan} disabled={!newStrengthPlan.name.trim() || newStrengthPlan.days.length === 0} className="w-full bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white rounded-2xl py-3.5 font-semibold transition-colors dark:bg-primary-500">{t('plans.savePlan')}</button>
           </>
         )}
 
@@ -251,7 +251,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onStartHiit, onStar
           <>
             <div className="mb-4">
               <label className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">{selectedArea === 'hiit' ? t('plans.hiitPlanName') : t('plans.circuitName')}</label>
-              <input type="text" value={newIntervalPlan.name} onChange={(e) => setNewIntervalPlan((p) => ({ ...p, name: e.target.value }))} placeholder={t('plans.enterPlanName')} className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <input type="text" value={newIntervalPlan.name} onChange={(e) => setNewIntervalPlan((p) => ({ ...p, name: e.target.value }))} placeholder={t('plans.enterPlanName')} className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
             </div>
             <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
               <div className="flex flex-col gap-4">
@@ -264,7 +264,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onStartHiit, onStar
               <Plus className="w-4 h-4" />
               <span className="text-sm font-medium">{newIntervalPlan.exercises.length > 0 ? `${newIntervalPlan.exercises.length} ${t('training.exercises')}` : t('plans.selectExercisesForDay')}</span>
             </button>
-            <button onClick={saveIntervalPlan} disabled={!newIntervalPlan.name.trim() || newIntervalPlan.exercises.length === 0} className="w-full bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white rounded-2xl py-3.5 font-semibold transition-colors dark:bg-primary-500">{t('plans.savePlan')}</button>
+            <button onClick={saveIntervalPlan} disabled={!newIntervalPlan.name.trim() || newIntervalPlan.exercises.length === 0} className="w-full bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white rounded-2xl py-3.5 font-semibold transition-colors dark:bg-primary-500">{t('plans.savePlan')}</button>
           </>
         )}
 
@@ -273,21 +273,21 @@ export default function TrainingPlans({ onBack, onStartPlan, onStartHiit, onStar
           <>
             <div className="mb-4">
               <label className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">{t('plans.cardioPlanName')}</label>
-              <input type="text" value={newCardioPlan.name} onChange={(e) => setNewCardioPlan((p) => ({ ...p, name: e.target.value }))} placeholder={t('plans.enterCardioPlanName')} className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <input type="text" value={newCardioPlan.name} onChange={(e) => setNewCardioPlan((p) => ({ ...p, name: e.target.value }))} placeholder={t('plans.enterCardioPlanName')} className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
             </div>
             <div className="flex flex-col gap-3 mb-4">
               {newCardioPlan.sessions.map((session, i) => (
                 <div key={i} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
                   <div className="flex items-center gap-2 mb-3">
-                    <input type="text" value={session.name} onChange={(e) => updateSession(i, 'name', e.target.value)} placeholder={t('plans.enterSessionName')} className="flex-1 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                    <input type="text" value={session.name} onChange={(e) => updateSession(i, 'name', e.target.value)} placeholder={t('plans.enterSessionName')} className="flex-1 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
                     <button onClick={() => removeSession(i)} className="p-2 text-slate-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
                   </div>
                   <div className="flex gap-2">
-                    <select value={session.exerciseId} onChange={(e) => updateSession(i, 'exerciseId', e.target.value)} className="flex-1 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    <select value={session.exerciseId} onChange={(e) => updateSession(i, 'exerciseId', e.target.value)} className="flex-1 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400">
                       <option value="">{t('plans.selectActivity')}</option>
                       {cardioExercises.map((ex) => (<option key={ex.id} value={ex.id}>{t(ex.nameKey)}</option>))}
                     </select>
-                    <input type="number" value={session.targetDuration} onChange={(e) => updateSession(i, 'targetDuration', parseInt(e.target.value) || 0)} className="w-20 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                    <input type="number" value={session.targetDuration} onChange={(e) => updateSession(i, 'targetDuration', parseInt(e.target.value) || 0)} className="w-20 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-400" />
                     <span className="self-center text-sm text-slate-400">{t('training.min')}</span>
                   </div>
                 </div>
@@ -296,7 +296,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onStartHiit, onStar
             <button onClick={addSession} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:border-primary-400 hover:text-primary-500 transition-colors mb-4">
               <Plus className="w-4 h-4" /><span className="text-sm font-medium">{t('plans.addSession')}</span>
             </button>
-            <button onClick={saveCardioPlan} disabled={!newCardioPlan.name.trim() || newCardioPlan.sessions.length === 0} className="w-full bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white rounded-2xl py-3.5 font-semibold transition-colors dark:bg-primary-500">{t('plans.savePlan')}</button>
+            <button onClick={saveCardioPlan} disabled={!newCardioPlan.name.trim() || newCardioPlan.sessions.length === 0} className="w-full bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white rounded-2xl py-3.5 font-semibold transition-colors dark:bg-primary-500">{t('plans.savePlan')}</button>
           </>
         )}
       </div>
@@ -449,7 +449,7 @@ function PlanCard({ plan, type, t, onStart, onDelete, isCustom }) {
           })}
           {exerciseIds.length > 6 && <span className="text-xs text-slate-400">+{exerciseIds.length - 6}</span>}
         </div>
-        <button onClick={() => onStart(isCustom ? { ...plan.days, name: plan.name } : plan)} className="w-full py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-medium text-sm transition-colors dark:bg-primary-500">
+        <button onClick={() => onStart(isCustom ? { ...plan.days, name: plan.name } : plan)} className="w-full py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-medium text-sm transition-colors dark:bg-primary-500">
           {t('plans.startPlan')}
         </button>
       </div>
@@ -539,7 +539,7 @@ function ExercisePicker({ initialSelected, onBack, onConfirm, exerciseType = 'st
 
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
+        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
@@ -562,7 +562,7 @@ function ExercisePicker({ initialSelected, onBack, onConfirm, exerciseType = 'st
 
       <div className="flex flex-col gap-2">
         {filtered.map((ex) => (
-          <button key={ex.id} onClick={() => toggleSelect(ex.id)} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-sm transition-all ${selected.includes(ex.id) ? 'ring-2 ring-primary-500' : ''}`}>
+          <button key={ex.id} onClick={() => toggleSelect(ex.id)} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-sm transition-all ${selected.includes(ex.id) ? 'ring-2 ring-primary-400' : ''}`}>
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate">{t(ex.nameKey)}</p>
@@ -582,7 +582,7 @@ function ExercisePicker({ initialSelected, onBack, onConfirm, exerciseType = 'st
 
       {selected.length > 0 && (
         <div className="fixed bottom-20 left-0 right-0 px-4 pb-2">
-          <button onClick={() => onConfirm(selected)} className="w-full max-w-lg mx-auto block bg-primary-600 hover:bg-primary-700 text-white rounded-2xl py-3.5 font-semibold text-center shadow-lg transition-colors dark:bg-primary-500">{t('training.done')} ({selected.length})</button>
+          <button onClick={() => onConfirm(selected)} className="w-full max-w-lg mx-auto block bg-primary-500 hover:bg-primary-600 text-white rounded-2xl py-3.5 font-semibold text-center shadow-lg transition-colors dark:bg-primary-500">{t('training.done')} ({selected.length})</button>
         </div>
       )}
     </div>

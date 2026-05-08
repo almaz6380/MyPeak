@@ -236,7 +236,7 @@ export default function TrainingPage() {
 
       <button
         onClick={startWorkout}
-        className="w-full bg-primary-600 hover:bg-primary-700 text-white rounded-2xl p-4 flex items-center justify-center gap-3 text-lg font-semibold transition-colors mb-6 dark:bg-primary-500 dark:hover:bg-primary-600"
+        className="w-full bg-primary-500 hover:bg-primary-600 text-white rounded-2xl p-4 flex items-center justify-center gap-3 text-lg font-semibold transition-colors mb-6 bg-primary-500 hover:bg-primary-600"
       >
         <Plus className="w-6 h-6" />
         {t('training.startWorkout')}
@@ -633,7 +633,7 @@ function HiitSetup({ onBack, onStart, exercises, t }) {
           <button
             key={p.id}
             onClick={() => loadSavedPlan(p)}
-            className="flex-shrink-0 px-4 py-2 rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 text-sm font-medium text-primary-700 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors"
+            className="flex-shrink-0 px-4 py-2 rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 text-sm font-medium text-primary-500 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors"
           >
             {p.name}
           </button>
@@ -719,7 +719,7 @@ function HiitSetup({ onBack, onStart, exercises, t }) {
         <button onClick={() => setShowSave(true)} disabled={selectedExercises.length === 0} className="w-full text-sm text-slate-500 dark:text-slate-400 hover:text-primary-500 font-medium py-2 disabled:opacity-50">{t('plans.saveHiitPlan')}</button>
       ) : (
         <div className="flex gap-2">
-          <input type="text" value={saveName} onChange={(e) => setSaveName(e.target.value)} placeholder={t('plans.hiitPlanName')} className="flex-1 px-3 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
+          <input type="text" value={saveName} onChange={(e) => setSaveName(e.target.value)} placeholder={t('plans.hiitPlanName')} className="flex-1 px-3 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
           <button onClick={handleSave} disabled={!saveName.trim()} className="px-4 py-2.5 rounded-xl bg-primary-600 text-white text-sm font-medium disabled:opacity-50">{t('common.save')}</button>
         </div>
       )}
@@ -789,7 +789,7 @@ function CircuitSetup({ onBack, onStart, exercises: circuitExercises, t }) {
             <button
               key={p.id}
               onClick={() => loadSavedPlan(p)}
-              className="flex-shrink-0 px-4 py-2 rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 text-sm font-medium text-primary-700 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors"
+              className="flex-shrink-0 px-4 py-2 rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 text-sm font-medium text-primary-500 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors"
             >
               {p.name}
             </button>
@@ -874,7 +874,7 @@ function CircuitSetup({ onBack, onStart, exercises: circuitExercises, t }) {
         <button onClick={() => setShowSave(true)} disabled={selectedExercises.length === 0} className="w-full text-sm text-slate-500 dark:text-slate-400 hover:text-primary-500 font-medium py-2 disabled:opacity-50">{t('plans.saveCircuit')}</button>
       ) : (
         <div className="flex gap-2">
-          <input type="text" value={saveName} onChange={(e) => setSaveName(e.target.value)} placeholder={t('plans.circuitName')} className="flex-1 px-3 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
+          <input type="text" value={saveName} onChange={(e) => setSaveName(e.target.value)} placeholder={t('plans.circuitName')} className="flex-1 px-3 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
           <button onClick={handleSaveCircuit} disabled={!saveName.trim()} className="px-4 py-2.5 rounded-xl bg-primary-600 text-white text-sm font-medium disabled:opacity-50">{t('common.save')}</button>
         </div>
       )}
@@ -917,7 +917,7 @@ function CircuitExercisePicker({ initialSelected, onBack, onConfirm, t }) {
 
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
+        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
@@ -1027,7 +1027,7 @@ function MartialArtsSetup({ onBack, onStart, t }) {
       {/* Saved Plans + Presets */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
         {savedPlans.map((p) => (
-          <button key={p.id} onClick={() => loadSavedPlan(p)} className="flex-shrink-0 px-4 py-2 rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 text-sm font-medium text-primary-700 dark:text-primary-400">{p.name}</button>
+          <button key={p.id} onClick={() => loadSavedPlan(p)} className="flex-shrink-0 px-4 py-2 rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 text-sm font-medium text-primary-500 dark:text-primary-400">{p.name}</button>
         ))}
         {presets.map((p, i) => (
           <button key={i} onClick={() => loadPreset(p)} className="flex-shrink-0 px-4 py-2 rounded-xl bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 text-sm font-medium text-violet-700 dark:text-violet-400">{t(p.nameKey)}</button>
@@ -1098,7 +1098,7 @@ function MartialArtsSetup({ onBack, onStart, t }) {
         <button onClick={() => setShowSave(true)} disabled={selectedExercises.length === 0} className="w-full text-sm text-slate-500 dark:text-slate-400 hover:text-primary-500 font-medium py-2 disabled:opacity-50">{t('plans.saveMartialArtsPlan')}</button>
       ) : (
         <div className="flex gap-2">
-          <input type="text" value={saveName} onChange={(e) => setSaveName(e.target.value)} placeholder={t('plans.martialArtsPlanName')} className="flex-1 px-3 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
+          <input type="text" value={saveName} onChange={(e) => setSaveName(e.target.value)} placeholder={t('plans.martialArtsPlanName')} className="flex-1 px-3 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
           <button onClick={handleSave} disabled={!saveName.trim()} className="px-4 py-2.5 rounded-xl bg-primary-600 text-white text-sm font-medium disabled:opacity-50">{t('common.save')}</button>
         </div>
       )}

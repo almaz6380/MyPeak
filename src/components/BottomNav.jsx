@@ -13,7 +13,7 @@ export default function BottomNav() {
   const { t } = useTranslation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-surface-dark-alt border-t border-slate-200 dark:border-slate-700 z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-surface-dark-alt border-t border-slate-200 dark:border-slate-800 z-50">
       <div className="max-w-lg mx-auto flex justify-around items-center h-16 pb-[env(safe-area-inset-bottom)]">
         {navItems.map(({ path, icon: Icon, labelKey }) => (
           <NavLink
@@ -22,8 +22,8 @@ export default function BottomNav() {
             className={({ isActive }) =>
               `flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors ${
                 isActive
-                  ? 'text-primary-600 dark:text-primary-400'
-                  : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                  ? 'text-primary-400'
+                  : 'text-slate-500 hover:text-slate-400 dark:text-slate-500 dark:hover:text-slate-300'
               }`
             }
           >

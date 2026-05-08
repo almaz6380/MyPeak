@@ -127,8 +127,8 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
           onClick={() => setShowManual(true)}
           className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
         >
-          <div className="w-9 h-9 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0">
-            <PenLine className="w-4.5 h-4.5 text-primary-600 dark:text-primary-400" />
+          <div className="w-9 h-9 rounded-xl bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center flex-shrink-0">
+            <PenLine className="w-4.5 h-4.5 text-primary-500 dark:text-primary-400" />
           </div>
           <div className="text-left min-w-0">
             <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{t('nutrition.manualEntry')}</p>
@@ -236,7 +236,7 @@ function ManualEntryForm({ onBack, onSave, t }) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder={t('nutrition.searchPlaceholder')}
-            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
           />
         </div>
 
@@ -246,7 +246,7 @@ function ManualEntryForm({ onBack, onSave, t }) {
             type="text"
             value={brand}
             onChange={(e) => setBrand(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
           />
         </div>
 
@@ -257,7 +257,7 @@ function ManualEntryForm({ onBack, onSave, t }) {
             inputMode="numeric"
             value={servingSize}
             onChange={(e) => setServingSize(parseInt(e.target.value) || 0)}
-            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
           />
         </div>
 
@@ -270,7 +270,7 @@ function ManualEntryForm({ onBack, onSave, t }) {
               value={calories}
               onChange={(e) => setCalories(e.target.value)}
               placeholder="0"
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
             />
           </div>
           <div>
@@ -281,7 +281,7 @@ function ManualEntryForm({ onBack, onSave, t }) {
               value={protein}
               onChange={(e) => setProtein(e.target.value)}
               placeholder="0"
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
             />
           </div>
           <div>
@@ -292,7 +292,7 @@ function ManualEntryForm({ onBack, onSave, t }) {
               value={carbs}
               onChange={(e) => setCarbs(e.target.value)}
               placeholder="0"
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
             />
           </div>
           <div>
@@ -303,7 +303,7 @@ function ManualEntryForm({ onBack, onSave, t }) {
               value={fat}
               onChange={(e) => setFat(e.target.value)}
               placeholder="0"
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
             />
           </div>
         </div>
@@ -311,7 +311,7 @@ function ManualEntryForm({ onBack, onSave, t }) {
         <button
           onClick={handleSave}
           disabled={!name.trim()}
-          className="w-full py-3.5 bg-primary-600 hover:bg-primary-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white rounded-2xl font-semibold transition-colors"
+          className="w-full py-3.5 bg-primary-500 hover:bg-primary-600 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white rounded-2xl font-semibold transition-colors"
         >
           {t('nutrition.add')}
         </button>
