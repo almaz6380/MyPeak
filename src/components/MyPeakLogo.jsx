@@ -3,23 +3,28 @@ export default function MyPeakLogo({ size = 28, showText = false, className = ''
     <div className={`flex items-center gap-2 ${className}`}>
       <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="peakGrad" x1="16" y1="2" x2="16" y2="30" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#818cf8" />
-            <stop offset="100%" stopColor="#6366f1" />
-          </linearGradient>
-          <linearGradient id="peakGrad2" x1="16" y1="2" x2="16" y2="30" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#a78bfa" />
-            <stop offset="100%" stopColor="#8b5cf6" />
+          <linearGradient id="peakGrad" x1="2" y1="28" x2="30" y2="4" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#6366f1" />
+            <stop offset="100%" stopColor="#a78bfa" />
           </linearGradient>
         </defs>
-        {/* Upward bolt / arrow */}
+        {/* Zigzag bolt: links unten → rechts rauf → rechts runter → rechts rauf (Spitze) */}
         <path
-          d="M18 2L7 17h7l-2 13L25 15h-7l2-13z"
-          fill="url(#peakGrad)"
+          d="M3 26L12 14L17 19L28 4"
+          stroke="url(#peakGrad)"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
         />
+        {/* Pfeilspitze oben */}
         <path
-          d="M18 2L7 17h7"
-          fill="url(#peakGrad2)"
+          d="M22 4H28V10"
+          stroke="url(#peakGrad)"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
         />
       </svg>
       {showText && (
