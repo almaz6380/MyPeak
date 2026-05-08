@@ -8,16 +8,29 @@ export default function BarcodeScanner({ onScanned, onClose }) {
   const [status, setStatus] = useState('starting');
   const [errorMsg, setErrorMsg] = useState('');
   const scannerRef = useRef(null);
+  const nativeLoopRef = useRef(null);
   const isProcessingRef = useRef(false);
   const isMountedRef = useRef(true);
 
-  const stopScanner = useCallback(async () => {
+  const cleanup = useCallback(async () => {
+    // Stop native scan loop
+    if (nativeLoopRef.current) {
+      clearInterval(nativeLoopRef.current);
+      nativeLoopRef.current = null;
+    }
+    // Stop html5-qrcode
     const s = scannerRef.current;
     scannerRef.current = null;
     if (!s) return;
     try { await s.stop(); } catch { /* */ }
     try { s.clear(); } catch { /* */ }
   }, []);
+
+  const onBarcodeFound = useCallback((barcode) => {
+    if (isProcessingRef.current) return;
+    isProcessingRef.current = true;
+    cleanup().then(() => lookupBarcode(barcode));
+  }, [cleanup]);
 
   const lookupBarcode = useCallback(async (barcode) => {
     if (!isMountedRef.current) return;
@@ -56,10 +69,9 @@ export default function BarcodeScanner({ onScanned, onClose }) {
   }, [onScanned]);
 
   const startScanner = useCallback(async () => {
-    await stopScanner();
+    await cleanup();
     if (!isMountedRef.current) return;
 
-    // Reset the container DOM completely to avoid stale video elements
     const container = document.getElementById('barcode-reader');
     if (container) container.innerHTML = '';
 
@@ -73,24 +85,23 @@ export default function BarcodeScanner({ onScanned, onClose }) {
       await scanner.start(
         { facingMode: 'environment' },
         {
-          fps: 20,
+          fps: 15,
           qrbox: (vw, vh) => ({
             width: Math.floor(Math.min(vw * 0.9, 400)),
             height: Math.floor(Math.min(vh * 0.25, 180)),
           }),
-          experimentalFeatures: {
-            useBarCodeDetectorIfSupported: true,
-          },
         },
-        (decodedText) => {
-          if (isProcessingRef.current) return;
-          isProcessingRef.current = true;
-          stopScanner().then(() => lookupBarcode(decodedText));
-        },
+        // html5-qrcode success callback (ZXing-based, slower but reliable fallback)
+        (decodedText) => onBarcodeFound(decodedText),
         () => {}
       );
 
-      if (isMountedRef.current) setStatus('scanning');
+      if (!isMountedRef.current) return;
+      setStatus('scanning');
+
+      // PARALLEL: Start native BarcodeDetector loop on the video element (much faster)
+      startNativeScanLoop();
+
     } catch (err) {
       console.error('Scanner error:', err);
       if (!isMountedRef.current) return;
@@ -102,7 +113,37 @@ export default function BarcodeScanner({ onScanned, onClose }) {
           : t('nutrition.cameraError')
       );
     }
-  }, [stopScanner, lookupBarcode, t]);
+  }, [cleanup, onBarcodeFound, t]);
+
+  function startNativeScanLoop() {
+    if (!('BarcodeDetector' in window)) return;
+
+    // Check if barcode formats are supported
+    BarcodeDetector.getSupportedFormats().then((formats) => {
+      const wanted = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39']
+        .filter((f) => formats.includes(f));
+      if (wanted.length === 0) return;
+
+      const detector = new BarcodeDetector({ formats: wanted });
+
+      // Scan every 100ms using the video element html5-qrcode created
+      nativeLoopRef.current = setInterval(async () => {
+        if (isProcessingRef.current || !isMountedRef.current) return;
+
+        const video = document.querySelector('#barcode-reader video');
+        if (!video || video.readyState < 2) return;
+
+        try {
+          const barcodes = await detector.detect(video);
+          if (barcodes.length > 0 && barcodes[0].rawValue) {
+            onBarcodeFound(barcodes[0].rawValue);
+          }
+        } catch {
+          // detect can fail if video not ready
+        }
+      }, 100);
+    }).catch(() => {});
+  }
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -110,12 +151,12 @@ export default function BarcodeScanner({ onScanned, onClose }) {
     return () => {
       isMountedRef.current = false;
       clearTimeout(timer);
-      stopScanner();
+      cleanup();
     };
   }, []);
 
   function handleClose() {
-    stopScanner().then(onClose);
+    cleanup().then(onClose);
   }
 
   return (
