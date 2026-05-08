@@ -93,7 +93,10 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
     <div className="p-4 pb-24">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <MyPeakLogo size={24} />
+        <div className="flex items-center gap-2.5">
+          <MyPeakLogo size={32} />
+          <h1 className="text-2xl font-bold">{t('nutrition.title')}</h1>
+        </div>
         <div className="flex gap-2">
           <button
             onClick={onOpenCustomMeals}

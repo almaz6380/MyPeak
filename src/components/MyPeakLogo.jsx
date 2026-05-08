@@ -1,51 +1,44 @@
-export default function MyPeakLogo({ size = 28, className = '' }) {
-  const width = size * 5.5;
-  const height = size;
-
+export default function MyPeakLogo({ size = 32, className = '' }) {
   return (
-    <svg width={width} height={height} viewBox="0 0 176 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
       <defs>
-        <linearGradient id="peakGrad" x1="0" y1="28" x2="176" y2="4" gradientUnits="userSpaceOnUse">
+        <linearGradient id="peakGrad" x1="2" y1="28" x2="30" y2="4" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#6366f1" />
           <stop offset="100%" stopColor="#a78bfa" />
         </linearGradient>
       </defs>
-      {/* Left part of zigzag: start bottom-left → up-right */}
+      {/* Zigzag bolt */}
       <path
-        d="M3 26L14 12"
+        d="M3 26L12 14L17 19L28 4"
         stroke="url(#peakGrad)"
         strokeWidth="3.5"
         strokeLinecap="round"
         strokeLinejoin="round"
+        fill="none"
       />
-      {/* "MyPeak" text in the middle */}
+      {/* Pfeilspitze */}
+      <path
+        d="M22 4H28V10"
+        stroke="url(#peakGrad)"
+        strokeWidth="3.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      {/* Weißer Balken überdeckt Pfad-Mitte */}
+      <rect x="5" y="15" width="22" height="9" rx="2" className="fill-surface-alt dark:fill-surface-dark" />
+      {/* MyPeak Text */}
       <text
-        x="88"
+        x="16"
         y="22"
         textAnchor="middle"
-        fontFamily="Inter, system-ui, -apple-system, sans-serif"
+        fontFamily="Inter, system-ui, sans-serif"
         fontWeight="800"
-        fontSize="18"
+        fontSize="7"
         fill="url(#peakGrad)"
       >
         MyPeak
       </text>
-      {/* Right part of zigzag: down-right → up-right with arrow */}
-      <path
-        d="M162 20L173 5"
-        stroke="url(#peakGrad)"
-        strokeWidth="3.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {/* Arrow tip */}
-      <path
-        d="M168 5H173V10"
-        stroke="url(#peakGrad)"
-        strokeWidth="3.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
     </svg>
   );
 }

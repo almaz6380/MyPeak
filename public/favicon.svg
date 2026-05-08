@@ -5,13 +5,13 @@
       <stop offset="100%" stop-color="#8b5cf6"/>
     </linearGradient>
   </defs>
-  <!-- Background -->
   <rect width="512" height="512" rx="96" fill="url(#bg)"/>
-  <!-- Left zigzag part -->
-  <path d="M80 400L155 260" stroke="white" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- "MyPeak" text -->
-  <text x="256" y="300" text-anchor="middle" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="800" font-size="100" fill="white">MyPeak</text>
-  <!-- Right zigzag part + arrow -->
-  <path d="M357 260L432 110" stroke="white" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M400 110H432V142" stroke="white" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Zigzag bolt -->
+  <path d="M80 400L192 220L272 310L432 80" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Arrow tip -->
+  <path d="M340 80H432V172" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- White bar behind text -->
+  <rect x="80" y="235" width="352" height="80" rx="16" fill="url(#bg)"/>
+  <!-- MyPeak text -->
+  <text x="256" y="293" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="72" fill="white">MyPeak</text>
 </svg>

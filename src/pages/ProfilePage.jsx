@@ -88,8 +88,9 @@ export default function ProfilePage() {
 
   return (
     <div className="p-4 pb-24">
-      <div className="mb-6">
-        <MyPeakLogo size={24} />
+      <div className="flex items-center gap-2.5 mb-6">
+        <MyPeakLogo size={32} />
+        <h1 className="text-2xl font-bold">{t('profile.title')}</h1>
       </div>
 
       {/* User header */}
