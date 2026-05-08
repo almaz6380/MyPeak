@@ -1,37 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
-import { X, ScanBarcode, Loader2, AlertCircle, ZoomOut, ZoomIn } from 'lucide-react';
-
-const FORMATS = [
-  Html5QrcodeSupportedFormats.EAN_13,
-  Html5QrcodeSupportedFormats.EAN_8,
-  Html5QrcodeSupportedFormats.UPC_A,
-  Html5QrcodeSupportedFormats.UPC_E,
-  Html5QrcodeSupportedFormats.CODE_128,
-  Html5QrcodeSupportedFormats.CODE_39,
-];
+import { Html5QrcodeScanner, Html5QrcodeScanType, Html5QrcodeSupportedFormats } from 'html5-qrcode';
+import { X, ScanBarcode, Loader2, AlertCircle } from 'lucide-react';
 
 export default function BarcodeScanner({ onScanned, onClose }) {
   const { t } = useTranslation();
   const [status, setStatus] = useState('starting');
   const [errorMsg, setErrorMsg] = useState('');
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [zoomRange, setZoomRange] = useState(null);
   const scannerRef = useRef(null);
   const isProcessingRef = useRef(false);
   const isMountedRef = useRef(true);
-
-  const stopScanner = useCallback(async () => {
-    const scanner = scannerRef.current;
-    if (!scanner) return;
-    try {
-      const state = scanner.getState();
-      if (state === 2) await scanner.stop();
-    } catch { /* ignore */ }
-    try { scanner.clear(); } catch { /* ignore */ }
-    scannerRef.current = null;
-  }, []);
 
   const lookupBarcode = useCallback(async (barcode) => {
     if (!isMountedRef.current) return;
@@ -73,95 +51,102 @@ export default function BarcodeScanner({ onScanned, onClose }) {
     }
   }, [onScanned]);
 
-  const startScanner = useCallback(async () => {
-    await stopScanner();
-    if (!isMountedRef.current) return;
-    setStatus('starting');
-    isProcessingRef.current = false;
-
-    try {
-      const scanner = new Html5Qrcode('barcode-reader', {
-        formatsToSupport: FORMATS,
-        verbose: false,
-      });
-      scannerRef.current = scanner;
-
-      // Use facingMode directly — this skips getCameras() and avoids extra permission prompts
-      await scanner.start(
-        { facingMode: 'environment' },
-        {
-          fps: 15,
-          qrbox: (vw, vh) => {
-            const w = Math.min(Math.floor(vw * 0.85), 340);
-            const h = Math.min(Math.floor(w * 0.45), Math.floor(vh * 0.3));
-            return { width: Math.max(w, 200), height: Math.max(h, 80) };
-          },
-          aspectRatio: window.innerHeight / window.innerWidth,
-          disableFlip: false,
-        },
-        (decodedText) => {
-          if (isProcessingRef.current) return;
-          isProcessingRef.current = true;
-          stopScanner().then(() => lookupBarcode(decodedText));
-        },
-        () => {} // ignore per-frame failures
-      );
-
-      if (!isMountedRef.current) return;
-
-      // Try to set zoom to minimum after scanner started
-      // Access the video track from the scanner's internal video element
-      try {
-        const videoEl = document.querySelector('#barcode-reader video');
-        const track = videoEl?.srcObject?.getVideoTracks()?.[0];
-        if (track) {
-          const caps = track.getCapabilities?.();
-          if (caps?.zoom) {
-            await track.applyConstraints({ advanced: [{ zoom: caps.zoom.min }] });
-            setZoomLevel(caps.zoom.min);
-            setZoomRange({ min: caps.zoom.min, max: caps.zoom.max, step: caps.zoom.step || 0.1 });
-          }
-        }
-      } catch { /* zoom not supported */ }
-
-      setStatus('scanning');
-    } catch (err) {
-      console.error('Scanner error:', err);
-      if (!isMountedRef.current) return;
-      const errStr = err?.toString?.() || '';
-      if (errStr.includes('NotAllowedError') || errStr.includes('Permission')) {
-        setStatus('error');
-        setErrorMsg(t('nutrition.cameraPermissionDenied'));
-      } else {
-        setStatus('error');
-        setErrorMsg(t('nutrition.cameraError'));
-      }
-    }
-  }, [stopScanner, lookupBarcode, t]);
-
-  function adjustZoom(delta) {
-    try {
-      const videoEl = document.querySelector('#barcode-reader video');
-      const track = videoEl?.srcObject?.getVideoTracks()?.[0];
-      if (!track || !zoomRange) return;
-      const newZoom = Math.max(zoomRange.min, Math.min(zoomRange.max, zoomLevel + delta));
-      track.applyConstraints({ advanced: [{ zoom: newZoom }] });
-      setZoomLevel(newZoom);
-    } catch { /* ignore */ }
-  }
-
   useEffect(() => {
     isMountedRef.current = true;
-    const timer = setTimeout(() => startScanner(), 100);
+
+    // Html5QrcodeScanner handles everything: camera permission, video rendering, scanning
+    const scanner = new Html5QrcodeScanner(
+      'barcode-reader',
+      {
+        fps: 15,
+        qrbox: { width: 280, height: 120 },
+        rememberLastUsedCamera: true,
+        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
+        showTorchButtonIfSupported: false,
+        showZoomSliderIfSupported: true,
+        defaultZoomValueIfSupported: 1,
+        // Use native BarcodeDetector API when available (much faster)
+        experimentalFeatures: {
+          useBarCodeDetectorIfSupported: true,
+        },
+        // No format restriction — scan ALL barcode types
+      },
+      /* verbose= */ false
+    );
+
+    scannerRef.current = scanner;
+
+    scanner.render(
+      // Success callback
+      (decodedText) => {
+        if (isProcessingRef.current) return;
+        isProcessingRef.current = true;
+
+        // Clear scanner UI before looking up
+        try { scanner.clear(); } catch { /* ignore */ }
+        scannerRef.current = null;
+
+        lookupBarcode(decodedText);
+      },
+      // Error callback (per-frame, ignore)
+      () => {}
+    );
+
+    // Once rendering starts, mark as scanning
+    // Small delay to let the scanner initialize
+    const timer = setTimeout(() => {
+      if (isMountedRef.current) setStatus('scanning');
+    }, 1500);
+
     return () => {
       isMountedRef.current = false;
       clearTimeout(timer);
-      stopScanner();
+      try { scanner.clear(); } catch { /* ignore */ }
+      scannerRef.current = null;
     };
-  }, []);
+  }, [lookupBarcode]);
+
+  function handleRetry() {
+    isProcessingRef.current = false;
+    setStatus('starting');
+
+    // Re-create scanner
+    const scanner = new Html5QrcodeScanner(
+      'barcode-reader',
+      {
+        fps: 15,
+        qrbox: { width: 280, height: 120 },
+        rememberLastUsedCamera: true,
+        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
+        showTorchButtonIfSupported: false,
+        showZoomSliderIfSupported: true,
+        defaultZoomValueIfSupported: 1,
+        experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+      },
+      false
+    );
+    scannerRef.current = scanner;
+
+    scanner.render(
+      (decodedText) => {
+        if (isProcessingRef.current) return;
+        isProcessingRef.current = true;
+        try { scanner.clear(); } catch { /* ignore */ }
+        scannerRef.current = null;
+        lookupBarcode(decodedText);
+      },
+      () => {}
+    );
+
+    setTimeout(() => {
+      if (isMountedRef.current) setStatus('scanning');
+    }, 1500);
+  }
 
   function handleClose() {
-    stopScanner().then(() => onClose());
+    try { scannerRef.current?.clear(); } catch { /* ignore */ }
+    scannerRef.current = null;
+    onClose();
   }
 
   return (
@@ -177,26 +162,11 @@ export default function BarcodeScanner({ onScanned, onClose }) {
         </button>
       </div>
 
-      {/* Camera View — html5-qrcode renders its own video here */}
-      <div className="flex-1 relative overflow-hidden">
-        <div id="barcode-reader" className="absolute inset-0" />
+      {/* Camera — html5-qrcode renders everything here */}
+      <div className="flex-1 relative overflow-hidden bg-black">
+        <div id="barcode-reader" className="w-full h-full" />
 
-        {/* Zoom Controls */}
-        {status === 'scanning' && zoomRange && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 bg-black/60 backdrop-blur-sm rounded-full px-4 py-2">
-            <button onClick={() => adjustZoom(-0.5)} className="p-1.5 text-white/70 hover:text-white transition-colors">
-              <ZoomOut className="w-5 h-5" />
-            </button>
-            <span className="text-white text-xs font-medium min-w-[3rem] text-center">
-              {zoomLevel.toFixed(1)}x
-            </span>
-            <button onClick={() => adjustZoom(0.5)} className="p-1.5 text-white/70 hover:text-white transition-colors">
-              <ZoomIn className="w-5 h-5" />
-            </button>
-          </div>
-        )}
-
-        {/* Loading */}
+        {/* Loading overlay */}
         {status === 'loading' && (
           <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-3 z-20">
             <Loader2 className="w-10 h-10 text-primary-400 animate-spin" />
@@ -213,7 +183,7 @@ export default function BarcodeScanner({ onScanned, onClose }) {
             <p className="text-white text-center font-semibold">{t('nutrition.barcodeNotFound')}</p>
             <p className="text-slate-400 text-center text-sm">{t('nutrition.barcodeNotFoundDesc')}</p>
             <div className="flex gap-3 w-full max-w-xs">
-              <button onClick={() => { isProcessingRef.current = false; startScanner(); }} className="flex-1 py-3 rounded-xl bg-white/10 text-white font-medium text-sm hover:bg-white/20 transition-colors">
+              <button onClick={handleRetry} className="flex-1 py-3 rounded-xl bg-white/10 text-white font-medium text-sm hover:bg-white/20 transition-colors">
                 {t('nutrition.scanAgain')}
               </button>
               <button onClick={handleClose} className="flex-1 py-3 rounded-xl bg-primary-600 text-white font-medium text-sm hover:bg-primary-700 transition-colors">
@@ -234,14 +204,6 @@ export default function BarcodeScanner({ onScanned, onClose }) {
             <button onClick={handleClose} className="px-8 py-3 rounded-xl bg-white/10 text-white font-medium text-sm hover:bg-white/20 transition-colors">
               {t('common.back')}
             </button>
-          </div>
-        )}
-
-        {/* Starting */}
-        {status === 'starting' && (
-          <div className="absolute inset-0 bg-black flex flex-col items-center justify-center gap-3 z-20">
-            <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
-            <p className="text-slate-400 text-sm">{t('nutrition.startingCamera')}</p>
           </div>
         )}
       </div>
