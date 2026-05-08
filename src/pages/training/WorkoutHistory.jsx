@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Calendar, Dumbbell, TrendingUp, ChevronDown, ChevronUp, GitCompareArrows, X, ArrowUpRight, ArrowDownRight, Minus, Loader2, Trash2, BarChart3 } from 'lucide-react';
-import { getWorkouts, deleteWorkout } from '../../data/workoutStorage';
+import { ArrowLeft, Calendar, Dumbbell, TrendingUp, ChevronDown, ChevronUp, GitCompareArrows, X, ArrowUpRight, ArrowDownRight, Minus, Loader2, Trash2, BarChart3, Pencil, Plus, Check } from 'lucide-react';
+import { getWorkouts, deleteWorkout, updateWorkout } from '../../data/workoutStorage';
 import { useAuth } from '../../context/AuthContext';
 import { getExerciseById } from '../../data/exercises';
 import MuscleGroupIcon from '../../components/icons/MuscleGroupIcon';
@@ -29,6 +29,7 @@ export default function WorkoutHistory({ onBack }) {
   const [showComparison, setShowComparison] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const [graphExercise, setGraphExercise] = useState(null);
+  const [editingWorkout, setEditingWorkout] = useState(null);
   const progress = useProgressComparison(user?.id);
   const weeklyWorkouts = progress.getWorkoutsByWeek();
 
@@ -344,6 +345,14 @@ export default function WorkoutHistory({ onBack }) {
                       </span>
                       {!compareMode && (
                         <button
+                          onClick={(e) => { e.stopPropagation(); setEditingWorkout(JSON.parse(JSON.stringify(workout))); }}
+                          className="p-1 text-slate-400 hover:text-primary-500 transition-colors"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                      )}
+                      {!compareMode && (
+                        <button
                           onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(workout.id); }}
                           className="p-1 text-slate-400 hover:text-red-500 transition-colors"
                         >
@@ -485,6 +494,142 @@ export default function WorkoutHistory({ onBack }) {
           </div>
         </div>
       )}
+
+      {/* Edit Workout Modal */}
+      {editingWorkout && (
+        <EditWorkoutModal
+          workout={editingWorkout}
+          onSave={async (updated) => {
+            await updateWorkout(user.id, updated.id, { exercises: updated.exercises, duration: updated.duration });
+            setWorkouts((prev) => prev.map((w) => w.id === updated.id ? { ...w, exercises: updated.exercises } : w));
+            setEditingWorkout(null);
+          }}
+          onClose={() => setEditingWorkout(null)}
+          t={t}
+          weightUnit={weightUnit}
+        />
+      )}
+    </div>
+  );
+}
+
+function EditWorkoutModal({ workout, onSave, onClose, t, weightUnit }) {
+  const [exercises, setExercises] = useState(workout.exercises || []);
+
+  function updateSet(exIdx, setIdx, field, value) {
+    setExercises((prev) => prev.map((ex, ei) => {
+      if (ei !== exIdx) return ex;
+      const sets = ex.sets.map((s, si) => si === setIdx ? { ...s, [field]: value } : s);
+      return { ...ex, sets };
+    }));
+  }
+
+  function addSet(exIdx) {
+    setExercises((prev) => prev.map((ex, ei) => {
+      if (ei !== exIdx) return ex;
+      const last = ex.sets[ex.sets.length - 1] || { reps: '', weight: '' };
+      return { ...ex, sets: [...ex.sets, { reps: last.reps, weight: last.weight }] };
+    }));
+  }
+
+  function removeSet(exIdx, setIdx) {
+    setExercises((prev) => prev.map((ex, ei) => {
+      if (ei !== exIdx) return ex;
+      if (ex.sets.length <= 1) return ex;
+      return { ...ex, sets: ex.sets.filter((_, si) => si !== setIdx) };
+    }));
+  }
+
+  function removeExercise(exIdx) {
+    setExercises((prev) => prev.filter((_, i) => i !== exIdx));
+  }
+
+  function handleSave() {
+    const cleaned = exercises
+      .map((ex) => ({
+        ...ex,
+        sets: ex.sets.map((s) => ({
+          reps: parseFloat(s.reps) || 0,
+          weight: parseFloat(s.weight) || 0,
+        })),
+      }))
+      .filter((ex) => ex.sets.some((s) => s.reps > 0 || s.weight > 0));
+    onSave({ ...workout, exercises: cleaned });
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-t-2xl w-full max-w-lg shadow-xl max-h-[90vh] flex flex-col animate-slide-up">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pt-5 pb-3 shrink-0 border-b border-slate-100 dark:border-slate-700">
+          <h3 className="text-lg font-bold">{t('common.edit')}</h3>
+          <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {exercises.map((ex, exIdx) => {
+            const exData = getExerciseById(ex.exerciseId) || {};
+            return (
+              <div key={exIdx} className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-semibold">{t(ex.nameKey || exData.nameKey || ex.exerciseId)}</h4>
+                  <button onClick={() => removeExercise(exIdx)} className="p-1 text-slate-400 hover:text-red-500">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-[2rem_1fr_1fr_2rem] gap-1.5 text-[11px] font-medium text-slate-400 mb-1">
+                  <span className="text-center">#</span>
+                  <span className="text-center">{t('training.weight')}</span>
+                  <span className="text-center">{t('training.reps')}</span>
+                  <span></span>
+                </div>
+
+                {ex.sets.map((set, setIdx) => (
+                  <div key={setIdx} className="grid grid-cols-[2rem_1fr_1fr_2rem] gap-1.5 items-center mb-1.5">
+                    <span className="text-xs text-center text-slate-400">{setIdx + 1}</span>
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      value={set.weight}
+                      onChange={(e) => updateSet(exIdx, setIdx, 'weight', e.target.value)}
+                      className="w-full px-2 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      value={set.reps}
+                      onChange={(e) => updateSet(exIdx, setIdx, 'reps', e.target.value)}
+                      className="w-full px-2 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                    <button onClick={() => removeSet(exIdx, setIdx)} className="text-slate-300 hover:text-red-400">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+
+                <button onClick={() => addSet(exIdx)} className="w-full text-xs text-primary-500 font-medium py-1 mt-1">
+                  {t('training.addSet')}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Save button */}
+        <div className="px-5 pt-3 pb-5 shrink-0 border-t border-slate-100 dark:border-slate-700">
+          <button
+            onClick={handleSave}
+            className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+          >
+            <Check className="w-4 h-4" />
+            {t('common.save')}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Trash2, X, Check, Save, Target } from 'lucide-react';
-import { saveWorkout, getPersonalRecord, getCustomPlans, saveCustomPlan } from '../../data/workoutStorage';
+import { saveWorkout, getPersonalRecord, saveCustomPlan } from '../../data/workoutStorage';
 import { useAuth } from '../../context/AuthContext';
+import { useActiveWorkout } from '../../context/ActiveWorkoutContext';
 import { getExerciseById } from '../../data/exercises';
 import MuscleGroupIcon from '../../components/icons/MuscleGroupIcon';
 import MiniSparkline from '../../components/progress/MiniSparkline';
@@ -10,19 +11,12 @@ import ProgressRing from '../../components/progress/ProgressRing';
 import PostWorkoutSummary from '../../components/progress/PostWorkoutSummary';
 import useProgressComparison, { getExerciseTarget, setExerciseTarget } from '../../hooks/useProgressComparison';
 
-export default function ActiveWorkout({ initialExercises = [], onFinish, onDiscard, onAddExercise }) {
+export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [exercises, setExercises] = useState(
-    initialExercises.map((ex) => ({
-      exerciseId: ex.id,
-      nameKey: ex.nameKey,
-      sets: ex.presetSets
-        ? Array.from({ length: ex.presetSets }, () => ({ reps: String(ex.presetReps || ''), weight: '' }))
-        : [{ reps: '', weight: '' }],
-    }))
-  );
-  const [startTime] = useState(Date.now());
+  const ctx = useActiveWorkout();
+  const exercises = ctx.workout?.exercises || [];
+
   const [elapsed, setElapsed] = useState(0);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [showNoValidSets, setShowNoValidSets] = useState(false);
@@ -34,63 +28,20 @@ export default function ActiveWorkout({ initialExercises = [], onFinish, onDisca
   const [editingTarget, setEditingTarget] = useState(null);
   const weightUnit = localStorage.getItem('weightUnit') || 'kg';
 
-  const wasFromPlan = initialExercises.some((ex) => ex.presetSets);
+  const wasFromPlan = ctx.workout?.fromPlan || false;
   const progress = useProgressComparison(user?.id);
 
+  // Timer — derived from context startTime
   useEffect(() => {
-    const timer = setInterval(() => setElapsed(Date.now() - startTime), 1000);
+    if (!ctx.workout?.startTime) return;
+    const timer = setInterval(() => setElapsed(Date.now() - ctx.workout.startTime), 1000);
     return () => clearInterval(timer);
-  }, [startTime]);
-
-  useEffect(() => {
-    setExercises((prev) => {
-      const existingIds = new Set(prev.map((e) => e.exerciseId));
-      const newOnes = initialExercises
-        .filter((ex) => !existingIds.has(ex.id))
-        .map((ex) => ({
-          exerciseId: ex.id,
-          nameKey: ex.nameKey,
-          sets: [{ reps: '', weight: '' }],
-        }));
-      return newOnes.length > 0 ? [...prev, ...newOnes] : prev;
-    });
-  }, [initialExercises]);
+  }, [ctx.workout?.startTime]);
 
   const formatTime = (ms) => {
     const mins = Math.floor(ms / 60000);
     const secs = Math.floor((ms % 60000) / 1000);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const updateSet = (exIdx, setIdx, field, value) => {
-    setExercises((prev) => {
-      const updated = [...prev];
-      updated[exIdx] = { ...updated[exIdx], sets: [...updated[exIdx].sets] };
-      updated[exIdx].sets[setIdx] = { ...updated[exIdx].sets[setIdx], [field]: value };
-      return updated;
-    });
-  };
-
-  const addSet = (exIdx) => {
-    setExercises((prev) => {
-      const updated = [...prev];
-      const lastSet = updated[exIdx].sets[updated[exIdx].sets.length - 1];
-      updated[exIdx] = { ...updated[exIdx], sets: [...updated[exIdx].sets, { reps: lastSet.reps, weight: lastSet.weight }] };
-      return updated;
-    });
-  };
-
-  const removeSet = (exIdx, setIdx) => {
-    setExercises((prev) => {
-      const updated = [...prev];
-      if (updated[exIdx].sets.length <= 1) return prev;
-      updated[exIdx] = { ...updated[exIdx], sets: updated[exIdx].sets.filter((_, i) => i !== setIdx) };
-      return updated;
-    });
-  };
-
-  const removeExercise = (exIdx) => {
-    setExercises((prev) => prev.filter((_, i) => i !== exIdx));
   };
 
   const checkForPRs = async () => {
@@ -123,11 +74,12 @@ export default function ActiveWorkout({ initialExercises = [], onFinish, onDisca
       exercises: validExercises.map((ex) => ({
         exerciseId: ex.exerciseId,
         nameKey: ex.nameKey,
-        sets: ex.sets.map((s) => ({ reps: parseInt(s.reps), weight: parseFloat(s.weight) })),
+        sets: ex.sets.map((s) => ({ reps: parseFloat(s.reps), weight: parseFloat(s.weight) })),
       })),
     };
 
     await saveWorkout(user.id, workout);
+    ctx.discardWorkout(); // Clear active workout from context + localStorage
     setPendingPrs(detectedPrs);
     setSavedWorkoutExercises(workout.exercises);
     setShowPostSummary(true);
@@ -152,6 +104,11 @@ export default function ActiveWorkout({ initialExercises = [], onFinish, onDisca
   };
 
   const handleSkipSavePlan = () => onFinish(pendingPrs);
+
+  const handleDiscard = () => {
+    ctx.discardWorkout();
+    onDiscard();
+  };
 
   // Post-workout summary
   if (showPostSummary && savedWorkoutExercises) {
@@ -186,16 +143,15 @@ export default function ActiveWorkout({ initialExercises = [], onFinish, onDisca
           const sparkData = progress.getSparklineData(ex.exerciseId);
           const comparison = progress.getComparison(
             ex.exerciseId,
-            ex.sets.filter((s) => s.reps && s.weight).map((s) => ({ reps: parseInt(s.reps), weight: parseFloat(s.weight) }))
+            ex.sets.filter((s) => s.reps && s.weight).map((s) => ({ reps: parseFloat(s.reps), weight: parseFloat(s.weight) }))
           );
           const target = getExerciseTarget(ex.exerciseId);
-          const setsAtTarget = ex.sets.filter((s) => parseInt(s.reps) >= target && s.reps !== '').length;
+          const setsAtTarget = ex.sets.filter((s) => parseFloat(s.reps) >= target && s.reps !== '').length;
           const allAtTarget = setsAtTarget === ex.sets.length && ex.sets.length > 0 && ex.sets.every((s) => s.reps !== '');
           const increment = weightUnit === 'kg' ? '2.5kg' : '5lbs';
 
           return (
             <div key={`${ex.exerciseId}-${exIdx}`} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
-              {/* Header: Icon + Name + Sparkline + Remove */}
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <ProgressRing status={comparison.status} size={24}>
@@ -204,12 +160,11 @@ export default function ActiveWorkout({ initialExercises = [], onFinish, onDisca
                   <h3 className="font-semibold">{t(ex.nameKey)}</h3>
                   <MiniSparkline data={sparkData} />
                 </div>
-                <button onClick={() => removeExercise(exIdx)} className="p-1.5 text-slate-400 hover:text-red-500">
+                <button onClick={() => ctx.removeExercise(exIdx)} className="p-1.5 text-slate-400 hover:text-red-500">
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Last session display */}
               {lastSession ? (
                 <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">
                   {t('training.lastTime')}: {lastSession.sets.map((s) => `${s.weight}${t(`training.${weightUnit}`)} × ${s.reps}`).join(', ')}
@@ -218,7 +173,6 @@ export default function ActiveWorkout({ initialExercises = [], onFinish, onDisca
                 <p className="text-xs text-green-500 mb-2">{t('training.firstTime')}</p>
               )}
 
-              {/* Target reps */}
               <div className="flex items-center gap-2 mb-2">
                 {editingTarget === ex.exerciseId ? (
                   <div className="flex items-center gap-1">
@@ -244,14 +198,12 @@ export default function ActiveWorkout({ initialExercises = [], onFinish, onDisca
                 )}
               </div>
 
-              {/* All sets at target banner */}
               {allAtTarget && (
                 <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg px-3 py-2 mb-2 text-xs text-green-700 dark:text-green-400 font-medium">
                   {t('training.allSetsAtTarget', { increment })}
                 </div>
               )}
 
-              {/* Set grid headers */}
               <div className="grid grid-cols-[2.5rem_1fr_1fr_2rem] gap-2 items-center text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">
                 <span className="text-center">{t('training.set')}</span>
                 <span className="text-center">{t('training.weight')} ({t(`training.${weightUnit}`)})</span>
@@ -259,7 +211,6 @@ export default function ActiveWorkout({ initialExercises = [], onFinish, onDisca
                 <span></span>
               </div>
 
-              {/* Set rows with color-coded comparison */}
               {ex.sets.map((set, setIdx) => {
                 const setStatus = progress.getSetComparison(ex.exerciseId, setIdx, set);
                 const borderColor = setStatus === 'improved' ? 'border-green-400 dark:border-green-600'
@@ -273,26 +224,26 @@ export default function ActiveWorkout({ initialExercises = [], onFinish, onDisca
                       type="number"
                       inputMode="decimal"
                       value={set.weight}
-                      onChange={(e) => updateSet(exIdx, setIdx, 'weight', e.target.value)}
+                      onChange={(e) => ctx.updateSet(exIdx, setIdx, 'weight', e.target.value)}
                       placeholder="0"
                       className={`w-full px-2 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border ${borderColor} text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-500`}
                     />
                     <input
                       type="number"
-                      inputMode="numeric"
+                      inputMode="decimal"
                       value={set.reps}
-                      onChange={(e) => updateSet(exIdx, setIdx, 'reps', e.target.value)}
+                      onChange={(e) => ctx.updateSet(exIdx, setIdx, 'reps', e.target.value)}
                       placeholder="0"
                       className={`w-full px-2 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border ${borderColor} text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-500`}
                     />
-                    <button onClick={() => removeSet(exIdx, setIdx)} className="flex items-center justify-center text-slate-300 hover:text-red-400">
+                    <button onClick={() => ctx.removeSet(exIdx, setIdx)} className="flex items-center justify-center text-slate-300 hover:text-red-400">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 );
               })}
 
-              <button onClick={() => addSet(exIdx)} className="w-full text-sm text-primary-500 hover:text-primary-600 font-medium py-1.5 mt-1">
+              <button onClick={() => ctx.addSet(exIdx)} className="w-full text-sm text-primary-500 hover:text-primary-600 font-medium py-1.5 mt-1">
                 {t('training.addSet')}
               </button>
             </div>
@@ -320,7 +271,7 @@ export default function ActiveWorkout({ initialExercises = [], onFinish, onDisca
             <p className="text-center font-semibold mb-4">{t('training.confirmDiscard')}</p>
             <div className="flex gap-3">
               <button onClick={() => setShowDiscardConfirm(false)} className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm">{t('common.cancel')}</button>
-              <button onClick={onDiscard} className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium text-sm">{t('training.discardWorkout')}</button>
+              <button onClick={handleDiscard} className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium text-sm">{t('training.discardWorkout')}</button>
             </div>
           </div>
         </div>
@@ -331,7 +282,7 @@ export default function ActiveWorkout({ initialExercises = [], onFinish, onDisca
           <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 w-full max-w-sm shadow-xl">
             <p className="text-center font-semibold mb-2">{t('training.noValidSets')}</p>
             <p className="text-center text-sm text-slate-500 dark:text-slate-400 mb-4">{t('training.noValidSetsDesc')}</p>
-            <button onClick={() => setShowNoValidSets(false)} className="w-full py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-medium text-sm dark:bg-primary-500">OK</button>
+            <button onClick={() => setShowNoValidSets(false)} className="w-full py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-medium text-sm">OK</button>
           </div>
         </div>
       )}
@@ -347,7 +298,7 @@ export default function ActiveWorkout({ initialExercises = [], onFinish, onDisca
             <input type="text" value={planName} onChange={(e) => setPlanName(e.target.value)} placeholder={t('training.savePlanName')} className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 mb-4" />
             <div className="flex gap-3">
               <button onClick={handleSkipSavePlan} className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm">{t('training.no')}</button>
-              <button onClick={handleSaveAsPlan} disabled={!planName.trim()} className="flex-1 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white font-medium text-sm dark:bg-primary-500">{t('training.yes')}</button>
+              <button onClick={handleSaveAsPlan} disabled={!planName.trim()} className="flex-1 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white font-medium text-sm">{t('training.yes')}</button>
             </div>
           </div>
         </div>

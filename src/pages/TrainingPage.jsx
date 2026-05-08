@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dumbbell, Plus, History, ClipboardList, Trophy, ArrowLeft, ChevronRight, Heart, Zap, RefreshCw, X, Search, Swords } from 'lucide-react';
+import { Dumbbell, Plus, History, ClipboardList, Trophy, ArrowLeft, ChevronRight, Heart, Zap, RefreshCw, X, Search, Swords, Play } from 'lucide-react';
 import ExerciseLibrary from './training/ExerciseLibrary';
 import ActiveWorkout from './training/ActiveWorkout';
 import ActiveCardio from './training/ActiveCardio';
@@ -13,14 +13,15 @@ import exercises, { getExerciseById, getExercisesByType } from '../data/exercise
 import { getCustomPlans, getCustomPlansByType, saveCustomPlan } from '../data/workoutStorage';
 import { getHiddenDefaultPlans, getPermanentDeletedDefaultPlans } from '../data/settingsStorage';
 import { useAuth } from '../context/AuthContext';
+import { useActiveWorkout } from '../context/ActiveWorkoutContext';
 import MuscleGroupIcon from '../components/icons/MuscleGroupIcon';
 import WeeklySummaryBanner from '../components/progress/WeeklySummaryBanner';
 
 export default function TrainingPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [view, setView] = useState('home');
-  const [workoutExercises, setWorkoutExercises] = useState([]);
+  const activeWorkout = useActiveWorkout();
+  const [view, setView] = useState(activeWorkout.isActive ? 'activeWorkout' : 'home');
   const [prNotification, setPrNotification] = useState(null);
   const [cardioActivity, setCardioActivity] = useState(null);
   const [hiitConfig, setHiitConfig] = useState(null);
@@ -32,12 +33,22 @@ export default function TrainingPage() {
   };
 
   const startEmptyWorkout = () => {
-    setWorkoutExercises([]);
     setView('selectForWorkout');
   };
 
-  const handleExercisesSelected = (exercises) => {
-    setWorkoutExercises((prev) => [...prev, ...exercises]);
+  const handleExercisesSelected = (selectedExercises) => {
+    if (activeWorkout.isActive) {
+      // Workout already running — add exercises to context
+      activeWorkout.addExercises(selectedExercises);
+    } else {
+      // Start new workout with selected exercises
+      const mapped = selectedExercises.map((ex) => ({
+        exerciseId: ex.id,
+        nameKey: ex.nameKey,
+        sets: [{ reps: '', weight: '' }],
+      }));
+      activeWorkout.startWorkout('strength', mapped);
+    }
     setView('activeWorkout');
   };
 
@@ -46,29 +57,32 @@ export default function TrainingPage() {
   };
 
   const handleFinishWorkout = (prs) => {
-    if (Object.keys(prs).length > 0) {
+    if (prs && Object.keys(prs).length > 0) {
       setPrNotification(prs);
       setTimeout(() => setPrNotification(null), 3000);
     }
-    setWorkoutExercises([]);
     setView('home');
   };
 
   const handleDiscardWorkout = () => {
-    setWorkoutExercises([]);
     setView('home');
   };
 
   const handleStartPlan = (planExercises) => {
-    // planExercises: array of { id, sets, reps }
     const enriched = planExercises
       .map((pe) => {
         const ex = getExerciseById(pe.id);
         if (!ex) return null;
-        return { ...ex, presetSets: pe.sets, presetReps: pe.reps };
+        return {
+          exerciseId: ex.id,
+          nameKey: ex.nameKey,
+          sets: Array.from({ length: pe.sets || 3 }, () => ({ reps: String(pe.reps || ''), weight: '' })),
+        };
       })
       .filter(Boolean);
-    setWorkoutExercises(enriched);
+    activeWorkout.startWorkout('strength', enriched, null);
+    // Mark as from plan so we don't offer "save as plan" after
+    if (activeWorkout.workout) activeWorkout.workout.fromPlan = true;
     setView('activeWorkout');
   };
 
@@ -117,7 +131,7 @@ export default function TrainingPage() {
   if (view === 'selectForWorkout') {
     return (
       <ExerciseLibrary
-        onBack={() => workoutExercises.length > 0 ? setView('activeWorkout') : setView('home')}
+        onBack={() => activeWorkout.isActive ? setView('activeWorkout') : setView('home')}
         onSelect={handleExercisesSelected}
         selectionMode
       />
@@ -127,7 +141,6 @@ export default function TrainingPage() {
   if (view === 'activeWorkout') {
     return (
       <ActiveWorkout
-        initialExercises={workoutExercises}
         onFinish={handleFinishWorkout}
         onDiscard={handleDiscardWorkout}
         onAddExercise={handleAddMoreExercises}
@@ -205,6 +218,17 @@ export default function TrainingPage() {
 
       <WeeklySummaryBanner userId={user?.id} />
 
+      {/* Resume active workout banner */}
+      {activeWorkout.isActive && (
+        <button
+          onClick={() => setView('activeWorkout')}
+          className="w-full bg-green-600 hover:bg-green-700 text-white rounded-2xl p-4 flex items-center justify-center gap-3 text-lg font-semibold transition-colors mb-4 animate-pulse"
+        >
+          <Play className="w-6 h-6" />
+          {t('training.continue')} — {formatElapsed(Date.now() - activeWorkout.workout.startTime)}
+        </button>
+      )}
+
       <button
         onClick={startWorkout}
         className="w-full bg-primary-600 hover:bg-primary-700 text-white rounded-2xl p-4 flex items-center justify-center gap-3 text-lg font-semibold transition-colors mb-6 dark:bg-primary-500 dark:hover:bg-primary-600"
@@ -220,6 +244,12 @@ export default function TrainingPage() {
       </div>
     </div>
   );
+}
+
+function formatElapsed(ms) {
+  const mins = Math.floor(ms / 60000);
+  const secs = Math.floor((ms % 60000) / 1000);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
 function QuickAction({ icon, label, onClick, className = '' }) {

@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
+import { ActiveWorkoutProvider } from './context/ActiveWorkoutContext';
 import BottomNav from './components/BottomNav';
 import TrainingPage from './pages/TrainingPage';
 import NutritionPage from './pages/NutritionPage';
@@ -44,7 +45,7 @@ export default function App() {
 
 function AppShell() {
   return (
-    <>
+    <ActiveWorkoutProvider>
       <main className="min-h-screen max-w-lg mx-auto pb-20">
         <Routes>
           <Route path="/" element={<TrainingPage />} />
@@ -54,6 +55,6 @@ function AppShell() {
         </Routes>
       </main>
       <BottomNav />
-    </>
+    </ActiveWorkoutProvider>
   );
 }

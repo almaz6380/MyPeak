@@ -52,6 +52,27 @@ export async function saveWorkout(userId, workout) {
   return { data, error };
 }
 
+export async function updateWorkout(userId, workoutId, updates) {
+  const { data, error } = await supabase
+    .from('workouts')
+    .update({ exercises: updates.exercises, duration: updates.duration })
+    .eq('id', workoutId)
+    .eq('user_id', userId)
+    .select()
+    .single();
+
+  if (!error && data) {
+    const cached = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
+    const idx = cached.findIndex((w) => w.id === workoutId);
+    if (idx >= 0) {
+      cached[idx] = { ...cached[idx], exercises: data.exercises, duration: data.duration };
+      localStorage.setItem(WORKOUTS_KEY, JSON.stringify(cached));
+    }
+  }
+
+  return { data, error };
+}
+
 export async function deleteWorkout(userId, workoutId) {
   await supabase
     .from('workouts')
