@@ -32,6 +32,9 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Automatische Weiterleitung zur Haupt-App nach Onboarding
 - [x] Trigger erstellt automatisch Profile + Settings bei neuer Registrierung
 - [x] Profil mit allen Daten änderbar (Gewicht, Größe, Ziel etc.)
+- [x] Gastmodus: "Als Gast testen" auf Login-Seite, komplette App ohne Registrierung
+- [x] Gast-Daten nur in localStorage (kein Supabase), isGuest()-Check in allen Storage-Funktionen
+- [x] Dezenter Banner: "Du bist im Gastmodus — registriere dich, um deine Daten dauerhaft zu speichern."
 
 ### Phase 2: Training-Tracking — FERTIG
 - [x] Übungsbibliothek mit Beschreibungen, Muskelgruppe, Equipment
