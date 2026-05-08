@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Settings, UtensilsCrossed, Pencil, X, Check, Droplets, Minus, GlassWater } from 'lucide-react';
 import MacroRing from './MacroRing';
+import MyPeakLogo from '../../components/MyPeakLogo';
 import { useAuth } from '../../context/AuthContext';
 import { getNutritionEntries, getNutritionGoals, deleteNutritionEntry, saveNutritionGoals, getWaterTotal, addWater, removeLastWater } from '../../data/nutritionStorage';
 
@@ -92,7 +93,10 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
     <div className="p-4 pb-24">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">{t('nutrition.title')}</h1>
+        <div className="flex items-center gap-2.5">
+          <MyPeakLogo size={28} />
+          <h1 className="text-2xl font-bold">{t('nutrition.title')}</h1>
+        </div>
         <div className="flex gap-2">
           <button
             onClick={onOpenCustomMeals}

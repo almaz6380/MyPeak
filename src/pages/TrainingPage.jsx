@@ -16,6 +16,7 @@ import { useAuth } from '../context/AuthContext';
 import { useActiveWorkout } from '../context/ActiveWorkoutContext';
 import MuscleGroupIcon from '../components/icons/MuscleGroupIcon';
 import WeeklySummaryBanner from '../components/progress/WeeklySummaryBanner';
+import MyPeakLogo from '../components/MyPeakLogo';
 
 export default function TrainingPage() {
   const { t } = useTranslation();
@@ -208,7 +209,10 @@ export default function TrainingPage() {
 
   return (
     <div className="p-4 pb-24">
-      <h1 className="text-2xl font-bold mb-6">{t('training.title')}</h1>
+      <div className="flex items-center gap-2.5 mb-6">
+        <MyPeakLogo size={28} />
+        <h1 className="text-2xl font-bold">{t('training.title')}</h1>
+      </div>
 
       {prNotification && (
         <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 mb-4 flex items-center gap-3 animate-pulse">

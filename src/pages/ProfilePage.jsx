@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { saveSetting } from '../data/settingsStorage';
+import MyPeakLogo from '../components/MyPeakLogo';
 import { supabase } from '../lib/supabase';
 import { Moon, Sun, Globe, Weight, LogOut, User, ChevronRight, Pencil, X, Check, Loader2 } from 'lucide-react';
 
@@ -87,7 +88,10 @@ export default function ProfilePage() {
 
   return (
     <div className="p-4 pb-24">
-      <h1 className="text-2xl font-bold mb-6">{t('profile.title')}</h1>
+      <div className="flex items-center gap-2.5 mb-6">
+        <MyPeakLogo size={28} />
+        <h1 className="text-2xl font-bold">{t('profile.title')}</h1>
+      </div>
 
       {/* User header */}
       {profile?.name && (

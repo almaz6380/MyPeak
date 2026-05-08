@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { BookOpen, Dumbbell, Apple, Pill, Droplets } from 'lucide-react';
+import MyPeakLogo from '../components/MyPeakLogo';
 
 export default function LibraryPage() {
   const { t } = useTranslation();
@@ -13,7 +14,10 @@ export default function LibraryPage() {
 
   return (
     <div className="p-4 pb-24">
-      <h1 className="text-2xl font-bold mb-6">{t('library.title')}</h1>
+      <div className="flex items-center gap-2.5 mb-6">
+        <MyPeakLogo size={28} />
+        <h1 className="text-2xl font-bold">{t('library.title')}</h1>
+      </div>
 
       <div className="flex flex-col gap-3">
         {sections.map((section) => (
