@@ -50,6 +50,9 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Automatisches Resume beim App-Start mit "Workout fortsetzen" Banner
 - [x] Abgeschlossene Workouts nachträglich bearbeiten (Sets/Reps/Gewicht ändern, Sätze hinzufügen/entfernen)
 - [x] Dezimale Wiederholungen möglich (z.B. 7.5 Reps)
+- [x] Workout-Typ-Auswahl vertikal redesigned (horizontale Karten mit Icon + Pfeil)
+- [x] Kampfsport-Icon: Custom Boxhandschuhe SVG
+- [x] Weißer Bildschirm behoben (localStorage-Validierung + Safety-Checks)
 
 ### Phase 3: Ernährungs-Tracking — FERTIG
 - [x] Lebensmittel-Suche (150 lokale Lebensmittel + Open Food Facts API)
