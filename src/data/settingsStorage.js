@@ -1,6 +1,9 @@
 import { supabase } from '../lib/supabase';
+import { isGuest } from '../context/AuthContext';
 
 export async function loadSettings(userId) {
+  if (isGuest(userId)) return null;
+
   const { data, error } = await supabase
     .from('user_settings')
     .select('*')
@@ -8,7 +11,6 @@ export async function loadSettings(userId) {
     .single();
 
   if (!error && data) {
-    // Cache to localStorage
     localStorage.setItem('weightUnit', data.weight_unit || 'kg');
     localStorage.setItem('language', data.language || 'de');
     localStorage.setItem('darkMode', JSON.stringify(data.dark_mode ?? false));
@@ -19,7 +21,6 @@ export async function loadSettings(userId) {
 }
 
 export async function saveSetting(userId, key, value) {
-  // Map localStorage key names to Supabase column names
   const columnMap = {
     weightUnit: 'weight_unit',
     language: 'language',
@@ -28,6 +29,9 @@ export async function saveSetting(userId, key, value) {
 
   const column = columnMap[key];
   if (!column) return;
+
+  // Guest: only localStorage (already saved by caller)
+  if (isGuest(userId)) return;
 
   await supabase
     .from('user_settings')

@@ -1,4 +1,8 @@
 import { supabase } from '../lib/supabase';
+import { isGuest } from '../context/AuthContext';
+
+// Helper: skip Supabase for guest users
+function guestSkip(userId) { return isGuest(userId); }
 
 const ENTRIES_PREFIX = 'nutrition_entries_';
 const CUSTOM_MEALS_KEY = 'custom_meals';
@@ -9,16 +13,18 @@ const GOALS_KEY = 'nutrition_goals';
 export async function getNutritionEntries(userId, date) {
   const cacheKey = ENTRIES_PREFIX + date;
 
-  const { data, error } = await supabase
-    .from('nutrition_entries')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('date', date)
-    .order('created_at', { ascending: true });
+  if (!guestSkip(userId)) {
+    const { data, error } = await supabase
+      .from('nutrition_entries')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('date', date)
+      .order('created_at', { ascending: true });
 
-  if (!error && data) {
-    localStorage.setItem(cacheKey, JSON.stringify(data));
-    return data;
+    if (!error && data) {
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+      return data;
+    }
   }
 
   const cached = localStorage.getItem(cacheKey);
@@ -26,10 +32,13 @@ export async function getNutritionEntries(userId, date) {
 }
 
 export async function saveNutritionEntry(userId, entry) {
-  const { data, error } = await supabase
-    .from('nutrition_entries')
-    .insert({
-      user_id: userId,
+  let data = null, error = null;
+
+  if (!guestSkip(userId)) {
+    ({ data, error } = await supabase
+      .from('nutrition_entries')
+      .insert({
+        user_id: userId,
       date: entry.date,
       meal_slot: entry.meal_slot,
       food_name: entry.food_name,
@@ -43,14 +52,15 @@ export async function saveNutritionEntry(userId, entry) {
       fiber: entry.fiber || 0,
       sugar: entry.sugar || 0,
       source: entry.source || 'manual',
-      source_id: entry.source_id || null,
-    })
-    .select()
-    .single();
+        source_id: entry.source_id || null,
+      })
+      .select()
+      .single());
+  }
 
   const cacheKey = ENTRIES_PREFIX + entry.date;
   const cached = JSON.parse(localStorage.getItem(cacheKey) || '[]');
-  cached.push(data || entry);
+  cached.push(data || { ...entry, id: `local_${Date.now()}` });
   localStorage.setItem(cacheKey, JSON.stringify(cached));
 
   return { data, error };
@@ -208,15 +218,17 @@ export async function logCustomMeal(userId, meal, date, mealSlot) {
 // ── Nutrition Goals ──────────────────────────────────────────
 
 export async function getNutritionGoals(userId) {
-  const { data, error } = await supabase
-    .from('nutrition_goals')
-    .select('*')
-    .eq('user_id', userId)
-    .single();
+  if (!guestSkip(userId)) {
+    const { data, error } = await supabase
+      .from('nutrition_goals')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
 
-  if (!error && data) {
-    localStorage.setItem(GOALS_KEY, JSON.stringify(data));
-    return data;
+    if (!error && data) {
+      localStorage.setItem(GOALS_KEY, JSON.stringify(data));
+      return data;
+    }
   }
 
   const cached = localStorage.getItem(GOALS_KEY);
@@ -226,37 +238,45 @@ export async function getNutritionGoals(userId) {
 }
 
 export async function saveNutritionGoals(userId, goals) {
-  const { data, error } = await supabase
-    .from('nutrition_goals')
-    .upsert({
-      user_id: userId,
-      calories: goals.calories,
-      protein: goals.protein,
-      carbs: goals.carbs,
-      fat: goals.fat,
-      tdee: goals.tdee || null,
-      water_ml: goals.water_ml || 3000,
-      updated_at: new Date().toISOString(),
-    })
-    .select()
-    .single();
+  let data = null;
+
+  if (!guestSkip(userId)) {
+    ({ data } = await supabase
+      .from('nutrition_goals')
+      .upsert({
+        user_id: userId,
+        calories: goals.calories,
+        protein: goals.protein,
+        carbs: goals.carbs,
+        fat: goals.fat,
+        tdee: goals.tdee || null,
+        water_ml: goals.water_ml || 3000,
+        updated_at: new Date().toISOString(),
+      })
+      .select()
+      .single());
+  }
 
   localStorage.setItem(GOALS_KEY, JSON.stringify(data || goals));
 
-  return { data, error };
+  return { data, error: null };
 }
 
 // ── Recent Foods ─────────────────────────────────────────────
 
 export async function getRecentFoods(userId, limit = 10) {
-  const { data, error } = await supabase
-    .from('nutrition_entries')
-    .select('food_name, brand, serving_size, serving_unit, calories, protein, carbs, fat, source, source_id')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(50);
+  let data = null;
 
-  if (error || !data) return [];
+  if (!guestSkip(userId)) {
+    ({ data } = await supabase
+      .from('nutrition_entries')
+      .select('food_name, brand, serving_size, serving_unit, calories, protein, carbs, fat, source, source_id')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(50));
+  }
+
+  if (!data) return [];
 
   const seen = new Set();
   const unique = [];
@@ -278,16 +298,18 @@ const WATER_PREFIX = 'water_';
 export async function getWaterTotal(userId, date) {
   const cacheKey = WATER_PREFIX + date;
 
-  const { data, error } = await supabase
-    .from('water_entries')
-    .select('id, amount_ml')
-    .eq('user_id', userId)
-    .eq('date', date);
+  if (!guestSkip(userId)) {
+    const { data, error } = await supabase
+      .from('water_entries')
+      .select('id, amount_ml')
+      .eq('user_id', userId)
+      .eq('date', date);
 
-  if (!error && data) {
-    const total = data.reduce((sum, e) => sum + e.amount_ml, 0);
-    localStorage.setItem(cacheKey, JSON.stringify({ entries: data, total }));
-    return { entries: data, total };
+    if (!error && data) {
+      const total = data.reduce((sum, e) => sum + e.amount_ml, 0);
+      localStorage.setItem(cacheKey, JSON.stringify({ entries: data, total }));
+      return { entries: data, total };
+    }
   }
 
   const cached = localStorage.getItem(cacheKey);
@@ -296,21 +318,23 @@ export async function getWaterTotal(userId, date) {
 }
 
 export async function addWater(userId, date, amountMl) {
-  const { data, error } = await supabase
-    .from('water_entries')
-    .insert({ user_id: userId, date, amount_ml: amountMl })
-    .select()
-    .single();
+  let data = null;
 
-  if (!error && data) {
-    const cacheKey = WATER_PREFIX + date;
-    const cached = JSON.parse(localStorage.getItem(cacheKey) || '{"entries":[],"total":0}');
-    cached.entries.push(data);
-    cached.total += amountMl;
-    localStorage.setItem(cacheKey, JSON.stringify(cached));
+  if (!guestSkip(userId)) {
+    ({ data } = await supabase
+      .from('water_entries')
+      .insert({ user_id: userId, date, amount_ml: amountMl })
+      .select()
+      .single());
   }
 
-  return { data, error };
+  const cacheKey = WATER_PREFIX + date;
+  const cached = JSON.parse(localStorage.getItem(cacheKey) || '{"entries":[],"total":0}');
+  cached.entries.push(data || { id: `local_${Date.now()}`, amount_ml: amountMl });
+  cached.total += amountMl;
+  localStorage.setItem(cacheKey, JSON.stringify(cached));
+
+  return { data, error: null };
 }
 
 export async function removeLastWater(userId, date) {

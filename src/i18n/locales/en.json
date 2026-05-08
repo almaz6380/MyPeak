@@ -503,7 +503,9 @@
     "passwordUpdated": "Password updated successfully!",
     "signOut": "Sign Out",
     "welcomeTitle": "Welcome to MyPeak",
-    "welcomeSubtitle": "Track your training. Reach your goals."
+    "welcomeSubtitle": "Track your training. Reach your goals.",
+    "guestMode": "Try as guest",
+    "guestBanner": "You're in guest mode — sign up to save your data permanently."
   },
   "onboarding": {
     "step": "Step {{current}} of {{total}}",

@@ -44,8 +44,18 @@ export default function App() {
 }
 
 function AppShell() {
+  const { isGuestMode } = useAuth();
+  const { t } = useTranslation();
+
   return (
     <ActiveWorkoutProvider>
+      {isGuestMode && (
+        <div className="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800 px-4 py-2 text-center">
+          <p className="text-xs text-amber-700 dark:text-amber-400">
+            {t('auth.guestBanner')}
+          </p>
+        </div>
+      )}
       <main className="min-h-screen max-w-lg mx-auto pb-20">
         <Routes>
           <Route path="/" element={<TrainingPage />} />

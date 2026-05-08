@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { isGuest } from '../context/AuthContext';
 
 const WORKOUTS_KEY = 'workouts';
 const CUSTOM_EXERCISES_KEY = 'custom_exercises';
@@ -6,47 +7,47 @@ const CUSTOM_EXERCISES_KEY = 'custom_exercises';
 // ── Workouts ──────────────────────────────────────────────
 
 export async function getWorkouts(userId) {
-  // Try Supabase first
-  const { data, error } = await supabase
-    .from('workouts')
-    .select('*')
-    .eq('user_id', userId)
-    .order('date', { ascending: false });
+  if (!isGuest(userId)) {
+    const { data, error } = await supabase
+      .from('workouts')
+      .select('*')
+      .eq('user_id', userId)
+      .order('date', { ascending: false });
 
-  if (!error && data) {
-    // Map to the shape the app expects
-    const workouts = data.map((row) => ({
-      id: row.id,
-      date: row.date,
-      duration: row.duration,
-      exercises: row.exercises,
-    }));
-    // Cache locally
-    localStorage.setItem(WORKOUTS_KEY, JSON.stringify(workouts));
-    return workouts;
+    if (!error && data) {
+      const workouts = data.map((row) => ({
+        id: row.id,
+        date: row.date,
+        duration: row.duration,
+        exercises: row.exercises,
+      }));
+      localStorage.setItem(WORKOUTS_KEY, JSON.stringify(workouts));
+      return workouts;
+    }
   }
 
-  // Fallback to localStorage
   const cached = localStorage.getItem(WORKOUTS_KEY);
   return cached ? JSON.parse(cached) : [];
 }
 
 export async function saveWorkout(userId, workout) {
-  // Save to Supabase
-  const { data, error } = await supabase
-    .from('workouts')
-    .insert({
-      user_id: userId,
-      date: workout.date,
-      duration: workout.duration,
-      exercises: workout.exercises,
-    })
-    .select()
-    .single();
+  let data = null, error = null;
 
-  // Also save to localStorage cache
+  if (!isGuest(userId)) {
+    ({ data, error } = await supabase
+      .from('workouts')
+      .insert({
+        user_id: userId,
+        date: workout.date,
+        duration: workout.duration,
+        exercises: workout.exercises,
+      })
+      .select()
+      .single());
+  }
+
   const cached = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
-  cached.unshift(data || workout);
+  cached.unshift(data || { ...workout, id: `local_${Date.now()}` });
   localStorage.setItem(WORKOUTS_KEY, JSON.stringify(cached));
 
   return { data, error };
@@ -87,14 +88,16 @@ export async function deleteWorkout(userId, workoutId) {
 // ── Custom Exercises ──────────────────────────────────────
 
 export async function getCustomExercises(userId) {
-  const { data, error } = await supabase
-    .from('custom_exercises')
-    .select('*')
-    .eq('user_id', userId);
+  if (!isGuest(userId)) {
+    const { data, error } = await supabase
+      .from('custom_exercises')
+      .select('*')
+      .eq('user_id', userId);
 
-  if (!error && data) {
-    localStorage.setItem(CUSTOM_EXERCISES_KEY, JSON.stringify(data));
-    return data;
+    if (!error && data) {
+      localStorage.setItem(CUSTOM_EXERCISES_KEY, JSON.stringify(data));
+      return data;
+    }
   }
 
   const cached = localStorage.getItem(CUSTOM_EXERCISES_KEY);
@@ -102,17 +105,21 @@ export async function getCustomExercises(userId) {
 }
 
 export async function saveCustomExercise(userId, exercise) {
-  const { data, error } = await supabase
-    .from('custom_exercises')
-    .insert({ user_id: userId, ...exercise })
-    .select()
-    .single();
+  let data = null;
+
+  if (!isGuest(userId)) {
+    ({ data } = await supabase
+      .from('custom_exercises')
+      .insert({ user_id: userId, ...exercise })
+      .select()
+      .single());
+  }
 
   const cached = JSON.parse(localStorage.getItem(CUSTOM_EXERCISES_KEY) || '[]');
   cached.push(data || exercise);
   localStorage.setItem(CUSTOM_EXERCISES_KEY, JSON.stringify(cached));
 
-  return { data, error };
+  return { data, error: null };
 }
 
 // ── Exercise History & PR ─────────────────────────────────
@@ -201,21 +208,23 @@ export async function updateCustomPlan(userId, planId, plan) {
 // ── Custom Plans ──────────────────────────────────────────
 
 export async function getCustomPlans(userId) {
-  const { data, error } = await supabase
-    .from('custom_plans')
-    .select('*')
-    .eq('user_id', userId)
-    .is('deleted_at', null)
-    .order('created_at', { ascending: false });
+  if (!isGuest(userId)) {
+    const { data, error } = await supabase
+      .from('custom_plans')
+      .select('*')
+      .eq('user_id', userId)
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false });
 
-  if (!error && data) {
-    const plans = data.map((row) => ({
-      id: row.id,
-      name: row.name,
-      days: row.days,
-    }));
-    localStorage.setItem('customPlans', JSON.stringify(plans));
-    return plans;
+    if (!error && data) {
+      const plans = data.map((row) => ({
+        id: row.id,
+        name: row.name,
+        days: row.days,
+      }));
+      localStorage.setItem('customPlans', JSON.stringify(plans));
+      return plans;
+    }
   }
 
   try {
@@ -226,22 +235,21 @@ export async function getCustomPlans(userId) {
 }
 
 export async function saveCustomPlan(userId, plan) {
-  const { data, error } = await supabase
-    .from('custom_plans')
-    .insert({
-      user_id: userId,
-      name: plan.name,
-      days: plan.days,
-    })
-    .select()
-    .single();
+  let data = null;
 
-  // Update localStorage cache
+  if (!isGuest(userId)) {
+    ({ data } = await supabase
+      .from('custom_plans')
+      .insert({ user_id: userId, name: plan.name, days: plan.days })
+      .select()
+      .single());
+  }
+
   const cached = JSON.parse(localStorage.getItem('customPlans') || '[]');
-  cached.unshift({ id: data?.id || plan.id, name: plan.name, days: plan.days });
+  cached.unshift({ id: data?.id || `local_${Date.now()}`, name: plan.name, days: plan.days });
   localStorage.setItem('customPlans', JSON.stringify(cached));
 
-  return { data, error };
+  return { data, error: null };
 }
 
 export async function deleteCustomPlan(userId, planId) {

@@ -4,6 +4,24 @@ import { loadSettings } from '../data/settingsStorage';
 import { migrateLocalDataToSupabase } from '../data/workoutStorage';
 
 const AuthContext = createContext();
+const GUEST_ID = 'guest';
+
+const GUEST_PROFILE = {
+  id: GUEST_ID,
+  name: 'Gast',
+  gender: 'male',
+  age: 25,
+  weight_kg: 75,
+  height_cm: 175,
+  goal: 'maintenance',
+  activity_level: 'moderate',
+  experience: 'beginner',
+  onboarding_completed: true,
+};
+
+export function isGuest(userId) {
+  return userId === GUEST_ID;
+}
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
@@ -19,16 +37,22 @@ export function AuthProvider({ children }) {
       .single();
     setProfile(data);
 
-    // Load settings from Supabase and sync to localStorage
     await loadSettings(userId);
-
-    // Migrate any existing localStorage data to Supabase (first login)
     migrateLocalDataToSupabase(userId);
 
     return data;
   }
 
   useEffect(() => {
+    // Check for guest session first
+    const guestSession = localStorage.getItem('guestMode');
+    if (guestSession === 'true') {
+      setUser({ id: GUEST_ID, email: 'guest@local' });
+      setProfile(GUEST_PROFILE);
+      setLoading(false);
+      return;
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -54,6 +78,12 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  function signInAsGuest() {
+    localStorage.setItem('guestMode', 'true');
+    setUser({ id: GUEST_ID, email: 'guest@local' });
+    setProfile(GUEST_PROFILE);
+  }
+
   async function signUp(email, password) {
     const { data, error } = await supabase.auth.signUp({ email, password });
     return { data, error };
@@ -68,6 +98,15 @@ export function AuthProvider({ children }) {
   }
 
   async function signOut() {
+    // Clear guest mode
+    if (isGuest(user?.id)) {
+      localStorage.removeItem('guestMode');
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      return { error: null };
+    }
+
     const { error } = await supabase.auth.signOut();
     if (!error) {
       setUser(null);
@@ -92,6 +131,10 @@ export function AuthProvider({ children }) {
   }
 
   async function refreshProfile() {
+    if (isGuest(user?.id)) {
+      setProfile(GUEST_PROFILE);
+      return;
+    }
     const { data: { session: currentSession } } = await supabase.auth.getSession();
     if (currentSession?.user) {
       await fetchProfile(currentSession.user.id);
@@ -103,8 +146,10 @@ export function AuthProvider({ children }) {
     user,
     profile,
     loading,
+    isGuestMode: isGuest(user?.id),
     signUp,
     signIn,
+    signInAsGuest,
     signOut,
     resetPassword,
     updatePassword,
