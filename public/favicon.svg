@@ -1,13 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512">
-      <stop offset="0%" stop-color="#6366f1"/>
-      <stop offset="100%" stop-color="#8b5cf6"/>
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
-  <path d="M16 480L144 288L208 352L448 32" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M368 32H448V112" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-  <rect x="64" y="128" width="384" height="144" rx="16" fill="url(#bg)"/>
-  <text x="256" y="240" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="88" fill="white">MyPeak</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Background square with rounded corners -->
+  <rect x="0" y="0" width="512" height="512" rx="100" fill="#0a0a0a"/>
+  
+  <!-- Zigzag chart line -->
+  <polyline points="85,370 160,250 215,310 285,200 340,260 415,150" stroke="#fbbf24" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Arrow head — symmetrisch -->
+  <path d="M388,163 L415,150 L417,181" stroke="#fef3c7" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Text: MyPeak -->
+  <text x="256" y="445" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="500" fill="#fef3c7" letter-spacing="3">MyPeak</text>
+  
+  <!-- Subtitle -->
+  <text x="256" y="473" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="400" fill="#fbbf24" letter-spacing="5" opacity="0.7">FITNESS</text>
 </svg>
