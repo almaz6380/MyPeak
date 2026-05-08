@@ -13,10 +13,10 @@ export default function BarcodeScanner({ onScanned, onClose }) {
 
   const stopScanner = useCallback(async () => {
     const s = scannerRef.current;
+    scannerRef.current = null;
     if (!s) return;
     try { await s.stop(); } catch { /* */ }
     try { s.clear(); } catch { /* */ }
-    scannerRef.current = null;
   }, []);
 
   const lookupBarcode = useCallback(async (barcode) => {
@@ -58,19 +58,26 @@ export default function BarcodeScanner({ onScanned, onClose }) {
   const startScanner = useCallback(async () => {
     await stopScanner();
     if (!isMountedRef.current) return;
+
+    // Reset the container DOM completely to avoid stale video elements
+    const container = document.getElementById('barcode-reader');
+    if (container) container.innerHTML = '';
+
     setStatus('starting');
     isProcessingRef.current = false;
 
     try {
-      // No formatsToSupport = scan ALL formats (EAN, UPC, QR, Code128, etc.)
       const scanner = new Html5Qrcode('barcode-reader', { verbose: false });
       scannerRef.current = scanner;
 
       await scanner.start(
         { facingMode: 'environment' },
         {
-          fps: 10,
-          qrbox: { width: 250, height: 100 },
+          fps: 20,
+          qrbox: (vw, vh) => ({
+            width: Math.floor(Math.min(vw * 0.9, 400)),
+            height: Math.floor(Math.min(vh * 0.25, 180)),
+          }),
           experimentalFeatures: {
             useBarCodeDetectorIfSupported: true,
           },
@@ -80,12 +87,12 @@ export default function BarcodeScanner({ onScanned, onClose }) {
           isProcessingRef.current = true;
           stopScanner().then(() => lookupBarcode(decodedText));
         },
-        () => {} // per-frame miss — ignore
+        () => {}
       );
 
       if (isMountedRef.current) setStatus('scanning');
     } catch (err) {
-      console.error('Scanner start error:', err);
+      console.error('Scanner error:', err);
       if (!isMountedRef.current) return;
       setStatus('error');
       const s = err?.toString?.() || '';
@@ -124,11 +131,10 @@ export default function BarcodeScanner({ onScanned, onClose }) {
         </button>
       </div>
 
-      {/* Camera — html5-qrcode renders video + scan region here */}
+      {/* Camera */}
       <div className="flex-1 relative overflow-hidden">
         <div id="barcode-reader" style={{ width: '100%', minHeight: '100%' }} />
 
-        {/* Loading overlay */}
         {status === 'loading' && (
           <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-3 z-20">
             <Loader2 className="w-10 h-10 text-primary-400 animate-spin" />
@@ -136,7 +142,6 @@ export default function BarcodeScanner({ onScanned, onClose }) {
           </div>
         )}
 
-        {/* Not Found */}
         {status === 'notFound' && (
           <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-4 px-8 z-20">
             <div className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center">
@@ -145,17 +150,16 @@ export default function BarcodeScanner({ onScanned, onClose }) {
             <p className="text-white text-center font-semibold">{t('nutrition.barcodeNotFound')}</p>
             <p className="text-slate-400 text-center text-sm">{t('nutrition.barcodeNotFoundDesc')}</p>
             <div className="flex gap-3 w-full max-w-xs">
-              <button onClick={() => { isProcessingRef.current = false; startScanner(); }} className="flex-1 py-3 rounded-xl bg-white/10 text-white font-medium text-sm hover:bg-white/20 transition-colors">
+              <button onClick={() => { isProcessingRef.current = false; startScanner(); }} className="flex-1 py-3 rounded-xl bg-white/10 text-white font-medium text-sm">
                 {t('nutrition.scanAgain')}
               </button>
-              <button onClick={handleClose} className="flex-1 py-3 rounded-xl bg-primary-600 text-white font-medium text-sm hover:bg-primary-700 transition-colors">
+              <button onClick={handleClose} className="flex-1 py-3 rounded-xl bg-primary-600 text-white font-medium text-sm">
                 {t('nutrition.manualEntry')}
               </button>
             </div>
           </div>
         )}
 
-        {/* Error */}
         {status === 'error' && (
           <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-4 px-8 z-20">
             <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center">
@@ -163,13 +167,12 @@ export default function BarcodeScanner({ onScanned, onClose }) {
             </div>
             <p className="text-white text-center font-semibold">{t('nutrition.cameraError')}</p>
             <p className="text-slate-400 text-center text-sm">{errorMsg}</p>
-            <button onClick={handleClose} className="px-8 py-3 rounded-xl bg-white/10 text-white font-medium text-sm hover:bg-white/20 transition-colors">
+            <button onClick={handleClose} className="px-8 py-3 rounded-xl bg-white/10 text-white font-medium text-sm">
               {t('common.back')}
             </button>
           </div>
         )}
 
-        {/* Starting */}
         {status === 'starting' && (
           <div className="absolute inset-0 bg-black flex flex-col items-center justify-center gap-3 z-20">
             <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
@@ -178,7 +181,6 @@ export default function BarcodeScanner({ onScanned, onClose }) {
         )}
       </div>
 
-      {/* Bottom hint */}
       {status === 'scanning' && (
         <div className="relative z-10 px-6 py-3 text-center" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
           <p className="text-slate-400 text-sm">{t('nutrition.scanHint')}</p>
