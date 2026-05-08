@@ -7,18 +7,18 @@ export default function MyPeakLogo({ size = 32, className = '' }) {
           <stop offset="100%" stopColor="#a78bfa" />
         </linearGradient>
       </defs>
-      {/* Unterer Pfeil-Teil: links unten → hoch → runter (stoppt vor Text) */}
+      {/* Unterer Pfeil-Teil: links unten → hoch → runter (stoppt weit vor Text) */}
       <path
-        d="M2 28L10 16L14.5 20.5"
+        d="M2 29L9 18L13 22"
         stroke="url(#peakGrad)"
         strokeWidth="2.8"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
       />
-      {/* Oberer Pfeil-Teil: nach Text weiter → rechts oben + Spitze */}
+      {/* Oberer Pfeil-Teil: startet weit nach Text → rechts oben + Spitze */}
       <path
-        d="M17.5 14L27 3"
+        d="M19 12L28 2"
         stroke="url(#peakGrad)"
         strokeWidth="2.8"
         strokeLinecap="round"
@@ -26,23 +26,22 @@ export default function MyPeakLogo({ size = 32, className = '' }) {
         fill="none"
       />
       <path
-        d="M22 3H27V8"
+        d="M23 2H28V7"
         stroke="url(#peakGrad)"
         strokeWidth="2.8"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
       />
-      {/* "MyPeak" Text — sitzt in der Lücke des Pfads */}
+      {/* "MyPeak" Text — größer, in der Lücke */}
       <text
         x="16"
-        y="19"
+        y="19.5"
         textAnchor="middle"
         fontFamily="Inter, system-ui, sans-serif"
         fontWeight="800"
-        fontSize="5.5"
+        fontSize="8"
         fill="url(#peakGrad)"
-        letterSpacing="0.3"
       >
         MyPeak
       </text>
