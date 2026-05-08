@@ -7,35 +7,42 @@ export default function MyPeakLogo({ size = 32, className = '' }) {
           <stop offset="100%" stopColor="#a78bfa" />
         </linearGradient>
       </defs>
-      {/* Zigzag bolt */}
+      {/* Unterer Pfeil-Teil: links unten → hoch → runter (stoppt vor Text) */}
       <path
-        d="M3 26L12 14L17 19L28 4"
+        d="M2 28L10 16L14.5 20.5"
         stroke="url(#peakGrad)"
-        strokeWidth="3.5"
+        strokeWidth="2.8"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
       />
-      {/* Pfeilspitze */}
+      {/* Oberer Pfeil-Teil: nach Text weiter → rechts oben + Spitze */}
       <path
-        d="M22 4H28V10"
+        d="M17.5 14L27 3"
         stroke="url(#peakGrad)"
-        strokeWidth="3.5"
+        strokeWidth="2.8"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
       />
-      {/* Weißer Balken überdeckt Pfad-Mitte */}
-      <rect x="5" y="15" width="22" height="9" rx="2" className="fill-surface-alt dark:fill-surface-dark" />
-      {/* MyPeak Text */}
+      <path
+        d="M22 3H27V8"
+        stroke="url(#peakGrad)"
+        strokeWidth="2.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      {/* "MyPeak" Text — sitzt in der Lücke des Pfads */}
       <text
         x="16"
-        y="22"
+        y="19"
         textAnchor="middle"
         fontFamily="Inter, system-ui, sans-serif"
         fontWeight="800"
-        fontSize="7"
+        fontSize="5.5"
         fill="url(#peakGrad)"
+        letterSpacing="0.3"
       >
         MyPeak
       </text>
