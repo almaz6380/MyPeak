@@ -7,9 +7,9 @@ export default function MyPeakLogo({ size = 32, className = '' }) {
           <stop offset="100%" stopColor="#a78bfa" />
         </linearGradient>
       </defs>
-      {/* Unterer Pfeil-Teil: links unten → hoch → runter (stoppt weit vor Text) */}
+      {/* Unterer Pfeil-Teil: links unten → hoch → runter (stoppt unter dem Text) */}
       <path
-        d="M2 29L9 18L13 22"
+        d="M2 29L9 18L13 23"
         stroke="url(#peakGrad)"
         strokeWidth="2.8"
         strokeLinecap="round"
