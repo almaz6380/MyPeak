@@ -58,28 +58,31 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
     onSaved();
   }
 
-  // If a food is selected, show the PortionPicker
-  if (selectedFood) {
-    return (
-      <PortionPicker
-        food={selectedFood}
-        language={lang}
-        onConfirm={handleConfirmFood}
-        onClose={() => setSelectedFood(null)}
-      />
-    );
-  }
-
-  // Barcode scanner
+  // Barcode scanner (must be checked BEFORE selectedFood)
   if (showScanner) {
     return (
       <BarcodeScanner
         onScanned={(food) => {
           setShowScanner(false);
-          setSelectedFood(food);
+          // Small delay so scanner fully unmounts before PortionPicker mounts
+          setTimeout(() => setSelectedFood(food), 50);
         }}
         onClose={() => setShowScanner(false)}
       />
+    );
+  }
+
+  // If a food is selected, show the PortionPicker
+  if (selectedFood) {
+    return (
+      <div className="min-h-screen bg-surface-alt dark:bg-surface-dark">
+        <PortionPicker
+          food={selectedFood}
+          language={lang}
+          onConfirm={handleConfirmFood}
+          onClose={() => setSelectedFood(null)}
+        />
+      </div>
     );
   }
 
