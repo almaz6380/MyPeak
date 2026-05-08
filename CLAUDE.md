@@ -41,11 +41,15 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Eigene Trainingspläne erstellen, speichern und löschen
 - [x] Workout starten: Auswahl zwischen Trainingsplan oder freiem Workout
 - [x] Workout beenden (speichert) vs. Workout verwerfen (löscht) — klar getrennte Aktionen
-- [x] Während des Workouts jederzeit Übungen hinzufügen/entfernen
+- [x] Während des Workouts jederzeit Übungen hinzufügen/entfernen (ohne State-Verlust)
 - [x] PR-Erkennung (Neuer persönlicher Rekord)
 - [x] Workout-Verlauf mit aufklappbaren Details (alle Sätze pro Übung)
 - [x] Workout-Vergleichsfunktion (wird später überarbeitet)
 - [x] Muskelgruppen-Filter und Suchfunktion in der Übungsbibliothek
+- [x] Workout-Persistenz: überlebt Tab-Wechsel + App-Schließen (ActiveWorkoutContext + localStorage)
+- [x] Automatisches Resume beim App-Start mit "Workout fortsetzen" Banner
+- [x] Abgeschlossene Workouts nachträglich bearbeiten (Sets/Reps/Gewicht ändern, Sätze hinzufügen/entfernen)
+- [x] Dezimale Wiederholungen möglich (z.B. 7.5 Reps)
 
 ### Phase 3: Ernährungs-Tracking — FERTIG
 - [x] Lebensmittel-Suche (150 lokale Lebensmittel + Open Food Facts API)
@@ -103,7 +107,7 @@ src/
 │       ├── ActiveWorkout.jsx     # Aktives Workout (Sets loggen, Timer, Beenden/Verwerfen)
 │       ├── ExerciseLibrary.jsx   # Übungsbibliothek mit Filter + Suche
 │       ├── TrainingPlans.jsx     # Vorgefertigte + eigene Pläne
-│       └── WorkoutHistory.jsx    # Verlauf mit Details + Vergleichsfunktion
+│       └── WorkoutHistory.jsx    # Verlauf mit Details + Vergleich + Edit-Modal
 │   └── nutrition/
 │       ├── DailyOverview.jsx     # Tagesansicht mit Makro-Ringen + Mahlzeit-Slots
 │       ├── AddFoodEntry.jsx      # Food-Eingabe-Flow (Suche, Scanner, Manuell)
@@ -128,7 +132,8 @@ src/
 │       └── en.json               # Englische Übersetzungen
 ├── context/
 │   ├── AuthContext.jsx           # Auth-State, Login/Logout, Profil-Verwaltung
-│   └── ThemeContext.jsx          # Dark/Light Mode
+│   ├── ThemeContext.jsx          # Dark/Light Mode
+│   └── ActiveWorkoutContext.jsx  # Aktives Workout State + localStorage Persistence
 └── supabase/
     └── schema.sql                # Komplettes DB-Schema (Tabellen, RLS, Trigger)
 ```
@@ -213,6 +218,9 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 - [x] Progress-Erkennung und PR-Anzeige
 - [x] Vorgefertigte Trainingspläne für alle Trainingsbereiche
 - [x] Eigene Trainingspläne erstellen, speichern, löschen
+- [x] Workout-Persistenz (ActiveWorkoutContext + localStorage)
+- [x] Abgeschlossene Workouts nachträglich bearbeiten
+- [x] Dezimale Wiederholungen (7.5 Reps)
 - [ ] Eigene Übungen erstellen (UI vorhanden, Speicherlogik im Storage bereit)
 - [ ] Notizen und Bilder pro Übung
 - [ ] YouTube-Videos bei Übungen einbetten (Ausführung zeigen)
