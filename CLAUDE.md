@@ -53,6 +53,8 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Workout-Typ-Auswahl vertikal redesigned (horizontale Karten mit Icon + Pfeil)
 - [x] Kampfsport-Icon: Custom Boxhandschuhe SVG
 - [x] Weißer Bildschirm behoben (localStorage-Validierung + Safety-Checks)
+- [x] 5 neue Kampfsportarten: Judo, BJJ, Taekwondo, Wrestling (je 4 Übungen)
+- [x] Eigene Übungen erstellen (Name, Muskelgruppe, Equipment → Supabase custom_exercises)
 
 ### Phase 3: Ernährungs-Tracking — FERTIG
 - [x] Lebensmittel-Suche (150 lokale Lebensmittel + Open Food Facts API)
@@ -277,7 +279,6 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 - [ ] YouTube-Videos bei Übungen einbetten
 - [ ] Individuelle Notizen pro Übung (z.B. Geräte-Einstellungen, persönliche Tipps)
 - [ ] Vergleichssystem Design überarbeiten
-- [ ] Eigene Übungen erstellen
 
 ### Backend/Infrastruktur
 - [ ] Bestätigungs-E-Mail anpassen (eigenes Design) — erfordert Custom SMTP in Supabase
@@ -312,6 +313,7 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 ## Design-Richtlinien
 
 - **Oberstes Prinzip:** Nicht überfüllt, einfach zu bedienen trotz vieler Features
+- **Logo:** Zigzag-Blitz-Pfeil (Indigo→Violett Gradient), in allen Tab-Headern + Favicon + PWA-Icon
 - **Stil:** Modern, clean — Indigo als Primärfarbe, abgerundete Karten, weiche Schatten
 - **Navigation:** Bottom-Navigation mit 4 Hauptbereichen (Training, Ernährung, Bibliothek, Profil)
 - **Responsiv:** Mobile-first, muss auf dem Handy perfekt funktionieren
