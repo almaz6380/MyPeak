@@ -556,24 +556,20 @@ function TrainingTypeCard({ icon, label, desc, color, onClick }) {
 
 function BoxingGlovesIcon({ className }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      {/* Left glove */}
-      <path d="M3.5 8.5C3.5 6 5.5 4 8 4c1.8 0 3.2 1 3.8 2.5.3.7.2 1.5.2 2.3v1.7c0 1-.3 1.8-1 2.5-.5.5-1.2.8-2 1v1.5c0 .8-.7 1.5-1.5 1.5H6c-.8 0-1.5-.7-1.5-1.5V14c-1.2-.5-2-1.7-2-3.2V8.5z" opacity="0.85" />
-      {/* Left glove thumb */}
-      <path d="M3.5 8.5c-.8 0-1.5.5-1.5 1.2v1.1c0 .7.7 1.2 1.5 1.2" opacity="0.65" />
-      {/* Right glove */}
-      <path d="M13 10.5c0-2.5 2-4.5 4.5-4.5 1.8 0 3.2 1 3.8 2.5.3.7.2 1.5.2 2.3v1.7c0 1-.3 1.8-1 2.5-.5.5-1.2.8-2 1v1.5c0 .8-.7 1.5-1.5 1.5h-1.5c-.8 0-1.5-.7-1.5-1.5V16c-1.2-.5-2-1.7-2-3.2v-2.3z" opacity="0.85" />
-      {/* Right glove thumb */}
-      <path d="M13 10.5c-.8 0-1.5.5-1.5 1.2v1.1c0 .7.7 1.2 1.5 1.2" opacity="0.65" />
-      {/* Laces left */}
-      <rect x="5.5" y="7" width="4" height="0.8" rx="0.4" opacity="0.4" />
-      <rect x="5.5" y="8.5" width="4" height="0.8" rx="0.4" opacity="0.4" />
-      {/* Laces right */}
-      <rect x="15" y="9" width="4" height="0.8" rx="0.4" opacity="0.4" />
-      <rect x="15" y="10.5" width="4" height="0.8" rx="0.4" opacity="0.4" />
-      {/* Wrist bands */}
-      <rect x="5" y="14.5" width="5" height="1.5" rx="0.5" opacity="0.5" />
-      <rect x="14.5" y="16.5" width="5" height="1.5" rx="0.5" opacity="0.5" />
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      {/* Glove body — side view, rounded fist shape */}
+      <path d="M7 7c0-2 1.5-4 4.5-4C14.5 3 17 5.5 17 9v2c0 2.5-1.5 4-4 4H9.5C7.5 15 7 13.5 7 12V7z" fill="currentColor" opacity="0.15" />
+      <path d="M7 7c0-2 1.5-4 4.5-4C14.5 3 17 5.5 17 9v2c0 2.5-1.5 4-4 4H9.5C7.5 15 7 13.5 7 12V7z" />
+      {/* Thumb */}
+      <path d="M7 8.5C5.5 8.5 5 9.5 5 10.5s.5 2 2 2" />
+      {/* Wrist cuff */}
+      <rect x="8" y="15" width="7" height="3" rx="1" fill="currentColor" opacity="0.15" />
+      <rect x="8" y="15" width="7" height="3" rx="1" />
+      {/* Wrist opening */}
+      <path d="M10 18v2.5" />
+      <path d="M13 18v2.5" />
+      {/* Knuckle line */}
+      <path d="M9 8h6" opacity="0.5" />
     </svg>
   );
 }
