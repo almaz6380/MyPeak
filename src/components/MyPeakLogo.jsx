@@ -7,7 +7,7 @@ export default function MyPeakLogo({ size = 32, className = '' }) {
           <stop offset="100%" stopColor="#a78bfa" />
         </linearGradient>
       </defs>
-      {/* Pfeil komplett durchgehend (HINTER dem Text) */}
+      {/* Pfeil komplett durchgehend */}
       <path
         d="M1 30L9 18L13 22L28 2"
         stroke="url(#peakGrad)"
@@ -15,7 +15,6 @@ export default function MyPeakLogo({ size = 32, className = '' }) {
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
-        opacity="0.3"
       />
       {/* Pfeilspitze */}
       <path
@@ -26,28 +25,12 @@ export default function MyPeakLogo({ size = 32, className = '' }) {
         strokeLinejoin="round"
         fill="none"
       />
-      {/* Unterer Pfeil-Teil (volle Deckkraft) */}
-      <path
-        d="M1 30L9 18L13 22"
-        stroke="url(#peakGrad)"
-        strokeWidth="2.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      />
-      {/* Oberer Pfeil-Teil (volle Deckkraft) */}
-      <path
-        d="M22 8L28 2"
-        stroke="url(#peakGrad)"
-        strokeWidth="2.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      />
+      {/* Hintergrund-Block hinter dem Text (überdeckt den Pfeil) */}
+      <rect x="4" y="8" width="24" height="9" rx="1.5" className="fill-surface-alt dark:fill-surface-dark" />
       {/* MyPeak Text im Vordergrund */}
       <text
         x="16"
-        y="18"
+        y="15"
         textAnchor="middle"
         fontFamily="Inter, system-ui, sans-serif"
         fontWeight="800"

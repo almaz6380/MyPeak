@@ -6,14 +6,8 @@
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="96" fill="url(#bg)"/>
-  <!-- Pfeil durchgehend (transparent hinter Text) -->
-  <path d="M16 480L144 288L208 352L448 32" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"/>
-  <!-- Pfeilspitze -->
+  <path d="M16 480L144 288L208 352L448 32" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M368 32H448V112" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Unterer Pfeil voll -->
-  <path d="M16 480L144 288L208 352" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Oberer Pfeil voll -->
-  <path d="M352 128L448 32" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- MyPeak Text -->
-  <text x="256" y="290" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="88" fill="white">MyPeak</text>
+  <rect x="64" y="128" width="384" height="144" rx="16" fill="url(#bg)"/>
+  <text x="256" y="240" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="88" fill="white">MyPeak</text>
 </svg>
