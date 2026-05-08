@@ -179,7 +179,25 @@ CREATE POLICY "Users can manage their own nutrition goals"
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
 
--- 9. Trigger: Automatisch Profile + Settings + Nutrition Goals bei neuer Registrierung anlegen
+-- 9. Water Entries (Fluessigkeits-Tracking pro Tag)
+CREATE TABLE water_entries (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  date date NOT NULL,
+  amount_ml integer NOT NULL,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE water_entries ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage their own water entries"
+  ON water_entries FOR ALL
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
+
+CREATE INDEX idx_water_entries_user_date ON water_entries(user_id, date DESC);
+
+-- 10. Trigger: Automatisch Profile + Settings + Nutrition Goals bei neuer Registrierung anlegen
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS trigger AS $$
 BEGIN

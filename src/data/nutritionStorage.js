@@ -222,7 +222,7 @@ export async function getNutritionGoals(userId) {
   const cached = localStorage.getItem(GOALS_KEY);
   if (cached) return JSON.parse(cached);
 
-  return { calories: 2000, protein: 150, carbs: 250, fat: 70 };
+  return { calories: 2000, protein: 150, carbs: 250, fat: 70, water_ml: 3000 };
 }
 
 export async function saveNutritionGoals(userId, goals) {
@@ -235,6 +235,7 @@ export async function saveNutritionGoals(userId, goals) {
       carbs: goals.carbs,
       fat: goals.fat,
       tdee: goals.tdee || null,
+      water_ml: goals.water_ml || 3000,
       updated_at: new Date().toISOString(),
     })
     .select()
@@ -268,4 +269,69 @@ export async function getRecentFoods(userId, limit = 10) {
     }
   }
   return unique;
+}
+
+// ── Water Tracking ───────────────────────────────────────────
+
+const WATER_PREFIX = 'water_';
+
+export async function getWaterTotal(userId, date) {
+  const cacheKey = WATER_PREFIX + date;
+
+  const { data, error } = await supabase
+    .from('water_entries')
+    .select('id, amount_ml')
+    .eq('user_id', userId)
+    .eq('date', date);
+
+  if (!error && data) {
+    const total = data.reduce((sum, e) => sum + e.amount_ml, 0);
+    localStorage.setItem(cacheKey, JSON.stringify({ entries: data, total }));
+    return { entries: data, total };
+  }
+
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) return JSON.parse(cached);
+  return { entries: [], total: 0 };
+}
+
+export async function addWater(userId, date, amountMl) {
+  const { data, error } = await supabase
+    .from('water_entries')
+    .insert({ user_id: userId, date, amount_ml: amountMl })
+    .select()
+    .single();
+
+  if (!error && data) {
+    const cacheKey = WATER_PREFIX + date;
+    const cached = JSON.parse(localStorage.getItem(cacheKey) || '{"entries":[],"total":0}');
+    cached.entries.push(data);
+    cached.total += amountMl;
+    localStorage.setItem(cacheKey, JSON.stringify(cached));
+  }
+
+  return { data, error };
+}
+
+export async function removeLastWater(userId, date) {
+  const cacheKey = WATER_PREFIX + date;
+
+  // Get the most recent entry for this date
+  const { data: entries } = await supabase
+    .from('water_entries')
+    .select('id, amount_ml')
+    .eq('user_id', userId)
+    .eq('date', date)
+    .order('created_at', { ascending: false })
+    .limit(1);
+
+  if (!entries || entries.length === 0) return;
+
+  const last = entries[0];
+  await supabase.from('water_entries').delete().eq('id', last.id);
+
+  const cached = JSON.parse(localStorage.getItem(cacheKey) || '{"entries":[],"total":0}');
+  cached.entries = cached.entries.filter((e) => e.id !== last.id);
+  cached.total = Math.max(0, cached.total - last.amount_ml);
+  localStorage.setItem(cacheKey, JSON.stringify(cached));
 }
