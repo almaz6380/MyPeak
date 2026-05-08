@@ -120,8 +120,8 @@ export default function PortionPicker({ food, onConfirm, onClose, initialServing
         </div>
       </div>
 
-      {/* Confirm Button — always visible at bottom */}
-      <div className="px-5 pt-3 shrink-0 border-t border-slate-200 dark:border-slate-700 bg-surface-alt dark:bg-surface-dark" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
+      {/* Confirm Button — always visible above BottomNav */}
+      <div className="px-5 pt-3 pb-24 shrink-0 border-t border-slate-200 dark:border-slate-700 bg-surface-alt dark:bg-surface-dark">
         <button
           onClick={handleConfirm}
           className="w-full py-3.5 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white rounded-2xl font-semibold transition-colors"
