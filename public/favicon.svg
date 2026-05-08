@@ -1,16 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512">
       <stop offset="0%" stop-color="#6366f1"/>
       <stop offset="100%" stop-color="#8b5cf6"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="96" fill="url(#bg)"/>
-  <!-- Unterer Pfeil-Teil -->
-  <path d="M48 440L168 256L232 320" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Oberer Pfeil-Teil + Spitze -->
-  <path d="M280 224L432 56" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M352 56H432V136" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- MyPeak Text in der Lücke -->
-  <text x="256" y="300" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="80" fill="white">MyPeak</text>
+  <!-- Pfeil durchgehend (transparent hinter Text) -->
+  <path d="M16 480L144 288L208 352L448 32" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"/>
+  <!-- Pfeilspitze -->
+  <path d="M368 32H448V112" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Unterer Pfeil voll -->
+  <path d="M16 480L144 288L208 352" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Oberer Pfeil voll -->
+  <path d="M352 128L448 32" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- MyPeak Text -->
+  <text x="256" y="290" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="88" fill="white">MyPeak</text>
 </svg>
