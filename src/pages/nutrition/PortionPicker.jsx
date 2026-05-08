@@ -35,9 +35,9 @@ export default function PortionPicker({ food, onConfirm, onClose, initialServing
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-surface-alt dark:bg-surface-dark">
+    <div className="p-4 pb-24">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 pt-5 pb-3 shrink-0">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-bold text-slate-900 dark:text-white truncate">{name}</h3>
           {food.brand && (
@@ -50,7 +50,7 @@ export default function PortionPicker({ food, onConfirm, onClose, initialServing
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-5">
+      <div>
         {/* Per 100g reference */}
         <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
           <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">{t('nutrition.per100g')}</p>
@@ -120,15 +120,13 @@ export default function PortionPicker({ food, onConfirm, onClose, initialServing
         </div>
       </div>
 
-      {/* Confirm Button — always visible above BottomNav */}
-      <div className="px-5 pt-3 pb-24 shrink-0 border-t border-slate-200 dark:border-slate-700 bg-surface-alt dark:bg-surface-dark">
-        <button
-          onClick={handleConfirm}
-          className="w-full py-3.5 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white rounded-2xl font-semibold transition-colors"
-        >
-          {editMode ? t('common.save') : t('nutrition.add')}
-        </button>
-      </div>
+      {/* Confirm Button */}
+      <button
+        onClick={handleConfirm}
+        className="w-full py-3.5 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white rounded-2xl font-semibold transition-colors mt-4"
+      >
+        {editMode ? t('common.save') : t('nutrition.add')}
+      </button>
     </div>
   );
 }

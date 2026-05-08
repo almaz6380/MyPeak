@@ -75,14 +75,12 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
   // If a food is selected, show the PortionPicker
   if (selectedFood) {
     return (
-      <div className="min-h-screen bg-surface-alt dark:bg-surface-dark">
-        <PortionPicker
-          food={selectedFood}
-          language={lang}
-          onConfirm={handleConfirmFood}
-          onClose={() => setSelectedFood(null)}
-        />
-      </div>
+      <PortionPicker
+        food={selectedFood}
+        language={lang}
+        onConfirm={handleConfirmFood}
+        onClose={() => setSelectedFood(null)}
+      />
     );
   }
 
