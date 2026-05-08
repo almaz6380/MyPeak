@@ -7,8 +7,18 @@ export function ActiveWorkoutProvider({ children }) {
   const [workout, setWorkout] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
-    } catch { /* */ }
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Validate: must have isActive, startTime, and exercises array
+        if (parsed?.isActive && parsed?.startTime && Array.isArray(parsed?.exercises)) {
+          return parsed;
+        }
+        // Invalid data — clean up
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch {
+      localStorage.removeItem(STORAGE_KEY);
+    }
     return null;
   });
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dumbbell, Plus, History, ClipboardList, Trophy, ArrowLeft, ChevronRight, Heart, Zap, RefreshCw, X, Search, Swords, Play } from 'lucide-react';
+import { Dumbbell, Plus, History, ClipboardList, Trophy, ArrowLeft, ChevronRight, Heart, Zap, RefreshCw, X, Search, Play } from 'lucide-react';
 import ExerciseLibrary from './training/ExerciseLibrary';
 import ActiveWorkout from './training/ActiveWorkout';
 import ActiveCardio from './training/ActiveCardio';
@@ -21,7 +21,8 @@ export default function TrainingPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const activeWorkout = useActiveWorkout();
-  const [view, setView] = useState(activeWorkout.isActive ? 'activeWorkout' : 'home');
+  const hasValidWorkout = activeWorkout.isActive && activeWorkout.workout?.exercises?.length > 0;
+  const [view, setView] = useState(hasValidWorkout ? 'activeWorkout' : 'home');
   const [prNotification, setPrNotification] = useState(null);
   const [cardioActivity, setCardioActivity] = useState(null);
   const [hiitConfig, setHiitConfig] = useState(null);
@@ -219,7 +220,7 @@ export default function TrainingPage() {
       <WeeklySummaryBanner userId={user?.id} />
 
       {/* Resume active workout banner */}
-      {activeWorkout.isActive && (
+      {hasValidWorkout && (
         <button
           onClick={() => setView('activeWorkout')}
           className="w-full bg-green-600 hover:bg-green-700 text-white rounded-2xl p-4 flex items-center justify-center gap-3 text-lg font-semibold transition-colors mb-4 animate-pulse"
@@ -486,37 +487,37 @@ function WorkoutStartChooser({ onBack, onStartPlan, onStartEmpty, onStartCardio,
         <h1 className="text-2xl font-bold">{t('training.chooseTrainingType')}</h1>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="flex flex-col gap-3">
         <TrainingTypeCard
-          icon={<Dumbbell className="w-7 h-7" />}
+          icon={<Dumbbell className="w-6 h-6" />}
           label={t('training.strength')}
           desc={t('training.strengthDesc')}
           color="primary"
           onClick={() => setStep('strengthChoice')}
         />
         <TrainingTypeCard
-          icon={<Heart className="w-7 h-7" />}
+          icon={<Heart className="w-6 h-6" />}
           label={t('training.cardio')}
           desc={t('training.cardioDesc')}
           color="red"
           onClick={() => setStep('cardioChoice')}
         />
         <TrainingTypeCard
-          icon={<Zap className="w-7 h-7" />}
+          icon={<Zap className="w-6 h-6" />}
           label={t('training.hiit')}
           desc={t('training.hiitDesc')}
           color="amber"
           onClick={() => setStep('hiitChoice')}
         />
         <TrainingTypeCard
-          icon={<RefreshCw className="w-7 h-7" />}
+          icon={<RefreshCw className="w-6 h-6" />}
           label={t('training.circuit')}
           desc={t('training.circuitDesc')}
           color="emerald"
           onClick={() => setStep('circuitChoice')}
         />
         <TrainingTypeCard
-          icon={<Swords className="w-7 h-7" />}
+          icon={<BoxingGlovesIcon className="w-6 h-6" />}
           label={t('training.martialArts')}
           desc={t('training.martialArtsDesc')}
           color="violet"
@@ -539,16 +540,32 @@ function TrainingTypeCard({ icon, label, desc, color, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 text-left shadow-sm hover:shadow-md transition-shadow flex flex-col items-center text-center gap-3"
+      className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 text-left shadow-sm hover:shadow-md transition-shadow flex items-center gap-4"
     >
-      <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${colorClasses[color]}`}>
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${colorClasses[color]}`}>
         {icon}
       </div>
-      <div>
+      <div className="flex-1 min-w-0">
         <p className="font-semibold">{label}</p>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{desc}</p>
       </div>
+      <ChevronRight className="w-5 h-5 text-slate-300 dark:text-slate-600 flex-shrink-0" />
     </button>
+  );
+}
+
+function BoxingGlovesIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 11c0-3.3 2.7-6 6-6h1a3 3 0 0 1 3 3v2a2 2 0 0 1-2 2H9" />
+      <path d="M4 11v3a4 4 0 0 0 4 4h1" />
+      <path d="M9 18v2" />
+      <path d="M4 11a2 2 0 0 1 0-4" />
+      <path d="M14 13c0-3.3 2.7-6 6-6" />
+      <path d="M20 7v4a4 4 0 0 1-4 4h-2" />
+      <path d="M14 15v3" />
+      <circle cx="7" cy="11" r="1" fill="currentColor" stroke="none" />
+    </svg>
   );
 }
 
