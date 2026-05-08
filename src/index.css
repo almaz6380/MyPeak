@@ -55,16 +55,10 @@
   animation: scan-line 2s ease-in-out infinite;
 }
 
-/* html5-qrcode: nur visuelles Styling, keine funktionalen Elemente verstecken */
+/* html5-qrcode minimal styling */
 #barcode-reader {
   border: none !important;
 }
 #barcode-reader video {
   object-fit: cover !important;
-}
-#barcode-reader__header_message {
-  display: none !important;
-}
-#barcode-reader__dashboard {
-  display: none !important;
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Html5QrcodeScanner, Html5QrcodeScanType, Html5QrcodeSupportedFormats } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 import { X, ScanBarcode, Loader2, AlertCircle } from 'lucide-react';
 
 export default function BarcodeScanner({ onScanned, onClose }) {
@@ -10,6 +10,14 @@ export default function BarcodeScanner({ onScanned, onClose }) {
   const scannerRef = useRef(null);
   const isProcessingRef = useRef(false);
   const isMountedRef = useRef(true);
+
+  const stopScanner = useCallback(async () => {
+    const s = scannerRef.current;
+    if (!s) return;
+    try { await s.stop(); } catch { /* */ }
+    try { s.clear(); } catch { /* */ }
+    scannerRef.current = null;
+  }, []);
 
   const lookupBarcode = useCallback(async (barcode) => {
     if (!isMountedRef.current) return;
@@ -25,7 +33,6 @@ export default function BarcodeScanner({ onScanned, onClose }) {
       if (json.status === 1 && json.product) {
         const p = json.product;
         const n = p.nutriments || {};
-
         onScanned({
           id: `off_${barcode}`,
           nameDE: p.product_name_de || p.product_name || barcode,
@@ -37,11 +44,8 @@ export default function BarcodeScanner({ onScanned, onClose }) {
           protein: Math.round((n.proteins_100g || 0) * 10) / 10,
           carbs: Math.round((n.carbohydrates_100g || 0) * 10) / 10,
           fat: Math.round((n.fat_100g || 0) * 10) / 10,
-          fiber: Math.round((n.fiber_100g || 0) * 10) / 10,
-          sugar: Math.round((n.sugars_100g || 0) * 10) / 10,
           source: 'openfoodfacts',
           source_id: barcode,
-          incomplete: !n['energy-kcal_100g'],
         });
       } else {
         setStatus('notFound');
@@ -51,102 +55,60 @@ export default function BarcodeScanner({ onScanned, onClose }) {
     }
   }, [onScanned]);
 
+  const startScanner = useCallback(async () => {
+    await stopScanner();
+    if (!isMountedRef.current) return;
+    setStatus('starting');
+    isProcessingRef.current = false;
+
+    try {
+      // No formatsToSupport = scan ALL formats (EAN, UPC, QR, Code128, etc.)
+      const scanner = new Html5Qrcode('barcode-reader', { verbose: false });
+      scannerRef.current = scanner;
+
+      await scanner.start(
+        { facingMode: 'environment' },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 100 },
+          experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true,
+          },
+        },
+        (decodedText) => {
+          if (isProcessingRef.current) return;
+          isProcessingRef.current = true;
+          stopScanner().then(() => lookupBarcode(decodedText));
+        },
+        () => {} // per-frame miss — ignore
+      );
+
+      if (isMountedRef.current) setStatus('scanning');
+    } catch (err) {
+      console.error('Scanner start error:', err);
+      if (!isMountedRef.current) return;
+      setStatus('error');
+      const s = err?.toString?.() || '';
+      setErrorMsg(
+        s.includes('NotAllowedError') || s.includes('Permission')
+          ? t('nutrition.cameraPermissionDenied')
+          : t('nutrition.cameraError')
+      );
+    }
+  }, [stopScanner, lookupBarcode, t]);
+
   useEffect(() => {
     isMountedRef.current = true;
-
-    // Html5QrcodeScanner handles everything: camera permission, video rendering, scanning
-    const scanner = new Html5QrcodeScanner(
-      'barcode-reader',
-      {
-        fps: 15,
-        qrbox: { width: 280, height: 120 },
-        rememberLastUsedCamera: true,
-        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
-        showTorchButtonIfSupported: false,
-        showZoomSliderIfSupported: true,
-        defaultZoomValueIfSupported: 1,
-        // Use native BarcodeDetector API when available (much faster)
-        experimentalFeatures: {
-          useBarCodeDetectorIfSupported: true,
-        },
-        // No format restriction — scan ALL barcode types
-      },
-      /* verbose= */ false
-    );
-
-    scannerRef.current = scanner;
-
-    scanner.render(
-      // Success callback
-      (decodedText) => {
-        if (isProcessingRef.current) return;
-        isProcessingRef.current = true;
-
-        // Clear scanner UI before looking up
-        try { scanner.clear(); } catch { /* ignore */ }
-        scannerRef.current = null;
-
-        lookupBarcode(decodedText);
-      },
-      // Error callback (per-frame, ignore)
-      () => {}
-    );
-
-    // Once rendering starts, mark as scanning
-    // Small delay to let the scanner initialize
-    const timer = setTimeout(() => {
-      if (isMountedRef.current) setStatus('scanning');
-    }, 1500);
-
+    const timer = setTimeout(startScanner, 150);
     return () => {
       isMountedRef.current = false;
       clearTimeout(timer);
-      try { scanner.clear(); } catch { /* ignore */ }
-      scannerRef.current = null;
+      stopScanner();
     };
-  }, [lookupBarcode]);
-
-  function handleRetry() {
-    isProcessingRef.current = false;
-    setStatus('starting');
-
-    // Re-create scanner
-    const scanner = new Html5QrcodeScanner(
-      'barcode-reader',
-      {
-        fps: 15,
-        qrbox: { width: 280, height: 120 },
-        rememberLastUsedCamera: true,
-        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
-        showTorchButtonIfSupported: false,
-        showZoomSliderIfSupported: true,
-        defaultZoomValueIfSupported: 1,
-        experimentalFeatures: { useBarCodeDetectorIfSupported: true },
-      },
-      false
-    );
-    scannerRef.current = scanner;
-
-    scanner.render(
-      (decodedText) => {
-        if (isProcessingRef.current) return;
-        isProcessingRef.current = true;
-        try { scanner.clear(); } catch { /* ignore */ }
-        scannerRef.current = null;
-        lookupBarcode(decodedText);
-      },
-      () => {}
-    );
-
-    setTimeout(() => {
-      if (isMountedRef.current) setStatus('scanning');
-    }, 1500);
-  }
+  }, []);
 
   function handleClose() {
-    try { scannerRef.current?.clear(); } catch { /* ignore */ }
-    scannerRef.current = null;
-    onClose();
+    stopScanner().then(onClose);
   }
 
   return (
@@ -162,9 +124,9 @@ export default function BarcodeScanner({ onScanned, onClose }) {
         </button>
       </div>
 
-      {/* Camera — html5-qrcode renders everything here */}
-      <div className="flex-1 relative overflow-hidden bg-black">
-        <div id="barcode-reader" className="w-full h-full" />
+      {/* Camera — html5-qrcode renders video + scan region here */}
+      <div className="flex-1 relative overflow-hidden">
+        <div id="barcode-reader" style={{ width: '100%', minHeight: '100%' }} />
 
         {/* Loading overlay */}
         {status === 'loading' && (
@@ -183,7 +145,7 @@ export default function BarcodeScanner({ onScanned, onClose }) {
             <p className="text-white text-center font-semibold">{t('nutrition.barcodeNotFound')}</p>
             <p className="text-slate-400 text-center text-sm">{t('nutrition.barcodeNotFoundDesc')}</p>
             <div className="flex gap-3 w-full max-w-xs">
-              <button onClick={handleRetry} className="flex-1 py-3 rounded-xl bg-white/10 text-white font-medium text-sm hover:bg-white/20 transition-colors">
+              <button onClick={() => { isProcessingRef.current = false; startScanner(); }} className="flex-1 py-3 rounded-xl bg-white/10 text-white font-medium text-sm hover:bg-white/20 transition-colors">
                 {t('nutrition.scanAgain')}
               </button>
               <button onClick={handleClose} className="flex-1 py-3 rounded-xl bg-primary-600 text-white font-medium text-sm hover:bg-primary-700 transition-colors">
@@ -204,6 +166,14 @@ export default function BarcodeScanner({ onScanned, onClose }) {
             <button onClick={handleClose} className="px-8 py-3 rounded-xl bg-white/10 text-white font-medium text-sm hover:bg-white/20 transition-colors">
               {t('common.back')}
             </button>
+          </div>
+        )}
+
+        {/* Starting */}
+        {status === 'starting' && (
+          <div className="absolute inset-0 bg-black flex flex-col items-center justify-center gap-3 z-20">
+            <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
+            <p className="text-slate-400 text-sm">{t('nutrition.startingCamera')}</p>
           </div>
         )}
       </div>
