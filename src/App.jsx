@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
@@ -15,11 +16,27 @@ import OnboardingPage from './pages/onboarding/OnboardingPage';
 export default function App() {
   const { user, profile, loading } = useAuth();
   const { t } = useTranslation();
+  const [showSplash, setShowSplash] = useState(true);
+  const [splashFading, setSplashFading] = useState(false);
+
+  useEffect(() => {
+    const fadeTimer = setTimeout(() => setSplashFading(true), 800);
+    const hideTimer = setTimeout(() => setShowSplash(false), 1200);
+    return () => { clearTimeout(fadeTimer); clearTimeout(hideTimer); };
+  }, []);
+
+  if (showSplash) {
+    return (
+      <div className={`min-h-screen bg-[#0a0a0a] flex items-center justify-center transition-opacity duration-400 ${splashFading ? 'opacity-0' : 'opacity-100'}`}>
+        <img src="/mypeak-icon-v2.svg" alt="MyPeak" className="w-40 h-40" />
+      </div>
+    );
+  }
 
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-surface-dark flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
       </div>
     );
   }
