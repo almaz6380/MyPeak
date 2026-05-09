@@ -125,7 +125,7 @@ export default function WorkoutHistory({ onBack }) {
     }
 
     return (
-      <div className="p-4 pt-14 pb-24">
+      <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={exitCompareMode} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
@@ -228,7 +228,7 @@ export default function WorkoutHistory({ onBack }) {
     }));
 
     return (
-      <div className="p-4 pt-14 pb-24">
+      <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => setGraphExercise(null)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
@@ -260,7 +260,7 @@ export default function WorkoutHistory({ onBack }) {
   }
 
   return (
-    <div className="p-4 pt-14 pb-24">
+    <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
         <button onClick={compareMode ? exitCompareMode : onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />

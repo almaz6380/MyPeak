@@ -57,7 +57,7 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
   }
 
   return (
-    <div className="p-4 pt-14 pb-24">
+    <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-4">
         <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           <ArrowLeft className="w-5 h-5" />

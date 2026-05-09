@@ -89,7 +89,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
   // ── TYPE CHOOSER (Stufe 1) ──
   if (!trainingType) {
     return (
-      <div className="p-4 pt-14 pb-24">
+      <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
@@ -124,7 +124,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
 
   // ── EXERCISE LIST (Stufe 2) ──
   return (
-    <div className="p-4 pt-14 pb-24">
+    <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-4">
         <button onClick={() => { setTrainingType(null); setSearch(''); setMuscleFilter('all'); setEquipmentFilter('all'); setMaFilter('all'); }}
           className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">

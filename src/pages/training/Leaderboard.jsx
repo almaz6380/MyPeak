@@ -35,7 +35,7 @@ export default function Leaderboard({ onBack }) {
   }, [user]);
 
   return (
-    <div className="p-4 pt-14 pb-24">
+    <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
         <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-2xl font-bold">{lang === 'de' ? 'Ranking' : 'Ranking'}</h1>

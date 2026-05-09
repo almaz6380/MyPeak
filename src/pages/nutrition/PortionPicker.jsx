@@ -35,7 +35,7 @@ export default function PortionPicker({ food, onConfirm, onClose, initialServing
   }
 
   return (
-    <div className="p-4 pt-14 pb-24">
+    <div className="p-4 pt-16 pb-24">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex-1 min-w-0">

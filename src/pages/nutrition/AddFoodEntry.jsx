@@ -129,7 +129,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
   const totalCalories = selectedItems.reduce((sum, item) => sum + (item.calories || 0), 0);
 
   return (
-    <div className="p-4 pt-14 pb-32">
+    <div className="p-4 pt-16 pb-32">
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <button onClick={onBack} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
@@ -330,7 +330,7 @@ function ManualEntryForm({ onBack, onSave, t }) {
   }
 
   return (
-    <div className="p-4 pt-14 pb-24">
+    <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
         <button onClick={onBack} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
           <ArrowLeft className="w-5 h-5" />

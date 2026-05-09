@@ -124,7 +124,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
   }
 
   return (
-    <div className="p-4 pt-14 pb-24">
+    <div className="p-4 pt-16 pb-24">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">{t('training.activeWorkout')}</h1>
         <span className="text-sm font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg">
