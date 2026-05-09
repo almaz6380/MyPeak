@@ -64,7 +64,7 @@ export default function FriendsList({ onBack, onAddFriend }) {
 
   if (isGuestMode) {
     return (
-      <div className="p-4 pb-24">
+      <div className="p-4 pt-14 pb-24">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
           <h1 className="text-2xl font-bold">{lang === 'de' ? 'Freunde' : 'Friends'}</h1>
@@ -75,7 +75,7 @@ export default function FriendsList({ onBack, onAddFriend }) {
   }
 
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 pt-14 pb-24">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
