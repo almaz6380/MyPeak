@@ -459,11 +459,41 @@ function CalendarModal({ selectedDate, onSelect, onClose, lang, t }) {
 // ── Goal Editor Modal ────────────────────────────────────────
 
 function GoalEditorModal({ goals, onSave, onClose, t }) {
-  const [calories, setCalories] = useState(Math.round(goals.calories));
-  const [protein, setProtein] = useState(Math.round(goals.protein));
-  const [carbs, setCarbs] = useState(Math.round(goals.carbs));
-  const [fat, setFat] = useState(Math.round(goals.fat));
-  const [waterMl, setWaterMl] = useState(Math.round(goals.water_ml || 3000));
+  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const [calories, setCalories] = useState(String(Math.round(goals.calories)));
+  const [protein, setProtein] = useState(String(Math.round(goals.protein)));
+  const [carbs, setCarbs] = useState(String(Math.round(goals.carbs)));
+  const [fat, setFat] = useState(String(Math.round(goals.fat)));
+  const [fiber, setFiber] = useState(String(Math.round(goals.fiber || 30)));
+  const [waterMl, setWaterMl] = useState(String(Math.round(goals.water_ml || 3000)));
+  const [autoCalc, setAutoCalc] = useState(null); // 'protein' | 'carbs' | 'fat' — which to auto-calculate
+
+  // Auto-calculate third macro when kcal + two macros are set
+  const cal = parseInt(calories) || 0;
+  const p = parseInt(protein) || 0;
+  const c = parseInt(carbs) || 0;
+  const f = parseInt(fat) || 0;
+
+  const proteinKcal = p * 4;
+  const carbsKcal = c * 4;
+  const fatKcal = f * 9;
+  const macroKcal = proteinKcal + carbsKcal + fatKcal;
+  const remaining = cal - macroKcal;
+
+  function autoCalcMacro(field) {
+    if (!cal) return;
+    if (field === 'protein') {
+      const rest = cal - (c * 4) - (f * 9);
+      setProtein(String(Math.max(0, Math.round(rest / 4))));
+    } else if (field === 'carbs') {
+      const rest = cal - (p * 4) - (f * 9);
+      setCarbs(String(Math.max(0, Math.round(rest / 4))));
+    } else if (field === 'fat') {
+      const rest = cal - (p * 4) - (c * 4);
+      setFat(String(Math.max(0, Math.round(rest / 9))));
+    }
+    setAutoCalc(field);
+  }
 
   function handleSave() {
     onSave({
@@ -471,28 +501,66 @@ function GoalEditorModal({ goals, onSave, onClose, t }) {
       protein: parseInt(protein) || 0,
       carbs: parseInt(carbs) || 0,
       fat: parseInt(fat) || 0,
+      fiber: parseInt(fiber) || 30,
       water_ml: parseInt(waterMl) || 3000,
     });
   }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl w-full max-w-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-6 pt-6 pb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl w-full max-w-sm shadow-xl max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 pt-6 pb-3 shrink-0">
           <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('nutrition.setGoal')}</h3>
           <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="px-6 space-y-3">
-          <GoalField label={`${t('nutrition.calories')} (kcal)`} value={calories} onChange={setCalories} color="bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800 focus:ring-primary-400" />
-          <GoalField label={`${t('nutrition.protein')} (g)`} value={protein} onChange={setProtein} color="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 focus:ring-blue-500" />
-          <GoalField label={`${t('nutrition.carbs')} (g)`} value={carbs} onChange={setCarbs} color="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 focus:ring-amber-500" />
-          <GoalField label={`${t('nutrition.fat')} (g)`} value={fat} onChange={setFat} color="bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 focus:ring-rose-500" />
-          <GoalField label={`${t('nutrition.water')} (ml)`} value={waterMl} onChange={setWaterMl} color="bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-800 focus:ring-cyan-500" />
+
+        <div className="overflow-y-auto flex-1 px-6">
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 mb-3">
+            {lang === 'de' ? 'Alle Werte sind frei anpassbar. Onboarding-Werte sind nur Empfehlungen.' : 'All values are freely adjustable. Onboarding values are recommendations only.'}
+          </p>
+
+          <div className="space-y-3">
+            <GoalField label={`${t('nutrition.calories')} (kcal)`} value={calories} onChange={setCalories} color="bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800 focus:ring-primary-400" />
+
+            <div className="flex items-end gap-2">
+              <div className="flex-1"><GoalField label={`${t('nutrition.protein')} (g)`} value={protein} onChange={(v) => { setProtein(v); setAutoCalc(null); }} color="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 focus:ring-blue-500" /></div>
+              <button onClick={() => autoCalcMacro('protein')} className={`mb-0.5 px-2 py-2.5 rounded-lg text-[10px] font-medium ${autoCalc === 'protein' ? 'bg-blue-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>Auto</button>
+            </div>
+
+            <div className="flex items-end gap-2">
+              <div className="flex-1"><GoalField label={`${t('nutrition.carbs')} (g)`} value={carbs} onChange={(v) => { setCarbs(v); setAutoCalc(null); }} color="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 focus:ring-amber-500" /></div>
+              <button onClick={() => autoCalcMacro('carbs')} className={`mb-0.5 px-2 py-2.5 rounded-lg text-[10px] font-medium ${autoCalc === 'carbs' ? 'bg-amber-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>Auto</button>
+            </div>
+
+            <div className="flex items-end gap-2">
+              <div className="flex-1"><GoalField label={`${t('nutrition.fat')} (g)`} value={fat} onChange={(v) => { setFat(v); setAutoCalc(null); }} color="bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 focus:ring-rose-500" /></div>
+              <button onClick={() => autoCalcMacro('fat')} className={`mb-0.5 px-2 py-2.5 rounded-lg text-[10px] font-medium ${autoCalc === 'fat' ? 'bg-rose-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>Auto</button>
+            </div>
+
+            {/* Macro kcal breakdown */}
+            <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3">
+              <div className="flex justify-between text-[10px] text-slate-400 mb-1">
+                <span>P: {proteinKcal} kcal</span>
+                <span>C: {carbsKcal} kcal</span>
+                <span>F: {fatKcal} kcal</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="font-medium">{lang === 'de' ? 'Makro-Summe' : 'Macro total'}: {macroKcal} kcal</span>
+                <span className={`font-semibold ${remaining === 0 ? 'text-green-500' : remaining > 0 ? 'text-amber-500' : 'text-red-500'}`}>
+                  {remaining > 0 ? `+${remaining}` : remaining} kcal
+                </span>
+              </div>
+            </div>
+
+            <GoalField label={`${t('nutrition.fiber') || (lang === 'de' ? 'Ballaststoffe' : 'Fiber')} (g)`} value={fiber} onChange={setFiber} color="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 focus:ring-green-500" />
+            <GoalField label={`${t('nutrition.water')} (ml)`} value={waterMl} onChange={setWaterMl} color="bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-800 focus:ring-cyan-500" />
+          </div>
         </div>
-        <div className="px-6 pt-5 pb-6">
-          <button onClick={handleSave} className="w-full py-3 bg-primary-500 hover:bg-primary-500 text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
+
+        <div className="px-6 pt-4 pb-6 shrink-0">
+          <button onClick={handleSave} className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
             <Check className="w-4 h-4" />
             {t('common.save')}
           </button>

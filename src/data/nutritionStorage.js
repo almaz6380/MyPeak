@@ -238,7 +238,7 @@ export async function getNutritionGoals(userId) {
   // Return cached goals if available (preserves manually set values)
   if (cachedGoals) return cachedGoals;
 
-  return { calories: 2000, protein: 150, carbs: 250, fat: 70, water_ml: 3000 };
+  return { calories: 2000, protein: 150, carbs: 250, fat: 70, fiber: 30, water_ml: 3000 };
 }
 
 export async function saveNutritionGoals(userId, goals) {
@@ -253,6 +253,7 @@ export async function saveNutritionGoals(userId, goals) {
         protein: goals.protein,
         carbs: goals.carbs,
         fat: goals.fat,
+        fiber: goals.fiber || 30,
         tdee: goals.tdee || null,
         water_ml: goals.water_ml || 3000,
         updated_at: new Date().toISOString(),
