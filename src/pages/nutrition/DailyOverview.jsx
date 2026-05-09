@@ -21,19 +21,25 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
   const [showWaterInput, setShowWaterInput] = useState(false);
   const [customWaterAmount, setCustomWaterAmount] = useState('');
 
+  // Load goals only once on mount
   useEffect(() => {
-    if (user) loadData();
+    if (user) {
+      getNutritionGoals(user.id).then((g) => setGoals(g));
+    }
+  }, [user]);
+
+  // Load entries + water when date changes
+  useEffect(() => {
+    if (user) loadDateData();
   }, [user, selectedDate]);
 
-  async function loadData() {
+  async function loadDateData() {
     setLoading(true);
-    const [entriesData, goalsData, waterData] = await Promise.all([
+    const [entriesData, waterData] = await Promise.all([
       getNutritionEntries(user.id, selectedDate),
-      getNutritionGoals(user.id),
       getWaterTotal(user.id, selectedDate),
     ]);
     setEntries(entriesData);
-    setGoals(goalsData);
     setWaterTotal(waterData.total);
     setLoading(false);
   }
@@ -546,11 +552,19 @@ function GoalEditorModal({ goals, onSave, onClose, t }) {
                 <span>C: {carbsKcal} kcal</span>
                 <span>F: {fatKcal} kcal</span>
               </div>
-              <div className="flex justify-between text-xs">
+              <div className="flex items-center justify-between text-xs">
                 <span className="font-medium">{lang === 'de' ? 'Makro-Summe' : 'Macro total'}: {macroKcal} kcal</span>
-                <span className={`font-semibold ${remaining === 0 ? 'text-green-500' : remaining > 0 ? 'text-amber-500' : 'text-red-500'}`}>
-                  {remaining > 0 ? `+${remaining}` : remaining} kcal
-                </span>
+                {remaining !== 0 && (
+                  <button
+                    onClick={() => setCalories(String(macroKcal))}
+                    className="px-2 py-1 rounded-lg bg-primary-500 text-white text-[10px] font-medium"
+                  >
+                    {lang === 'de' ? `kcal → ${macroKcal}` : `kcal → ${macroKcal}`}
+                  </button>
+                )}
+                {remaining === 0 && (
+                  <span className="font-semibold text-green-500">✓</span>
+                )}
               </div>
             </div>
 
