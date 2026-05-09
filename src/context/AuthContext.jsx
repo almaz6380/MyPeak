@@ -30,21 +30,38 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   async function fetchProfile(userId) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    setProfile(data);
+    // Try to load cached profile first for instant display
+    const cachedProfile = localStorage.getItem('cachedProfile');
+    if (cachedProfile) {
+      const parsed = JSON.parse(cachedProfile);
+      if (parsed?.id === userId) setProfile(parsed);
+    }
 
-    await loadSettings(userId);
+    // Then fetch fresh from Supabase (non-blocking if cache existed)
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (data) {
+        setProfile(data);
+        localStorage.setItem('cachedProfile', JSON.stringify(data));
+      }
+    } catch {
+      // Offline or Supabase down — cached profile is fine
+    }
+
+    // Background tasks — don't block app startup
+    loadSettings(userId).catch(() => {});
     migrateLocalDataToSupabase(userId);
 
-    return data;
+    return;
   }
 
   useEffect(() => {
-    // Check for guest session first
+    // Check for guest session first (instant)
     const guestSession = localStorage.getItem('guestMode');
     if (guestSession === 'true') {
       setUser({ id: GUEST_ID, email: 'guest@local' });
@@ -53,7 +70,13 @@ export function AuthProvider({ children }) {
       return;
     }
 
+    // Timeout: if Supabase doesn't respond in 5s, show login
+    const timeout = setTimeout(() => {
+      if (loading) setLoading(false);
+    }, 5000);
+
     supabase.auth.getSession().then(({ data: { session } }) => {
+      clearTimeout(timeout);
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -61,6 +84,9 @@ export function AuthProvider({ children }) {
       } else {
         setLoading(false);
       }
+    }).catch(() => {
+      clearTimeout(timeout);
+      setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
