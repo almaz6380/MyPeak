@@ -54,20 +54,15 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
     onSaved();
   }
 
-  // Quick-add a recent food directly (with its last portion)
-  function quickAddRecent(food) {
-    setSelectedItems((prev) => [...prev, {
-      food_name: food.food_name,
-      brand: food.brand || null,
-      serving_size: food.serving_size,
-      serving_unit: food.serving_unit || 'g',
-      calories: food.calories,
-      protein: food.protein,
-      carbs: food.carbs,
-      fat: food.fat,
-      source: food.source || 'manual',
-      source_id: food.source_id || null,
-    }]);
+  // Open PortionPicker for a recent food so user can choose grams
+  function selectRecent(food) {
+    setSelectedFood({
+      ...food,
+      nameDE: food.food_name,
+      nameEN: food.food_name,
+      servingSize: food.serving_size,
+      servingUnit: food.serving_unit || 'g',
+    });
   }
 
   // Check if a recent food is already in the queue
@@ -239,7 +234,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
                 return (
                   <div key={i} className="flex items-center gap-3 px-4 py-3 border-b border-slate-50 dark:border-slate-700/50 last:border-0">
                     <button
-                      onClick={() => inQueue ? null : quickAddRecent(food)}
+                      onClick={() => inQueue ? null : selectRecent(food)}
                       className="flex-1 text-left min-w-0"
                     >
                       <p className={`text-sm font-medium truncate ${inQueue ? 'text-primary-400' : 'text-slate-700 dark:text-slate-200'}`}>
@@ -255,7 +250,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
                       </div>
                     </button>
                     <button
-                      onClick={() => inQueue ? null : quickAddRecent(food)}
+                      onClick={() => inQueue ? null : selectRecent(food)}
                       className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
                         inQueue
                           ? 'bg-primary-500 text-white'
