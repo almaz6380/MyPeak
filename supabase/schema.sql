@@ -278,7 +278,49 @@ CREATE POLICY "Anyone can read XP" ON user_xp FOR SELECT USING (true);
 CREATE POLICY "Users can manage their own XP" ON user_xp FOR ALL
   USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
 
--- 14. Trigger: Automatisch Profile + Settings + Nutrition Goals + XP bei neuer Registrierung anlegen
+-- 14. Community Products (von Usern hinzugefügte Produkte per Barcode)
+CREATE TABLE community_products (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  barcode text UNIQUE NOT NULL,
+  name text NOT NULL,
+  brand text,
+  calories numeric NOT NULL DEFAULT 0,
+  protein numeric NOT NULL DEFAULT 0,
+  carbs numeric NOT NULL DEFAULT 0,
+  fat numeric NOT NULL DEFAULT 0,
+  created_by uuid REFERENCES auth.users(id),
+  confirmations integer DEFAULT 1,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE community_products ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can read community products" ON community_products FOR SELECT USING (true);
+CREATE POLICY "Authenticated users can insert" ON community_products FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+CREATE POLICY "Anyone can update confirmations" ON community_products FOR UPDATE USING (true);
+
+CREATE INDEX idx_community_products_barcode ON community_products(barcode);
+
+-- 15. Product Overrides (persoenliche Korrekturen pro User)
+CREATE TABLE product_overrides (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  barcode text NOT NULL,
+  calories numeric NOT NULL,
+  protein numeric NOT NULL,
+  carbs numeric NOT NULL,
+  fat numeric NOT NULL,
+  created_at timestamptz DEFAULT now(),
+  UNIQUE(user_id, barcode)
+);
+
+ALTER TABLE product_overrides ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage their own overrides" ON product_overrides FOR ALL
+  USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE POLICY "Anyone can read overrides for crowdsource" ON product_overrides FOR SELECT USING (true);
+
+CREATE INDEX idx_product_overrides_barcode ON product_overrides(barcode);
+
+-- 16. Trigger: Automatisch Profile + Settings + Nutrition Goals + XP bei neuer Registrierung anlegen
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS trigger AS $$
 BEGIN
