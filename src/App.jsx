@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import { ActiveWorkoutProvider } from './context/ActiveWorkoutContext';
+import { CameraProvider } from './context/CameraContext';
 import SplashScreen from './components/SplashScreen';
 import BottomNav from './components/BottomNav';
 import TrainingPage from './pages/TrainingPage';
@@ -57,6 +58,7 @@ function AppShell() {
   const { t } = useTranslation();
 
   return (
+    <CameraProvider>
     <ActiveWorkoutProvider>
       {isGuestMode && (
         <div className="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800 px-4 py-2 text-center">
@@ -75,5 +77,6 @@ function AppShell() {
       </main>
       <BottomNav />
     </ActiveWorkoutProvider>
+    </CameraProvider>
   );
 }

@@ -3,11 +3,13 @@ import { useTranslation } from 'react-i18next';
 import Quagga from '@ericblade/quagga2';
 import { X, ScanBarcode, Loader2, AlertCircle, Plus, Check } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useCamera } from '../../context/CameraContext';
 import { lookupCommunityProduct, addCommunityProduct } from '../../data/communityProducts';
 
 export default function BarcodeScanner({ onScanned, onClose }) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const camera = useCamera();
   const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
   const [status, setStatus] = useState('starting'); // starting | scanning | loading | notFound | addProduct | error
   const [errorMsg, setErrorMsg] = useState('');
@@ -90,7 +92,7 @@ export default function BarcodeScanner({ onScanned, onClose }) {
     }
   }, [onScanned]);
 
-  const startScanner = useCallback(() => {
+  const startScanner = useCallback(async () => {
     stopQuagga();
     if (!isMountedRef.current) return;
 
@@ -99,6 +101,13 @@ export default function BarcodeScanner({ onScanned, onClose }) {
 
     setStatus('starting');
     isProcessingRef.current = false;
+
+    // Pre-request camera via context (reuses existing permission)
+    try {
+      if (camera) await camera.requestCamera();
+    } catch {
+      // Will be caught by Quagga below
+    }
 
     Quagga.init(
       {
