@@ -126,6 +126,7 @@ const exercises = [
   { id: 'elliptical', type: 'cardio', cardioType: 'elliptical', nameKey: 'exercises.elliptical', descKey: 'exercises.ellipticalDesc' },
   { id: 'rowing-machine', type: 'cardio', cardioType: 'rowing', nameKey: 'exercises.rowingMachine', descKey: 'exercises.rowingMachineDesc' },
   { id: 'swimming', type: 'cardio', cardioType: 'swimming', nameKey: 'exercises.swimming', descKey: 'exercises.swimmingDesc' },
+  { id: 'jump-rope', type: 'cardio', cardioType: 'jumprope', nameKey: 'exercises.jumpRope', descKey: 'exercises.jumpRopeDesc' },
 
   // === HIIT ===
   { id: 'burpees', type: 'hiit', equipment: 'bodyweight', nameKey: 'exercises.burpees', descKey: 'exercises.burpeesDesc' },
