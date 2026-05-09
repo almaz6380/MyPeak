@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Clock, UtensilsCrossed, PenLine, ScanBarcode } from 'lucide-react';
+import { ArrowLeft, Clock, UtensilsCrossed, PenLine, ScanBarcode, Check, Plus, X } from 'lucide-react';
 import FoodSearch from './FoodSearch';
 import PortionPicker from './PortionPicker';
 import BarcodeScanner from './BarcodeScanner';
@@ -10,29 +10,69 @@ import { saveNutritionEntry, getRecentFoods, getCustomMeals, logCustomMeal } fro
 export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language = 'de' }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const lang = i18n.language || language;
+
+  const [activeTab, setActiveTab] = useState('search'); // search | recent
   const [selectedFood, setSelectedFood] = useState(null);
+  const [selectedItems, setSelectedItems] = useState([]); // Multi-select queue
   const [recentFoods, setRecentFoods] = useState([]);
   const [customMeals, setCustomMeals] = useState([]);
   const [showManual, setShowManual] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
-  const lang = i18n.language || language;
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (user) {
-      getRecentFoods(user.id).then(setRecentFoods);
+      getRecentFoods(user.id, 30).then(setRecentFoods);
       getCustomMeals(user.id).then(setCustomMeals);
     }
   }, [user]);
 
-  async function handleConfirmFood(foodData) {
-    const entry = {
-      date,
-      meal_slot: mealSlot,
-      ...foodData,
-    };
-    await saveNutritionEntry(user.id, entry);
+  // Add a food to the multi-select queue (from PortionPicker)
+  function handleConfirmFood(foodData) {
+    setSelectedItems((prev) => [...prev, foodData]);
     setSelectedFood(null);
+  }
+
+  // Remove from queue
+  function removeFromQueue(index) {
+    setSelectedItems((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  // Save all selected items at once
+  async function handleSaveAll() {
+    if (selectedItems.length === 0) return;
+    setSaving(true);
+    for (const item of selectedItems) {
+      await saveNutritionEntry(user.id, {
+        date,
+        meal_slot: mealSlot,
+        ...item,
+      });
+    }
+    setSaving(false);
     onSaved();
+  }
+
+  // Quick-add a recent food directly (with its last portion)
+  function quickAddRecent(food) {
+    setSelectedItems((prev) => [...prev, {
+      food_name: food.food_name,
+      brand: food.brand || null,
+      serving_size: food.serving_size,
+      serving_unit: food.serving_unit || 'g',
+      calories: food.calories,
+      protein: food.protein,
+      carbs: food.carbs,
+      fat: food.fat,
+      source: food.source || 'manual',
+      source_id: food.source_id || null,
+    }]);
+  }
+
+  // Check if a recent food is already in the queue
+  function isInQueue(foodName) {
+    return selectedItems.some((item) => item.food_name === foodName);
   }
 
   async function handleLogCustomMeal(meal) {
@@ -41,9 +81,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
   }
 
   async function handleManualSave(data) {
-    const entry = {
-      date,
-      meal_slot: mealSlot,
+    setSelectedItems((prev) => [...prev, {
       food_name: data.food_name,
       brand: data.brand || null,
       serving_size: data.serving_size,
@@ -53,18 +91,16 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
       carbs: data.carbs,
       fat: data.fat,
       source: 'manual',
-    };
-    await saveNutritionEntry(user.id, entry);
-    onSaved();
+    }]);
+    setShowManual(false);
   }
 
-  // Barcode scanner (must be checked BEFORE selectedFood)
+  // Barcode scanner
   if (showScanner) {
     return (
       <BarcodeScanner
         onScanned={(food) => {
           setShowScanner(false);
-          // Small delay so scanner fully unmounts before PortionPicker mounts
           setTimeout(() => setSelectedFood(food), 50);
         }}
         onClose={() => setShowScanner(false)}
@@ -72,7 +108,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
     );
   }
 
-  // If a food is selected, show the PortionPicker
+  // PortionPicker for a selected food
   if (selectedFood) {
     return (
       <PortionPicker
@@ -95,10 +131,12 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
     );
   }
 
+  const totalCalories = selectedItems.reduce((sum, item) => sum + (item.calories || 0), 0);
+
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 pb-32">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-4">
         <button onClick={onBack} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -108,91 +146,162 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
+      {/* Tabs: Lebensmittel | Letzte */}
+      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 mb-4">
         <button
-          onClick={() => setShowScanner(true)}
-          className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+          onClick={() => setActiveTab('search')}
+          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+            activeTab === 'search'
+              ? 'bg-white dark:bg-surface-dark-alt text-slate-900 dark:text-white shadow-sm'
+              : 'text-slate-500 dark:text-slate-400'
+          }`}
         >
-          <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0">
-            <ScanBarcode className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400" />
-          </div>
-          <div className="text-left min-w-0">
-            <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{t('nutrition.scanBarcode')}</p>
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">{t('nutrition.scanBarcodeDesc')}</p>
-          </div>
+          {lang === 'de' ? 'Lebensmittel' : 'Food'}
         </button>
-
         <button
-          onClick={() => setShowManual(true)}
-          className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+          onClick={() => setActiveTab('recent')}
+          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+            activeTab === 'recent'
+              ? 'bg-white dark:bg-surface-dark-alt text-slate-900 dark:text-white shadow-sm'
+              : 'text-slate-500 dark:text-slate-400'
+          }`}
         >
-          <div className="w-9 h-9 rounded-xl bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center flex-shrink-0">
-            <PenLine className="w-4.5 h-4.5 text-primary-500 dark:text-primary-400" />
-          </div>
-          <div className="text-left min-w-0">
-            <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{t('nutrition.manualEntry')}</p>
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">{t('nutrition.manualEntryDesc')}</p>
-          </div>
+          {lang === 'de' ? 'Letzte' : 'Recent'} {recentFoods.length > 0 && `(${recentFoods.length})`}
         </button>
       </div>
 
-      {/* Custom Meals */}
-      {customMeals.length > 0 && (
-        <div className="mb-4">
-          <h3 className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-2 flex items-center gap-1.5">
-            <UtensilsCrossed className="w-3.5 h-3.5" />
-            {t('nutrition.customMeals')}
-          </h3>
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {customMeals.map((meal) => (
-              <button
-                key={meal.id}
-                onClick={() => handleLogCustomMeal(meal)}
-                className="flex-shrink-0 px-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt shadow-sm border border-slate-100 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-700 transition-colors"
-              >
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">{meal.name}</p>
-                <p className="text-xs text-slate-400 dark:text-slate-500">{Math.round(meal.total_calories)} kcal</p>
-              </button>
-            ))}
+      {/* TAB: Search */}
+      {activeTab === 'search' && (
+        <>
+          {/* Quick Actions */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <button
+              onClick={() => setShowScanner(true)}
+              className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0">
+                <ScanBarcode className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div className="text-left min-w-0">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{t('nutrition.scanBarcode')}</p>
+                <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">{t('nutrition.scanBarcodeDesc')}</p>
+              </div>
+            </button>
+            <button
+              onClick={() => setShowManual(true)}
+              className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-xl bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center flex-shrink-0">
+                <PenLine className="w-4.5 h-4.5 text-primary-500 dark:text-primary-400" />
+              </div>
+              <div className="text-left min-w-0">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{t('nutrition.manualEntry')}</p>
+                <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">{t('nutrition.manualEntryDesc')}</p>
+              </div>
+            </button>
           </div>
+
+          {/* Custom Meals */}
+          {customMeals.length > 0 && (
+            <div className="mb-4">
+              <h3 className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-2 flex items-center gap-1.5">
+                <UtensilsCrossed className="w-3.5 h-3.5" />
+                {t('nutrition.customMeals')}
+              </h3>
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                {customMeals.map((meal) => (
+                  <button key={meal.id} onClick={() => handleLogCustomMeal(meal)}
+                    className="flex-shrink-0 px-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt shadow-sm border border-slate-100 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-700 transition-colors">
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">{meal.name}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">{Math.round(meal.total_calories)} kcal</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Food Search */}
+          <FoodSearch onSelectFood={setSelectedFood} language={lang} />
+        </>
+      )}
+
+      {/* TAB: Recent */}
+      {activeTab === 'recent' && (
+        <div>
+          {recentFoods.length === 0 ? (
+            <p className="text-center text-sm text-slate-400 dark:text-slate-500 py-12">
+              {lang === 'de' ? 'Noch keine Lebensmittel geloggt.' : 'No foods logged yet.'}
+            </p>
+          ) : (
+            <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden">
+              {recentFoods.map((food, i) => {
+                const inQueue = isInQueue(food.food_name);
+                return (
+                  <div key={i} className="flex items-center gap-3 px-4 py-3 border-b border-slate-50 dark:border-slate-700/50 last:border-0">
+                    <button
+                      onClick={() => inQueue ? null : quickAddRecent(food)}
+                      className="flex-1 text-left min-w-0"
+                    >
+                      <p className={`text-sm font-medium truncate ${inQueue ? 'text-primary-400' : 'text-slate-700 dark:text-slate-200'}`}>
+                        {food.food_name}
+                        {food.brand && <span className="text-xs text-slate-400 ml-1">{food.brand}</span>}
+                      </p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="text-xs text-slate-400">{food.serving_size}{food.serving_unit}</span>
+                        <span className="text-slate-200 dark:text-slate-700">·</span>
+                        <span className="text-xs text-slate-400">{Math.round(food.calories)} kcal</span>
+                        <span className="text-slate-200 dark:text-slate-700">·</span>
+                        <span className="inline-flex px-1 py-0.5 rounded bg-blue-50 dark:bg-blue-900/20 text-[10px] font-semibold text-blue-500">P {Math.round(food.protein)}g</span>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => inQueue ? null : quickAddRecent(food)}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
+                        inQueue
+                          ? 'bg-primary-500 text-white'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-primary-100 dark:hover:bg-primary-900/30 hover:text-primary-500'
+                      }`}
+                    >
+                      {inQueue ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
-      {/* Recent Foods */}
-      {recentFoods.length > 0 && (
-        <div className="mb-4">
-          <h3 className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-2 flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5" />
-            {t('nutrition.recentFoods')}
-          </h3>
-          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden">
-            {recentFoods.map((food, i) => (
-              <button
-                key={i}
-                onClick={() => setSelectedFood({
-                  ...food,
-                  nameDE: food.food_name,
-                  nameEN: food.food_name,
-                  servingSize: food.serving_size,
-                  servingUnit: food.serving_unit,
-                })}
-                className="w-full flex items-center justify-between px-4 py-2.5 text-left border-b border-slate-50 dark:border-slate-700/50 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
-              >
-                <div>
-                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{food.food_name}</p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500">
-                    {food.serving_size}{food.serving_unit} · {Math.round(food.calories)} kcal
-                  </p>
+      {/* Selected Items Queue (floating bottom bar) */}
+      {selectedItems.length > 0 && (
+        <div className="fixed bottom-20 left-0 right-0 px-4 z-30">
+          <div className="max-w-lg mx-auto bg-white dark:bg-surface-dark-alt rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-3">
+            {/* Items list */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mb-2">
+              {selectedItems.map((item, i) => (
+                <div key={i} className="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-xs">
+                  <span className="font-medium text-primary-600 dark:text-primary-400 max-w-[100px] truncate">{item.food_name}</span>
+                  <span className="text-primary-400 dark:text-primary-500">{Math.round(item.calories)}</span>
+                  <button onClick={() => removeFromQueue(i)} className="text-primary-300 hover:text-red-400 ml-0.5">
+                    <X className="w-3 h-3" />
+                  </button>
                 </div>
-              </button>
-            ))}
+              ))}
+            </div>
+            {/* Save button */}
+            <button
+              onClick={handleSaveAll}
+              disabled={saving}
+              className="w-full py-2.5 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-colors"
+            >
+              <Check className="w-4 h-4" />
+              {saving
+                ? '...'
+                : `${selectedItems.length} ${lang === 'de' ? 'Einträge speichern' : 'entries save'} · ${Math.round(totalCalories)} kcal`}
+            </button>
           </div>
         </div>
       )}
-
-      {/* Food Search */}
-      <FoodSearch onSelectFood={setSelectedFood} language={lang} />
     </div>
   );
 }
@@ -227,92 +336,46 @@ function ManualEntryForm({ onBack, onSave, t }) {
         </button>
         <h1 className="text-xl font-bold">{t('nutrition.manualEntry')}</h1>
       </div>
-
       <div className="space-y-4">
         <div>
           <label className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">{t('nutrition.foodName')}</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder={t('nutrition.searchPlaceholder')}
-            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
-          />
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('nutrition.searchPlaceholder')}
+            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
         </div>
-
         <div>
           <label className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">{t('nutrition.brand')}</label>
-          <input
-            type="text"
-            value={brand}
-            onChange={(e) => setBrand(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
-          />
+          <input type="text" value={brand} onChange={(e) => setBrand(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
         </div>
-
         <div>
           <label className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">{t('nutrition.servingSize')} (g)</label>
-          <input
-            type="number"
-            inputMode="numeric"
-            value={servingSize}
-            onChange={(e) => setServingSize(parseInt(e.target.value) || 0)}
-            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
-          />
+          <input type="number" inputMode="numeric" value={servingSize} onChange={(e) => setServingSize(parseInt(e.target.value) || 0)}
+            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
         </div>
-
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">{t('nutrition.calories')} (kcal)</label>
-            <input
-              type="number"
-              inputMode="decimal"
-              value={calories}
-              onChange={(e) => setCalories(e.target.value)}
-              placeholder="0"
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
-            />
+            <input type="number" inputMode="decimal" value={calories} onChange={(e) => setCalories(e.target.value)} placeholder="0"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
           </div>
           <div>
             <label className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">{t('nutrition.protein')} (g)</label>
-            <input
-              type="number"
-              inputMode="decimal"
-              value={protein}
-              onChange={(e) => setProtein(e.target.value)}
-              placeholder="0"
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
-            />
+            <input type="number" inputMode="decimal" value={protein} onChange={(e) => setProtein(e.target.value)} placeholder="0"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
           </div>
           <div>
             <label className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">{t('nutrition.carbs')} (g)</label>
-            <input
-              type="number"
-              inputMode="decimal"
-              value={carbs}
-              onChange={(e) => setCarbs(e.target.value)}
-              placeholder="0"
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
-            />
+            <input type="number" inputMode="decimal" value={carbs} onChange={(e) => setCarbs(e.target.value)} placeholder="0"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
           </div>
           <div>
             <label className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-1 block">{t('nutrition.fat')} (g)</label>
-            <input
-              type="number"
-              inputMode="decimal"
-              value={fat}
-              onChange={(e) => setFat(e.target.value)}
-              placeholder="0"
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
-            />
+            <input type="number" inputMode="decimal" value={fat} onChange={(e) => setFat(e.target.value)} placeholder="0"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
           </div>
         </div>
-
-        <button
-          onClick={handleSave}
-          disabled={!name.trim()}
-          className="w-full py-3.5 bg-primary-500 hover:bg-primary-600 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white rounded-2xl font-semibold transition-colors"
-        >
+        <button onClick={handleSave} disabled={!name.trim()}
+          className="w-full py-3.5 bg-primary-500 hover:bg-primary-600 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white rounded-2xl font-semibold transition-colors">
           {t('nutrition.add')}
         </button>
       </div>
