@@ -223,7 +223,7 @@ export default function TrainingPage() {
   }
 
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 pt-14 pb-24">
       <div className="flex flex-col items-center pt-12 mb-6">
         <MyPeakLogo size={36} />
         <h1 className="text-2xl font-bold mt-2">{t('training.title')}</h1>
@@ -316,7 +316,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onStartEmpty, onStartCardio,
   // Step: Choose strength plan day
   if (step === 'plans') {
     return (
-      <div className="p-4 pb-24">
+      <div className="p-4 pt-14 pb-24">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => setStep('strengthChoice')} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
@@ -384,7 +384,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onStartEmpty, onStartCardio,
   // Step: Strength sub-choice (plan or free)
   if (step === 'strengthChoice') {
     return (
-      <div className="p-4 pb-24">
+      <div className="p-4 pt-14 pb-24">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => setStep('type')} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
@@ -438,7 +438,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onStartEmpty, onStartCardio,
   // Step: Cardio activity selection
   if (step === 'cardioChoice') {
     return (
-      <div className="p-4 pb-24">
+      <div className="p-4 pt-14 pb-24">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => setStep('type')} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
@@ -506,7 +506,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onStartEmpty, onStartCardio,
 
   // Step: Training type selection (initial)
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 pt-14 pb-24">
       <div className="flex items-center gap-3 mb-6">
         <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
@@ -642,7 +642,7 @@ function HiitSetup({ onBack, onStart, exercises, t }) {
   };
 
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 pt-14 pb-24">
       <div className="flex items-center gap-3 mb-6">
         <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
@@ -797,7 +797,7 @@ function CircuitSetup({ onBack, onStart, exercises: circuitExercises, t }) {
   }
 
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 pt-14 pb-24">
       <div className="flex items-center gap-3 mb-6">
         <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
@@ -932,7 +932,7 @@ function CircuitExercisePicker({ initialSelected, onBack, onConfirm, t }) {
   const toggle = (id) => setSelected((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
 
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 pt-14 pb-24">
       <div className="flex items-center gap-3 mb-4">
         <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-2xl font-bold">{t('training.addExercise')}</h1>
@@ -1039,7 +1039,7 @@ function MartialArtsSetup({ onBack, onStart, t }) {
   const formatTime = (s) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
 
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 pt-14 pb-24">
       <div className="flex items-center gap-3 mb-6">
         <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />

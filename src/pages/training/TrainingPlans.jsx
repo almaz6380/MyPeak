@@ -211,7 +211,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onStartHiit, onStar
   // ── Create Form ──
   if (view === 'create') {
     return (
-      <div className="p-4 pb-24">
+      <div className="p-4 pt-14 pb-24">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => { setView('list'); resetCreateForms(); }} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
@@ -305,7 +305,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onStartHiit, onStar
 
   // ── Plan List View ──
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 pt-14 pb-24">
       <div className="flex items-center gap-3 mb-4">
         <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
@@ -531,7 +531,7 @@ function ExercisePicker({ initialSelected, onBack, onConfirm, exerciseType = 'st
   const toggleSelect = (id) => setSelected((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
 
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 pt-14 pb-24">
       <div className="flex items-center gap-3 mb-4">
         <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-2xl font-bold">{t('plans.selectExercisesForDay')}</h1>

@@ -21,7 +21,7 @@ export default function LibraryPage() {
   ];
 
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 pt-14 pb-24">
       <div className="flex flex-col items-center pt-12 mb-6">
         <MyPeakLogo size={36} />
         <h1 className="text-2xl font-bold mt-2">{t('library.title')}</h1>

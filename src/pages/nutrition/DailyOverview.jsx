@@ -96,7 +96,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
   const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
 
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 pt-14 pb-24">
       {/* Header */}
       <div className="flex flex-col items-center pt-12 mb-4">
         <MyPeakLogo size={36} />

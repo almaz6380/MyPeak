@@ -49,7 +49,7 @@ export default function ActiveMartialArts({ config, onFinish, onDiscard }) {
   // Pre-start screen
   if (!timer.started) {
     return (
-      <div className="p-4 pb-24">
+      <div className="p-4 pt-14 pb-24">
         <div className="flex items-center gap-3 mb-6">
           <MuscleGroupIcon group="martial-arts" size={28} className="text-violet-500" />
           <h1 className="text-2xl font-bold">{t('training.martialArts')}</h1>
@@ -95,7 +95,7 @@ export default function ActiveMartialArts({ config, onFinish, onDiscard }) {
   const strokeOffset = circumference * (1 - timer.progress);
 
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 pt-14 pb-24">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">{t('training.martialArts')}</h1>
         <span className="text-sm text-slate-500 dark:text-slate-400">

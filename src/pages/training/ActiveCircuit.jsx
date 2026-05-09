@@ -44,7 +44,7 @@ export default function ActiveCircuit({ config, onFinish, onDiscard }) {
 
   if (!timer.started) {
     return (
-      <div className="p-4 pb-24">
+      <div className="p-4 pt-14 pb-24">
         <h1 className="text-2xl font-bold mb-6">{t('training.circuit')}</h1>
         <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 shadow-sm text-center mb-6">
           <p className="text-5xl font-bold mb-2">{config.rounds}</p>
@@ -83,7 +83,7 @@ export default function ActiveCircuit({ config, onFinish, onDiscard }) {
   }
 
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 pt-14 pb-24">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">{t('training.circuit')}</h1>
         <span className="text-sm text-slate-500 dark:text-slate-400">

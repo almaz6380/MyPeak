@@ -90,7 +90,7 @@ export default function RecipeDetail({ recipe, onBack, onSaved }) {
   }
 
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 pt-14 pb-24">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
