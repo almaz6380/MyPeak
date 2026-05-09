@@ -218,6 +218,10 @@ export async function logCustomMeal(userId, meal, date, mealSlot) {
 // ── Nutrition Goals ──────────────────────────────────────────
 
 export async function getNutritionGoals(userId) {
+  // Always check localStorage first for instant response
+  const cached = localStorage.getItem(GOALS_KEY);
+  const cachedGoals = cached ? JSON.parse(cached) : null;
+
   if (!guestSkip(userId)) {
     const { data, error } = await supabase
       .from('nutrition_goals')
@@ -231,8 +235,8 @@ export async function getNutritionGoals(userId) {
     }
   }
 
-  const cached = localStorage.getItem(GOALS_KEY);
-  if (cached) return JSON.parse(cached);
+  // Return cached goals if available (preserves manually set values)
+  if (cachedGoals) return cachedGoals;
 
   return { calories: 2000, protein: 150, carbs: 250, fat: 70, water_ml: 3000 };
 }
@@ -252,12 +256,14 @@ export async function saveNutritionGoals(userId, goals) {
         tdee: goals.tdee || null,
         water_ml: goals.water_ml || 3000,
         updated_at: new Date().toISOString(),
-      })
+      }, { onConflict: 'user_id' })
       .select()
       .single());
   }
 
-  localStorage.setItem(GOALS_KEY, JSON.stringify(data || goals));
+  // Always save to localStorage — this is the source of truth for the session
+  const toCache = data || { ...goals, user_id: userId };
+  localStorage.setItem(GOALS_KEY, JSON.stringify(toCache));
 
   return { data, error: null };
 }
