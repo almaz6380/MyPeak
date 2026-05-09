@@ -81,6 +81,9 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Wasserziel editierbar im Goal-Editor (Default 3L)
 - [x] Supabase-Tabellen: nutrition_entries, custom_meals, nutrition_goals, water_entries
 - [x] Vollständige DE/EN Übersetzungen (~80 Keys)
+- [x] Kochbuch: 25 Rezepte (5 pro Mahlzeit), 2 Filter-Ebenen (Mahlzeit + Ernährungsform)
+- [x] Portionsrechner (skaliert Zutaten + Nährwerte), Favoriten, Suche
+- [x] "Gegessen"-Button → Mahlzeit wählen → ins Tagestracking übernehmen
 
 ### PWA-Setup — FERTIG
 - [x] manifest.json mit App-Name, Icons, standalone display
@@ -123,6 +126,9 @@ src/
 │       ├── ExerciseLibrary.jsx   # Übungsbibliothek mit Filter + Suche
 │       ├── TrainingPlans.jsx     # Vorgefertigte + eigene Pläne
 │       └── WorkoutHistory.jsx    # Verlauf mit Details + Vergleich + Edit-Modal
+│       ├── FriendsList.jsx       # Freundesliste + Anfragen
+│       ├── Leaderboard.jsx       # Wöchentliches Ranking
+│       └── ChallengesList.jsx    # Challenges verwalten
 │   └── nutrition/
 │       ├── DailyOverview.jsx     # Tagesansicht mit Makro-Ringen + Mahlzeit-Slots
 │       ├── AddFoodEntry.jsx      # Food-Eingabe-Flow (Suche, Scanner, Manuell)
@@ -132,13 +138,17 @@ src/
 │       ├── MacroRing.jsx         # SVG-Kreisdiagramm für Makros
 │       ├── TDEECalculator.jsx    # TDEE-Rechner (Mifflin-St Jeor)
 │       ├── CustomMealsList.jsx   # Gespeicherte Mahlzeiten verwalten
-│       └── CustomMealBuilder.jsx # Mahlzeit aus mehreren Foods zusammenstellen
+│       ├── CustomMealBuilder.jsx # Mahlzeit aus mehreren Foods zusammenstellen
+│       ├── Cookbook.jsx           # Kochbuch mit Filtern + Suche
+│       └── RecipeDetail.jsx      # Einzelrezept mit Portionsrechner + Gegessen-Button
 ├── data/
 │   ├── exercises.js              # 34 Übungen mit Muskelgruppe + Equipment
 │   ├── workoutStorage.js         # Supabase CRUD für Workouts + Migration von localStorage
 │   ├── settingsStorage.js        # Supabase CRUD für User-Settings
 │   ├── nutritionStorage.js       # Supabase CRUD für Nutrition (Entries, Meals, Goals)
-│   └── foodDatabase.js           # 150 lokale Lebensmittel + Open Food Facts API
+│   ├── foodDatabase.js           # 150 lokale Lebensmittel + Open Food Facts API
+│   ├── socialStorage.js          # Freunde, Challenges, XP, Leaderboard
+│   └── recipesData.js            # 25 Rezepte mit Nährwerten (DE + EN)
 ├── lib/
 │   └── supabase.js               # Supabase Client (URL + Anon Key aus .env)
 ├── i18n/
