@@ -320,7 +320,21 @@ CREATE POLICY "Anyone can read overrides for crowdsource" ON product_overrides F
 
 CREATE INDEX idx_product_overrides_barcode ON product_overrides(barcode);
 
--- 16. Trigger: Automatisch Profile + Settings + Nutrition Goals + XP bei neuer Registrierung anlegen
+-- 16. Exercise Notes (Notizen + Geräte-Einstellungen pro User/Übung)
+CREATE TABLE exercise_notes (
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  exercise_id text NOT NULL,
+  note text DEFAULT '',
+  settings jsonb DEFAULT '[]'::jsonb,
+  updated_at timestamptz DEFAULT now(),
+  PRIMARY KEY (user_id, exercise_id)
+);
+
+ALTER TABLE exercise_notes ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage their own exercise notes" ON exercise_notes FOR ALL
+  USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+
+-- 17. Trigger: Automatisch Profile + Settings + Nutrition Goals + XP bei neuer Registrierung anlegen
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS trigger AS $$
 BEGIN

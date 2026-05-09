@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2, X, Check, Save, Target } from 'lucide-react';
-import { saveWorkout, getPersonalRecord, saveCustomPlan } from '../../data/workoutStorage';
+import { Plus, Trash2, X, Check, Save, Target, StickyNote } from 'lucide-react';
+import { saveWorkout, getPersonalRecord, saveCustomPlan, getAllExerciseNotes } from '../../data/workoutStorage';
+import ExerciseNoteModal from './ExerciseNoteModal';
 import { useAuth } from '../../context/AuthContext';
 import { useActiveWorkout } from '../../context/ActiveWorkoutContext';
 import { getExerciseById } from '../../data/exercises';
@@ -26,7 +27,14 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
   const [planName, setPlanName] = useState('');
   const [pendingPrs, setPendingPrs] = useState({});
   const [editingTarget, setEditingTarget] = useState(null);
+  const [noteModal, setNoteModal] = useState(null); // { exerciseId, name }
+  const [exerciseNotes, setExerciseNotes] = useState({});
   const weightUnit = localStorage.getItem('weightUnit') || 'kg';
+
+  // Load all notes on mount
+  useEffect(() => {
+    if (user) getAllExerciseNotes(user.id).then(setExerciseNotes);
+  }, [user]);
 
   const wasFromPlan = ctx.workout?.fromPlan || false;
   const progress = useProgressComparison(user?.id);
@@ -160,6 +168,10 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
                   <h3 className="font-semibold">{t(ex.nameKey)}</h3>
                   <MiniSparkline data={sparkData} />
                 </div>
+                <button onClick={() => setNoteModal({ exerciseId: ex.exerciseId, name: t(ex.nameKey) })}
+                  className={`p-1.5 ${exerciseNotes[ex.exerciseId]?.note || exerciseNotes[ex.exerciseId]?.settings?.length ? 'text-primary-400' : 'text-slate-400 hover:text-primary-500'}`}>
+                  <StickyNote className="w-4 h-4" />
+                </button>
                 <button onClick={() => ctx.removeExercise(exIdx)} className="p-1.5 text-slate-400 hover:text-red-500">
                   <X className="w-4 h-4" />
                 </button>
@@ -171,6 +183,24 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
                 </p>
               ) : (
                 <p className="text-xs text-green-500 mb-2">{t('training.firstTime')}</p>
+              )}
+
+              {/* Note preview */}
+              {exerciseNotes[ex.exerciseId] && (exerciseNotes[ex.exerciseId].note || exerciseNotes[ex.exerciseId].settings?.length > 0) && (
+                <div className="bg-primary-50 dark:bg-primary-900/10 rounded-lg px-2.5 py-1.5 mb-2">
+                  {exerciseNotes[ex.exerciseId].settings?.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-1">
+                      {exerciseNotes[ex.exerciseId].settings.map((s, si) => (
+                        <span key={si} className="text-[10px] font-semibold text-primary-500 bg-primary-100 dark:bg-primary-900/30 px-1.5 py-0.5 rounded">
+                          {s.label}: {s.value}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {exerciseNotes[ex.exerciseId].note && (
+                    <p className="text-[10px] text-primary-400 truncate">{exerciseNotes[ex.exerciseId].note}</p>
+                  )}
+                </div>
               )}
 
               <div className="flex items-center gap-2 mb-2">
@@ -302,6 +332,19 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
             </div>
           </div>
         </div>
+      )}
+
+      {noteModal && (
+        <ExerciseNoteModal
+          exerciseId={noteModal.exerciseId}
+          exerciseName={noteModal.name}
+          initialNote={exerciseNotes[noteModal.exerciseId]?.note || ''}
+          initialSettings={exerciseNotes[noteModal.exerciseId]?.settings || []}
+          onClose={() => setNoteModal(null)}
+          onSaved={(note, settings) => {
+            setExerciseNotes((prev) => ({ ...prev, [noteModal.exerciseId]: { ...prev[noteModal.exerciseId], note, settings } }));
+          }}
+        />
       )}
     </div>
   );

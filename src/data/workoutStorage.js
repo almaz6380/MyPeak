@@ -343,3 +343,71 @@ export async function migrateLocalDataToSupabase(userId) {
     }
   }
 }
+
+// ── Exercise Notes ───────────────────────────────────────────
+
+const NOTES_CACHE_KEY = 'exercise_notes';
+
+export async function getExerciseNote(userId, exerciseId) {
+  // Check cache first
+  const cached = JSON.parse(localStorage.getItem(NOTES_CACHE_KEY) || '{}');
+  const cacheKey = `${userId}_${exerciseId}`;
+
+  if (!isGuest(userId)) {
+    const { data } = await supabase
+      .from('exercise_notes')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('exercise_id', exerciseId)
+      .single();
+
+    if (data) {
+      cached[cacheKey] = data;
+      localStorage.setItem(NOTES_CACHE_KEY, JSON.stringify(cached));
+      return data;
+    }
+  }
+
+  return cached[cacheKey] || { note: '', settings: [] };
+}
+
+export async function saveExerciseNote(userId, exerciseId, note, settings) {
+  const cacheKey = `${userId}_${exerciseId}`;
+  const entry = { user_id: userId, exercise_id: exerciseId, note, settings, updated_at: new Date().toISOString() };
+
+  // Cache first
+  const cached = JSON.parse(localStorage.getItem(NOTES_CACHE_KEY) || '{}');
+  cached[cacheKey] = entry;
+  localStorage.setItem(NOTES_CACHE_KEY, JSON.stringify(cached));
+
+  if (!isGuest(userId)) {
+    await supabase
+      .from('exercise_notes')
+      .upsert(entry, { onConflict: 'user_id,exercise_id' });
+  }
+}
+
+export async function getAllExerciseNotes(userId) {
+  const cached = JSON.parse(localStorage.getItem(NOTES_CACHE_KEY) || '{}');
+
+  if (!isGuest(userId)) {
+    const { data } = await supabase
+      .from('exercise_notes')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (data) {
+      data.forEach((d) => { cached[`${userId}_${d.exercise_id}`] = d; });
+      localStorage.setItem(NOTES_CACHE_KEY, JSON.stringify(cached));
+    }
+  }
+
+  // Return as map: exerciseId → note data
+  const result = {};
+  Object.entries(cached).forEach(([key, val]) => {
+    if (key.startsWith(userId)) {
+      result[val.exercise_id] = val;
+    }
+  });
+  return result;
+}
