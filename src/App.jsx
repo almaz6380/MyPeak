@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import { ActiveWorkoutProvider } from './context/ActiveWorkoutContext';
+import SplashScreen from './components/SplashScreen';
 import BottomNav from './components/BottomNav';
 import TrainingPage from './pages/TrainingPage';
 import NutritionPage from './pages/NutritionPage';
@@ -17,20 +18,10 @@ export default function App() {
   const { user, profile, loading } = useAuth();
   const { t } = useTranslation();
   const [showSplash, setShowSplash] = useState(true);
-  const [splashFading, setSplashFading] = useState(false);
-
-  useEffect(() => {
-    const fadeTimer = setTimeout(() => setSplashFading(true), 800);
-    const hideTimer = setTimeout(() => setShowSplash(false), 1200);
-    return () => { clearTimeout(fadeTimer); clearTimeout(hideTimer); };
-  }, []);
+  const handleSplashFinished = useCallback(() => setShowSplash(false), []);
 
   if (showSplash) {
-    return (
-      <div className={`min-h-screen bg-[#0a0a0a] flex items-center justify-center transition-opacity duration-400 ${splashFading ? 'opacity-0' : 'opacity-100'}`}>
-        <img src="/mypeak-icon-v2.svg" alt="MyPeak" className="w-40 h-40" />
-      </div>
-    );
+    return <SplashScreen onFinished={handleSplashFinished} />;
   }
 
   if (loading) {
