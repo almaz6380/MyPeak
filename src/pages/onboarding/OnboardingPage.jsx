@@ -80,7 +80,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-surface-dark flex flex-col p-4">
+    <div className="min-h-screen bg-slate-50 dark:bg-surface-dark flex flex-col p-4 pt-14">
       <div className="w-full max-w-sm mx-auto flex-1 flex flex-col">
         {/* Progress bar */}
         <div className="mb-8 mt-4">
