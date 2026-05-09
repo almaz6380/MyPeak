@@ -6,7 +6,7 @@ import { saveSetting } from '../data/settingsStorage';
 import MyPeakLogo from '../components/MyPeakLogo';
 import { supabase } from '../lib/supabase';
 import { Moon, Sun, Globe, Weight, LogOut, User, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy } from 'lucide-react';
-import { getOrCreateFriendCode, getXP } from '../data/socialStorage';
+import { getOrCreateFriendCode, getXP, getLevelTitle, calculateLevel, hasGoldenFrame } from '../data/socialStorage';
 
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
@@ -118,20 +118,32 @@ export default function ProfilePage() {
       )}
 
       {/* MyPeak Code + XP */}
-      {!isGuestMode && (
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm p-4 mb-4">
-          {/* XP Badge */}
+      {!isGuestMode && (() => {
+        const levelInfo = calculateLevel(xpData.total_xp || 0);
+        const title = getLevelTitle(levelInfo.level);
+        const golden = hasGoldenFrame(levelInfo.level);
+        const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+        return (
+        <div className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm p-4 mb-4 ${golden ? 'ring-2 ring-primary-400 shadow-primary-400/20 shadow-lg' : ''}`}>
+          {/* Level + Title */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-primary-400" />
-              <span className="text-sm font-semibold">Level {xpData.level}</span>
+              <span className="text-lg">{title.emoji}</span>
+              <div>
+                <span className="text-sm font-bold text-primary-400">Level {levelInfo.level}</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500 ml-2">{lang === 'de' ? title.de : title.en}</span>
+              </div>
             </div>
-            <span className="text-xs text-slate-400 dark:text-slate-500">{xpData.total_xp} XP · {xpData.streak_days} {t('common.back') === 'Zurück' ? 'Tage Streak' : 'day streak'}</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500">{xpData.streak_days || 0} 🔥</span>
           </div>
           {/* XP Progress */}
-          <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full mb-4 overflow-hidden">
-            <div className="h-full bg-primary-400 rounded-full transition-all" style={{ width: `${(xpData.total_xp % 100)}%` }} />
+          <div className="flex items-center gap-2 mb-1">
+            <div className="flex-1 h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+              <div className="h-full bg-primary-400 rounded-full transition-all" style={{ width: `${Math.round(levelInfo.progress * 100)}%` }} />
+            </div>
+            <span className="text-[10px] text-slate-400 font-mono">{levelInfo.xpInCurrentLevel}/{levelInfo.xpToNextLevel}</span>
           </div>
+          <p className="text-[10px] text-slate-400 dark:text-slate-500">{xpData.total_xp || 0} XP {lang === 'de' ? 'gesamt' : 'total'}</p>
           {/* Friend Code */}
           {friendCode && (
             <div>
@@ -150,7 +162,8 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
-      )}
+        );
+      })()}
 
       {/* Personal Data */}
       {profile && (

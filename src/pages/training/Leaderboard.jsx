@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Trophy, TrendingUp, Flame, Dumbbell } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { getFriends } from '../../data/socialStorage';
-import { getLeaderboardCategory, getLeaderboardData } from '../../data/socialStorage';
+import { getFriends, getLeaderboardCategory, getLeaderboardData, getLevelTitle, hasGoldenFrame } from '../../data/socialStorage';
 
 export default function Leaderboard({ onBack }) {
   const { t } = useTranslation();
@@ -80,12 +79,14 @@ export default function Leaderboard({ onBack }) {
                 {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}
               </div>
 
-              {/* Name + Level */}
+              {/* Name + Level + Title */}
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-semibold truncate ${entry.isMe ? 'text-primary-500' : ''}`}>
                   {entry.isMe ? (lang === 'de' ? 'Du' : 'You') : entry.name}
                 </p>
-                <p className="text-[10px] text-slate-400">Lv. {entry.level}</p>
+                <p className="text-[10px] text-slate-400">
+                  {getLevelTitle(entry.level).emoji} Lv. {entry.level} · {lang === 'de' ? getLevelTitle(entry.level).de : getLevelTitle(entry.level).en}
+                </p>
               </div>
 
               {/* Score */}

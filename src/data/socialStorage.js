@@ -188,6 +188,50 @@ export async function completeChallenge(challengeId) {
 
 // ── XP System ────────────────────────────────────────────────
 
+// XP-Werte
+export const XP_VALUES = {
+  WORKOUT_COMPLETED: 50,
+  NEW_PR: 100,
+  STREAK_7: 100,
+  STREAK_14: 200,
+  STREAK_30: 500,
+  NUTRITION_LOGGED: 20,
+  CHALLENGE_WON: 150,
+  FRIEND_INVITED: 75,
+  DAILY_LOGIN: 5,
+};
+
+// Titel basierend auf Level
+export function getLevelTitle(level) {
+  if (level >= 51) return { de: 'GOAT', en: 'GOAT', emoji: '🐐' };
+  if (level >= 31) return { de: 'Legende', en: 'Legend', emoji: '👑' };
+  if (level >= 16) return { de: 'Champion', en: 'Champion', emoji: '🏆' };
+  if (level >= 6) return { de: 'Warrior', en: 'Warrior', emoji: '⚔️' };
+  return { de: 'Rookie', en: 'Rookie', emoji: '🌱' };
+}
+
+// XP pro Level (progressiv: Level 1=100, Level 2=150, Level 3=200...)
+export function xpForLevel(level) {
+  return 100 + (level - 1) * 50;
+}
+
+export function calculateLevel(totalXP) {
+  let level = 1;
+  let xpNeeded = 0;
+  while (xpNeeded + xpForLevel(level) <= totalXP) {
+    xpNeeded += xpForLevel(level);
+    level++;
+  }
+  const xpInCurrentLevel = totalXP - xpNeeded;
+  const xpToNextLevel = xpForLevel(level);
+  return { level, xpInCurrentLevel, xpToNextLevel, progress: xpInCurrentLevel / xpToNextLevel };
+}
+
+// Kosmetische Rewards
+export function hasGoldenFrame(level) {
+  return level >= 30;
+}
+
 export async function getXP(userId) {
   if (isGuest(userId)) return { total_xp: 0, level: 1, streak_days: 0 };
 
@@ -199,7 +243,6 @@ export async function getXP(userId) {
 
   if (data) return data;
 
-  // Create if not exists
   const { data: created } = await supabase
     .from('user_xp')
     .upsert({ user_id: userId })
@@ -209,12 +252,14 @@ export async function getXP(userId) {
   return created || { total_xp: 0, level: 1, streak_days: 0 };
 }
 
+// Returns { oldLevel, newLevel, xpGained } for level-up detection
 export async function addXP(userId, amount) {
-  if (isGuest(userId)) return;
+  if (isGuest(userId)) return { oldLevel: 1, newLevel: 1, xpGained: 0 };
 
   const current = await getXP(userId);
+  const oldLevel = calculateLevel(current.total_xp || 0).level;
   const newXP = (current.total_xp || 0) + amount;
-  const newLevel = Math.floor(newXP / 100) + 1;
+  const { level: newLevel } = calculateLevel(newXP);
 
   await supabase
     .from('user_xp')
@@ -224,10 +269,12 @@ export async function addXP(userId, amount) {
       level: newLevel,
       updated_at: new Date().toISOString(),
     });
+
+  return { oldLevel, newLevel, xpGained: amount };
 }
 
 export async function updateStreak(userId) {
-  if (isGuest(userId)) return;
+  if (isGuest(userId)) return null;
 
   const xp = await getXP(userId);
   const today = new Date().toISOString().split('T')[0];
@@ -237,23 +284,31 @@ export async function updateStreak(userId) {
   if (xp.last_workout_date === yesterday) {
     newStreak = (xp.streak_days || 0) + 1;
   } else if (xp.last_workout_date === today) {
-    return; // Already counted today
+    return null; // Already counted today
   }
 
-  // Streak bonus at 7 days
-  let bonusXP = 10; // Base workout XP
-  if (newStreak % 7 === 0) bonusXP += 25;
+  // Streak bonuses (gestaffelt)
+  let totalXPGain = XP_VALUES.WORKOUT_COMPLETED;
+  if (newStreak >= 30 && (xp.streak_days || 0) < 30) totalXPGain += XP_VALUES.STREAK_30;
+  else if (newStreak >= 14 && (xp.streak_days || 0) < 14) totalXPGain += XP_VALUES.STREAK_14;
+  else if (newStreak >= 7 && (xp.streak_days || 0) < 7) totalXPGain += XP_VALUES.STREAK_7;
+
+  const newTotalXP = (xp.total_xp || 0) + totalXPGain;
+  const { level: newLevel } = calculateLevel(newTotalXP);
+  const oldLevel = calculateLevel(xp.total_xp || 0).level;
 
   await supabase
     .from('user_xp')
     .upsert({
       user_id: userId,
-      total_xp: (xp.total_xp || 0) + bonusXP,
-      level: Math.floor(((xp.total_xp || 0) + bonusXP) / 100) + 1,
+      total_xp: newTotalXP,
+      level: newLevel,
       streak_days: newStreak,
       last_workout_date: today,
       updated_at: new Date().toISOString(),
     });
+
+  return { oldLevel, newLevel, xpGained: totalXPGain, streak: newStreak };
 }
 
 // ── Leaderboard ──────────────────────────────────────────────
