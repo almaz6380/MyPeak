@@ -327,7 +327,8 @@ BEGIN
   INSERT INTO profiles (id) VALUES (NEW.id);
   INSERT INTO user_settings (user_id) VALUES (NEW.id);
   INSERT INTO nutrition_goals (user_id) VALUES (NEW.id);
-  INSERT INTO user_xp (user_id) VALUES (NEW.id);
+  -- Optional tables: don't fail registration if they don't exist
+  BEGIN INSERT INTO user_xp (user_id) VALUES (NEW.id); EXCEPTION WHEN OTHERS THEN NULL; END;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

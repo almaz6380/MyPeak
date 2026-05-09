@@ -27,9 +27,17 @@ export default function RegisterForm({ onSwitchToLogin }) {
     }
 
     setLoading(true);
-    const { error } = await signUp(email, password);
+    const { data, error } = await signUp(email, password);
     if (error) {
-      setError(t('auth.registerError'));
+      console.error('Registration error:', error);
+      // Show specific error if available
+      if (error.message?.includes('already registered')) {
+        setError(t('common.back') === 'Zurück' ? 'Diese E-Mail ist bereits registriert.' : 'This email is already registered.');
+      } else if (error.message?.includes('valid email')) {
+        setError(t('common.back') === 'Zurück' ? 'Bitte gib eine gültige E-Mail ein.' : 'Please enter a valid email.');
+      } else {
+        setError(t('auth.registerError') + (error.message ? ` (${error.message})` : ''));
+      }
     } else {
       setSuccess(true);
     }
