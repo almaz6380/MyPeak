@@ -51,8 +51,7 @@ export default function OnboardingPage() {
 
       const { error: updateError, count } = await supabase
         .from('profiles')
-        .update(payload)
-        .eq('id', user.id)
+        .upsert({ id: user.id, ...payload }, { onConflict: 'id' })
         .select();
 
       console.log('Supabase response — error:', updateError, 'count:', count);
