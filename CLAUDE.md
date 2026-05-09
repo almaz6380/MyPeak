@@ -78,7 +78,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Tägliche Kalorien- und Makro-Übersicht mit SVG-Ringen (kcal, Protein, Carbs, Fat)
 - [x] TDEE-Rechner (Mifflin-St Jeor Formel, vorbefüllt mit Profildaten)
 - [x] Makro-Ziele manuell editierbar (nicht nur über TDEE)
-- [x] Barcode-Scanner per Kamera (Quagga2 + Open Food Facts API + Community Products)
+- [x] Barcode-Scanner per Kamera (Quagga2 + Open Food Facts API + Community Products + CameraContext)
 - [x] Community Products: Unbekannte Produkte selbst hinzufügen → steht allen Usern zur Verfügung
 - [x] Crowdsource-Korrekturen: 3+ ähnliche User-Korrekturen → Community-Eintrag wird automatisch aktualisiert
 - [x] 4 Mahlzeit-Slots (Frühstück, Mittagessen, Abendessen, Snacks)
@@ -100,7 +100,8 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Service Worker (network-first strategy)
 - [x] PWA-Icons (192px + 512px)
 - [x] apple-touch-icon + apple-mobile-web-app-status-bar-style
-- [x] App auf Homescreen installierbar → Kamera-Berechtigung bleibt dauerhaft
+- [x] App auf Homescreen installierbar
+- [x] CameraContext: Kamera-Berechtigung einmal pro Session cached (kein erneuter Prompt beim 2. Scan)
 
 ### Phase 3.5–6: Noch offen (siehe Bauplan unten)
 
@@ -152,6 +153,11 @@ src/
 │       ├── CustomMealBuilder.jsx # Mahlzeit aus mehreren Foods zusammenstellen
 │       ├── Cookbook.jsx           # Kochbuch mit Filtern + Suche
 │       └── RecipeDetail.jsx      # Einzelrezept mit Portionsrechner + Gegessen-Button
+├── context/
+│   ├── AuthContext.jsx           # Auth-State, Login/Logout, Profil, Gastmodus
+│   ├── ThemeContext.jsx          # Dark/Light Mode (Dark = Standard)
+│   ├── ActiveWorkoutContext.jsx  # Aktives Workout State + localStorage Persistence
+│   └── CameraContext.jsx         # Kamera-Berechtigung Session-Cache
 ├── data/
 │   ├── exercises.js              # 90+ Kraftübungen + Cardio/HIIT/Kampfsport
 │   ├── workoutStorage.js         # Supabase CRUD für Workouts + Notes + Migration
