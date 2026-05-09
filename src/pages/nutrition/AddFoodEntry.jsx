@@ -250,6 +250,12 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
                       </div>
                     </button>
                     <button
+                      onClick={() => setRecentFoods((prev) => prev.filter((_, idx) => idx !== i))}
+                      className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-slate-300 dark:text-slate-600 hover:text-red-400 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                    <button
                       onClick={() => inQueue ? null : selectRecent(food)}
                       className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
                         inQueue
