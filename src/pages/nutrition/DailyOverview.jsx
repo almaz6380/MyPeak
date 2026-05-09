@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Plus, Trash2, Settings, UtensilsCrossed, Pencil, X, Check, Droplets, Minus, GlassWater } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2, Settings, UtensilsCrossed, Pencil, X, Check, Droplets, Minus, GlassWater, BookOpen } from 'lucide-react';
 import MacroRing from './MacroRing';
 import MyPeakLogo from '../../components/MyPeakLogo';
 import { useAuth } from '../../context/AuthContext';
@@ -8,7 +8,7 @@ import { getNutritionEntries, getNutritionGoals, deleteNutritionEntry, saveNutri
 
 const MEAL_SLOTS = ['breakfast', 'lunch', 'dinner', 'snack'];
 
-export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOpenCustomMeals }) {
+export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOpenCustomMeals, onOpenCookbook }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
@@ -98,6 +98,12 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
       </div>
       <div className="flex items-center justify-end mb-4">
         <div className="flex gap-2">
+          <button
+            onClick={onOpenCookbook}
+            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+          >
+            <BookOpen className="w-5 h-5" />
+          </button>
           <button
             onClick={onOpenCustomMeals}
             className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"

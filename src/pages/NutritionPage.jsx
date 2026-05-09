@@ -5,6 +5,8 @@ import TDEECalculator from './nutrition/TDEECalculator';
 import CustomMealsList from './nutrition/CustomMealsList';
 import CustomMealBuilder from './nutrition/CustomMealBuilder';
 import PortionPicker from './nutrition/PortionPicker';
+import Cookbook from './nutrition/Cookbook';
+import RecipeDetail from './nutrition/RecipeDetail';
 import { useAuth } from '../context/AuthContext';
 import { updateNutritionEntry } from '../data/nutritionStorage';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +21,7 @@ export default function NutritionPage() {
   const [activeDate, setActiveDate] = useState(formatDate(new Date()));
   const [editingEntry, setEditingEntry] = useState(null);
   const [editMeal, setEditMeal] = useState(null);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   function refresh() {
@@ -113,6 +116,25 @@ export default function NutritionPage() {
     );
   }
 
+  if (view === 'cookbook') {
+    return (
+      <Cookbook
+        onBack={() => setView('home')}
+        onSelectRecipe={(recipe) => { setSelectedRecipe(recipe); setView('recipeDetail'); }}
+      />
+    );
+  }
+
+  if (view === 'recipeDetail' && selectedRecipe) {
+    return (
+      <RecipeDetail
+        recipe={selectedRecipe}
+        onBack={() => setView('cookbook')}
+        onSaved={refresh}
+      />
+    );
+  }
+
   // Default: Daily Overview
   return (
     <DailyOverview
@@ -121,6 +143,7 @@ export default function NutritionPage() {
       onEditEntry={handleEditEntry}
       onOpenTDEE={() => setView('tdee')}
       onOpenCustomMeals={() => setView('customMeals')}
+      onOpenCookbook={() => setView('cookbook')}
     />
   );
 }
