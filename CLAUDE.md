@@ -75,7 +75,8 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Community Products: Unbekannte Produkte selbst hinzufügen → steht allen Usern zur Verfügung
 - [x] Crowdsource-Korrekturen: 3+ ähnliche User-Korrekturen → Community-Eintrag wird automatisch aktualisiert
 - [x] 4 Mahlzeit-Slots (Frühstück, Mittagessen, Abendessen, Snacks)
-- [x] Zuletzt verwendete Lebensmittel für Schnellzugriff
+- [x] Lebensmittel hinzufügen: Tabs (Lebensmittel | Letzte) + Multi-Auswahl + alle auf einmal speichern
+- [x] Letzte Lebensmittel: Schnellauswahl-Tab mit allen zuvor gegessenen Foods, ein Tap zum Hinzufügen
 - [x] Custom Calendar für Datumsauswahl (kein nativer Browser-Picker)
 - [x] Farbcodierte Makro-Badges bei jedem Eintrag (P/C/F als Pills)
 - [x] PortionPicker mit Live-Makro-Berechnung und +/- Buttons
