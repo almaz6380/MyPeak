@@ -5,7 +5,7 @@ export const muscleGroups = [
 
 export const trainingTypes = ['strength', 'cardio', 'hiit', 'circuit', 'martial-arts'];
 
-export const martialArtsCategories = ['boxing', 'kickboxing', 'mma', 'karate'];
+export const martialArtsCategories = ['boxing', 'kickboxing', 'mma'];
 
 const exercises = [
   // === STRENGTH ===
@@ -17,6 +17,30 @@ const exercises = [
   { id: 'cable-crossover', type: 'strength', muscleGroup: 'chest', equipment: 'cable', nameKey: 'exercises.cableCrossover', descKey: 'exercises.cableCrossoverDesc' },
   { id: 'chest-dips', type: 'strength', muscleGroup: 'chest', equipment: 'bodyweight', nameKey: 'exercises.chestDips', descKey: 'exercises.chestDipsDesc' },
   { id: 'chest-press-machine', type: 'strength', muscleGroup: 'chest', equipment: 'machine', nameKey: 'exercises.chestPressMachine', descKey: 'exercises.chestPressMachineDesc' },
+  { id: 'decline-bench-press', type: 'strength', muscleGroup: 'chest', equipment: 'barbell', nameKey: 'exercises.declineBenchPress', descKey: 'exercises.declineBenchPressDesc' },
+  { id: 'incline-dumbbell-press', type: 'strength', muscleGroup: 'chest', equipment: 'dumbbell', nameKey: 'exercises.inclineDumbbellPress', descKey: 'exercises.inclineDumbbellPressDesc' },
+  { id: 'flat-dumbbell-press', type: 'strength', muscleGroup: 'chest', equipment: 'dumbbell', nameKey: 'exercises.flatDumbbellPress', descKey: 'exercises.flatDumbbellPressDesc' },
+  { id: 'decline-dumbbell-press', type: 'strength', muscleGroup: 'chest', equipment: 'dumbbell', nameKey: 'exercises.declineDumbbellPress', descKey: 'exercises.declineDumbbellPressDesc' },
+  { id: 'incline-dumbbell-flyes', type: 'strength', muscleGroup: 'chest', equipment: 'dumbbell', nameKey: 'exercises.inclineDumbbellFlyes', descKey: 'exercises.inclineDumbbellFlyesDesc' },
+  { id: 'cable-flyes-low', type: 'strength', muscleGroup: 'chest', equipment: 'cable', nameKey: 'exercises.cableFlyesLow', descKey: 'exercises.cableFlyesLowDesc' },
+  { id: 'cable-flyes-high', type: 'strength', muscleGroup: 'chest', equipment: 'cable', nameKey: 'exercises.cableFlyesHigh', descKey: 'exercises.cableFlyesHighDesc' },
+  { id: 'pec-deck', type: 'strength', muscleGroup: 'chest', equipment: 'machine', nameKey: 'exercises.pecDeck', descKey: 'exercises.pecDeckDesc' },
+  { id: 'smith-machine-bench', type: 'strength', muscleGroup: 'chest', equipment: 'machine', nameKey: 'exercises.smithMachineBench', descKey: 'exercises.smithMachineBenchDesc' },
+  { id: 'smith-machine-incline', type: 'strength', muscleGroup: 'chest', equipment: 'machine', nameKey: 'exercises.smithMachineIncline', descKey: 'exercises.smithMachineInclineDesc' },
+  { id: 'landmine-press', type: 'strength', muscleGroup: 'chest', equipment: 'barbell', nameKey: 'exercises.landminePress', descKey: 'exercises.landminePressDesc' },
+  { id: 'push-up-wide', type: 'strength', muscleGroup: 'chest', equipment: 'bodyweight', nameKey: 'exercises.pushUpWide', descKey: 'exercises.pushUpWideDesc' },
+  { id: 'push-up-diamond', type: 'strength', muscleGroup: 'chest', equipment: 'bodyweight', nameKey: 'exercises.pushUpDiamond', descKey: 'exercises.pushUpDiamondDesc' },
+  { id: 'push-up-decline', type: 'strength', muscleGroup: 'chest', equipment: 'bodyweight', nameKey: 'exercises.pushUpDecline', descKey: 'exercises.pushUpDeclineDesc' },
+  { id: 'push-up-incline', type: 'strength', muscleGroup: 'chest', equipment: 'bodyweight', nameKey: 'exercises.pushUpIncline', descKey: 'exercises.pushUpInclineDesc' },
+  { id: 'svend-press', type: 'strength', muscleGroup: 'chest', equipment: 'dumbbell', nameKey: 'exercises.svendPress', descKey: 'exercises.svendPressDesc' },
+  { id: 'chest-squeeze-press', type: 'strength', muscleGroup: 'chest', equipment: 'dumbbell', nameKey: 'exercises.chestSqueezePress', descKey: 'exercises.chestSqueezePressDesc' },
+  { id: 'single-arm-cable-press', type: 'strength', muscleGroup: 'chest', equipment: 'cable', nameKey: 'exercises.singleArmCablePress', descKey: 'exercises.singleArmCablePressDesc' },
+  { id: 'around-the-world', type: 'strength', muscleGroup: 'chest', equipment: 'dumbbell', nameKey: 'exercises.aroundTheWorld', descKey: 'exercises.aroundTheWorldDesc' },
+  { id: 'plate-press', type: 'strength', muscleGroup: 'chest', equipment: 'bodyweight', nameKey: 'exercises.platePress', descKey: 'exercises.platePressDesc' },
+  { id: 'guillotine-press', type: 'strength', muscleGroup: 'chest', equipment: 'barbell', nameKey: 'exercises.guillotinePress', descKey: 'exercises.guillotinePressDesc' },
+  { id: 'hex-press', type: 'strength', muscleGroup: 'chest', equipment: 'dumbbell', nameKey: 'exercises.hexPress', descKey: 'exercises.hexPressDesc' },
+  { id: 'machine-chest-fly', type: 'strength', muscleGroup: 'chest', equipment: 'machine', nameKey: 'exercises.machineChestFly', descKey: 'exercises.machineChestFlyDesc' },
+  { id: 'resistance-band-chest-press', type: 'strength', muscleGroup: 'chest', equipment: 'bodyweight', nameKey: 'exercises.resistanceBandChestPress', descKey: 'exercises.resistanceBandChestPressDesc' },
 
   // Back
   { id: 'deadlift', type: 'strength', muscleGroup: 'back', equipment: 'barbell', nameKey: 'exercises.deadlift', descKey: 'exercises.deadliftDesc' },
@@ -25,6 +49,30 @@ const exercises = [
   { id: 'lat-pulldown', type: 'strength', muscleGroup: 'back', equipment: 'cable', nameKey: 'exercises.latPulldown', descKey: 'exercises.latPulldownDesc' },
   { id: 'seated-cable-row', type: 'strength', muscleGroup: 'back', equipment: 'cable', nameKey: 'exercises.seatedCableRow', descKey: 'exercises.seatedCableRowDesc' },
   { id: 'dumbbell-row', type: 'strength', muscleGroup: 'back', equipment: 'dumbbell', nameKey: 'exercises.dumbbellRow', descKey: 'exercises.dumbbellRowDesc' },
+  { id: 't-bar-row', type: 'strength', muscleGroup: 'back', equipment: 'barbell', nameKey: 'exercises.tBarRow', descKey: 'exercises.tBarRowDesc' },
+  { id: 'pendlay-row', type: 'strength', muscleGroup: 'back', equipment: 'barbell', nameKey: 'exercises.pendlayRow', descKey: 'exercises.pendlayRowDesc' },
+  { id: 'meadows-row', type: 'strength', muscleGroup: 'back', equipment: 'barbell', nameKey: 'exercises.meadowsRow', descKey: 'exercises.meadowsRowDesc' },
+  { id: 'chest-supported-row', type: 'strength', muscleGroup: 'back', equipment: 'dumbbell', nameKey: 'exercises.chestSupportedRow', descKey: 'exercises.chestSupportedRowDesc' },
+  { id: 'single-arm-cable-row', type: 'strength', muscleGroup: 'back', equipment: 'cable', nameKey: 'exercises.singleArmCableRow', descKey: 'exercises.singleArmCableRowDesc' },
+  { id: 'wide-grip-pulldown', type: 'strength', muscleGroup: 'back', equipment: 'cable', nameKey: 'exercises.wideGripPulldown', descKey: 'exercises.wideGripPulldownDesc' },
+  { id: 'close-grip-pulldown', type: 'strength', muscleGroup: 'back', equipment: 'cable', nameKey: 'exercises.closeGripPulldown', descKey: 'exercises.closeGripPulldownDesc' },
+  { id: 'reverse-grip-pulldown', type: 'strength', muscleGroup: 'back', equipment: 'cable', nameKey: 'exercises.reverseGripPulldown', descKey: 'exercises.reverseGripPulldownDesc' },
+  { id: 'straight-arm-pulldown', type: 'strength', muscleGroup: 'back', equipment: 'cable', nameKey: 'exercises.straightArmPulldown', descKey: 'exercises.straightArmPulldownDesc' },
+  { id: 'cable-pullover', type: 'strength', muscleGroup: 'back', equipment: 'cable', nameKey: 'exercises.cablePullover', descKey: 'exercises.cablePulloverDesc' },
+  { id: 'machine-row', type: 'strength', muscleGroup: 'back', equipment: 'machine', nameKey: 'exercises.machineRow', descKey: 'exercises.machineRowDesc' },
+  { id: 'smith-machine-row', type: 'strength', muscleGroup: 'back', equipment: 'machine', nameKey: 'exercises.smithMachineRow', descKey: 'exercises.smithMachineRowDesc' },
+  { id: 'rack-pull', type: 'strength', muscleGroup: 'back', equipment: 'barbell', nameKey: 'exercises.rackPull', descKey: 'exercises.rackPullDesc' },
+  { id: 'good-morning', type: 'strength', muscleGroup: 'back', equipment: 'barbell', nameKey: 'exercises.goodMorning', descKey: 'exercises.goodMorningDesc' },
+  { id: 'hyperextension', type: 'strength', muscleGroup: 'back', equipment: 'bodyweight', nameKey: 'exercises.hyperextension', descKey: 'exercises.hyperextensionDesc' },
+  { id: 'reverse-hyperextension', type: 'strength', muscleGroup: 'back', equipment: 'bodyweight', nameKey: 'exercises.reverseHyperextension', descKey: 'exercises.reverseHyperextensionDesc' },
+  { id: 'chin-ups', type: 'strength', muscleGroup: 'back', equipment: 'bodyweight', nameKey: 'exercises.chinUps', descKey: 'exercises.chinUpsDesc' },
+  { id: 'inverted-row', type: 'strength', muscleGroup: 'back', equipment: 'bodyweight', nameKey: 'exercises.invertedRow', descKey: 'exercises.invertedRowDesc' },
+  { id: 'seal-row', type: 'strength', muscleGroup: 'back', equipment: 'dumbbell', nameKey: 'exercises.sealRow', descKey: 'exercises.sealRowDesc' },
+  { id: 'kroc-row', type: 'strength', muscleGroup: 'back', equipment: 'dumbbell', nameKey: 'exercises.krocRow', descKey: 'exercises.krocRowDesc' },
+  { id: 'helms-row', type: 'strength', muscleGroup: 'back', equipment: 'dumbbell', nameKey: 'exercises.helmsRow', descKey: 'exercises.helmsRowDesc' },
+  { id: 'snatch-grip-deadlift', type: 'strength', muscleGroup: 'back', equipment: 'barbell', nameKey: 'exercises.snatchGripDeadlift', descKey: 'exercises.snatchGripDeadliftDesc' },
+  { id: 'deficit-deadlift', type: 'strength', muscleGroup: 'back', equipment: 'barbell', nameKey: 'exercises.deficitDeadlift', descKey: 'exercises.deficitDeadliftDesc' },
+  { id: 'sumo-deadlift', type: 'strength', muscleGroup: 'back', equipment: 'barbell', nameKey: 'exercises.sumoDeadlift', descKey: 'exercises.sumoDeadliftDesc' },
 
   // Shoulders
   { id: 'overhead-press', type: 'strength', muscleGroup: 'shoulders', equipment: 'barbell', nameKey: 'exercises.overheadPress', descKey: 'exercises.overheadPressDesc' },
@@ -116,10 +164,6 @@ const exercises = [
   { id: 'cage-work', type: 'martial-arts', martialArtsCategory: 'mma', nameKey: 'exercises.cageWork', descKey: 'exercises.cageWorkDesc' },
 
   // Karate
-  { id: 'kata-practice', type: 'martial-arts', martialArtsCategory: 'karate', nameKey: 'exercises.kataPractice', descKey: 'exercises.kataPracticeDesc' },
-  { id: 'kihon-basics', type: 'martial-arts', martialArtsCategory: 'karate', nameKey: 'exercises.kihonBasics', descKey: 'exercises.kihonBasicsDesc' },
-  { id: 'kumite-sparring', type: 'martial-arts', martialArtsCategory: 'karate', nameKey: 'exercises.kumiteSparring', descKey: 'exercises.kumiteSparringDesc' },
-  { id: 'makiwara-training', type: 'martial-arts', martialArtsCategory: 'karate', nameKey: 'exercises.makiwaraTraining', descKey: 'exercises.makiwaraTrainingDesc' },
 
   // Judo
   { id: 'uchikomi-drill', type: 'martial-arts', martialArtsCategory: 'judo', nameKey: 'exercises.uchikomiDrill', descKey: 'exercises.uchikomiDrillDesc' },
