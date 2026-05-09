@@ -71,7 +71,9 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Tägliche Kalorien- und Makro-Übersicht mit SVG-Ringen (kcal, Protein, Carbs, Fat)
 - [x] TDEE-Rechner (Mifflin-St Jeor Formel, vorbefüllt mit Profildaten)
 - [x] Makro-Ziele manuell editierbar (nicht nur über TDEE)
-- [x] Barcode-Scanner per Kamera (Quagga2 + Open Food Facts API)
+- [x] Barcode-Scanner per Kamera (Quagga2 + Open Food Facts API + Community Products)
+- [x] Community Products: Unbekannte Produkte selbst hinzufügen → steht allen Usern zur Verfügung
+- [x] Crowdsource-Korrekturen: 3+ ähnliche User-Korrekturen → Community-Eintrag wird automatisch aktualisiert
 - [x] 4 Mahlzeit-Slots (Frühstück, Mittagessen, Abendessen, Snacks)
 - [x] Zuletzt verwendete Lebensmittel für Schnellzugriff
 - [x] Custom Calendar für Datumsauswahl (kein nativer Browser-Picker)
@@ -177,6 +179,8 @@ src/
 - **challenges** — Herausforderungen (exercise_ids, criteria: volume/rounds, Zeitraum, Scores, winner_id)
 - **user_xp** — Erfahrungspunkte, Level, Streak pro User
 - **water_entries** — Flüssigkeitseinträge pro Tag (date, amount_ml)
+- **community_products** — Von Usern hinzugefügte Barcode-Produkte (barcode, name, nutrition, confirmations)
+- **product_overrides** — Persönliche Nährwert-Korrekturen pro User/Barcode
 
 ---
 
