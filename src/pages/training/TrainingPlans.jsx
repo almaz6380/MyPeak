@@ -449,7 +449,7 @@ function PlanCard({ plan, type, t, onStart, onDelete, isCustom }) {
           })}
           {exerciseIds.length > 6 && <span className="text-xs text-slate-400">+{exerciseIds.length - 6}</span>}
         </div>
-        <button onClick={() => onStart(isCustom ? { ...plan.days, name: plan.name } : plan)} className="w-full py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-medium text-sm transition-colors dark:bg-primary-500">
+        <button onClick={() => onStart(isCustom ? { ...plan.days, name: plan.name } : plan)} className="w-full py-2.5 rounded-xl bg-primary-500 hover:bg-primary-500 text-white font-medium text-sm transition-colors dark:bg-primary-500">
           {t('plans.startPlan')}
         </button>
       </div>
@@ -582,7 +582,7 @@ function ExercisePicker({ initialSelected, onBack, onConfirm, exerciseType = 'st
 
       {selected.length > 0 && (
         <div className="fixed bottom-20 left-0 right-0 px-4 pb-2">
-          <button onClick={() => onConfirm(selected)} className="w-full max-w-lg mx-auto block bg-primary-500 hover:bg-primary-600 text-white rounded-2xl py-3.5 font-semibold text-center shadow-lg transition-colors dark:bg-primary-500">{t('training.done')} ({selected.length})</button>
+          <button onClick={() => onConfirm(selected)} className="w-full max-w-lg mx-auto block bg-primary-500 hover:bg-primary-500 text-white rounded-2xl py-3.5 font-semibold text-center shadow-lg transition-colors dark:bg-primary-500">{t('training.done')} ({selected.length})</button>
         </div>
       )}
     </div>
@@ -591,6 +591,6 @@ function ExercisePicker({ initialSelected, onBack, onConfirm, exerciseType = 'st
 
 function FilterPill({ label, active, onClick }) {
   return (
-    <button onClick={onClick} className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${active ? 'bg-primary-600 text-white dark:bg-primary-500' : 'bg-white dark:bg-surface-dark-alt text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'}`}>{label}</button>
+    <button onClick={onClick} className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${active ? 'bg-primary-500 text-white' : 'bg-white dark:bg-surface-dark-alt text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'}`}>{label}</button>
   );
 }

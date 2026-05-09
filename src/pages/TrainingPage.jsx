@@ -236,7 +236,7 @@ export default function TrainingPage() {
 
       <button
         onClick={startWorkout}
-        className="w-full bg-primary-500 hover:bg-primary-600 text-white rounded-2xl p-4 flex items-center justify-center gap-3 text-lg font-semibold transition-colors mb-6 bg-primary-500 hover:bg-primary-600"
+        className="w-full bg-primary-500 hover:bg-primary-500 text-white rounded-2xl p-4 flex items-center justify-center gap-3 text-lg font-semibold transition-colors mb-6 bg-primary-500 hover:bg-primary-600"
       >
         <Plus className="w-6 h-6" />
         {t('training.startWorkout')}
@@ -720,7 +720,7 @@ function HiitSetup({ onBack, onStart, exercises, t }) {
       ) : (
         <div className="flex gap-2">
           <input type="text" value={saveName} onChange={(e) => setSaveName(e.target.value)} placeholder={t('plans.hiitPlanName')} className="flex-1 px-3 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
-          <button onClick={handleSave} disabled={!saveName.trim()} className="px-4 py-2.5 rounded-xl bg-primary-600 text-white text-sm font-medium disabled:opacity-50">{t('common.save')}</button>
+          <button onClick={handleSave} disabled={!saveName.trim()} className="px-4 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-medium disabled:opacity-50">{t('common.save')}</button>
         </div>
       )}
     </div>
@@ -875,7 +875,7 @@ function CircuitSetup({ onBack, onStart, exercises: circuitExercises, t }) {
       ) : (
         <div className="flex gap-2">
           <input type="text" value={saveName} onChange={(e) => setSaveName(e.target.value)} placeholder={t('plans.circuitName')} className="flex-1 px-3 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
-          <button onClick={handleSaveCircuit} disabled={!saveName.trim()} className="px-4 py-2.5 rounded-xl bg-primary-600 text-white text-sm font-medium disabled:opacity-50">{t('common.save')}</button>
+          <button onClick={handleSaveCircuit} disabled={!saveName.trim()} className="px-4 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-medium disabled:opacity-50">{t('common.save')}</button>
         </div>
       )}
     </div>
@@ -1099,7 +1099,7 @@ function MartialArtsSetup({ onBack, onStart, t }) {
       ) : (
         <div className="flex gap-2">
           <input type="text" value={saveName} onChange={(e) => setSaveName(e.target.value)} placeholder={t('plans.martialArtsPlanName')} className="flex-1 px-3 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
-          <button onClick={handleSave} disabled={!saveName.trim()} className="px-4 py-2.5 rounded-xl bg-primary-600 text-white text-sm font-medium disabled:opacity-50">{t('common.save')}</button>
+          <button onClick={handleSave} disabled={!saveName.trim()} className="px-4 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-medium disabled:opacity-50">{t('common.save')}</button>
         </div>
       )}
     </div>

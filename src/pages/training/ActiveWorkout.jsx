@@ -282,7 +282,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
           <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 w-full max-w-sm shadow-xl">
             <p className="text-center font-semibold mb-2">{t('training.noValidSets')}</p>
             <p className="text-center text-sm text-slate-500 dark:text-slate-400 mb-4">{t('training.noValidSetsDesc')}</p>
-            <button onClick={() => setShowNoValidSets(false)} className="w-full py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-medium text-sm">OK</button>
+            <button onClick={() => setShowNoValidSets(false)} className="w-full py-2.5 rounded-xl bg-primary-500 hover:bg-primary-500 text-white font-medium text-sm">OK</button>
           </div>
         </div>
       )}

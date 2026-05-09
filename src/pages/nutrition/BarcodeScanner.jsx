@@ -223,7 +223,7 @@ export default function BarcodeScanner({ onScanned, onClose }) {
               <button onClick={() => { isProcessingRef.current = false; startScanner(); }} className="flex-1 py-3 rounded-xl bg-white/10 text-white font-medium text-sm">
                 {t('nutrition.scanAgain')}
               </button>
-              <button onClick={handleClose} className="flex-1 py-3 rounded-xl bg-primary-600 text-white font-medium text-sm">
+              <button onClick={handleClose} className="flex-1 py-3 rounded-xl bg-primary-500 text-white font-medium text-sm">
                 {t('nutrition.manualEntry')}
               </button>
             </div>

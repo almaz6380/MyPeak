@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ChevronDown, ChevronUp, AlertTriangle, Syringe, FlaskConical, Brain, Flame, Heart, ShieldCheck, BookOpen } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, AlertTriangle, Syringe, FlaskConical, Brain, Flame, Heart, ShieldCheck, BookOpen, ChevronRight, Stethoscope } from 'lucide-react';
 import peptides from '../../data/peptidesData';
 
 const CATEGORIES = [
@@ -11,14 +11,19 @@ const CATEGORIES = [
   { id: 'cognitive', icon: Brain, color: 'text-cyan-500 bg-cyan-50 dark:bg-cyan-900/20' },
 ];
 
-const SECTION_COLORS = {
-  0: 'border-l-primary-400',
-  1: 'border-l-blue-400',
-  2: 'border-l-green-400',
-  3: 'border-l-amber-400',
-  4: 'border-l-red-400',
-  5: 'border-l-purple-400',
-  6: 'border-l-cyan-400',
+const SECTION_COLORS = [
+  'border-l-primary-400', 'border-l-blue-400', 'border-l-green-400',
+  'border-l-amber-400', 'border-l-red-400', 'border-l-purple-400',
+  'border-l-cyan-400', 'border-l-rose-400',
+];
+
+const categoryNames = {
+  all: { de: 'Alle', en: 'All' },
+  healing: { de: 'Heilung & Recovery', en: 'Healing & Recovery' },
+  gh: { de: 'Wachstumshormon', en: 'Growth Hormone' },
+  fatloss: { de: 'Fettabbau', en: 'Fat Loss' },
+  antiaging: { de: 'Anti-Aging', en: 'Anti-Aging' },
+  cognitive: { de: 'Kognition', en: 'Cognition' },
 };
 
 export default function PeptidesPage({ onBack }) {
@@ -26,24 +31,60 @@ export default function PeptidesPage({ onBack }) {
   const lang = i18n.language || 'de';
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedPeptide, setSelectedPeptide] = useState(null);
-
-  const categoryNames = {
-    all: { de: 'Alle', en: 'All' },
-    healing: { de: 'Heilung & Recovery', en: 'Healing & Recovery' },
-    gh: { de: 'Wachstumshormon', en: 'Growth Hormone' },
-    fatloss: { de: 'Fettabbau', en: 'Fat Loss' },
-    antiaging: { de: 'Anti-Aging', en: 'Anti-Aging' },
-    cognitive: { de: 'Kognition', en: 'Cognition' },
-  };
+  const [showEbook, setShowEbook] = useState(false);
 
   const filtered = activeCategory === 'all'
     ? peptides
     : peptides.filter((p) => p.category === activeCategory);
 
-  // Detail view for a single peptide (e-book style)
+  // ── E-BOOK VIEW ──
+  if (selectedPeptide && showEbook) {
+    const p = selectedPeptide;
+    return (
+      <div className="p-4 pb-24">
+        <div className="flex items-center gap-3 mb-6">
+          <button onClick={() => setShowEbook(false)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div>
+            <h1 className="text-xl font-bold">{lang === 'de' ? p.nameDE : p.nameEN}</h1>
+            <p className="text-xs text-primary-400">{lang === 'de' ? 'Ausführliches E-Book' : 'Detailed E-Book'}</p>
+          </div>
+        </div>
+
+        {p.sections && p.sections.length > 0 ? (
+          <div className="space-y-3">
+            {p.sections.map((section, i) => (
+              <EbookSection
+                key={i}
+                title={lang === 'de' ? section.titleDE : section.titleEN}
+                content={lang === 'de' ? section.contentDE : section.contentEN}
+                colorClass={SECTION_COLORS[i % SECTION_COLORS.length]}
+                defaultOpen={i === 0}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <BookOpen className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
+            <p className="text-slate-400 dark:text-slate-500 text-sm">
+              {lang === 'de' ? 'E-Book wird derzeit erstellt...' : 'E-Book is being created...'}
+            </p>
+          </div>
+        )}
+
+        <Disclaimer lang={lang} />
+      </div>
+    );
+  }
+
+  // ── KURZFASSUNG (Detail-Ansicht) ──
   if (selectedPeptide) {
     const p = selectedPeptide;
     const cat = CATEGORIES.find((c) => c.id === p.category);
+    const CatIcon = cat?.icon || Syringe;
+    const quick = lang === 'de' ? p.quickDE : p.quickEN;
+    const hasEbook = p.sections && p.sections.length > 0;
 
     return (
       <div className="p-4 pb-24">
@@ -51,42 +92,77 @@ export default function PeptidesPage({ onBack }) {
           <button onClick={() => setSelectedPeptide(null)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <div>
+          <div className="flex-1">
             <h1 className="text-xl font-bold">{lang === 'de' ? p.nameDE : p.nameEN}</h1>
             <p className="text-xs text-slate-400 dark:text-slate-500">{categoryNames[p.category]?.[lang]}</p>
           </div>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${cat?.color}`}>
+            <CatIcon className="w-5 h-5" />
+          </div>
         </div>
 
-        {/* Sections */}
-        <div className="space-y-4">
-          {p.sections.map((section, i) => (
-            <PeptideSection
-              key={i}
-              title={lang === 'de' ? section.titleDE : section.titleEN}
-              content={lang === 'de' ? section.contentDE : section.contentEN}
-              colorClass={SECTION_COLORS[i] || SECTION_COLORS[0]}
-              defaultOpen={i === 0}
+        {/* Summary */}
+        <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+          {lang === 'de' ? p.summaryDE : p.summaryEN}
+        </p>
+
+        {/* Quick Info Cards */}
+        {quick && (
+          <div className="space-y-3 mb-6">
+            <QuickCard
+              title={lang === 'de' ? 'Wirkung' : 'Effects'}
+              text={quick.wirkung}
+              color="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-l-green-400"
             />
-          ))}
-        </div>
+            <QuickCard
+              title={lang === 'de' ? 'Nebenwirkungen' : 'Side Effects'}
+              text={quick.nebenwirkungen}
+              color="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-l-red-400"
+            />
+          </div>
+        )}
 
-        {/* Disclaimer at bottom */}
-        <div className="mt-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 flex gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+        {/* Medical Advice Notice */}
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 mb-4 flex gap-3">
+          <Stethoscope className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-blue-700 dark:text-blue-400 leading-relaxed">
             {lang === 'de'
-              ? 'Diese Informationen dienen nur zu Bildungszwecken und ersetzen keine ärztliche Beratung. Konsultiere immer einen Arzt vor der Anwendung von Peptiden.'
-              : 'This information is for educational purposes only and does not replace medical advice. Always consult a doctor before using peptides.'}
+              ? 'Dosierung und Anwendung sollten ausschließlich mit einem qualifizierten Arzt besprochen werden.'
+              : 'Dosage and administration should only be discussed with a qualified physician.'}
           </p>
         </div>
+
+        {/* E-Book Button */}
+        <button
+          onClick={() => hasEbook ? setShowEbook(true) : null}
+          className={`w-full rounded-2xl p-4 flex items-center gap-4 transition-all ${
+            hasEbook
+              ? 'bg-primary-500 hover:bg-primary-500 text-white shadow-lg'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
+          }`}
+        >
+          <BookOpen className="w-6 h-6 flex-shrink-0" />
+          <div className="flex-1 text-left">
+            <p className="font-semibold text-sm">
+              {lang === 'de' ? 'Ausführliches E-Book lesen' : 'Read detailed E-Book'}
+            </p>
+            <p className={`text-xs mt-0.5 ${hasEbook ? 'text-white/70' : ''}`}>
+              {hasEbook
+                ? `${p.sections.length} ${lang === 'de' ? 'Kapitel' : 'chapters'}`
+                : (lang === 'de' ? 'Wird erstellt...' : 'Coming soon...')}
+            </p>
+          </div>
+          {hasEbook && <ChevronRight className="w-5 h-5" />}
+        </button>
+
+        <Disclaimer lang={lang} />
       </div>
     );
   }
 
-  // List view
+  // ── LIST VIEW ──
   return (
     <div className="p-4 pb-24">
-      {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           <ArrowLeft className="w-5 h-5" />
@@ -94,15 +170,7 @@ export default function PeptidesPage({ onBack }) {
         <h1 className="text-2xl font-bold">{lang === 'de' ? 'Peptide' : 'Peptides'}</h1>
       </div>
 
-      {/* Disclaimer */}
-      <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 mb-4 flex gap-3">
-        <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-        <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
-          {lang === 'de'
-            ? 'Diese Informationen dienen nur zu Bildungszwecken. Peptide sind in vielen Ländern verschreibungspflichtig oder nicht zugelassen. Konsultiere immer einen Arzt vor der Anwendung.'
-            : 'This information is for educational purposes only. Peptides are prescription-only or unapproved in many countries. Always consult a doctor before use.'}
-        </p>
-      </div>
+      <Disclaimer lang={lang} />
 
       {/* Category Filter */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
@@ -112,7 +180,7 @@ export default function PeptidesPage({ onBack }) {
             onClick={() => setActiveCategory(catId)}
             className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
               activeCategory === catId
-                ? 'bg-primary-600 text-white'
+                ? 'bg-primary-500 text-white'
                 : 'bg-white dark:bg-surface-dark-alt text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
             }`}
           >
@@ -125,11 +193,12 @@ export default function PeptidesPage({ onBack }) {
         {filtered.length} {lang === 'de' ? 'Peptide' : 'Peptides'}
       </p>
 
-      {/* Peptide Cards → tap to open e-book */}
+      {/* Peptide Cards */}
       <div className="flex flex-col gap-3">
         {filtered.map((peptide) => {
           const cat = CATEGORIES.find((c) => c.id === peptide.category);
           const CatIcon = cat?.icon || Syringe;
+          const hasEbook = peptide.sections && peptide.sections.length > 0;
 
           return (
             <button
@@ -144,9 +213,14 @@ export default function PeptidesPage({ onBack }) {
                 <p className="font-semibold truncate">{lang === 'de' ? peptide.nameDE : peptide.nameEN}</p>
                 <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{categoryNames[peptide.category]?.[lang]}</p>
               </div>
-              <div className="flex items-center gap-1 text-slate-300 dark:text-slate-600 flex-shrink-0">
-                <BookOpen className="w-4 h-4" />
-                <span className="text-[10px]">{peptide.sections?.length || 0}</span>
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                {hasEbook && (
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-primary-50 dark:bg-primary-900/20 text-[10px] font-semibold text-primary-500 dark:text-primary-400">
+                    <BookOpen className="w-3 h-3" />
+                    E-Book
+                  </span>
+                )}
+                <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
               </div>
             </button>
           );
@@ -156,25 +230,41 @@ export default function PeptidesPage({ onBack }) {
   );
 }
 
-function PeptideSection({ title, content, colorClass, defaultOpen = false }) {
-  const [open, setOpen] = useState(defaultOpen);
+function QuickCard({ title, text, color }) {
+  return (
+    <div className={`rounded-xl p-3 border-l-4 ${color}`}>
+      <p className="text-xs font-semibold mb-1">{title}</p>
+      <p className="text-xs opacity-90 leading-relaxed">{text}</p>
+    </div>
+  );
+}
 
+function EbookSection({ title, content, colorClass, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
     <div className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden border-l-4 ${colorClass}`}>
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between p-4 text-left"
-      >
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-4 text-left">
         <h3 className="font-semibold text-sm">{title}</h3>
         {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
       </button>
       {open && (
         <div className="px-4 pb-4">
-          <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">
-            {content}
-          </p>
+          <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">{content}</p>
         </div>
       )}
+    </div>
+  );
+}
+
+function Disclaimer({ lang }) {
+  return (
+    <div className="mt-6 mb-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 flex gap-3">
+      <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+      <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+        {lang === 'de'
+          ? 'Diese Informationen dienen nur zu Bildungszwecken und ersetzen keine ärztliche Beratung. Peptide sind in vielen Ländern verschreibungspflichtig oder nicht zugelassen. Konsultiere immer einen Arzt vor der Anwendung.'
+          : 'This information is for educational purposes only and does not replace medical advice. Peptides are prescription-only or unapproved in many countries. Always consult a doctor before use.'}
+      </p>
     </div>
   );
 }

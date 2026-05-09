@@ -260,7 +260,7 @@ export default function TDEECalculator({ onBack, onSaved }) {
         className={`w-full py-3.5 rounded-2xl font-semibold transition-colors flex items-center justify-center gap-2 ${
           saved
             ? 'bg-green-500 text-white'
-            : 'bg-primary-500 hover:bg-primary-600 text-white'
+            : 'bg-primary-500 hover:bg-primary-500 text-white'
         }`}
       >
         {saved ? (

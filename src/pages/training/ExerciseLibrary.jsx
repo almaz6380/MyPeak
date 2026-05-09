@@ -165,7 +165,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
         <div className="fixed bottom-20 left-0 right-0 px-4 pb-2">
           <button
             onClick={handleConfirm}
-            className="w-full max-w-lg mx-auto block bg-primary-500 hover:bg-primary-600 text-white rounded-2xl py-3.5 font-semibold text-center shadow-lg transition-colors bg-primary-500 hover:bg-primary-600"
+            className="w-full max-w-lg mx-auto block bg-primary-500 hover:bg-primary-500 text-white rounded-2xl py-3.5 font-semibold text-center shadow-lg transition-colors bg-primary-500 hover:bg-primary-600"
           >
             {t('training.addExercise')} ({selected.length})
           </button>
@@ -213,7 +213,7 @@ function CreateExerciseModal({ onSave, onClose, t }) {
                   onClick={() => setMuscleGroup(mg)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     muscleGroup === mg
-                      ? 'bg-primary-600 text-white'
+                      ? 'bg-primary-500 text-white'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                   }`}
                 >
@@ -232,7 +232,7 @@ function CreateExerciseModal({ onSave, onClose, t }) {
                   onClick={() => setEquipment(eq)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     equipment === eq
-                      ? 'bg-primary-600 text-white'
+                      ? 'bg-primary-500 text-white'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                   }`}
                 >
@@ -264,7 +264,7 @@ function FilterPill({ label, active, onClick }) {
       onClick={onClick}
       className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
         active
-          ? 'bg-primary-600 text-white dark:bg-primary-500'
+          ? 'bg-primary-500 text-white'
           : 'bg-white dark:bg-surface-dark-alt text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
       }`}
     >

@@ -164,7 +164,7 @@ export default function PostWorkoutSummary({ exercises, prs = {}, duration, user
 
       <button
         onClick={onDismiss}
-        className="w-full bg-primary-500 hover:bg-primary-600 text-white rounded-2xl py-3.5 font-semibold transition-colors dark:bg-primary-500"
+        className="w-full bg-primary-500 hover:bg-primary-500 text-white rounded-2xl py-3.5 font-semibold transition-colors dark:bg-primary-500"
       >
         {t('training.continue')}
       </button>

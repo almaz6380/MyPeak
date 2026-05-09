@@ -89,7 +89,7 @@ export default function OnboardingPage() {
           </p>
           <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
             <div
-              className="h-full bg-primary-600 rounded-full transition-all duration-300"
+              className="h-full bg-primary-500 rounded-full transition-all duration-300"
               style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
             />
           </div>

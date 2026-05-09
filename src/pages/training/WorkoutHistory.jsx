@@ -623,7 +623,7 @@ function EditWorkoutModal({ workout, onSave, onClose, t, weightUnit }) {
         <div className="px-5 pt-3 pb-5 shrink-0 border-t border-slate-100 dark:border-slate-700">
           <button
             onClick={handleSave}
-            className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-3 bg-primary-500 hover:bg-primary-500 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
           >
             <Check className="w-4 h-4" />
             {t('common.save')}
