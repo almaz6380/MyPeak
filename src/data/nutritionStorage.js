@@ -218,10 +218,16 @@ export async function logCustomMeal(userId, meal, date, mealSlot) {
 // ── Nutrition Goals ──────────────────────────────────────────
 
 export async function getNutritionGoals(userId) {
-  // Always check localStorage first for instant response
+  // localStorage is the primary source of truth
   const cached = localStorage.getItem(GOALS_KEY);
-  const cachedGoals = cached ? JSON.parse(cached) : null;
+  if (cached) {
+    const cachedGoals = JSON.parse(cached);
+    // If we have cached goals, return them immediately
+    // Supabase sync happens in background on save, not on load
+    return cachedGoals;
+  }
 
+  // No cache → first time → try Supabase
   if (!guestSkip(userId)) {
     const { data, error } = await supabase
       .from('nutrition_goals')
@@ -235,17 +241,17 @@ export async function getNutritionGoals(userId) {
     }
   }
 
-  // Return cached goals if available (preserves manually set values)
-  if (cachedGoals) return cachedGoals;
-
   return { calories: 2000, protein: 150, carbs: 250, fat: 70, fiber: 30, water_ml: 3000 };
 }
 
 export async function saveNutritionGoals(userId, goals) {
-  let data = null;
+  // Save to localStorage FIRST — this is the source of truth
+  const toCache = { ...goals, user_id: userId };
+  localStorage.setItem(GOALS_KEY, JSON.stringify(toCache));
 
   if (!guestSkip(userId)) {
-    ({ data } = await supabase
+    // Try Supabase — only save fields that exist in the table
+    const { error } = await supabase
       .from('nutrition_goals')
       .upsert({
         user_id: userId,
@@ -253,18 +259,13 @@ export async function saveNutritionGoals(userId, goals) {
         protein: goals.protein,
         carbs: goals.carbs,
         fat: goals.fat,
-        fiber: goals.fiber || 30,
         tdee: goals.tdee || null,
         water_ml: goals.water_ml || 3000,
         updated_at: new Date().toISOString(),
-      }, { onConflict: 'user_id' })
-      .select()
-      .single());
-  }
+      }, { onConflict: 'user_id' });
 
-  // Always save to localStorage — this is the source of truth for the session
-  const toCache = data || { ...goals, user_id: userId };
-  localStorage.setItem(GOALS_KEY, JSON.stringify(toCache));
+    if (error) console.error('Failed to save goals to Supabase:', error);
+  }
 
   return { data, error: null };
 }
