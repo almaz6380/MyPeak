@@ -58,6 +58,11 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Weißer Bildschirm behoben (localStorage-Validierung + Safety-Checks)
 - [x] 5 neue Kampfsportarten: Judo, BJJ, Taekwondo, Wrestling (je 4 Übungen)
 - [x] Eigene Übungen erstellen (Name, Muskelgruppe, Equipment → Supabase custom_exercises)
+- [x] Freunde-System: MyPeak-Code (MP-NAME-XXXX), per Code hinzufügen, Anfragen annehmen/ablehnen
+- [x] Leaderboard: Wöchentlich rotierende Kategorie (Volumen/Streak/Trainings), nur Freunde
+- [x] Challenges: Freund herausfordern, Volumen oder Runden, Zeitraum wählbar, Live-Score
+- [x] XP-System: Workout +10 XP, Challenge gewinnen +50 XP, 7-Tage-Streak +25 XP, Level-Anzeige im Profil
+- [x] Social-Karten auf Training-Startseite (Ranking, Challenges, Freunde)
 
 ### Phase 3: Ernährungs-Tracking — FERTIG
 - [x] Lebensmittel-Suche (150 lokale Lebensmittel + Open Food Facts API)
@@ -157,6 +162,10 @@ src/
 - **nutrition_entries** — Lebensmittel-Einträge pro Tag/Mahlzeit (date, meal_slot, food_name, serving_size, calories, protein, carbs, fat, source)
 - **custom_meals** — Gespeicherte Mahlzeit-Vorlagen (name, items als JSONB, Gesamtmakros, Soft-Delete)
 - **nutrition_goals** — Tägliche Kalorien-/Makro-/Wasser-Ziele pro User (1 Zeile, Upsert)
+- **friend_codes** — Einzigartiger MyPeak-Code pro User (MP-NAME-XXXX)
+- **friendships** — Freundschaftsverbindungen (sender_id, receiver_id, status: pending/accepted/declined)
+- **challenges** — Herausforderungen (exercise_ids, criteria: volume/rounds, Zeitraum, Scores, winner_id)
+- **user_xp** — Erfahrungspunkte, Level, Streak pro User
 - **water_entries** — Flüssigkeitseinträge pro Tag (date, amount_ml)
 
 ---
