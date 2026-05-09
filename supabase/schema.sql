@@ -324,11 +324,10 @@ CREATE INDEX idx_product_overrides_barcode ON product_overrides(barcode);
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO profiles (id) VALUES (NEW.id);
-  INSERT INTO user_settings (user_id) VALUES (NEW.id);
-  INSERT INTO nutrition_goals (user_id) VALUES (NEW.id);
-  -- Optional tables: don't fail registration if they don't exist
-  BEGIN INSERT INTO user_xp (user_id) VALUES (NEW.id); EXCEPTION WHEN OTHERS THEN NULL; END;
+  INSERT INTO profiles (id) VALUES (NEW.id) ON CONFLICT DO NOTHING;
+  INSERT INTO user_settings (user_id) VALUES (NEW.id) ON CONFLICT DO NOTHING;
+  INSERT INTO nutrition_goals (user_id) VALUES (NEW.id) ON CONFLICT DO NOTHING;
+  INSERT INTO user_xp (user_id) VALUES (NEW.id) ON CONFLICT DO NOTHING;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
