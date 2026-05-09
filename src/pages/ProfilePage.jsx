@@ -5,18 +5,29 @@ import { useAuth } from '../context/AuthContext';
 import { saveSetting } from '../data/settingsStorage';
 import MyPeakLogo from '../components/MyPeakLogo';
 import { supabase } from '../lib/supabase';
-import { Moon, Sun, Globe, Weight, LogOut, User, ChevronRight, Pencil, X, Check, Loader2 } from 'lucide-react';
+import { Moon, Sun, Globe, Weight, LogOut, User, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy } from 'lucide-react';
+import { getOrCreateFriendCode, getXP } from '../data/socialStorage';
 
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
   const { darkMode, toggleDarkMode } = useTheme();
-  const { user, profile, signOut, refreshProfile } = useAuth();
+  const { user, profile, signOut, refreshProfile, isGuestMode } = useAuth();
   const [weightUnit, setWeightUnit] = useState(() => localStorage.getItem('weightUnit') || 'kg');
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const [editField, setEditField] = useState(null); // which field is being edited
   const [editValue, setEditValue] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const [friendCode, setFriendCode] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [xpData, setXpData] = useState({ total_xp: 0, level: 1, streak_days: 0 });
+
+  useState(() => {
+    if (user && !isGuestMode) {
+      getOrCreateFriendCode(user.id, profile?.name).then((code) => code && setFriendCode(code));
+      getXP(user.id).then(setXpData);
+    }
+  }, [user]);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'de' ? 'en' : 'de';
@@ -103,6 +114,41 @@ export default function ProfilePage() {
             <p className="text-lg font-semibold text-slate-900 dark:text-white">{profile.name}</p>
             <p className="text-sm text-slate-500 dark:text-slate-400">{user?.email}</p>
           </div>
+        </div>
+      )}
+
+      {/* MyPeak Code + XP */}
+      {!isGuestMode && (
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm p-4 mb-4">
+          {/* XP Badge */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-primary-400" />
+              <span className="text-sm font-semibold">Level {xpData.level}</span>
+            </div>
+            <span className="text-xs text-slate-400 dark:text-slate-500">{xpData.total_xp} XP · {xpData.streak_days} {t('common.back') === 'Zurück' ? 'Tage Streak' : 'day streak'}</span>
+          </div>
+          {/* XP Progress */}
+          <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full mb-4 overflow-hidden">
+            <div className="h-full bg-primary-400 rounded-full transition-all" style={{ width: `${(xpData.total_xp % 100)}%` }} />
+          </div>
+          {/* Friend Code */}
+          {friendCode && (
+            <div>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">{t('common.back') === 'Zurück' ? 'Mein MyPeak-Code' : 'My MyPeak Code'}</p>
+              <div className="flex items-center gap-2">
+                <code className="flex-1 bg-slate-50 dark:bg-slate-800 rounded-xl px-4 py-2.5 text-center font-mono text-sm font-bold tracking-wider text-primary-400">
+                  {friendCode}
+                </code>
+                <button
+                  onClick={() => { navigator.clipboard.writeText(friendCode); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+                  className={`p-2.5 rounded-xl transition-colors ${copied ? 'bg-green-100 dark:bg-green-900/30 text-green-500' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-primary-400'}`}
+                >
+                  {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

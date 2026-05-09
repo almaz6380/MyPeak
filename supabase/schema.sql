@@ -197,13 +197,95 @@ CREATE POLICY "Users can manage their own water entries"
 
 CREATE INDEX idx_water_entries_user_date ON water_entries(user_id, date DESC);
 
--- 10. Trigger: Automatisch Profile + Settings + Nutrition Goals bei neuer Registrierung anlegen
+-- 10. Friend Codes (einzigartiger MyPeak-Code pro User)
+CREATE TABLE friend_codes (
+  user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  code text UNIQUE NOT NULL,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE friend_codes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read friend codes" ON friend_codes FOR SELECT USING (true);
+CREATE POLICY "Users can insert their own code" ON friend_codes FOR INSERT WITH CHECK (user_id = auth.uid());
+
+-- 11. Friendships (Freundschaftsverbindungen)
+CREATE TABLE friendships (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  sender_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  receiver_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined')),
+  created_at timestamptz DEFAULT now(),
+  UNIQUE(sender_id, receiver_id)
+);
+
+ALTER TABLE friendships ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can see their own friendships" ON friendships FOR SELECT
+  USING (sender_id = auth.uid() OR receiver_id = auth.uid());
+CREATE POLICY "Users can send friend requests" ON friendships FOR INSERT
+  WITH CHECK (sender_id = auth.uid());
+CREATE POLICY "Users can update friendships they received" ON friendships FOR UPDATE
+  USING (receiver_id = auth.uid());
+CREATE POLICY "Users can delete their own friendships" ON friendships FOR DELETE
+  USING (sender_id = auth.uid() OR receiver_id = auth.uid());
+
+CREATE INDEX idx_friendships_sender ON friendships(sender_id);
+CREATE INDEX idx_friendships_receiver ON friendships(receiver_id);
+
+-- 12. Challenges (Herausforderungen zwischen Freunden)
+CREATE TABLE challenges (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  challenger_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  opponent_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  exercise_ids jsonb NOT NULL DEFAULT '[]'::jsonb,
+  criteria text NOT NULL DEFAULT 'volume' CHECK (criteria IN ('volume', 'rounds')),
+  start_date date NOT NULL,
+  end_date date NOT NULL,
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'completed', 'declined')),
+  challenger_score numeric DEFAULT 0,
+  opponent_score numeric DEFAULT 0,
+  winner_id uuid REFERENCES auth.users(id),
+  xp_reward integer DEFAULT 50,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE challenges ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can see their own challenges" ON challenges FOR SELECT
+  USING (challenger_id = auth.uid() OR opponent_id = auth.uid());
+CREATE POLICY "Users can create challenges" ON challenges FOR INSERT
+  WITH CHECK (challenger_id = auth.uid());
+CREATE POLICY "Participants can update challenges" ON challenges FOR UPDATE
+  USING (challenger_id = auth.uid() OR opponent_id = auth.uid());
+
+CREATE INDEX idx_challenges_challenger ON challenges(challenger_id);
+CREATE INDEX idx_challenges_opponent ON challenges(opponent_id);
+
+-- 13. User XP (Erfahrungspunkte + Level)
+CREATE TABLE user_xp (
+  user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  total_xp integer NOT NULL DEFAULT 0,
+  level integer NOT NULL DEFAULT 1,
+  streak_days integer NOT NULL DEFAULT 0,
+  last_workout_date date,
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE user_xp ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read XP" ON user_xp FOR SELECT USING (true);
+CREATE POLICY "Users can manage their own XP" ON user_xp FOR ALL
+  USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+
+-- 14. Trigger: Automatisch Profile + Settings + Nutrition Goals + XP bei neuer Registrierung anlegen
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS trigger AS $$
 BEGIN
   INSERT INTO profiles (id) VALUES (NEW.id);
   INSERT INTO user_settings (user_id) VALUES (NEW.id);
   INSERT INTO nutrition_goals (user_id) VALUES (NEW.id);
+  INSERT INTO user_xp (user_id) VALUES (NEW.id);
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

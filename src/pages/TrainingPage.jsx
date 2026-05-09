@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dumbbell, Plus, History, ClipboardList, Trophy, ArrowLeft, ChevronRight, Heart, Zap, RefreshCw, X, Search, Play } from 'lucide-react';
+import { Dumbbell, Plus, History, ClipboardList, Trophy, ArrowLeft, ChevronRight, Heart, Zap, RefreshCw, X, Search, Play, Users, Swords, Medal } from 'lucide-react';
 import ExerciseLibrary from './training/ExerciseLibrary';
 import ActiveWorkout from './training/ActiveWorkout';
 import ActiveCardio from './training/ActiveCardio';
@@ -9,6 +9,9 @@ import ActiveCircuit from './training/ActiveCircuit';
 import ActiveMartialArts from './training/ActiveMartialArts';
 import WorkoutHistory from './training/WorkoutHistory';
 import TrainingPlans, { defaultPlans } from './training/TrainingPlans';
+import FriendsList from './training/FriendsList';
+import Leaderboard from './training/Leaderboard';
+import ChallengesList from './training/ChallengesList';
 import exercises, { getExerciseById, getExercisesByType } from '../data/exercises';
 import { getCustomPlans, getCustomPlansByType, saveCustomPlan } from '../data/workoutStorage';
 import { getHiddenDefaultPlans, getPermanentDeletedDefaultPlans } from '../data/settingsStorage';
@@ -207,6 +210,18 @@ export default function TrainingPage() {
     );
   }
 
+  if (view === 'friends') {
+    return <FriendsList onBack={() => setView('home')} />;
+  }
+
+  if (view === 'leaderboard') {
+    return <Leaderboard onBack={() => setView('home')} />;
+  }
+
+  if (view === 'challenges') {
+    return <ChallengesList onBack={() => setView('home')} onCreateChallenge={() => setView('home')} />;
+  }
+
   return (
     <div className="p-4 pb-24">
       <div className="flex flex-col items-center pt-12 mb-6">
@@ -242,10 +257,18 @@ export default function TrainingPage() {
         {t('training.startWorkout')}
       </button>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 mb-6">
         <QuickAction icon={<ClipboardList className="w-6 h-6" />} label={t('training.plans')} onClick={() => setView('plans')} />
         <QuickAction icon={<Dumbbell className="w-6 h-6" />} label={t('training.exercises')} onClick={() => setView('exercises')} />
         <QuickAction icon={<History className="w-6 h-6" />} label={t('training.history')} onClick={() => setView('history')} className="col-span-2" />
+      </div>
+
+      {/* Social */}
+      <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">{t('common.back') === 'Zurück' ? 'Social' : 'Social'}</h2>
+      <div className="grid grid-cols-3 gap-3">
+        <QuickAction icon={<Medal className="w-6 h-6" />} label={t('common.back') === 'Zurück' ? 'Ranking' : 'Ranking'} onClick={() => setView('leaderboard')} />
+        <QuickAction icon={<Swords className="w-6 h-6" />} label="Challenges" onClick={() => setView('challenges')} />
+        <QuickAction icon={<Users className="w-6 h-6" />} label={t('common.back') === 'Zurück' ? 'Freunde' : 'Friends'} onClick={() => setView('friends')} />
       </div>
     </div>
   );
