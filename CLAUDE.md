@@ -63,6 +63,13 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Challenges: Freund herausfordern, Volumen oder Runden, Zeitraum wählbar, Live-Score
 - [x] XP-System: Workout +10 XP, Challenge gewinnen +50 XP, 7-Tage-Streak +25 XP, Level-Anzeige im Profil
 - [x] Social-Karten auf Training-Startseite (Ranking, Challenges, Freunde)
+- [x] Level-System: Titel (Rookie/Warrior/Champion/Legend/GOAT), progressive XP, Level-Up Animation
+- [x] Übungsbibliothek erweitert: 90 Kraftübungen (48 neue Brust+Rücken), hierarchische Navigation (Bereich→Filter)
+- [x] Equipment-Filter (Langhantel/Kurzhantel/Kabelzug/Maschine/Körpergewicht) in der Bibliothek
+- [x] Karate entfernt, Seilspringen bei Cardio hinzugefügt
+- [x] Übungsnotizen + Geräte-Einstellungen pro Übung (Supabase exercise_notes)
+- [x] Foto-Upload pro Übung (IndexedDB lokal, komprimiert)
+- [x] Notiz-Vorschau als farbige Tags unter dem Übungsnamen im Workout
 
 ### Phase 3: Ernährungs-Tracking — FERTIG
 - [x] Lebensmittel-Suche (150 lokale Lebensmittel + Open Food Facts API)
@@ -131,7 +138,8 @@ src/
 │       └── WorkoutHistory.jsx    # Verlauf mit Details + Vergleich + Edit-Modal
 │       ├── FriendsList.jsx       # Freundesliste + Anfragen
 │       ├── Leaderboard.jsx       # Wöchentliches Ranking
-│       └── ChallengesList.jsx    # Challenges verwalten
+│       ├── ChallengesList.jsx    # Challenges verwalten
+│       └── ExerciseNoteModal.jsx # Notizen + Settings + Foto pro Übung
 │   └── nutrition/
 │       ├── DailyOverview.jsx     # Tagesansicht mit Makro-Ringen + Mahlzeit-Slots
 │       ├── AddFoodEntry.jsx      # Food-Eingabe-Flow (Suche, Scanner, Manuell)
@@ -145,8 +153,9 @@ src/
 │       ├── Cookbook.jsx           # Kochbuch mit Filtern + Suche
 │       └── RecipeDetail.jsx      # Einzelrezept mit Portionsrechner + Gegessen-Button
 ├── data/
-│   ├── exercises.js              # 34 Übungen mit Muskelgruppe + Equipment
-│   ├── workoutStorage.js         # Supabase CRUD für Workouts + Migration von localStorage
+│   ├── exercises.js              # 90+ Kraftübungen + Cardio/HIIT/Kampfsport
+│   ├── workoutStorage.js         # Supabase CRUD für Workouts + Notes + Migration
+│   ├── exercisePhotos.js         # IndexedDB CRUD für Übungsfotos (lokal)
 │   ├── settingsStorage.js        # Supabase CRUD für User-Settings
 │   ├── nutritionStorage.js       # Supabase CRUD für Nutrition (Entries, Meals, Goals)
 │   ├── foodDatabase.js           # 150 lokale Lebensmittel + Open Food Facts API
@@ -182,6 +191,7 @@ src/
 - **water_entries** — Flüssigkeitseinträge pro Tag (date, amount_ml)
 - **community_products** — Von Usern hinzugefügte Barcode-Produkte (barcode, name, nutrition, confirmations)
 - **product_overrides** — Persönliche Nährwert-Korrekturen pro User/Barcode
+- **exercise_notes** — Notizen + Geräte-Einstellungen pro User/Übung (note, settings als JSONB)
 
 ---
 
@@ -284,8 +294,8 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 
 ### Phase 4: Wissensbibliothek — IN ARBEIT
 - [x] Peptide-Bibliothek: 20 Peptide in 5 Kategorien (Heilung, GH, Fettabbau, Anti-Aging, Kognition)
-- [x] Kurzfassung pro Peptid (Wirkung, Dosierung, Nebenwirkungen)
-- [ ] Ausführliche E-Books pro Peptid mit Studien (teilweise fertig, Rest offen)
+- [x] Kurzfassung pro Peptid (Wirkung, Nebenwirkungen — keine Dosierungen)
+- [x] Ausführliche E-Books: 20 Peptide × 7 Kapitel = 140 Sections (DE+EN, mit Studien, ohne Dosierungen)
 - [ ] Block: Training-Wissen
 - [ ] Block: Ernährungs-Wissen
 - [ ] Block: Supplemente
