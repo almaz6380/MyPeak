@@ -306,64 +306,72 @@ const WATER_PREFIX = 'water_';
 export async function getWaterTotal(userId, date) {
   const cacheKey = WATER_PREFIX + date;
 
-  if (!guestSkip(userId)) {
-    const { data, error } = await supabase
-      .from('water_entries')
-      .select('id, amount_ml')
-      .eq('user_id', userId)
-      .eq('date', date);
+  // localStorage first (instant)
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) return JSON.parse(cached);
 
-    if (!error && data) {
-      const total = data.reduce((sum, e) => sum + e.amount_ml, 0);
-      localStorage.setItem(cacheKey, JSON.stringify({ entries: data, total }));
-      return { entries: data, total };
+  // No cache → try Supabase
+  if (!guestSkip(userId)) {
+    try {
+      const { data, error } = await supabase
+        .from('water_entries')
+        .select('id, amount_ml')
+        .eq('user_id', userId)
+        .eq('date', date);
+
+      if (!error && data) {
+        const total = data.reduce((sum, e) => sum + e.amount_ml, 0);
+        localStorage.setItem(cacheKey, JSON.stringify({ entries: data, total }));
+        return { entries: data, total };
+      }
+    } catch (err) {
+      console.error('Failed to load water from Supabase:', err);
     }
   }
 
-  const cached = localStorage.getItem(cacheKey);
-  if (cached) return JSON.parse(cached);
   return { entries: [], total: 0 };
 }
 
 export async function addWater(userId, date, amountMl) {
-  let data = null;
-
-  if (!guestSkip(userId)) {
-    ({ data } = await supabase
-      .from('water_entries')
-      .insert({ user_id: userId, date, amount_ml: amountMl })
-      .select()
-      .single());
-  }
-
+  // Save to localStorage FIRST (always works)
   const cacheKey = WATER_PREFIX + date;
   const cached = JSON.parse(localStorage.getItem(cacheKey) || '{"entries":[],"total":0}');
-  cached.entries.push(data || { id: `local_${Date.now()}`, amount_ml: amountMl });
+  const localEntry = { id: `local_${Date.now()}`, amount_ml: amountMl };
+  cached.entries.push(localEntry);
   cached.total += amountMl;
   localStorage.setItem(cacheKey, JSON.stringify(cached));
 
-  return { data, error: null };
+  // Then try Supabase
+  if (!guestSkip(userId)) {
+    try {
+      await supabase
+        .from('water_entries')
+        .insert({ user_id: userId, date, amount_ml: amountMl });
+    } catch (err) {
+      console.error('Failed to save water to Supabase:', err);
+    }
+  }
+
+  return { data: localEntry, error: null };
 }
 
 export async function removeLastWater(userId, date) {
   const cacheKey = WATER_PREFIX + date;
-
-  // Get the most recent entry for this date
-  const { data: entries } = await supabase
-    .from('water_entries')
-    .select('id, amount_ml')
-    .eq('user_id', userId)
-    .eq('date', date)
-    .order('created_at', { ascending: false })
-    .limit(1);
-
-  if (!entries || entries.length === 0) return;
-
-  const last = entries[0];
-  await supabase.from('water_entries').delete().eq('id', last.id);
-
   const cached = JSON.parse(localStorage.getItem(cacheKey) || '{"entries":[],"total":0}');
-  cached.entries = cached.entries.filter((e) => e.id !== last.id);
-  cached.total = Math.max(0, cached.total - last.amount_ml);
-  localStorage.setItem(cacheKey, JSON.stringify(cached));
+
+  // Remove last entry from localStorage
+  if (cached.entries.length > 0) {
+    const last = cached.entries.pop();
+    cached.total = Math.max(0, cached.total - (last.amount_ml || 0));
+    localStorage.setItem(cacheKey, JSON.stringify(cached));
+
+    // Try to delete from Supabase too
+    if (!guestSkip(userId) && last.id && !last.id.startsWith('local_')) {
+      try {
+        await supabase.from('water_entries').delete().eq('id', last.id);
+      } catch (err) {
+        console.error('Failed to delete water from Supabase:', err);
+      }
+    }
+  }
 }
