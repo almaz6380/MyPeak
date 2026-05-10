@@ -19,7 +19,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 ### Phase 1: Fundament — FERTIG
 - [x] Projektstruktur aufgesetzt (React + Vite + Tailwind CSS)
 - [x] Bottom-Navigation (5 Tabs: Training, Ernährung, HOME-FAB, Bibliothek, Profil)
-- [x] Home-Dashboard als zentrale Startseite mit Kalorien, Makros, Wasser, Supplements, Training, Streak
+- [x] Home-Dashboard als zentrale Startseite mit Kalorien, Makros (P/C/F/Ballaststoffe), Wasser, Supplements, Training, Streak
 - [x] Datumsnavigation auf Home: Pfeile links/rechts + Kalender-Modal, alle Daten tagesbezogen
 - [x] Profil-Avatar oben links → navigiert zu /profile, Logo zentriert, Begrüßung mit Tageszeit + Name
 - [x] Home-Button als goldener Kreis-FAB mit MyPeak-Pfeil, ragt über Nav hinaus
