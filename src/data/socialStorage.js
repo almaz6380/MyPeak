@@ -50,9 +50,20 @@ export async function lookupFriendCode(code) {
 export async function sendFriendRequest(userId, friendId) {
   if (isGuest(userId) || userId === friendId) return { error: 'invalid' };
 
+  // Check if friendship already exists (in either direction)
+  const { data: existing } = await supabase
+    .from('friendships')
+    .select('id, status')
+    .or(`and(sender_id.eq.${userId},receiver_id.eq.${friendId}),and(sender_id.eq.${friendId},receiver_id.eq.${userId})`)
+    .in('status', ['pending', 'accepted']);
+
+  if (existing && existing.length > 0) {
+    return { error: 'already_exists' };
+  }
+
   const { data, error } = await supabase
     .from('friendships')
-    .insert({ sender_id: userId, receiver_id: friendId })
+    .insert({ sender_id: userId, receiver_id: friendId, status: 'pending' })
     .select()
     .single();
 
@@ -62,14 +73,26 @@ export async function sendFriendRequest(userId, friendId) {
 export async function getFriendRequests(userId) {
   if (isGuest(userId)) return [];
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('friendships')
-    .select('*, sender:profiles!friendships_sender_id_fkey(id, name)')
+    .select('id, sender_id, receiver_id, status, created_at')
     .eq('receiver_id', userId)
     .eq('status', 'pending')
     .order('created_at', { ascending: false });
 
-  return data || [];
+  if (error || !data) return [];
+
+  // Fetch sender profiles separately
+  const senderIds = data.map((r) => r.sender_id);
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, name')
+    .in('id', senderIds);
+
+  return data.map((r) => ({
+    ...r,
+    sender: profiles?.find((p) => p.id === r.sender_id) || { id: r.sender_id, name: 'User' },
+  }));
 }
 
 export async function respondToFriendRequest(requestId, accept) {
@@ -84,18 +107,25 @@ export async function respondToFriendRequest(requestId, accept) {
 export async function getFriends(userId) {
   if (isGuest(userId)) return [];
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('friendships')
-    .select('*, sender:profiles!friendships_sender_id_fkey(id, name), receiver:profiles!friendships_receiver_id_fkey(id, name)')
+    .select('id, sender_id, receiver_id, status')
     .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
     .eq('status', 'accepted');
 
-  if (!data) return [];
+  if (error || !data || data.length === 0) return [];
+
+  // Get all friend user IDs
+  const friendIds = data.map((f) => f.sender_id === userId ? f.receiver_id : f.sender_id);
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, name')
+    .in('id', friendIds);
 
   return data.map((f) => {
-    const isSender = f.sender_id === userId;
-    const friend = isSender ? f.receiver : f.sender;
-    return { friendshipId: f.id, ...friend };
+    const friendId = f.sender_id === userId ? f.receiver_id : f.sender_id;
+    const profile = profiles?.find((p) => p.id === friendId) || { id: friendId, name: 'User' };
+    return { friendshipId: f.id, ...profile };
   });
 }
 
@@ -128,13 +158,26 @@ export async function createChallenge(userId, challenge) {
 export async function getChallenges(userId) {
   if (isGuest(userId)) return [];
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('challenges')
-    .select('*, challenger:profiles!challenges_challenger_id_fkey(id, name), opponent:profiles!challenges_opponent_id_fkey(id, name)')
+    .select('*')
     .or(`challenger_id.eq.${userId},opponent_id.eq.${userId}`)
     .order('created_at', { ascending: false });
 
-  return data || [];
+  if (error || !data || data.length === 0) return [];
+
+  // Fetch all involved user profiles
+  const userIds = [...new Set(data.flatMap((c) => [c.challenger_id, c.opponent_id]))];
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, name')
+    .in('id', userIds);
+
+  return data.map((c) => ({
+    ...c,
+    challenger: profiles?.find((p) => p.id === c.challenger_id) || { id: c.challenger_id, name: 'User' },
+    opponent: profiles?.find((p) => p.id === c.opponent_id) || { id: c.opponent_id, name: 'User' },
+  }));
 }
 
 export async function respondToChallenge(challengeId, accept) {

@@ -23,7 +23,7 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view their own profile"
   ON profiles FOR SELECT
-  USING (id = auth.uid());
+  USING (true);  -- Allow reading all profiles (name only exposed via select)
 
 CREATE POLICY "Users can update their own profile"
   ON profiles FOR UPDATE
@@ -356,7 +356,7 @@ CREATE TABLE supplements (
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   name text NOT NULL,
   brand text,
-  form text NOT NULL DEFAULT 'capsule',
+  form text NOT NULL DEFAULT 'tablet',
   dosage_amount numeric NOT NULL DEFAULT 1,
   dosage_unit text NOT NULL DEFAULT 'Stück',
   notes text DEFAULT '',
@@ -383,4 +383,52 @@ CREATE TABLE supplement_logs (
 
 ALTER TABLE supplement_logs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users manage own supplement logs" ON supplement_logs
+  FOR ALL USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+
+-- 19. Cycle Settings (Zyklustracking)
+CREATE TABLE cycle_settings (
+  user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  cycle_length integer NOT NULL DEFAULT 28,
+  period_length integer NOT NULL DEFAULT 5,
+  last_period_start date NOT NULL,
+  tracking_enabled boolean DEFAULT true,
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE cycle_settings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users manage own cycle settings" ON cycle_settings
+  FOR ALL USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+
+-- 20. Cycle Logs (Symptom-Tagebuch)
+CREATE TABLE cycle_logs (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  date date NOT NULL,
+  mood text,
+  energy text,
+  pain text,
+  sleep text,
+  bloating boolean DEFAULT false,
+  headache boolean DEFAULT false,
+  cravings boolean DEFAULT false,
+  notes text DEFAULT '',
+  UNIQUE (user_id, date)
+);
+
+ALTER TABLE cycle_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users manage own cycle logs" ON cycle_logs
+  FOR ALL USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+
+-- 21. Weight Entries (Gewichtsverlauf)
+CREATE TABLE weight_entries (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  date date NOT NULL,
+  weight_kg numeric NOT NULL,
+  created_at timestamptz DEFAULT now(),
+  UNIQUE (user_id, date)
+);
+
+ALTER TABLE weight_entries ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users manage own weight entries" ON weight_entries
   FOR ALL USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());

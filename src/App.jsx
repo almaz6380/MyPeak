@@ -13,6 +13,7 @@ import TrainingPage from './pages/TrainingPage';
 import NutritionPage from './pages/NutritionPage';
 import LibraryPage from './pages/LibraryPage';
 import ProfilePage from './pages/ProfilePage';
+import CycleDetailPage from './pages/CycleDetailPage';
 import AuthPage from './pages/auth/AuthPage';
 import UpdatePasswordPage from './pages/auth/UpdatePasswordPage';
 import OnboardingPage from './pages/onboarding/OnboardingPage';
@@ -77,6 +78,7 @@ function AppShell() {
             <Route path="/nutrition" element={<NutritionPage />} />
             <Route path="/library" element={<LibraryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/cycle" element={<CycleDetailPage onBack={() => window.history.back()} />} />
           </Routes>
         </main>
       </PullToRefresh>

@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Droplets, Dumbbell, Flame, ChevronRight, ChevronLeft, Pill, User, Calendar } from 'lucide-react';
+import { Droplets, Dumbbell, Flame, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Pill, User, Calendar, Plus, Scale } from 'lucide-react';
 import MyPeakLogo from '../components/MyPeakLogo';
 import { useAuth } from '../context/AuthContext';
 import { getNutritionEntries, getNutritionGoals, getWaterTotal } from '../data/nutritionStorage';
 import { getWorkouts } from '../data/workoutStorage';
 import { getXP } from '../data/socialStorage';
 import { getSupplements, getSupplementLogs, getTodayScheduledSupplements, getSupplementProgress } from '../data/supplementStorage';
+import { getCycleSettings, getCyclePhase, getPhaseRecommendations } from '../data/cycleStorage';
+import { getWeightEntries, saveWeightEntry } from '../data/weightStorage';
 
 function formatDate(d) {
   return d.toISOString().split('T')[0];
@@ -51,6 +53,12 @@ export default function HomePage() {
   const [dayWorkouts, setDayWorkouts] = useState(0);
   const [xpData, setXpData] = useState({ total_xp: 0, level: 1, streak_days: 0 });
   const [suppProgress, setSuppProgress] = useState({ total: 0, taken: 0 });
+  const [cyclePhase, setCyclePhase] = useState(null);
+  const [showCycle, setShowCycle] = useState(false);
+  const [weightEntries, setWeightEntries] = useState([]);
+  const [showWeightChart, setShowWeightChart] = useState(false);
+  const [showWeightInput, setShowWeightInput] = useState(false);
+  const [weightInput, setWeightInput] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -93,6 +101,23 @@ export default function HomePage() {
       const scheduled = getTodayScheduledSupplements(supps || [], selectedDate);
       const progress = getSupplementProgress(scheduled, suppLogs || []);
       setSuppProgress(progress);
+
+      // Weight
+      const weights = await getWeightEntries(user.id);
+      setWeightEntries(weights);
+
+      // Cycle (only for female users)
+      if (profile?.gender === 'female') {
+        const cycleSettings = await getCycleSettings(user.id);
+        if (cycleSettings && cycleSettings.tracking_enabled !== false) {
+          const phase = getCyclePhase(cycleSettings, selectedDate);
+          setCyclePhase(phase);
+          setShowCycle(true);
+        } else {
+          setCyclePhase(null);
+          setShowCycle(false);
+        }
+      }
     } catch (err) {
       console.error('Dashboard load error:', err);
     }
@@ -103,6 +128,16 @@ export default function HomePage() {
     const d = new Date(selectedDate + 'T12:00:00');
     d.setDate(d.getDate() + offset);
     setSelectedDate(formatDate(d));
+  }
+
+  async function handleAddWeight() {
+    const w = parseFloat(weightInput);
+    if (!w || w < 20 || w > 400) return;
+    await saveWeightEntry(user.id, selectedDate, w);
+    const updated = await getWeightEntries(user.id);
+    setWeightEntries(updated);
+    setWeightInput('');
+    setShowWeightInput(false);
   }
 
   const calPercent = goals.calories > 0 ? Math.min(100, Math.round((nutrition.calories / goals.calories) * 100)) : 0;
@@ -221,6 +256,33 @@ export default function HomePage() {
             </button>
           </div>
 
+          {/* Cycle Widget (female only) */}
+          {showCycle && cyclePhase && (
+            <button
+              onClick={() => navigate('/cycle')}
+              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm text-left hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full ${cyclePhase.bgClass}`} />
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                    {t(`cycle.phase_${cyclePhase.phase}`)}
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    · {t('cycle.day')} {cyclePhase.dayInPhase}/{cyclePhase.phaseLength}
+                  </span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-300" />
+              </div>
+              <div className="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-2">
+                <div className={`h-full ${cyclePhase.bgClass} rounded-full`} style={{ width: `${Math.round((cyclePhase.dayInPhase / cyclePhase.phaseLength) * 100)}%` }} />
+              </div>
+              <p className="text-xs text-slate-400">
+                {getPhaseRecommendations(cyclePhase.phase, lang)?.training?.split('.')[0]}.
+              </p>
+            </button>
+          )}
+
           {/* Training + Streak Card */}
           <button
             onClick={() => navigate('/training')}
@@ -248,6 +310,68 @@ export default function HomePage() {
               </div>
             </div>
           </button>
+          {/* Weight Chart Card */}
+          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden">
+            <button
+              onClick={() => setShowWeightChart(!showWeightChart)}
+              className="w-full p-4 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <Scale className="w-5 h-5 text-primary-500" />
+                <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('home.weight')}</span>
+                {weightEntries.length > 0 && (
+                  <span className="text-sm text-slate-400 ml-1">
+                    {weightEntries[weightEntries.length - 1].weight_kg} kg
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setShowWeightInput(!showWeightInput); setShowWeightChart(true); }}
+                  className="p-1.5 rounded-lg bg-primary-500 text-white"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+                {showWeightChart ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+              </div>
+            </button>
+
+            {showWeightChart && (
+              <div className="px-4 pb-4">
+                {/* Weight input */}
+                {showWeightInput && (
+                  <div className="flex gap-2 mb-3">
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      step="0.1"
+                      value={weightInput}
+                      onChange={(e) => setWeightInput(e.target.value)}
+                      placeholder="kg"
+                      className="flex-1 px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                    <button
+                      onClick={handleAddWeight}
+                      disabled={!weightInput || parseFloat(weightInput) < 20}
+                      className="px-4 py-2.5 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white text-sm font-semibold rounded-xl"
+                    >
+                      {t('nutrition.add')}
+                    </button>
+                  </div>
+                )}
+
+                {/* Chart */}
+                {weightEntries.length >= 2 ? (
+                  <WeightChart entries={weightEntries} />
+                ) : (
+                  <p className="text-xs text-slate-400 text-center py-4">
+                    {t('home.weightNoData')}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
         </div>
       )}
 
@@ -378,5 +502,84 @@ function CalendarModal({ selectedDate, onSelect, onClose, lang }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function WeightChart({ entries }) {
+  const last30 = entries.slice(-30);
+  if (last30.length < 2) return null;
+
+  const weights = last30.map((e) => e.weight_kg);
+  const minW = Math.floor(Math.min(...weights) - 1);
+  const maxW = Math.ceil(Math.max(...weights) + 1);
+  const range = maxW - minW || 1;
+
+  const chartW = 320;
+  const chartH = 120;
+  const padX = 35;
+  const padY = 10;
+  const w = chartW - padX;
+  const h = chartH - padY * 2;
+
+  const points = last30.map((e, i) => {
+    const x = padX + (i / (last30.length - 1)) * w;
+    const y = padY + h - ((e.weight_kg - minW) / range) * h;
+    return `${x},${y}`;
+  }).join(' ');
+
+  // Area fill path
+  const firstX = padX;
+  const lastX = padX + w;
+  const areaPath = `M${firstX},${padY + h} ` + last30.map((e, i) => {
+    const x = padX + (i / (last30.length - 1)) * w;
+    const y = padY + h - ((e.weight_kg - minW) / range) * h;
+    return `L${x},${y}`;
+  }).join(' ') + ` L${lastX},${padY + h} Z`;
+
+  const gridLines = 3;
+  const gridValues = Array.from({ length: gridLines }, (_, i) => minW + (range / (gridLines - 1)) * i);
+
+  return (
+    <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full" style={{ maxHeight: 140 }}>
+      {/* Grid lines + labels */}
+      {gridValues.map((v, i) => {
+        const y = padY + h - ((v - minW) / range) * h;
+        return (
+          <g key={i}>
+            <line x1={padX} y1={y} x2={chartW} y2={y} stroke="currentColor" className="text-slate-200 dark:text-slate-700" strokeWidth="0.5" />
+            <text x={padX - 4} y={y + 3} textAnchor="end" className="fill-slate-400 text-[8px]">{v.toFixed(0)}</text>
+          </g>
+        );
+      })}
+
+      {/* Area */}
+      <path d={areaPath} fill="url(#weightGradient)" opacity="0.2" />
+
+      {/* Line */}
+      <polyline points={points} fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+
+      {/* Dots on first and last */}
+      {[last30[0], last30[last30.length - 1]].map((e, idx) => {
+        const i = idx === 0 ? 0 : last30.length - 1;
+        const x = padX + (i / (last30.length - 1)) * w;
+        const y = padY + h - ((e.weight_kg - minW) / range) * h;
+        return <circle key={idx} cx={x} cy={y} r="3" fill="#f59e0b" />;
+      })}
+
+      {/* Date labels */}
+      <text x={padX} y={chartH - 1} className="fill-slate-400 text-[7px]">
+        {last30[0].date.slice(5)}
+      </text>
+      <text x={chartW} y={chartH - 1} textAnchor="end" className="fill-slate-400 text-[7px]">
+        {last30[last30.length - 1].date.slice(5)}
+      </text>
+
+      <defs>
+        <linearGradient id="weightGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#f59e0b" />
+          <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+    </svg>
   );
 }
