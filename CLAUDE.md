@@ -80,6 +80,9 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Übungsnotizen + Geräte-Einstellungen pro Übung (Supabase exercise_notes)
 - [x] Foto-Upload pro Übung (IndexedDB lokal, komprimiert)
 - [x] Notiz-Vorschau als farbige Tags unter dem Übungsnamen im Workout
+- [x] Rauten-Kalender (DiamondCalendar): Swipbare Rauten-Reihe oben, Bogen-Effekt, Schwarz/Blau/Gold
+- [x] Wochenplan-System: Einheiten/Woche wählen → Tage verteilen → Split-Typ oder Übungen zuweisen
+- [x] Supabase: weekly_schedules Tabelle, aktiver Plan bestimmt blaue Rauten im Kalender
 
 ### Phase 3: Ernährungs-Tracking — FERTIG
 - [x] Lebensmittel-Suche (150 lokale Lebensmittel + Open Food Facts API)
@@ -193,7 +196,8 @@ src/
 │       ├── ActiveWorkout.jsx     # Aktives Workout (Sets loggen, Timer, Beenden/Verwerfen)
 │       ├── ExerciseLibrary.jsx   # Übungsbibliothek mit Filter + Suche
 │       ├── TrainingPlans.jsx     # Vorgefertigte + eigene Pläne
-│       └── WorkoutHistory.jsx    # Verlauf mit Details + Vergleich + Edit-Modal
+│       ├── WorkoutHistory.jsx    # Verlauf mit Details + Vergleich + Edit-Modal
+│       └── WeeklyPlanBuilder.jsx # 3-Schritte Wochenplan-Erstellung
 │       ├── FriendsList.jsx       # Freundesliste + Anfragen
 │       ├── Leaderboard.jsx       # Wöchentliches Ranking
 │       ├── ChallengesList.jsx    # Challenges verwalten
@@ -263,6 +267,7 @@ src/
 - **supplements** — Supplement-Einträge (name, brand, form, dosage, schedule als JSONB, Soft-Delete)
 - **supplement_logs** — Einnahme-Bestätigungen pro Supplement/Tag/Zeitslot (UNIQUE constraint)
 - **active_diet** — Aktive Diätform pro User (diet_id, started_at, config als JSONB)
+- **weekly_schedules** — Wochenpläne (name, sessions_per_week, days als JSONB, is_active)
 - **cycle_settings** — Zyklustracking-Einstellungen (cycle_length, period_length, last_period_start)
 - **cycle_logs** — Symptom-Tagebuch pro Tag (mood, energy, pain, sleep, bloating, headache, cravings)
 - **weight_entries** — Gewichtsverlauf pro Tag (date, weight_kg, UNIQUE user+date)
