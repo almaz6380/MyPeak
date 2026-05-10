@@ -117,12 +117,12 @@ export default function DiamondCalendar({ selectedDay, onSelectDay, scheduledDay
                 style={{
                   width: slot.size,
                   height: slot.size,
-                  transform: `rotate(45deg)${i === 4 && pulse ? ' scale(1.2)' : ''}`,
-                  borderRadius: Math.max(3, slot.size * 0.15),
+                  transform: i === 4 && pulse ? 'scale(1.2)' : 'none',
+                  borderRadius: '50%',
                   transition: i === 4 ? 'transform 0.1s ease-out' : 'none',
                 }}
               >
-                <span className="font-bold text-white" style={{ transform: 'rotate(-45deg)', fontSize: slot.fs }}>
+                <span className="font-bold text-white" style={{ fontSize: slot.fs }}>
                   {slot.day}
                 </span>
               </div>
