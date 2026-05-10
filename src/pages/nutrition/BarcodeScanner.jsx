@@ -11,9 +11,10 @@ export default function BarcodeScanner({ onScanned, onClose }) {
   const { user } = useAuth();
   const camera = useCamera();
   const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
-  const [status, setStatus] = useState('starting'); // starting | scanning | loading | notFound | addProduct | error
+  const [status, setStatus] = useState('starting'); // starting | scanning | loading | found | notFound | addProduct | error
   const [errorMsg, setErrorMsg] = useState('');
   const [scannedBarcode, setScannedBarcode] = useState(null);
+  const [foundProduct, setFoundProduct] = useState(null);
   const isProcessingRef = useRef(false);
   const isMountedRef = useRef(true);
   const quaggaRunningRef = useRef(false);
@@ -43,7 +44,7 @@ export default function BarcodeScanner({ onScanned, onClose }) {
       // 1. Check community products first (our DB)
       const community = await lookupCommunityProduct(barcode);
       if (community) {
-        onScanned({
+        setFoundProduct({
           id: `community_${barcode}`,
           nameDE: community.name,
           nameEN: community.name,
@@ -56,7 +57,9 @@ export default function BarcodeScanner({ onScanned, onClose }) {
           fat: community.fat,
           source: 'community',
           source_id: barcode,
+          image_url: null,
         });
+        setStatus('found');
         return;
       }
 
@@ -70,7 +73,7 @@ export default function BarcodeScanner({ onScanned, onClose }) {
       if (json.status === 1 && json.product) {
         const p = json.product;
         const n = p.nutriments || {};
-        onScanned({
+        setFoundProduct({
           id: `off_${barcode}`,
           nameDE: p.product_name_de || p.product_name || barcode,
           nameEN: p.product_name_en || p.product_name || barcode,
@@ -83,7 +86,9 @@ export default function BarcodeScanner({ onScanned, onClose }) {
           fat: Math.round((n.fat_100g || 0) * 10) / 10,
           source: 'openfoodfacts',
           source_id: barcode,
+          image_url: p.image_front_url || p.image_front_small_url || p.image_url || null,
         });
+        setStatus('found');
       } else {
         setStatus('notFound');
       }
@@ -188,6 +193,82 @@ export default function BarcodeScanner({ onScanned, onClose }) {
   }, []);
 
   function handleClose() { stopQuagga(); onClose(); }
+
+  // ── FOUND PRODUCT SCREEN ──
+  if (status === 'found' && foundProduct) {
+    const displayName = lang === 'de' ? (foundProduct.nameDE || foundProduct.nameEN) : (foundProduct.nameEN || foundProduct.nameDE);
+    return (
+      <div className="fixed inset-0 bg-black z-50 flex flex-col">
+        <div className="relative z-10 flex items-center justify-between px-4 pt-4 pb-2" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
+          <div className="flex items-center gap-2 text-white">
+            <Check className="w-5 h-5 text-green-400" />
+            <h2 className="text-base font-semibold">{lang === 'de' ? 'Produkt gefunden' : 'Product found'}</h2>
+          </div>
+          <button onClick={handleClose} className="p-2 rounded-xl bg-white/10 text-white">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="flex-1 flex flex-col items-center justify-center px-6">
+          {/* Product image */}
+          {foundProduct.image_url ? (
+            <div className="w-40 h-40 rounded-2xl bg-white overflow-hidden mb-5 shadow-lg">
+              <img src={foundProduct.image_url} alt="" className="w-full h-full object-contain" />
+            </div>
+          ) : (
+            <div className="w-40 h-40 rounded-2xl bg-slate-800 flex items-center justify-center mb-5">
+              <span className="text-6xl">🏷️</span>
+            </div>
+          )}
+
+          {/* Product name */}
+          <h3 className="text-xl font-bold text-white text-center mb-1">{displayName}</h3>
+          {foundProduct.brand && (
+            <p className="text-sm text-slate-400 mb-4">{foundProduct.brand}</p>
+          )}
+
+          {/* Macros */}
+          <div className="flex gap-3 mb-8">
+            <div className="bg-slate-800 rounded-xl px-4 py-3 text-center">
+              <p className="text-lg font-bold text-primary-400">{foundProduct.calories}</p>
+              <p className="text-[10px] text-slate-500">kcal</p>
+            </div>
+            <div className="bg-slate-800 rounded-xl px-4 py-3 text-center">
+              <p className="text-lg font-bold text-blue-400">{foundProduct.protein}g</p>
+              <p className="text-[10px] text-slate-500">Protein</p>
+            </div>
+            <div className="bg-slate-800 rounded-xl px-4 py-3 text-center">
+              <p className="text-lg font-bold text-amber-400">{foundProduct.carbs}g</p>
+              <p className="text-[10px] text-slate-500">Carbs</p>
+            </div>
+            <div className="bg-slate-800 rounded-xl px-4 py-3 text-center">
+              <p className="text-lg font-bold text-rose-400">{foundProduct.fat}g</p>
+              <p className="text-[10px] text-slate-500">Fat</p>
+            </div>
+          </div>
+
+          <p className="text-[10px] text-slate-600 mb-4">{lang === 'de' ? 'pro 100g' : 'per 100g'}</p>
+
+          {/* Actions */}
+          <div className="w-full max-w-xs flex flex-col gap-2">
+            <button
+              onClick={() => onScanned(foundProduct)}
+              className="w-full py-3.5 rounded-xl bg-primary-500 text-white font-semibold flex items-center justify-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              {lang === 'de' ? 'Hinzufügen' : 'Add'}
+            </button>
+            <button
+              onClick={() => { isProcessingRef.current = false; setFoundProduct(null); startScanner(); }}
+              className="w-full py-3 rounded-xl bg-white/10 text-white font-medium text-sm"
+            >
+              {t('nutrition.scanAgain')}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // ── ADD PRODUCT FORM ──
   if (status === 'addProduct') {
