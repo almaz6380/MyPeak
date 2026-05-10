@@ -21,7 +21,9 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Bottom-Navigation (5 Tabs: Training, Ernährung, HOME-FAB, Bibliothek, Profil)
 - [x] Home-Dashboard als zentrale Startseite mit Kalorien, Makros (P/C/F/Ballaststoffe), Wasser, Supplements, Training, Streak
 - [x] Datumsnavigation auf Home: Pfeile links/rechts + Kalender-Modal, alle Daten tagesbezogen
-- [x] Profil-Avatar oben links → navigiert zu /profile, Logo zentriert, Begrüßung mit Tageszeit + Name
+- [x] Profil-Avatar oben rechts → navigiert zu /profile, Logo zentriert, Begrüßung mit Tageszeit + Name
+- [x] Gewichtsverlauf-Diagramm: SVG-Liniengraph (letzte 30 Einträge), ein-/ausblendbar, Plus-Button zum Eintragen
+- [x] Zyklustracking: 4 Phasen mit Training-/Ernährungs-Empfehlungen, Symptom-Tagebuch, Home-Widget (nur female)
 - [x] Home-Button als goldener Kreis-FAB mit MyPeak-Pfeil, ragt über Nav hinaus
 - [x] Pull-to-Refresh: MyPeak-Logo zeichnet sich neu beim Aktualisieren
 - [x] Mehrsprachigkeit (DE/EN) mit i18next eingerichtet
@@ -124,6 +126,22 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [ ] Optionale Nährwerte pro Supplement (Kalorien, Protein etc.) — nur anzeigen, nicht pflicht
 - [x] Form "Kapsel" entfernt
 
+### Phase 3.3: Zyklustracking (weibliche User) — FERTIG
+- [x] 4 Zyklusphasen (Menstruation, Follikelphase, Ovulation, Lutealphase) mit Farbcodierung
+- [x] Phasenspezifische Training- und Ernährungs-Empfehlungen
+- [x] Symptom-Tagebuch: Stimmung (5 Emojis), Energie, Schmerzen, Schlaf, Symptom-Toggles, Notizen
+- [x] Ersteinrichtung mit Slider (Zykluslänge 21-35, Periodenlänge 3-7)
+- [x] Home-Widget zeigt aktuelle Phase + Tag (nur bei gender=female)
+- [x] Supabase: cycle_settings + cycle_logs Tabellen
+- [x] localStorage-first Pattern + Gastmodus
+
+### Phase 3.4: Gewichtsverlauf — FERTIG
+- [x] Gewichtsverlauf als SVG-Liniengraph auf dem Home-Dashboard
+- [x] Plus-Button zum Eintragen (kg, Dezimalzahlen)
+- [x] Ein-/ausblendbar (Tap auf Header)
+- [x] Gold-Linie mit Gradient-Füllung, letzte 30 Einträge
+- [x] Supabase: weight_entries Tabelle
+
 ### Phase 3.5–6: Noch offen (siehe Bauplan unten)
 
 ---
@@ -146,7 +164,8 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 ```
 src/
 ├── pages/
-│   ├── HomePage.jsx              # Dashboard mit Kalorien, Makros, Wasser, Supplements, Training, Level
+│   ├── HomePage.jsx              # Dashboard mit Kalorien, Makros, Wasser, Supplements, Training, Gewicht, Zyklus
+│   ├── CycleDetailPage.jsx      # Zyklustracking Detail-Seite mit Tagebuch + Empfehlungen
 │   ├── TrainingPage.jsx          # Training-Hub + Workout-Start-Auswahl
 │   ├── ProfilePage.jsx           # Profil mit Dark Mode, Sprache, Einheiten
 │   ├── auth/
@@ -189,6 +208,8 @@ src/
 │   ├── foodDatabase.js           # 150 lokale Lebensmittel + Open Food Facts API
 │   ├── socialStorage.js          # Freunde, Challenges, XP, Leaderboard
 │   ├── supplementStorage.js      # Supplements CRUD + Einnahme-Logs
+│   ├── cycleStorage.js           # Zyklustracking: Settings, Logs, Phasenberechnung
+│   ├── weightStorage.js          # Gewichtsverlauf CRUD
 │   └── recipesData.js            # 25 Rezepte mit Nährwerten (DE + EN)
 ├── lib/
 │   └── supabase.js               # Supabase Client (URL + Anon Key aus .env)
@@ -223,6 +244,9 @@ src/
 - **exercise_notes** — Notizen + Geräte-Einstellungen pro User/Übung (note, settings als JSONB)
 - **supplements** — Supplement-Einträge (name, brand, form, dosage, schedule als JSONB, Soft-Delete)
 - **supplement_logs** — Einnahme-Bestätigungen pro Supplement/Tag/Zeitslot (UNIQUE constraint)
+- **cycle_settings** — Zyklustracking-Einstellungen (cycle_length, period_length, last_period_start)
+- **cycle_logs** — Symptom-Tagebuch pro Tag (mood, energy, pain, sleep, bloating, headache, cravings)
+- **weight_entries** — Gewichtsverlauf pro Tag (date, weight_kg, UNIQUE user+date)
 
 ---
 
