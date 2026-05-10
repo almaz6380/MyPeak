@@ -56,7 +56,10 @@ export default function HomePage() {
   const [cyclePhase, setCyclePhase] = useState(null);
   const [showCycle, setShowCycle] = useState(false);
   const [weightEntries, setWeightEntries] = useState([]);
-  const [showWeightChart, setShowWeightChart] = useState(false);
+  const [showWeightChart, setShowWeightChart] = useState(() => {
+    const saved = localStorage.getItem('weight_chart_collapsed');
+    return saved !== 'true';
+  });
   const [showWeightInput, setShowWeightInput] = useState(false);
   const [weightInput, setWeightInput] = useState('');
   const [weightRange, setWeightRange] = useState('3m');
@@ -323,7 +326,7 @@ export default function HomePage() {
           {/* Weight Chart Card */}
           <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden">
             <button
-              onClick={() => setShowWeightChart(!showWeightChart)}
+              onClick={() => { const next = !showWeightChart; setShowWeightChart(next); localStorage.setItem('weight_chart_collapsed', (!next).toString()); }}
               className="w-full p-4 flex items-center justify-between"
             >
               <div className="flex items-center gap-2">
@@ -337,7 +340,7 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={(e) => { e.stopPropagation(); setShowWeightInput(!showWeightInput); setShowWeightChart(true); }}
+                  onClick={(e) => { e.stopPropagation(); setShowWeightInput(!showWeightInput); setShowWeightChart(true); localStorage.setItem('weight_chart_collapsed', 'false'); }}
                   className="p-1.5 rounded-lg bg-primary-500 text-white"
                 >
                   <Plus className="w-3.5 h-3.5" />
