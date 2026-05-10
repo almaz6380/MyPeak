@@ -97,6 +97,23 @@ export default function WorkoutHistory({ onBack }) {
     setShowComparison(false);
   };
 
+  // Edit workout view — separate full screen
+  if (editingWorkout) {
+    return (
+      <EditWorkoutModal
+        workout={editingWorkout}
+        onSave={async (updated) => {
+          await updateWorkout(user.id, updated.id, { exercises: updated.exercises, duration: updated.duration });
+          setWorkouts((prev) => prev.map((w) => w.id === updated.id ? { ...w, exercises: updated.exercises } : w));
+          setEditingWorkout(null);
+        }}
+        onClose={() => setEditingWorkout(null)}
+        t={t}
+        weightUnit={weightUnit}
+      />
+    );
+  }
+
   // Comparison view
   if (showComparison && compareSelection.length === 2) {
     const w1 = workouts.find((w) => w.id === compareSelection[0]);
@@ -495,20 +512,6 @@ export default function WorkoutHistory({ onBack }) {
         </div>
       )}
 
-      {/* Edit Workout Modal */}
-      {editingWorkout && (
-        <EditWorkoutModal
-          workout={editingWorkout}
-          onSave={async (updated) => {
-            await updateWorkout(user.id, updated.id, { exercises: updated.exercises, duration: updated.duration });
-            setWorkouts((prev) => prev.map((w) => w.id === updated.id ? { ...w, exercises: updated.exercises } : w));
-            setEditingWorkout(null);
-          }}
-          onClose={() => setEditingWorkout(null)}
-          t={t}
-          weightUnit={weightUnit}
-        />
-      )}
     </div>
   );
 }
