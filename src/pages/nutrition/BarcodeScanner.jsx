@@ -353,9 +353,8 @@ export default function BarcodeScanner({ onScanned, onClose }) {
 }
 
 function FoundProductScreen({ product, lang, onConfirm, onScanAgain, onClose, t }) {
-  const [imgFailed, setImgFailed] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const displayName = lang === 'de' ? (product.nameDE || product.nameEN) : (product.nameEN || product.nameDE);
-  const showImage = product.image_url && !imgFailed;
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col">
@@ -370,15 +369,15 @@ function FoundProductScreen({ product, lang, onConfirm, onScanAgain, onClose, t 
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        {showImage && (
-          <div className="w-40 h-40 rounded-2xl bg-slate-800 overflow-hidden mb-5 shadow-lg">
-            <img
-              src={product.image_url}
-              alt=""
-              className="w-full h-full object-contain"
-              onError={() => setImgFailed(true)}
-            />
-          </div>
+        {/* Hidden img to test if it loads, only show when onLoad fires */}
+        {product.image_url && (
+          <img
+            src={product.image_url}
+            alt=""
+            onLoad={(e) => { if (e.target.naturalWidth > 1) setImgLoaded(true); }}
+            onError={() => setImgLoaded(false)}
+            className={imgLoaded ? 'w-40 h-40 rounded-2xl bg-slate-800 object-contain mb-5 shadow-lg' : 'hidden'}
+          />
         )}
 
         <h3 className="text-xl font-bold text-white text-center mb-1">{displayName}</h3>
