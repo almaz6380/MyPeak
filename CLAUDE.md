@@ -27,7 +27,8 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Supabase als Backend (Auth + Datenbank)
 - [x] Registrierung und Login mit E-Mail/Passwort
 - [x] Passwort-Zurücksetzen-Flow
-- [x] Onboarding-Flow mit 7 Schritten (Geschlecht, Alter, Gewicht, Größe, Ziel, Aktivitätslevel, Trainingserfahrung)
+- [x] Onboarding-Flow mit 8 Seiten (Name+Geburtsdatum, Geschlecht, Größe-Slider, Gewicht-Slider, Ziel, Aktivitätslevel, Erfahrung, Nutzungsbedingungen)
+- [x] Smooth fade-in Animationen, Fortschrittsbalken, große Karten, goldener Slider-Thumb
 - [x] Onboarding-Daten werden in Supabase `profiles`-Tabelle gespeichert
 - [x] Automatische Weiterleitung zur Haupt-App nach Onboarding
 - [x] Trigger erstellt automatisch Profile + Settings bei neuer Registrierung
@@ -103,6 +104,21 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] App auf Homescreen installierbar
 - [x] CameraContext: Kamera-Berechtigung einmal pro Session cached (kein erneuter Prompt beim 2. Scan)
 
+### Phase 3.2: Supplement-Tracking — FERTIG
+- [x] Supplements manuell anlegen (Name, Marke, Form, Dosierung, Notizen)
+- [x] Formen: Tablette, Kapsel, Pulver, Flüssig (Kapsel wird später entfernt)
+- [x] Voller 7-Tage-Wochenplan (pro Supplement individuelle Tage wählbar)
+- [x] 5 Einnahmezeiten: Morgens, Mittags, Pre-Workout, Post-Workout, Abends
+- [x] Tagesansicht gruppiert nach Einnahmezeit mit Checkboxen zum Abhaken
+- [x] Fortschrittsbalken (X/Y eingenommen)
+- [x] In-App Banner "Noch X Supplements offen"
+- [x] Supplement-Karte in der Ernährungs-Tagesansicht
+- [x] Supabase: supplements + supplement_logs Tabellen mit RLS
+- [x] localStorage-first Pattern (offline + Gastmodus)
+- [x] i18n komplett (DE + EN)
+- [ ] Optionale Nährwerte pro Supplement (Kalorien, Protein etc.) — nur anzeigen, nicht pflicht
+- [ ] Form "Kapsel" entfernen
+
 ### Phase 3.5–6: Noch offen (siehe Bauplan unten)
 
 ---
@@ -166,6 +182,7 @@ src/
 │   ├── nutritionStorage.js       # Supabase CRUD für Nutrition (Entries, Meals, Goals)
 │   ├── foodDatabase.js           # 150 lokale Lebensmittel + Open Food Facts API
 │   ├── socialStorage.js          # Freunde, Challenges, XP, Leaderboard
+│   ├── supplementStorage.js      # Supplements CRUD + Einnahme-Logs
 │   └── recipesData.js            # 25 Rezepte mit Nährwerten (DE + EN)
 ├── lib/
 │   └── supabase.js               # Supabase Client (URL + Anon Key aus .env)
@@ -198,6 +215,8 @@ src/
 - **community_products** — Von Usern hinzugefügte Barcode-Produkte (barcode, name, nutrition, confirmations)
 - **product_overrides** — Persönliche Nährwert-Korrekturen pro User/Barcode
 - **exercise_notes** — Notizen + Geräte-Einstellungen pro User/Übung (note, settings als JSONB)
+- **supplements** — Supplement-Einträge (name, brand, form, dosage, schedule als JSONB, Soft-Delete)
+- **supplement_logs** — Einnahme-Bestätigungen pro Supplement/Tag/Zeitslot (UNIQUE constraint)
 
 ---
 
