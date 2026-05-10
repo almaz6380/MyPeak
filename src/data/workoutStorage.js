@@ -31,26 +31,43 @@ export async function getWorkouts(userId) {
 }
 
 export async function saveWorkout(userId, workout) {
+  // Save to localStorage FIRST (always works, even offline)
+  const localEntry = { ...workout, id: `local_${Date.now()}` };
+  const cached = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
+  cached.unshift(localEntry);
+  localStorage.setItem(WORKOUTS_KEY, JSON.stringify(cached));
+
   let data = null, error = null;
 
   if (!isGuest(userId)) {
-    ({ data, error } = await supabase
-      .from('workouts')
-      .insert({
-        user_id: userId,
-        date: workout.date,
-        duration: workout.duration,
-        exercises: workout.exercises,
-      })
-      .select()
-      .single());
+    try {
+      ({ data, error } = await supabase
+        .from('workouts')
+        .insert({
+          user_id: userId,
+          date: workout.date,
+          duration: workout.duration,
+          exercises: workout.exercises,
+        })
+        .select()
+        .single());
+
+      if (error) console.error('Failed to save workout to Supabase:', error);
+
+      // Update localStorage with Supabase ID if available
+      if (data) {
+        const c = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
+        if (c.length > 0 && c[0].id === localEntry.id) {
+          c[0] = { ...c[0], id: data.id };
+          localStorage.setItem(WORKOUTS_KEY, JSON.stringify(c));
+        }
+      }
+    } catch (err) {
+      console.error('Workout save exception:', err);
+    }
   }
 
-  const cached = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
-  cached.unshift(data || { ...workout, id: `local_${Date.now()}` });
-  localStorage.setItem(WORKOUTS_KEY, JSON.stringify(cached));
-
-  return { data, error };
+  return { data: data || localEntry, error };
 }
 
 export async function updateWorkout(userId, workoutId, updates) {
@@ -105,21 +122,23 @@ export async function getCustomExercises(userId) {
 }
 
 export async function saveCustomExercise(userId, exercise) {
-  let data = null;
-
-  if (!isGuest(userId)) {
-    ({ data } = await supabase
-      .from('custom_exercises')
-      .insert({ user_id: userId, ...exercise })
-      .select()
-      .single());
-  }
-
+  // Save to localStorage FIRST (always works)
   const cached = JSON.parse(localStorage.getItem(CUSTOM_EXERCISES_KEY) || '[]');
-  cached.push(data || exercise);
+  cached.push(exercise);
   localStorage.setItem(CUSTOM_EXERCISES_KEY, JSON.stringify(cached));
 
-  return { data, error: null };
+  // Then try Supabase
+  if (!isGuest(userId)) {
+    try {
+      await supabase
+        .from('custom_exercises')
+        .insert({ user_id: userId, ...exercise });
+    } catch (err) {
+      console.error('Failed to save custom exercise to Supabase:', err);
+    }
+  }
+
+  return { data: exercise, error: null };
 }
 
 // ── Exercise History & PR ─────────────────────────────────

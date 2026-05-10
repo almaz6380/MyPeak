@@ -86,8 +86,13 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
       })),
     };
 
-    await saveWorkout(user.id, workout);
-    ctx.discardWorkout(); // Clear active workout from context + localStorage
+    try {
+      await saveWorkout(user.id, workout);
+    } catch (err) {
+      console.error('Failed to save workout:', err);
+      // Save locally even if Supabase fails
+    }
+    ctx.discardWorkout();
     setPendingPrs(detectedPrs);
     setSavedWorkoutExercises(workout.exercises);
     setShowPostSummary(true);
