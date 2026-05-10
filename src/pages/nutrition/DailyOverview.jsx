@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Plus, Trash2, Settings, UtensilsCrossed, Pencil, X, Check, Droplets, Minus, GlassWater, BookOpen } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2, Settings, UtensilsCrossed, Pencil, X, Check, Droplets, GlassWater, BookOpen } from 'lucide-react';
 import MacroRing from './MacroRing';
 import MyPeakLogo from '../../components/MyPeakLogo';
 import { useAuth } from '../../context/AuthContext';
-import { getNutritionEntries, getNutritionGoals, deleteNutritionEntry, saveNutritionGoals, getWaterTotal, addWater, removeLastWater } from '../../data/nutritionStorage';
+import { getNutritionEntries, getNutritionGoals, deleteNutritionEntry, saveNutritionGoals, getWaterTotal, addWater, removeWaterAmount } from '../../data/nutritionStorage';
 
 const MEAL_SLOTS = ['breakfast', 'lunch', 'dinner', 'snack'];
 
@@ -44,15 +44,14 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
     setLoading(false);
   }
 
-  async function handleAddWater(ml) {
-    await addWater(user.id, selectedDate, ml);
+  function handleAddWater(ml) {
     setWaterTotal((prev) => prev + ml);
+    addWater(user.id, selectedDate, ml);
   }
 
-  async function handleRemoveWater() {
-    await removeLastWater(user.id, selectedDate);
-    const waterData = await getWaterTotal(user.id, selectedDate);
-    setWaterTotal(waterData.total);
+  function handleRemoveWaterAmount(ml) {
+    setWaterTotal((prev) => Math.max(0, prev - ml));
+    removeWaterAmount(user.id, selectedDate, ml);
   }
 
   function handleCustomWaterAdd() {
@@ -276,8 +275,11 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
         </div>
 
         <div className="flex items-center gap-2">
-          <button onClick={handleRemoveWater} className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-red-400 transition-colors">
-            <Minus className="w-4 h-4" />
+          <button onClick={() => handleRemoveWaterAmount(250)} className="flex-1 py-2 rounded-xl bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 text-sm font-medium hover:bg-rose-100 dark:hover:bg-rose-900/30 transition-colors">
+            -250ml
+          </button>
+          <button onClick={() => handleRemoveWaterAmount(500)} className="flex-1 py-2 rounded-xl bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 text-sm font-medium hover:bg-rose-100 dark:hover:bg-rose-900/30 transition-colors">
+            -500ml
           </button>
           <button onClick={() => handleAddWater(250)} className="flex-1 py-2 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 text-sm font-medium hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-colors">
             +250ml
@@ -285,7 +287,9 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
           <button onClick={() => handleAddWater(500)} className="flex-1 py-2 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 text-sm font-medium hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-colors">
             +500ml
           </button>
-          <button onClick={() => setShowWaterInput(!showWaterInput)} className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+        </div>
+        <div className="flex items-center gap-2 mt-2">
+          <button onClick={() => setShowWaterInput(!showWaterInput)} className="flex-1 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
             {t('nutrition.customAmount')}
           </button>
         </div>

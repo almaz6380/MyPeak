@@ -267,7 +267,7 @@ export async function saveNutritionGoals(userId, goals) {
     if (error) console.error('Failed to save goals to Supabase:', error);
   }
 
-  return { data, error: null };
+  return { data: toCache, error: null };
 }
 
 // ── Recent Foods ─────────────────────────────────────────────
@@ -372,6 +372,37 @@ export async function removeLastWater(userId, date) {
       } catch (err) {
         console.error('Failed to delete water from Supabase:', err);
       }
+    }
+  }
+}
+
+export async function removeWaterAmount(userId, date, amountMl) {
+  const cacheKey = WATER_PREFIX + date;
+  const cached = JSON.parse(localStorage.getItem(cacheKey) || '{"entries":[],"total":0}');
+
+  cached.total = Math.max(0, cached.total - amountMl);
+
+  // Remove entries from the end until we've removed enough
+  let remaining = amountMl;
+  const toDeleteFromSupabase = [];
+  while (remaining > 0 && cached.entries.length > 0) {
+    const last = cached.entries.pop();
+    remaining -= last.amount_ml || 0;
+    if (last.id && !last.id.startsWith('local_')) {
+      toDeleteFromSupabase.push(last.id);
+    }
+  }
+
+  localStorage.setItem(cacheKey, JSON.stringify(cached));
+
+  // Try to delete from Supabase
+  if (!guestSkip(userId) && toDeleteFromSupabase.length > 0) {
+    try {
+      for (const id of toDeleteFromSupabase) {
+        await supabase.from('water_entries').delete().eq('id', id);
+      }
+    } catch (err) {
+      console.error('Failed to delete water from Supabase:', err);
     }
   }
 }
