@@ -8,6 +8,13 @@ import { getNutritionEntries, getNutritionGoals, deleteNutritionEntry, saveNutri
 
 const MEAL_SLOTS = ['breakfast', 'lunch', 'dinner', 'snack'];
 
+function getFoodEmoji(source) {
+  if (source === 'openfoodfacts') return '🏷️';
+  if (source === 'custom_meal') return '🍱';
+  if (source === 'barcode') return '📷';
+  return '🍽️';
+}
+
 export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOpenCustomMeals, onOpenCookbook, onOpenSupplements }) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -211,6 +218,10 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
 
             {slotEntries.map((entry) => (
               <div key={entry.id} className="flex items-center gap-3 px-4 py-3 border-b border-slate-50 dark:border-slate-700/50 last:border-0">
+                {/* Food emoji */}
+                <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0 text-base">
+                  {getFoodEmoji(entry.source)}
+                </div>
                 <button onClick={() => onEditEntry(entry)} className="flex-1 text-left min-w-0">
                   <div className="flex items-baseline justify-between gap-2 mb-1">
                     <p className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">
