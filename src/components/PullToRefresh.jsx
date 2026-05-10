@@ -8,7 +8,6 @@ export default function PullToRefresh({ children }) {
   const [refreshing, setRefreshing] = useState(false);
   const startY = useRef(0);
   const pulling = useRef(false);
-  const containerRef = useRef(null);
 
   const isAtTop = useCallback(() => {
     return window.scrollY <= 0;
@@ -34,7 +33,6 @@ export default function PullToRefresh({ children }) {
     const diff = currentY - startY.current;
 
     if (diff > 0) {
-      // Dampen the pull distance
       const dampened = Math.min(MAX_PULL, diff * 0.4);
       setPullDistance(dampened);
     }
@@ -47,7 +45,6 @@ export default function PullToRefresh({ children }) {
     if (pullDistance >= THRESHOLD) {
       setRefreshing(true);
       setPullDistance(THRESHOLD);
-      // Wait for animation then reload
       setTimeout(() => {
         window.location.reload();
       }, 900);
@@ -61,7 +58,6 @@ export default function PullToRefresh({ children }) {
 
   return (
     <div
-      ref={containerRef}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -73,15 +69,30 @@ export default function PullToRefresh({ children }) {
           className="fixed top-0 left-0 right-0 flex items-center justify-center z-[100] pointer-events-none"
           style={{ height: `${pullDistance}px` }}
         >
-          <div
-            className="bg-surface-dark/90 backdrop-blur-sm rounded-full p-2"
-            style={{ opacity: progress, transform: `scale(${0.5 + progress * 0.5})` }}
-          >
-            <ZigzagArrow
-              size={36}
-              progress={refreshing ? 1 : progress}
-              animate={refreshing}
-            />
+          <div style={{ opacity: progress, transform: `scale(${0.5 + progress * 0.5})` }}>
+            <svg width="48" height="48" viewBox="0 0 512 512" fill="none">
+              <polyline
+                points="45,400 130,270 195,340 275,210 340,280 430,150"
+                stroke="#fbbf24"
+                strokeWidth="9"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeDasharray="900"
+                strokeDashoffset={refreshing ? undefined : 900 * (1 - progress)}
+                className={refreshing ? 'ptr-line-animate' : ''}
+              />
+              <path
+                d="M400,165 L430,150 L432,183"
+                stroke="#fbbf24"
+                strokeWidth="9"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity={refreshing ? undefined : (progress > 0.8 ? (progress - 0.8) * 5 : 0)}
+                className={refreshing ? 'ptr-arrow-animate' : ''}
+              />
+            </svg>
           </div>
         </div>
       )}
@@ -96,45 +107,5 @@ export default function PullToRefresh({ children }) {
         {children}
       </div>
     </div>
-  );
-}
-
-function ZigzagArrow({ size = 36, progress = 0, animate = false }) {
-  const viewBox = "0 0 500 500";
-  const lineLength = 900;
-  const arrowLength = 100;
-
-  const lineOffset = animate ? 0 : lineLength * (1 - progress);
-  const arrowOpacity = animate ? 1 : progress > 0.8 ? (progress - 0.8) * 5 : 0;
-
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={viewBox}
-      fill="none"
-    >
-      <polyline
-        points="45,400 130,270 195,340 275,210 340,280 430,150"
-        stroke="#fbbf24"
-        strokeWidth="12"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-        strokeDasharray={lineLength}
-        strokeDashoffset={lineOffset}
-        className={animate ? 'ptr-line-animate' : ''}
-      />
-      <path
-        d="M400,165 L430,150 L432,183"
-        stroke="#fbbf24"
-        strokeWidth="12"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-        opacity={arrowOpacity}
-        className={animate ? 'ptr-arrow-animate' : ''}
-      />
-    </svg>
   );
 }
