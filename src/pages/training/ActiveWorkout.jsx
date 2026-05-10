@@ -74,8 +74,6 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
       return;
     }
 
-    const detectedPrs = await checkForPRs();
-
     const workout = {
       date: new Date().toISOString(),
       duration: elapsed,
@@ -86,12 +84,21 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
       })),
     };
 
+    // Save workout first (localStorage always works)
     try {
       await saveWorkout(user.id, workout);
     } catch (err) {
       console.error('Failed to save workout:', err);
-      // Save locally even if Supabase fails
     }
+
+    // PR check non-blocking — don't let it prevent finishing
+    let detectedPrs = {};
+    try {
+      detectedPrs = await checkForPRs();
+    } catch (err) {
+      console.error('PR check failed:', err);
+    }
+
     ctx.discardWorkout();
     setPendingPrs(detectedPrs);
     setSavedWorkoutExercises(workout.exercises);
