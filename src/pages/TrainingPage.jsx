@@ -26,7 +26,7 @@ import PeakPrograms from './training/PeakPrograms';
 
 export default function TrainingPage() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const activeWorkout = useActiveWorkout();
   const hasValidWorkout = activeWorkout.isActive && activeWorkout.workout?.exercises?.length > 0;
   const [view, setView] = useState(hasValidWorkout ? 'activeWorkout' : 'home');
