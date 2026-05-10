@@ -18,7 +18,10 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ### Phase 1: Fundament — FERTIG
 - [x] Projektstruktur aufgesetzt (React + Vite + Tailwind CSS)
-- [x] Bottom-Navigation (Training, Ernährung, Bibliothek, Profil)
+- [x] Bottom-Navigation (5 Tabs: Training, Ernährung, HOME-FAB, Bibliothek, Profil)
+- [x] Home-Dashboard als zentrale Startseite mit Kalorien, Makros, Wasser, Supplements, Training, Streak, Level/XP
+- [x] Home-Button als goldener Kreis-FAB mit MyPeak-Pfeil, ragt über Nav hinaus
+- [x] Pull-to-Refresh: MyPeak-Logo zeichnet sich neu beim Aktualisieren
 - [x] Mehrsprachigkeit (DE/EN) mit i18next eingerichtet
 - [x] Basis-Design mit Farbschema, Typografie, Dark/Light Mode
 - [x] Einheiten umschaltbar (kg/lbs) im Profil
@@ -106,7 +109,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ### Phase 3.2: Supplement-Tracking — FERTIG
 - [x] Supplements manuell anlegen (Name, Marke, Form, Dosierung, Notizen)
-- [x] Formen: Tablette, Kapsel, Pulver, Flüssig (Kapsel wird später entfernt)
+- [x] Formen: Tablette, Pulver, Flüssig
 - [x] Voller 7-Tage-Wochenplan (pro Supplement individuelle Tage wählbar)
 - [x] 5 Einnahmezeiten: Morgens, Mittags, Pre-Workout, Post-Workout, Abends
 - [x] Tagesansicht gruppiert nach Einnahmezeit mit Checkboxen zum Abhaken
@@ -117,7 +120,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] localStorage-first Pattern (offline + Gastmodus)
 - [x] i18n komplett (DE + EN)
 - [ ] Optionale Nährwerte pro Supplement (Kalorien, Protein etc.) — nur anzeigen, nicht pflicht
-- [ ] Form "Kapsel" entfernen
+- [x] Form "Kapsel" entfernt
 
 ### Phase 3.5–6: Noch offen (siehe Bauplan unten)
 
@@ -141,6 +144,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 ```
 src/
 ├── pages/
+│   ├── HomePage.jsx              # Dashboard mit Kalorien, Makros, Wasser, Supplements, Training, Level
 │   ├── TrainingPage.jsx          # Training-Hub + Workout-Start-Auswahl
 │   ├── ProfilePage.jsx           # Profil mit Dark Mode, Sprache, Einheiten
 │   ├── auth/
@@ -268,7 +272,7 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 
 ### Phase 1: Fundament — FERTIG
 - [x] Projektstruktur aufsetzen (React + Tailwind)
-- [x] Navigation / App-Layout (Bottom-Navigation mit: Training, Ernährung, Bibliothek, Profil)
+- [x] Navigation / App-Layout (Bottom-Navigation mit: Training, Ernährung, HOME-FAB, Bibliothek, Profil)
 - [x] Mehrsprachigkeit (DE/EN) einrichten
 - [x] Basis-Design festlegen (Farbschema, Typografie, Dark/Light Mode)
 
@@ -383,7 +387,7 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 - **Farbpalette Light Mode:** Hintergrund #ffffff / #f5f5f5, Akzentfarbe dunkleres Gold #b45309, Texte Schwarz/Dunkelgrau
 - **Primary-Farben:** Gold-Palette (primary-400: #fbbf24, primary-500: #f59e0b, primary-600: #d97706)
 - **Stil:** Modern, clean — Gold als Primärfarbe, abgerundete Karten, weiche Schatten
-- **Navigation:** Bottom-Navigation mit 4 Hauptbereichen (Training, Ernährung, Bibliothek, Profil), aktiver Tab in Gold
+- **Navigation:** Bottom-Navigation mit 5 Tabs (Training, Ernährung, HOME-FAB, Bibliothek, Profil), Home-Button als goldener Kreis-FAB mit MyPeak-Pfeil
 - **Responsiv:** Mobile-first, muss auf dem Handy perfekt funktionieren
 - **Dark Mode:** Standard beim ersten Öffnen, umschaltbar im Profil
 
