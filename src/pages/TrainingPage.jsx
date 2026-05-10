@@ -22,6 +22,7 @@ import WeeklySummaryBanner from '../components/progress/WeeklySummaryBanner';
 import MyPeakLogo from '../components/MyPeakLogo';
 import DiamondCalendar from '../components/DiamondCalendar';
 import WeeklyPlanBuilder from './training/WeeklyPlanBuilder';
+import MyPlans from './training/MyPlans';
 import PeakPrograms from './training/PeakPrograms';
 
 export default function TrainingPage() {
@@ -266,8 +267,12 @@ export default function TrainingPage() {
     return <ChallengesList onBack={() => setView('home')} onCreateChallenge={() => setView('home')} />;
   }
 
+  if (view === 'myPlans') {
+    return <MyPlans onBack={() => setView('home')} onCreate={() => setView('weeklyPlan')} onStartFreeWorkout={() => setView('startChoice')} />;
+  }
+
   if (view === 'weeklyPlan') {
-    return <WeeklyPlanBuilder onBack={() => setView('home')} onSaved={() => { loadCalendarData(); setView('home'); }} />;
+    return <WeeklyPlanBuilder onBack={() => setView('myPlans')} onSaved={() => { loadCalendarData(); setView('myPlans'); }} />;
   }
 
   if (view === 'peakPrograms') {
@@ -331,7 +336,7 @@ export default function TrainingPage() {
       {/* Two-tab layout: Meine Pläne / Peak-Programme */}
       <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 mb-4">
         <button
-          onClick={() => setView('weeklyPlan')}
+          onClick={() => setView('myPlans')}
           className="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-white dark:bg-surface-dark-alt text-slate-900 dark:text-white shadow-sm"
         >
           {lang === 'de' ? 'Meine Pläne' : 'My Plans'}
