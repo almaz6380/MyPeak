@@ -22,7 +22,9 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Home-Dashboard als zentrale Startseite mit Kalorien, Makros (P/C/F/Ballaststoffe), Wasser, Supplements, Training, Streak
 - [x] Datumsnavigation auf Home: Pfeile links/rechts + Kalender-Modal, alle Daten tagesbezogen
 - [x] Profil-Avatar oben rechts → navigiert zu /profile, Logo zentriert, Begrüßung mit Tageszeit + Name
-- [x] Gewichtsverlauf-Diagramm: SVG-Liniengraph (letzte 30 Einträge), ein-/ausblendbar, Plus-Button zum Eintragen
+- [x] Gewichtsverlauf-Diagramm: SVG-Liniengraph, ein-/ausblendbar (Zustand in localStorage), Plus-Button zum Eintragen
+- [x] Gewichtsdiagramm: Zeiträume 7T/14T/1M/3M/6M/1J/Alle + eigener Datumsbereich (Von-Bis-Picker)
+- [x] Gewichtsdiagramm: Standard ausgeklappt, Profil-Gewicht als Startwert
 - [x] Zyklustracking: 4 Phasen mit Training-/Ernährungs-Empfehlungen, Symptom-Tagebuch, Home-Widget (nur female)
 - [x] Home-Button als goldener Kreis-FAB mit MyPeak-Pfeil, ragt über Nav hinaus
 - [x] Pull-to-Refresh: MyPeak-Logo zeichnet sich neu beim Aktualisieren
