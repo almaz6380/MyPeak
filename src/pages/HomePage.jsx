@@ -45,7 +45,7 @@ export default function HomePage() {
 
   const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
   const [showCalendar, setShowCalendar] = useState(false);
-  const [nutrition, setNutrition] = useState({ calories: 0, protein: 0, carbs: 0, fat: 0 });
+  const [nutrition, setNutrition] = useState({ calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 });
   const [goals, setGoals] = useState({ calories: 2000, protein: 150, carbs: 250, fat: 70, water_ml: 3000 });
   const [waterTotal, setWaterTotal] = useState(0);
   const [dayWorkouts, setDayWorkouts] = useState(0);
@@ -76,8 +76,9 @@ export default function HomePage() {
           protein: acc.protein + (e.protein || 0),
           carbs: acc.carbs + (e.carbs || 0),
           fat: acc.fat + (e.fat || 0),
+          fiber: acc.fiber + (e.fiber || 0),
         }),
-        { calories: 0, protein: 0, carbs: 0, fat: 0 }
+        { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 }
       );
       setNutrition(totals);
       if (goalsData) setGoals(goalsData);
@@ -181,6 +182,7 @@ export default function HomePage() {
               <MacroPill label="P" value={Math.round(nutrition.protein)} goal={goals.protein} color="bg-blue-500" />
               <MacroPill label="C" value={Math.round(nutrition.carbs)} goal={goals.carbs} color="bg-amber-500" />
               <MacroPill label="F" value={Math.round(nutrition.fat)} goal={goals.fat} color="bg-rose-500" />
+              <MacroPill label="B" value={Math.round(nutrition.fiber)} goal={goals.fiber || 30} color="bg-green-500" />
             </div>
           </button>
 
