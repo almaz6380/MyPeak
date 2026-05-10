@@ -2,7 +2,8 @@
 
 const DB_NAME = 'mypeak_photos';
 const STORE_NAME = 'exercise_photos';
-const DB_VERSION = 1;
+const PRODUCT_STORE = 'product_photos';
+const DB_VERSION = 2;
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -11,6 +12,9 @@ function openDB() {
       const db = req.result;
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME);
+      }
+      if (!db.objectStoreNames.contains(PRODUCT_STORE)) {
+        db.createObjectStore(PRODUCT_STORE);
       }
     };
     req.onsuccess = () => resolve(req.result);
@@ -55,6 +59,38 @@ export async function deleteExercisePhoto(exerciseId) {
       const tx = db.transaction(STORE_NAME, 'readwrite');
       const store = tx.objectStore(STORE_NAME);
       store.delete(`photo_${exerciseId}`);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+    });
+  } catch {
+    return false;
+  }
+}
+
+// ── Product Photos (Barcode-basiert) ────────────────────────
+
+export async function getProductPhoto(barcode) {
+  try {
+    const db = await openDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(PRODUCT_STORE, 'readonly');
+      const store = tx.objectStore(PRODUCT_STORE);
+      const req = store.get(`product_${barcode}`);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => resolve(null);
+    });
+  } catch {
+    return null;
+  }
+}
+
+export async function saveProductPhoto(barcode, base64Data) {
+  try {
+    const db = await openDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(PRODUCT_STORE, 'readwrite');
+      const store = tx.objectStore(PRODUCT_STORE);
+      store.put(base64Data, `product_${barcode}`);
       tx.oncomplete = () => resolve(true);
       tx.onerror = () => resolve(false);
     });

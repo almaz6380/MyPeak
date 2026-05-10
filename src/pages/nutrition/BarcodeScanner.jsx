@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import Quagga from '@ericblade/quagga2';
-import { X, ScanBarcode, Loader2, AlertCircle, Plus, Check } from 'lucide-react';
+import { X, ScanBarcode, Loader2, AlertCircle, Plus, Check, Camera } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCamera } from '../../context/CameraContext';
 import { lookupCommunityProduct, addCommunityProduct } from '../../data/communityProducts';
+import { getProductPhoto, saveProductPhoto, compressImage } from '../../data/exercisePhotos';
 
 export default function BarcodeScanner({ onScanned, onClose }) {
   const { t } = useTranslation();
@@ -40,6 +41,9 @@ export default function BarcodeScanner({ onScanned, onClose }) {
     setStatus('loading');
     setScannedBarcode(barcode);
 
+    // Check for locally saved product photo
+    const localPhoto = await getProductPhoto(barcode);
+
     try {
       // 1. Check community products first (our DB)
       const community = await lookupCommunityProduct(barcode);
@@ -58,6 +62,7 @@ export default function BarcodeScanner({ onScanned, onClose }) {
           source: 'community',
           source_id: barcode,
           image_url: null,
+          local_photo: localPhoto,
         });
         setStatus('found');
         return;
@@ -87,6 +92,7 @@ export default function BarcodeScanner({ onScanned, onClose }) {
           source: 'openfoodfacts',
           source_id: barcode,
           image_url: p.image_front_url || p.image_front_small_url || p.image_small_url || p.image_url || p.image_thumb_url || null,
+          local_photo: localPhoto,
         });
         setStatus('found');
       } else {
@@ -354,7 +360,18 @@ export default function BarcodeScanner({ onScanned, onClose }) {
 
 function FoundProductScreen({ product, lang, onConfirm, onScanAgain, onClose, t }) {
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [localPhoto, setLocalPhoto] = useState(product.local_photo || null);
+  const fileInputRef = useRef(null);
   const displayName = lang === 'de' ? (product.nameDE || product.nameEN) : (product.nameEN || product.nameDE);
+  const hasAnyImage = imgLoaded || localPhoto;
+
+  async function handlePhotoCapture(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const compressed = await compressImage(file);
+    await saveProductPhoto(product.source_id, compressed);
+    setLocalPhoto(compressed);
+  }
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col">
@@ -369,8 +386,15 @@ function FoundProductScreen({ product, lang, onConfirm, onScanAgain, onClose, t 
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        {/* Hidden img to test if it loads, only show when onLoad fires */}
-        {product.image_url && (
+        {/* Local photo (from IndexedDB) */}
+        {localPhoto && (
+          <div className="w-40 h-40 rounded-2xl bg-slate-800 overflow-hidden mb-5 shadow-lg">
+            <img src={localPhoto} alt="" className="w-full h-full object-contain" />
+          </div>
+        )}
+
+        {/* API image — only show if no local photo, and only after onLoad confirms it's real */}
+        {!localPhoto && product.image_url && (
           <img
             src={product.image_url}
             alt=""
@@ -378,6 +402,27 @@ function FoundProductScreen({ product, lang, onConfirm, onScanAgain, onClose, t 
             onError={() => setImgLoaded(false)}
             className={imgLoaded ? 'w-40 h-40 rounded-2xl bg-slate-800 object-contain mb-5 shadow-lg' : 'hidden'}
           />
+        )}
+
+        {/* Camera button — only if no image at all */}
+        {!hasAnyImage && (
+          <>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-40 h-40 rounded-2xl bg-slate-800 flex flex-col items-center justify-center mb-5 border-2 border-dashed border-slate-600 hover:border-primary-500 transition-colors"
+            >
+              <Camera className="w-8 h-8 text-slate-500 mb-2" />
+              <span className="text-xs text-slate-500">{lang === 'de' ? 'Foto aufnehmen' : 'Take photo'}</span>
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handlePhotoCapture}
+              className="hidden"
+            />
+          </>
         )}
 
         <h3 className="text-xl font-bold text-white text-center mb-1">{displayName}</h3>
