@@ -560,18 +560,17 @@ function EditWorkoutModal({ workout, onSave, onClose, t, weightUnit }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center">
-      <div className="bg-white dark:bg-surface-dark-alt rounded-t-2xl w-full max-w-lg shadow-xl max-h-[90vh] flex flex-col animate-slide-up">
+    <div className="p-4 pt-16 pb-24">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 pt-5 pb-3 shrink-0 border-b border-slate-100 dark:border-slate-700">
+        <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold">{t('common.edit')}</h3>
           <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* Content */}
+        <div className="space-y-4">
           {/* Add exercise input */}
           {showAddExercise && (
             <AddExerciseToEdit
@@ -635,7 +634,7 @@ function EditWorkoutModal({ workout, onSave, onClose, t, weightUnit }) {
         </div>
 
         {/* Add exercise + Save */}
-        <div className="px-5 pt-3 shrink-0 border-t border-slate-100 dark:border-slate-700 space-y-2" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
+        <div className="space-y-3 mt-4">
           <button
             onClick={() => setShowAddExercise(true)}
             className="w-full py-2.5 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl text-slate-500 dark:text-slate-400 text-sm font-medium flex items-center justify-center gap-1.5 hover:border-primary-400 hover:text-primary-500 transition-colors"
@@ -645,13 +644,12 @@ function EditWorkoutModal({ workout, onSave, onClose, t, weightUnit }) {
           </button>
           <button
             onClick={handleSave}
-            className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-3.5 bg-primary-500 hover:bg-primary-600 text-white rounded-2xl font-semibold flex items-center justify-center gap-2 transition-colors"
           >
             <Check className="w-4 h-4" />
             {t('common.save')}
           </button>
         </div>
-      </div>
     </div>
   );
 }
