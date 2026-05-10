@@ -80,7 +80,9 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Übungsnotizen + Geräte-Einstellungen pro Übung (Supabase exercise_notes)
 - [x] Foto-Upload pro Übung (IndexedDB lokal, komprimiert)
 - [x] Notiz-Vorschau als farbige Tags unter dem Übungsnamen im Workout
-- [x] Rauten-Kalender (DiamondCalendar): Swipbare Rauten-Reihe oben, Bogen-Effekt, Schwarz/Blau/Gold
+- [x] Kreiskalender (DiamondCalendar): Swipbare Kreise oben, Bogen-Effekt, Schwarz/Blau/Gold, Pulse-Feedback
+- [x] Kreiskalender: Tage laufen über Monatsgrenzen hinweg, Monatsname passt sich automatisch an
+- [x] Kreiskalender: Kalender-Picker für exakte Tagesauswahl
 - [x] Wochenplan-System: Einheiten/Woche wählen → Tage verteilen → Split-Typ oder Übungen zuweisen
 - [x] Supabase: weekly_schedules Tabelle, aktiver Plan bestimmt blaue Rauten im Kalender
 
