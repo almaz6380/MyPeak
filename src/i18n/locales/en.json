@@ -5,6 +5,20 @@
     "library": "Library",
     "profile": "Profile"
   },
+  "home": {
+    "goodMorning": "Good morning",
+    "goodAfternoon": "Good afternoon",
+    "goodEvening": "Good evening",
+    "calories": "Calories",
+    "water": "Water",
+    "supplements": "Supplements",
+    "training": "Training this week",
+    "workouts": "Workouts",
+    "streak": "Streak",
+    "days": "days",
+    "level": "Level",
+    "xpProgress": "XP Progress"
+  },
   "training": {
     "title": "Training",
     "startWorkout": "Start Workout",

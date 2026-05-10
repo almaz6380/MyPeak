@@ -8,6 +8,7 @@ import { CameraProvider } from './context/CameraContext';
 import SplashScreen from './components/SplashScreen';
 import BottomNav from './components/BottomNav';
 import PullToRefresh from './components/PullToRefresh';
+import HomePage from './pages/HomePage';
 import TrainingPage from './pages/TrainingPage';
 import NutritionPage from './pages/NutritionPage';
 import LibraryPage from './pages/LibraryPage';
@@ -71,7 +72,8 @@ function AppShell() {
       <PullToRefresh>
         <main className="min-h-screen max-w-lg mx-auto pb-20">
           <Routes>
-            <Route path="/" element={<TrainingPage />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/training" element={<TrainingPage />} />
             <Route path="/nutrition" element={<NutritionPage />} />
             <Route path="/library" element={<LibraryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
