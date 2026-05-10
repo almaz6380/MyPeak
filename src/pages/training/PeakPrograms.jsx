@@ -29,9 +29,11 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
   const [activating, setActivating] = useState(false);
 
   // Sort categories: show matching goal first
+  const goalOrder = { muscle_gain: 'strength', weight_loss: 'hiit', maintenance: 'cardio' };
+  const preferredCat = goalOrder[userGoal] || '';
   const sortedCategories = [...peakCategories].sort((a, b) => {
-    if (userGoal === 'muscle_gain' && a.id === 'strength') return -1;
-    if (userGoal === 'weight_loss' && a.id === 'hiit') return -1;
+    if (a.id === preferredCat) return -1;
+    if (b.id === preferredCat) return 1;
     return 0;
   });
 
@@ -108,8 +110,10 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
                 <span className="text-xs font-medium text-slate-500 w-8">{DAY_NAMES[i].slice(0, 2)}</span>
                 {day ? (
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">{day.label}</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">{day.label || day.type || ''}</p>
                     {day.exercises && <p className="text-[10px] text-slate-400">{day.exercises.length} {lang === 'de' ? 'Übungen' : 'exercises'}</p>}
+                    {day.targetDuration && <p className="text-[10px] text-slate-400">{Math.round(day.targetDuration / 60)} min</p>}
+                    {day.rounds && <p className="text-[10px] text-slate-400">{day.rounds} {lang === 'de' ? 'Runden' : 'rounds'}</p>}
                   </div>
                 ) : (
                   <p className="text-sm text-slate-400 italic">{lang === 'de' ? 'Ruhetag' : 'Rest day'}</p>

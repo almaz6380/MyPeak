@@ -271,7 +271,17 @@ export default function TrainingPage() {
   }
 
   if (view === 'peakPrograms') {
-    return <PeakPrograms onBack={() => setView('home')} onProgramActivated={() => { loadCalendarData(); setView('home'); }} userGoal={profile?.goal} userExperience={profile?.experience} />;
+    try {
+      return <PeakPrograms onBack={() => setView('home')} onProgramActivated={() => { loadCalendarData(); setView('home'); }} userGoal={profile?.goal || ''} userExperience={profile?.experience || ''} />;
+    } catch (err) {
+      console.error('PeakPrograms error:', err);
+      return (
+        <div className="p-4 pt-16">
+          <p className="text-red-500">Error: {err.message}</p>
+          <button onClick={() => setView('home')} className="mt-4 px-4 py-2 bg-primary-500 text-white rounded-xl">Zurück</button>
+        </div>
+      );
+    }
   }
 
   return (
