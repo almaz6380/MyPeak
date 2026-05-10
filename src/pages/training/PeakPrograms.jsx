@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ChevronRight, Dumbbell, Heart, Zap, Swords, Star, Clock, Calendar, Play, Check } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Dumbbell, Heart, Zap, Swords, Star, Clock, Calendar, Play, Check, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { saveWeeklySchedule } from '../../data/workoutStorage';
 
@@ -37,106 +37,27 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
     return 0;
   });
 
-  async function handleActivateProgram(program) {
-    setActivating(true);
-    // Convert peak program to weekly schedule
-    await saveWeeklySchedule(user.id, {
-      name: lang === 'de' ? program.nameDE : program.nameEN,
-      sessions_per_week: program.sessions_per_week,
-      days: program.days,
-    });
-    setActivating(false);
-    onProgramActivated();
-  }
 
   // ── Program Detail ──
   if (selectedProgram) {
-    const p = selectedProgram;
-    const levelInfo = LEVEL_LABELS[p.level] || LEVEL_LABELS.beginner;
-    const isRecommended = (p.goal === userGoal) || (p.level === userExperience);
-    const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-    const DAY_NAMES = lang === 'de'
-      ? ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
-      : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
     return (
-      <div className="p-4 pt-16 pb-24">
-        <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setSelectedProgram(null)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold">{lang === 'de' ? p.nameDE : p.nameEN}</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${levelInfo.color}`}>
-                {lang === 'de' ? levelInfo.de : levelInfo.en}
-              </span>
-              {isRecommended && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400 flex items-center gap-0.5">
-                  <Star className="w-3 h-3" /> {lang === 'de' ? 'Empfohlen' : 'Recommended'}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-          {lang === 'de' ? p.descDE : p.descEN}
-        </p>
-
-        {/* Stats */}
-        <div className="flex gap-3 mb-6">
-          <div className="flex-1 bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-center">
-            <Clock className="w-4 h-4 text-slate-400 mx-auto mb-1" />
-            <p className="text-lg font-bold text-slate-900 dark:text-white">{p.duration_weeks}</p>
-            <p className="text-[10px] text-slate-400">{lang === 'de' ? 'Wochen' : 'Weeks'}</p>
-          </div>
-          <div className="flex-1 bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-center">
-            <Calendar className="w-4 h-4 text-slate-400 mx-auto mb-1" />
-            <p className="text-lg font-bold text-slate-900 dark:text-white">{p.sessions_per_week}x</p>
-            <p className="text-[10px] text-slate-400">{lang === 'de' ? 'pro Woche' : 'per week'}</p>
-          </div>
-        </div>
-
-        {/* Weekly Plan Preview */}
-        <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3">
-          {lang === 'de' ? 'Wochenplan' : 'Weekly Plan'}
-        </h2>
-        <div className="space-y-2 mb-6">
-          {DAY_KEYS.map((key, i) => {
-            const day = p.days?.[key];
-            return (
-              <div key={key} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl ${day ? 'bg-white dark:bg-surface-dark-alt' : 'bg-slate-50 dark:bg-slate-800/50'}`}>
-                <span className="text-xs font-medium text-slate-500 w-8">{DAY_NAMES[i].slice(0, 2)}</span>
-                {day ? (
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">{day.label || day.type || ''}</p>
-                    {day.exercises && <p className="text-[10px] text-slate-400">{day.exercises.length} {lang === 'de' ? 'Übungen' : 'exercises'}</p>}
-                    {day.targetDuration && <p className="text-[10px] text-slate-400">{Math.round(day.targetDuration / 60)} min</p>}
-                    {day.rounds && <p className="text-[10px] text-slate-400">{day.rounds} {lang === 'de' ? 'Runden' : 'rounds'}</p>}
-                  </div>
-                ) : (
-                  <p className="text-sm text-slate-400 italic">{lang === 'de' ? 'Ruhetag' : 'Rest day'}</p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Activate Button */}
-        <button
-          onClick={() => handleActivateProgram(p)}
-          disabled={activating}
-          className="w-full py-4 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold rounded-2xl flex items-center justify-center gap-2"
-        >
-          {activating ? '...' : (
-            <>
-              <Play className="w-5 h-5" />
-              {lang === 'de' ? 'Programm starten' : 'Start Program'}
-            </>
-          )}
-        </button>
-      </div>
+      <ProgramDetail
+        program={selectedProgram}
+        lang={lang}
+        userGoal={userGoal}
+        userExperience={userExperience}
+        activating={activating}
+        onBack={() => setSelectedProgram(null)}
+        onActivate={(customDays) => {
+          const p = selectedProgram;
+          setActivating(true);
+          saveWeeklySchedule(user.id, {
+            name: lang === 'de' ? p.nameDE : p.nameEN,
+            sessions_per_week: p.sessions_per_week,
+            days: customDays,
+          }).then(() => { setActivating(false); onProgramActivated(); });
+        }}
+      />
     );
   }
 
@@ -240,6 +161,196 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
           );
         })}
       </div>
+    </div>
+  );
+}
+
+// ── Program Detail with editable days + exercises ──
+function ProgramDetail({ program, lang, userGoal, userExperience, activating, onBack, onActivate }) {
+  const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+  const DAY_NAMES_SHORT = lang === 'de' ? ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const DAY_NAMES = lang === 'de'
+    ? ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
+    : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+  const levelInfo = LEVEL_LABELS[program.level] || LEVEL_LABELS.beginner;
+  const isRecommended = (program.goal === userGoal) || (program.level === userExperience);
+
+  // Editable copy of days
+  const [customDays, setCustomDays] = useState(() => JSON.parse(JSON.stringify(program.days)));
+  const [editingDay, setEditingDay] = useState(null); // key of the day being edited
+  const [swapSource, setSwapSource] = useState(null); // for swapping days
+
+  // Get training sessions (non-null days) in order
+  const trainingSessions = DAY_KEYS
+    .map((key) => ({ key, data: program.days[key] }))
+    .filter((d) => d.data !== null);
+
+  function swapDays(dayA, dayB) {
+    setCustomDays((prev) => {
+      const next = { ...prev };
+      const temp = next[dayA];
+      next[dayA] = next[dayB];
+      next[dayB] = temp;
+      return next;
+    });
+    setSwapSource(null);
+  }
+
+  function handleDayTap(key) {
+    if (swapSource) {
+      if (swapSource !== key) swapDays(swapSource, key);
+      else setSwapSource(null);
+    } else {
+      setSwapSource(key);
+    }
+  }
+
+  function removeExercise(dayKey, exIdx) {
+    setCustomDays((prev) => {
+      const next = { ...prev };
+      if (next[dayKey]?.exercises) {
+        next[dayKey] = { ...next[dayKey], exercises: next[dayKey].exercises.filter((_, i) => i !== exIdx) };
+      }
+      return next;
+    });
+  }
+
+  function resetToOriginal() {
+    setCustomDays(JSON.parse(JSON.stringify(program.days)));
+  }
+
+  return (
+    <div className="p-4 pt-16 pb-24">
+      <div className="flex items-center gap-3 mb-6">
+        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <div className="flex-1">
+          <h1 className="text-xl font-bold">{lang === 'de' ? program.nameDE : program.nameEN}</h1>
+          <div className="flex items-center gap-2 mt-1">
+            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${levelInfo.color}`}>
+              {lang === 'de' ? levelInfo.de : levelInfo.en}
+            </span>
+            {isRecommended && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400 flex items-center gap-0.5">
+                <Star className="w-3 h-3" /> {lang === 'de' ? 'Empfohlen' : 'Recommended'}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+        {lang === 'de' ? program.descDE : program.descEN}
+      </p>
+
+      {/* Stats */}
+      <div className="flex gap-3 mb-4">
+        <div className="flex-1 bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-center">
+          <Clock className="w-4 h-4 text-slate-400 mx-auto mb-1" />
+          <p className="text-lg font-bold text-slate-900 dark:text-white">{program.duration_weeks}</p>
+          <p className="text-[10px] text-slate-400">{lang === 'de' ? 'Wochen' : 'Weeks'}</p>
+        </div>
+        <div className="flex-1 bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-center">
+          <Calendar className="w-4 h-4 text-slate-400 mx-auto mb-1" />
+          <p className="text-lg font-bold text-slate-900 dark:text-white">{program.sessions_per_week}x</p>
+          <p className="text-[10px] text-slate-400">{lang === 'de' ? 'pro Woche' : 'per week'}</p>
+        </div>
+      </div>
+
+      {/* Day arrangement hint */}
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 mb-4">
+        <p className="text-xs text-blue-700 dark:text-blue-400">
+          {swapSource
+            ? (lang === 'de' ? `${DAY_NAMES_SHORT[DAY_KEYS.indexOf(swapSource)]} ausgewählt — tippe auf einen anderen Tag zum Tauschen` : `${DAY_NAMES_SHORT[DAY_KEYS.indexOf(swapSource)]} selected — tap another day to swap`)
+            : (lang === 'de' ? 'Tippe auf einen Tag um ihn mit einem anderen zu tauschen. Übungen können entfernt werden.' : 'Tap a day to swap it with another. Exercises can be removed.')}
+        </p>
+      </div>
+
+      {/* Editable Weekly Plan */}
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+          {lang === 'de' ? 'Wochenplan anpassen' : 'Customize Weekly Plan'}
+        </h2>
+        <button onClick={resetToOriginal} className="text-xs text-primary-500 font-medium">
+          {lang === 'de' ? 'Zurücksetzen' : 'Reset'}
+        </button>
+      </div>
+
+      <div className="space-y-2 mb-6">
+        {DAY_KEYS.map((key, i) => {
+          const day = customDays[key];
+          const isSwapSelected = swapSource === key;
+          return (
+            <div key={key}>
+              <button
+                onClick={() => handleDayTap(key)}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all ${
+                  isSwapSelected
+                    ? 'bg-primary-50 dark:bg-primary-900/20 ring-2 ring-primary-400'
+                    : day
+                      ? 'bg-white dark:bg-surface-dark-alt'
+                      : 'bg-slate-50 dark:bg-slate-800/50'
+                }`}
+              >
+                <span className="text-xs font-semibold text-slate-500 w-8">{DAY_NAMES_SHORT[i]}</span>
+                {day ? (
+                  <div className="flex-1 text-left">
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">{day.label || day.type || ''}</p>
+                    {day.exercises && <p className="text-[10px] text-slate-400">{day.exercises.length} {lang === 'de' ? 'Übungen' : 'exercises'}</p>}
+                    {day.targetDuration && <p className="text-[10px] text-slate-400">{Math.round(day.targetDuration / 60)} min</p>}
+                    {day.rounds && <p className="text-[10px] text-slate-400">{day.rounds} {lang === 'de' ? 'Runden' : 'rounds'}</p>}
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-400 italic flex-1 text-left">{lang === 'de' ? 'Ruhetag' : 'Rest day'}</p>
+                )}
+                {day && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setEditingDay(editingDay === key ? null : key); }}
+                    className="p-1 text-slate-400 hover:text-primary-500"
+                  >
+                    <ChevronRight className={`w-4 h-4 transition-transform ${editingDay === key ? 'rotate-90' : ''}`} />
+                  </button>
+                )}
+              </button>
+
+              {/* Expanded exercises */}
+              {editingDay === key && day?.exercises && (
+                <div className="ml-12 mt-1 space-y-1 mb-2">
+                  {day.exercises.map((ex, exIdx) => (
+                    <div key={exIdx} className="flex items-center justify-between px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                      <span className="text-xs text-slate-600 dark:text-slate-400">
+                        {ex.id || ex} {ex.sets && `· ${ex.sets}×${ex.reps}`}
+                      </span>
+                      <button
+                        onClick={() => removeExercise(key, exIdx)}
+                        className="text-slate-300 hover:text-red-500 p-0.5"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Activate Button */}
+      <button
+        onClick={() => onActivate(customDays)}
+        disabled={activating}
+        className="w-full py-4 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold rounded-2xl flex items-center justify-center gap-2"
+      >
+        {activating ? '...' : (
+          <>
+            <Play className="w-5 h-5" />
+            {lang === 'de' ? 'Programm starten' : 'Start Program'}
+          </>
+        )}
+      </button>
     </div>
   );
 }
