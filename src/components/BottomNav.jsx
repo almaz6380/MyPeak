@@ -34,44 +34,49 @@ export default function BottomNav() {
   const { t } = useTranslation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-surface-dark-alt border-t border-slate-200 dark:border-slate-800 z-50">
-      <div className="max-w-lg mx-auto flex justify-around items-end h-16 pb-[env(safe-area-inset-bottom)]">
-        {leftItems.map((item) => (
-          <NavItem key={item.path} {...item} t={t} />
-        ))}
-
-        {/* Home FAB */}
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            `flex flex-col items-center -mt-5 transition-transform ${isActive ? 'scale-105' : ''}`
-          }
-        >
-          <div className="w-14 h-14 rounded-full bg-primary-500 flex items-center justify-center shadow-lg shadow-primary-500/30">
-            <svg width="28" height="28" viewBox="0 0 512 512" fill="none">
-              <polyline
-                points="45,400 130,270 195,340 275,210 340,280 430,150"
-                stroke="#0a0a0a"
-                strokeWidth="12"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M400,165 L430,150 L432,183"
-                stroke="#0a0a0a"
-                strokeWidth="12"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
+    <nav className="fixed bottom-0 left-0 right-0 z-50">
+      {/* Home FAB — positioned above the bar */}
+      <div className="absolute left-1/2 -translate-x-1/2 -top-5 z-10">
+        <NavLink to="/">
+          {({ isActive }) => (
+            <div className={`w-14 h-14 rounded-full bg-primary-500 flex items-center justify-center shadow-lg shadow-primary-500/30 transition-transform ${isActive ? 'scale-105' : ''}`}>
+              <svg width="28" height="28" viewBox="0 0 512 512" fill="none">
+                <polyline
+                  points="45,400 130,270 195,340 275,210 340,280 430,150"
+                  stroke="#0a0a0a"
+                  strokeWidth="12"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M400,165 L430,150 L432,183"
+                  stroke="#0a0a0a"
+                  strokeWidth="12"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          )}
         </NavLink>
+      </div>
 
-        {rightItems.map((item) => (
-          <NavItem key={item.path} {...item} t={t} />
-        ))}
+      {/* Bar */}
+      <div className="bg-white dark:bg-surface-dark-alt border-t border-slate-200 dark:border-slate-800">
+        <div className="max-w-lg mx-auto flex items-center justify-around h-16 pb-[env(safe-area-inset-bottom)]">
+          {leftItems.map((item) => (
+            <NavItem key={item.path} {...item} t={t} />
+          ))}
+
+          {/* Spacer for the FAB */}
+          <div className="w-14" />
+
+          {rightItems.map((item) => (
+            <NavItem key={item.path} {...item} t={t} />
+          ))}
+        </div>
       </div>
     </nav>
   );
