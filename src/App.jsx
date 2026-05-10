@@ -7,6 +7,7 @@ import { ActiveWorkoutProvider } from './context/ActiveWorkoutContext';
 import { CameraProvider } from './context/CameraContext';
 import SplashScreen from './components/SplashScreen';
 import BottomNav from './components/BottomNav';
+import PullToRefresh from './components/PullToRefresh';
 import TrainingPage from './pages/TrainingPage';
 import NutritionPage from './pages/NutritionPage';
 import LibraryPage from './pages/LibraryPage';
@@ -67,14 +68,16 @@ function AppShell() {
           </p>
         </div>
       )}
-      <main className="min-h-screen max-w-lg mx-auto pb-20">
-        <Routes>
-          <Route path="/" element={<TrainingPage />} />
-          <Route path="/nutrition" element={<NutritionPage />} />
-          <Route path="/library" element={<LibraryPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-        </Routes>
-      </main>
+      <PullToRefresh>
+        <main className="min-h-screen max-w-lg mx-auto pb-20">
+          <Routes>
+            <Route path="/" element={<TrainingPage />} />
+            <Route path="/nutrition" element={<NutritionPage />} />
+            <Route path="/library" element={<LibraryPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Routes>
+        </main>
+      </PullToRefresh>
       <BottomNav />
     </ActiveWorkoutProvider>
     </CameraProvider>
