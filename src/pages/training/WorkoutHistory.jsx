@@ -515,6 +515,8 @@ export default function WorkoutHistory({ onBack }) {
 
 function EditWorkoutModal({ workout, onSave, onClose, t, weightUnit }) {
   const [exercises, setExercises] = useState(workout.exercises || []);
+  const [showAddExercise, setShowAddExercise] = useState(false);
+  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
 
   function updateSet(exIdx, setIdx, field, value) {
     setExercises((prev) => prev.map((ex, ei) => {
@@ -570,6 +572,19 @@ function EditWorkoutModal({ workout, onSave, onClose, t, weightUnit }) {
 
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {/* Add exercise input */}
+          {showAddExercise && (
+            <AddExerciseToEdit
+              onAdd={(ex) => {
+                setExercises((prev) => [...prev, { exerciseId: ex.id, nameKey: ex.nameKey, sets: [{ reps: '', weight: '' }] }]);
+                setShowAddExercise(false);
+              }}
+              onClose={() => setShowAddExercise(false)}
+              t={t}
+              lang={lang}
+            />
+          )}
+
           {exercises.map((ex, exIdx) => {
             const exData = getExerciseById(ex.exerciseId) || {};
             return (
@@ -619,16 +634,52 @@ function EditWorkoutModal({ workout, onSave, onClose, t, weightUnit }) {
           })}
         </div>
 
-        {/* Save button */}
-        <div className="px-5 pt-3 pb-5 shrink-0 border-t border-slate-100 dark:border-slate-700">
+        {/* Add exercise + Save */}
+        <div className="px-5 pt-3 shrink-0 border-t border-slate-100 dark:border-slate-700 space-y-2" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
+          <button
+            onClick={() => setShowAddExercise(true)}
+            className="w-full py-2.5 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl text-slate-500 dark:text-slate-400 text-sm font-medium flex items-center justify-center gap-1.5 hover:border-primary-400 hover:text-primary-500 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            {t('training.addExercise')}
+          </button>
           <button
             onClick={handleSave}
-            className="w-full py-3 bg-primary-500 hover:bg-primary-500 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
           >
             <Check className="w-4 h-4" />
             {t('common.save')}
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function AddExerciseToEdit({ onAdd, onClose, t, lang }) {
+  const [search, setSearch] = useState('');
+  const allEx = require('../../data/exercises').default;
+  const filtered = allEx
+    .filter((ex) => (ex.type || 'strength') === 'strength')
+    .filter((ex) => !search || t(ex.nameKey).toLowerCase().includes(search.toLowerCase()))
+    .slice(0, 20);
+
+  return (
+    <div className="bg-white dark:bg-surface-dark-alt rounded-xl border border-slate-200 dark:border-slate-700 p-3 mb-2">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-sm font-semibold">{t('training.addExercise')}</p>
+        <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
+      </div>
+      <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+        placeholder={lang === 'de' ? 'Übung suchen...' : 'Search exercise...'}
+        className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-primary-400" />
+      <div className="max-h-40 overflow-y-auto space-y-1">
+        {filtered.map((ex) => (
+          <button key={ex.id} onClick={() => onAdd(ex)}
+            className="w-full text-left px-3 py-2 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 text-sm transition-colors">
+            {t(ex.nameKey)}
+          </button>
+        ))}
       </div>
     </div>
   );
