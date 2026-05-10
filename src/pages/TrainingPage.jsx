@@ -22,6 +22,7 @@ import WeeklySummaryBanner from '../components/progress/WeeklySummaryBanner';
 import MyPeakLogo from '../components/MyPeakLogo';
 import DiamondCalendar from '../components/DiamondCalendar';
 import WeeklyPlanBuilder from './training/WeeklyPlanBuilder';
+import PeakPrograms from './training/PeakPrograms';
 
 export default function TrainingPage() {
   const { t } = useTranslation();
@@ -269,6 +270,10 @@ export default function TrainingPage() {
     return <WeeklyPlanBuilder onBack={() => setView('home')} onSaved={() => { loadCalendarData(); setView('home'); }} />;
   }
 
+  if (view === 'peakPrograms') {
+    return <PeakPrograms onBack={() => setView('home')} onProgramActivated={() => { loadCalendarData(); setView('home'); }} userGoal={profile?.goal} userExperience={profile?.experience} />;
+  }
+
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex flex-col items-center pt-6 mb-4">
@@ -313,11 +318,26 @@ export default function TrainingPage() {
         {t('training.startWorkout')}
       </button>
 
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <QuickAction icon={<ClipboardList className="w-6 h-6" />} label={t('training.plans')} onClick={() => setView('plans')} />
-        <QuickAction icon={<Dumbbell className="w-6 h-6" />} label={t('training.exercises')} onClick={() => setView('exercises')} />
-        <QuickAction icon={<RefreshCw className="w-6 h-6" />} label={lang === 'de' ? 'Wochenplan' : 'Weekly Plan'} onClick={() => setView('weeklyPlan')} />
-        <QuickAction icon={<History className="w-6 h-6" />} label={t('training.history')} onClick={() => setView('history')} />
+      {/* Two-tab layout: Meine Pläne / Peak-Programme */}
+      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 mb-4">
+        <button
+          onClick={() => setView('weeklyPlan')}
+          className="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-white dark:bg-surface-dark-alt text-slate-900 dark:text-white shadow-sm"
+        >
+          {lang === 'de' ? 'Meine Pläne' : 'My Plans'}
+        </button>
+        <button
+          onClick={() => setView('peakPrograms')}
+          className="flex-1 py-2.5 rounded-lg text-sm font-semibold text-slate-500 dark:text-slate-400"
+        >
+          Peak-{lang === 'de' ? 'Programme' : 'Programs'}
+        </button>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <QuickAction icon={<ClipboardList className="w-6 h-6" />} label={t('training.plans')} onClick={() => setView('plans')} vertical />
+        <QuickAction icon={<Dumbbell className="w-6 h-6" />} label={t('training.exercises')} onClick={() => setView('exercises')} vertical />
+        <QuickAction icon={<History className="w-6 h-6" />} label={t('training.history')} onClick={() => setView('history')} vertical />
       </div>
 
       {/* Social */}
