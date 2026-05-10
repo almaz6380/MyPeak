@@ -370,7 +370,7 @@ function FoundProductScreen({ product, lang, onConfirm, onScanAgain, onClose, t 
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        {showImage ? (
+        {showImage && (
           <div className="w-40 h-40 rounded-2xl bg-slate-800 overflow-hidden mb-5 shadow-lg">
             <img
               src={product.image_url}
@@ -378,10 +378,6 @@ function FoundProductScreen({ product, lang, onConfirm, onScanAgain, onClose, t 
               className="w-full h-full object-contain"
               onError={() => setImgFailed(true)}
             />
-          </div>
-        ) : (
-          <div className="w-40 h-40 rounded-2xl bg-slate-800 flex items-center justify-center mb-5">
-            <span className="text-6xl">🏷️</span>
           </div>
         )}
 
