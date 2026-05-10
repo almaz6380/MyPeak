@@ -86,7 +86,7 @@ export default function BarcodeScanner({ onScanned, onClose }) {
           fat: Math.round((n.fat_100g || 0) * 10) / 10,
           source: 'openfoodfacts',
           source_id: barcode,
-          image_url: p.image_front_url || p.image_front_small_url || p.image_url || null,
+          image_url: p.image_front_url || p.image_front_small_url || p.image_small_url || p.image_url || p.image_thumb_url || null,
         });
         setStatus('found');
       } else {

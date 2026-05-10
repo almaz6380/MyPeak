@@ -247,7 +247,7 @@ export async function searchOpenFoodFacts(query, language = 'de') {
         fat: Math.round((p.nutriments.fat_100g || 0) * 10) / 10,
         fiber: Math.round((p.nutriments.fiber_100g || 0) * 10) / 10,
         sugar: Math.round((p.nutriments.sugars_100g || 0) * 10) / 10,
-        image_url: p.image_front_small_url || p.image_front_url || p.image_url || null,
+        image_url: p.image_front_small_url || p.image_front_url || p.image_small_url || p.image_url || p.image_thumb_url || null,
         source: 'openfoodfacts',
         source_id: p.code || p._id,
         incomplete: !p.nutriments['energy-kcal_100g'] || !p.nutriments.proteins_100g,
