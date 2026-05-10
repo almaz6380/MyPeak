@@ -6,6 +6,7 @@ import PortionPicker from './PortionPicker';
 import BarcodeScanner from './BarcodeScanner';
 import { useAuth } from '../../context/AuthContext';
 import { saveNutritionEntry, getRecentFoods, getCustomMeals, logCustomMeal } from '../../data/nutritionStorage';
+import { getCategoryEmoji } from '../../data/foodDatabase';
 
 export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language = 'de' }) {
   const { t, i18n } = useTranslation();
@@ -233,6 +234,14 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
                 const inQueue = isInQueue(food.food_name);
                 return (
                   <div key={i} className="flex items-center gap-3 px-4 py-3 border-b border-slate-50 dark:border-slate-700/50 last:border-0">
+                    {/* Food image/emoji */}
+                    <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      {food.image_url ? (
+                        <img src={food.image_url} alt="" className="w-full h-full object-cover" loading="lazy" />
+                      ) : (
+                        <span className="text-base">{getCategoryEmoji(food.source === 'openfoodfacts' ? null : food.category)}</span>
+                      )}
+                    </div>
                     <button
                       onClick={() => inQueue ? null : selectRecent(food)}
                       className="flex-1 text-left min-w-0"

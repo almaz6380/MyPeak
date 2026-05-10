@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, Wifi, WifiOff, AlertTriangle } from 'lucide-react';
-import { searchLocalFoods, searchOpenFoodFacts } from '../../data/foodDatabase';
+import { searchLocalFoods, searchOpenFoodFacts, getCategoryEmoji } from '../../data/foodDatabase';
 
 export default function FoodSearch({ onSelectFood, language = 'de' }) {
   const { t } = useTranslation();
@@ -120,12 +120,29 @@ export default function FoodSearch({ onSelectFood, language = 'de' }) {
 
 function FoodResultItem({ food, language, onSelect, isOnline }) {
   const name = language === 'de' ? (food.nameDE || food.nameEN) : (food.nameEN || food.nameDE);
+  const [imgError, setImgError] = useState(false);
+  const hasImage = food.image_url && !imgError;
 
   return (
     <button
       onClick={() => onSelect(food)}
-      className="w-full flex items-center justify-between px-4 py-3 text-left border-b border-slate-50 dark:border-slate-700/50 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+      className="w-full flex items-center gap-3 px-4 py-3 text-left border-b border-slate-50 dark:border-slate-700/50 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
     >
+      {/* Image / Emoji fallback */}
+      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0 overflow-hidden">
+        {hasImage ? (
+          <img
+            src={food.image_url}
+            alt=""
+            className="w-full h-full object-cover"
+            onError={() => setImgError(true)}
+            loading="lazy"
+          />
+        ) : (
+          <span className="text-lg">{getCategoryEmoji(food.category)}</span>
+        )}
+      </div>
+
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">
           {name}
@@ -139,7 +156,7 @@ function FoodResultItem({ food, language, onSelect, isOnline }) {
           <span className="text-slate-300 dark:text-slate-600"> / 100g</span>
         </p>
       </div>
-      <div className="text-right ml-3 flex-shrink-0">
+      <div className="text-right ml-2 flex-shrink-0">
         <span className="text-xs font-medium text-primary-500">{food.servingSize}{food.servingUnit}</span>
       </div>
     </button>

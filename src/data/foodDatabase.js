@@ -201,6 +201,19 @@ export const foodCategories = [
   { id: 'frozen', nameDE: 'Tiefkühl & Convenience', nameEN: 'Frozen & Convenience' },
 ];
 
+// ── Category Emojis (Fallback wenn kein Bild) ───────────────
+const CATEGORY_EMOJIS = {
+  dairy: '🥛', eggs: '🥚', meat: '🥩', fish: '🐟',
+  grains: '🌾', bakery: '🍞', fruit: '🍎', vegetables: '🥦',
+  legumes: '🫘', nuts: '🥜', oils: '🫒', drinks: '🥤',
+  snacks: '🍫', prepared: '🥫', supplements: '💊',
+  breakfast: '🥣', frozen: '❄️',
+};
+
+export function getCategoryEmoji(category) {
+  return CATEGORY_EMOJIS[category] || '🍽️';
+}
+
 // ── Open Food Facts API ──────────────────────────────────────
 
 const offCache = new Map();
@@ -234,6 +247,7 @@ export async function searchOpenFoodFacts(query, language = 'de') {
         fat: Math.round((p.nutriments.fat_100g || 0) * 10) / 10,
         fiber: Math.round((p.nutriments.fiber_100g || 0) * 10) / 10,
         sugar: Math.round((p.nutriments.sugars_100g || 0) * 10) / 10,
+        image_url: p.image_front_small_url || p.image_front_url || p.image_url || null,
         source: 'openfoodfacts',
         source_id: p.code || p._id,
         incomplete: !p.nutriments['energy-kcal_100g'] || !p.nutriments.proteins_100g,
