@@ -26,6 +26,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Gewichtsdiagramm: Zeiträume 7T/14T/1M/3M/6M/1J/Alle + eigener Datumsbereich (Von-Bis-Picker)
 - [x] Gewichtsdiagramm: Standard ausgeklappt, Profil-Gewicht als Startwert
 - [x] Zyklustracking: 4 Phasen mit Training-/Ernährungs-Empfehlungen, Symptom-Tagebuch, Home-Widget (nur female)
+- [x] Zyklustracking: Setup-Karte auf Home wenn noch nicht eingerichtet (🌸 "Zyklus einrichten")
 - [x] Home-Button als goldener Kreis-FAB mit MyPeak-Pfeil, ragt über Nav hinaus
 - [x] Pull-to-Refresh: MyPeak-Logo zeichnet sich neu beim Aktualisieren
 - [x] Mehrsprachigkeit (DE/EN) mit i18next eingerichtet
@@ -90,6 +91,8 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Peak-Programme anpassbar: Tage tauschen (Ruhetage verschieben), Übungen entfernen, Zurücksetzen
 - [x] Level-Badges + "Empfohlen" basierend auf Onboarding-Ziel/Erfahrung
 - [x] Programm starten → wird als Wochenplan gespeichert → Kreiskalender zeigt blaue Tage
+- [x] Meine Pläne: Übersicht gespeicherter Wochenpläne + Freies Training Button + Plan erstellen
+- [x] Verlauf als eigene Karte unter den QuickActions, über Social
 
 ### Phase 3: Ernährungs-Tracking — FERTIG
 - [x] Lebensmittel-Suche (150 lokale Lebensmittel + Open Food Facts API)
@@ -205,7 +208,8 @@ src/
 │       ├── TrainingPlans.jsx     # Vorgefertigte + eigene Pläne
 │       ├── WorkoutHistory.jsx    # Verlauf mit Details + Vergleich + Edit-Modal
 │       ├── WeeklyPlanBuilder.jsx # 3-Schritte Wochenplan-Erstellung
-│       └── PeakPrograms.jsx     # Peak-Programme Übersicht + Detail + Anpassung
+│       ├── PeakPrograms.jsx     # Peak-Programme Übersicht + Detail + Anpassung
+│       └── MyPlans.jsx          # Meine Pläne Übersicht + Freies Training
 │       ├── FriendsList.jsx       # Freundesliste + Anfragen
 │       ├── Leaderboard.jsx       # Wöchentliches Ranking
 │       ├── ChallengesList.jsx    # Challenges verwalten
