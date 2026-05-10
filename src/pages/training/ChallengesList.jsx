@@ -106,15 +106,15 @@ export default function ChallengesList({ onBack, onCreateChallenge, onViewChalle
                         {daysLeft} {lang === 'de' ? 'Tage' : 'days'}
                       </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div className="text-center">
+                    <div className="flex items-center justify-around">
+                      <div className="text-center flex-1">
                         <p className="text-lg font-bold text-primary-400">{Math.round(myScore)}</p>
                         <p className="text-[10px] text-slate-400">{lang === 'de' ? 'Du' : 'You'}</p>
                       </div>
-                      <Swords className="w-5 h-5 text-slate-300 dark:text-slate-600" />
-                      <div className="text-center">
+                      <Swords className="w-5 h-5 text-slate-300 dark:text-slate-600 flex-shrink-0" />
+                      <div className="text-center flex-1">
                         <p className="text-lg font-bold text-slate-500">{Math.round(theirScore)}</p>
-                        <p className="text-[10px] text-slate-400">{opponent?.name}</p>
+                        <p className="text-[10px] text-slate-400 truncate">{opponent?.name}</p>
                       </div>
                     </div>
                   </button>

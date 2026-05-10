@@ -266,9 +266,9 @@ export default function TrainingPage() {
       {/* Social */}
       <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">{t('common.back') === 'Zurück' ? 'Social' : 'Social'}</h2>
       <div className="grid grid-cols-3 gap-3">
-        <QuickAction icon={<Medal className="w-6 h-6" />} label={t('common.back') === 'Zurück' ? 'Ranking' : 'Ranking'} onClick={() => setView('leaderboard')} />
-        <QuickAction icon={<Swords className="w-6 h-6" />} label="Challenges" onClick={() => setView('challenges')} />
-        <QuickAction icon={<Users className="w-6 h-6" />} label={t('common.back') === 'Zurück' ? 'Freunde' : 'Friends'} onClick={() => setView('friends')} />
+        <QuickAction icon={<Medal className="w-6 h-6" />} label={t('common.back') === 'Zurück' ? 'Ranking' : 'Ranking'} onClick={() => setView('leaderboard')} vertical />
+        <QuickAction icon={<Swords className="w-6 h-6" />} label="Challenges" onClick={() => setView('challenges')} vertical />
+        <QuickAction icon={<Users className="w-6 h-6" />} label={t('common.back') === 'Zurück' ? 'Freunde' : 'Friends'} onClick={() => setView('friends')} vertical />
       </div>
     </div>
   );
@@ -280,14 +280,18 @@ function formatElapsed(ms) {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-function QuickAction({ icon, label, onClick, className = '' }) {
+function QuickAction({ icon, label, onClick, className = '', vertical = false }) {
   return (
     <button
       onClick={onClick}
-      className={`bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-3 text-left shadow-sm hover:shadow-md transition-shadow ${className}`}
+      className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:shadow-md transition-shadow ${
+        vertical
+          ? 'flex flex-col items-center justify-center gap-1.5 py-5 px-2 text-center'
+          : 'flex items-center gap-3 p-4 text-left'
+      } ${className}`}
     >
-      <span className="text-primary-500">{icon}</span>
-      <span className="font-medium">{label}</span>
+      <span className="text-primary-500 flex-shrink-0">{icon}</span>
+      <span className={`font-medium leading-tight ${vertical ? 'text-xs w-full truncate' : 'text-sm'}`}>{label}</span>
     </button>
   );
 }
