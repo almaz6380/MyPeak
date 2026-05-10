@@ -89,6 +89,9 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] TDEE-Rechner (Mifflin-St Jeor Formel, vorbefüllt mit Profildaten)
 - [x] Makro-Ziele manuell editierbar (nicht nur über TDEE)
 - [x] Barcode-Scanner per Kamera (Quagga2 + Open Food Facts API + Community Products + CameraContext)
+- [x] Barcode-Scan: Produktbild von Open Food Facts + Makros als Fullscreen-Ergebnis nach Scan
+- [x] Produktfotos: Eigenes Foto aufnehmen wenn kein Bild in der Datenbank (IndexedDB, komprimiert)
+- [x] Lebensmittel-Bilder: Open Food Facts Produktbilder in Suche + Kategorie-Emojis als Fallback
 - [x] Community Products: Unbekannte Produkte selbst hinzufügen → steht allen Usern zur Verfügung
 - [x] Crowdsource-Korrekturen: 3+ ähnliche User-Korrekturen → Community-Eintrag wird automatisch aktualisiert
 - [x] 4 Mahlzeit-Slots (Frühstück, Mittagessen, Abendessen, Snacks)
@@ -204,7 +207,7 @@ src/
 ├── data/
 │   ├── exercises.js              # 90+ Kraftübungen + Cardio/HIIT/Kampfsport
 │   ├── workoutStorage.js         # Supabase CRUD für Workouts + Notes + Migration
-│   ├── exercisePhotos.js         # IndexedDB CRUD für Übungsfotos (lokal)
+│   ├── exercisePhotos.js         # IndexedDB CRUD für Übungs- + Produktfotos (lokal)
 │   ├── settingsStorage.js        # Supabase CRUD für User-Settings
 │   ├── nutritionStorage.js       # Supabase CRUD für Nutrition (Entries, Meals, Goals)
 │   ├── foodDatabase.js           # 150 lokale Lebensmittel + Open Food Facts API
