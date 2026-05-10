@@ -42,6 +42,7 @@ export default function TrainingPage() {
   const [selectedDay, setSelectedDay] = useState(now.getDate());
   const [scheduledDays, setScheduledDays] = useState(new Set());
   const [completedDays, setCompletedDays] = useState(new Set());
+  const [showTrainingCalendar, setShowTrainingCalendar] = useState(false);
   const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
 
   useEffect(() => {
@@ -278,6 +279,7 @@ export default function TrainingPage() {
         year={calYear}
         month={calMonth}
         lang={lang}
+        onOpenCalendar={() => setShowTrainingCalendar(true)}
       />
 
       {prNotification && (
@@ -322,6 +324,23 @@ export default function TrainingPage() {
         <QuickAction icon={<Swords className="w-6 h-6" />} label="Challenges" onClick={() => setView('challenges')} vertical />
         <QuickAction icon={<Users className="w-6 h-6" />} label={t('common.back') === 'Zurück' ? 'Freunde' : 'Friends'} onClick={() => setView('friends')} vertical />
       </div>
+
+      {/* Training Calendar Modal */}
+      {showTrainingCalendar && (
+        <TrainingCalendarModal
+          selectedDay={selectedDay}
+          year={calYear}
+          month={calMonth}
+          lang={lang}
+          onSelect={(day, yr, mo) => {
+            setCalYear(yr);
+            setCalMonth(mo);
+            setSelectedDay(day);
+            setShowTrainingCalendar(false);
+          }}
+          onClose={() => setShowTrainingCalendar(false)}
+        />
+      )}
     </div>
   );
 }
@@ -1181,6 +1200,95 @@ function MartialArtsSetup({ onBack, onStart, t }) {
           <button onClick={handleSave} disabled={!saveName.trim()} className="px-4 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-medium disabled:opacity-50">{t('common.save')}</button>
         </div>
       )}
+    </div>
+  );
+}
+
+function TrainingCalendarModal({ selectedDay, year, month, lang, onSelect, onClose }) {
+  const [viewYear, setViewYear] = useState(year);
+  const [viewMonth, setViewMonth] = useState(month);
+
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const adjustedFirst = firstDay === 0 ? 6 : firstDay - 1;
+
+  const monthName = new Date(viewYear, viewMonth).toLocaleDateString(
+    lang === 'de' ? 'de-DE' : 'en-US',
+    { month: 'long', year: 'numeric' }
+  );
+
+  const dayHeaders = lang === 'de'
+    ? ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
+    : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  function prevMonth() {
+    if (viewMonth === 0) { setViewYear(viewYear - 1); setViewMonth(11); }
+    else setViewMonth(viewMonth - 1);
+  }
+
+  function nextMonth() {
+    if (viewMonth === 11) { setViewYear(viewYear + 1); setViewMonth(0); }
+    else setViewMonth(viewMonth + 1);
+  }
+
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-6" onClick={onClose}>
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl w-full max-w-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 pt-5 pb-3">
+          <button onClick={prevMonth} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
+            <ArrowLeft className="w-5 h-5 text-slate-400" />
+          </button>
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 capitalize">{monthName}</span>
+          <button onClick={nextMonth} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
+            <ChevronRight className="w-5 h-5 text-slate-400" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-7 px-4 pb-1">
+          {dayHeaders.map((d) => (
+            <span key={d} className="text-[10px] font-medium text-slate-400 text-center py-1">{d}</span>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-7 px-4 pb-4 gap-y-0.5">
+          {Array.from({ length: adjustedFirst }).map((_, i) => <span key={`e${i}`} />)}
+          {Array.from({ length: daysInMonth }).map((_, i) => {
+            const day = i + 1;
+            const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isSelected = day === selectedDay && viewYear === year && viewMonth === month;
+            const isToday = dateStr === todayStr;
+            return (
+              <button
+                key={day}
+                onClick={() => onSelect(day, viewYear, viewMonth)}
+                className={`h-9 w-9 mx-auto rounded-full text-sm font-medium flex items-center justify-center transition-colors ${
+                  isSelected
+                    ? 'bg-primary-500 text-white'
+                    : isToday
+                      ? 'ring-2 ring-primary-400 text-primary-500'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                {day}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex gap-2 px-5 pb-5">
+          <button
+            onClick={() => { const n = new Date(); onSelect(n.getDate(), n.getFullYear(), n.getMonth()); }}
+            className="flex-1 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-semibold"
+          >
+            {lang === 'de' ? 'Heute' : 'Today'}
+          </button>
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm font-semibold">
+            {lang === 'de' ? 'Schließen' : 'Close'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
