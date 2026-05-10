@@ -293,6 +293,7 @@ export default function TrainingPage() {
     <div className="p-4 pt-16 pb-24">
       <div className="flex flex-col items-center pt-6 mb-4">
         <MyPeakLogo size={32} />
+        <h1 className="text-2xl font-bold mt-2">{t('training.title')}</h1>
       </div>
 
       {/* Diamond Calendar */}
