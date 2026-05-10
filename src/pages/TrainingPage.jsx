@@ -13,13 +13,15 @@ import FriendsList from './training/FriendsList';
 import Leaderboard from './training/Leaderboard';
 import ChallengesList from './training/ChallengesList';
 import exercises, { getExerciseById, getExercisesByType } from '../data/exercises';
-import { getCustomPlans, getCustomPlansByType, saveCustomPlan } from '../data/workoutStorage';
+import { getCustomPlans, getCustomPlansByType, saveCustomPlan, getActiveSchedule, getScheduledDaysForMonth, getWorkouts } from '../data/workoutStorage';
 import { getHiddenDefaultPlans, getPermanentDeletedDefaultPlans } from '../data/settingsStorage';
 import { useAuth } from '../context/AuthContext';
 import { useActiveWorkout } from '../context/ActiveWorkoutContext';
 import MuscleGroupIcon from '../components/icons/MuscleGroupIcon';
 import WeeklySummaryBanner from '../components/progress/WeeklySummaryBanner';
 import MyPeakLogo from '../components/MyPeakLogo';
+import DiamondCalendar from '../components/DiamondCalendar';
+import WeeklyPlanBuilder from './training/WeeklyPlanBuilder';
 
 export default function TrainingPage() {
   const { t } = useTranslation();
@@ -32,6 +34,41 @@ export default function TrainingPage() {
   const [hiitConfig, setHiitConfig] = useState(null);
   const [circuitConfig, setCircuitConfig] = useState(null);
   const [martialArtsConfig, setMartialArtsConfig] = useState(null);
+
+  // Diamond Calendar state
+  const now = new Date();
+  const [calYear, setCalYear] = useState(now.getFullYear());
+  const [calMonth, setCalMonth] = useState(now.getMonth());
+  const [selectedDay, setSelectedDay] = useState(now.getDate());
+  const [scheduledDays, setScheduledDays] = useState(new Set());
+  const [completedDays, setCompletedDays] = useState(new Set());
+  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+
+  useEffect(() => {
+    if (user) loadCalendarData();
+  }, [user, calYear, calMonth]);
+
+  async function loadCalendarData() {
+    const [schedule, workouts] = await Promise.all([
+      getActiveSchedule(user.id),
+      getWorkouts(user.id),
+    ]);
+
+    // Scheduled days from weekly plan
+    if (schedule) {
+      setScheduledDays(getScheduledDaysForMonth(schedule, calYear, calMonth));
+    }
+
+    // Completed days from workout history
+    const completed = new Set();
+    (workouts || []).forEach((w) => {
+      const d = new Date(w.date);
+      if (d.getFullYear() === calYear && d.getMonth() === calMonth) {
+        completed.add(d.getDate());
+      }
+    });
+    setCompletedDays(completed);
+  }
 
   const startWorkout = () => {
     setView('startChoice');
@@ -222,12 +259,26 @@ export default function TrainingPage() {
     return <ChallengesList onBack={() => setView('home')} onCreateChallenge={() => setView('home')} />;
   }
 
+  if (view === 'weeklyPlan') {
+    return <WeeklyPlanBuilder onBack={() => setView('home')} onSaved={() => { loadCalendarData(); setView('home'); }} />;
+  }
+
   return (
     <div className="p-4 pt-16 pb-24">
-      <div className="flex flex-col items-center pt-12 mb-6">
-        <MyPeakLogo size={36} />
-        <h1 className="text-2xl font-bold mt-2">{t('training.title')}</h1>
+      <div className="flex flex-col items-center pt-6 mb-4">
+        <MyPeakLogo size={32} />
       </div>
+
+      {/* Diamond Calendar */}
+      <DiamondCalendar
+        selectedDay={selectedDay}
+        onSelectDay={setSelectedDay}
+        scheduledDays={scheduledDays}
+        completedDays={completedDays}
+        year={calYear}
+        month={calMonth}
+        lang={lang}
+      />
 
       {prNotification && (
         <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 mb-4 flex items-center gap-3 animate-pulse">
@@ -260,7 +311,8 @@ export default function TrainingPage() {
       <div className="grid grid-cols-2 gap-3 mb-6">
         <QuickAction icon={<ClipboardList className="w-6 h-6" />} label={t('training.plans')} onClick={() => setView('plans')} />
         <QuickAction icon={<Dumbbell className="w-6 h-6" />} label={t('training.exercises')} onClick={() => setView('exercises')} />
-        <QuickAction icon={<History className="w-6 h-6" />} label={t('training.history')} onClick={() => setView('history')} className="col-span-2" />
+        <QuickAction icon={<RefreshCw className="w-6 h-6" />} label={lang === 'de' ? 'Wochenplan' : 'Weekly Plan'} onClick={() => setView('weeklyPlan')} />
+        <QuickAction icon={<History className="w-6 h-6" />} label={t('training.history')} onClick={() => setView('history')} />
       </div>
 
       {/* Social */}

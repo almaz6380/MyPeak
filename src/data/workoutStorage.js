@@ -430,3 +430,111 @@ export async function getAllExerciseNotes(userId) {
   });
   return result;
 }
+
+// ── Weekly Schedules ────────────────────────────────────────────
+
+const SCHEDULE_KEY = 'weekly_schedules';
+const ACTIVE_SCHEDULE_KEY = 'active_weekly_schedule';
+
+export async function getWeeklySchedules(userId) {
+  if (!guestSkip(userId)) {
+    try {
+      const { data, error } = await supabase
+        .from('weekly_schedules')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        localStorage.setItem(SCHEDULE_KEY, JSON.stringify(data));
+        return data;
+      }
+    } catch (err) {
+      console.error('Failed to load weekly schedules:', err);
+    }
+  }
+
+  try {
+    return JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+export async function getActiveSchedule(userId) {
+  const schedules = await getWeeklySchedules(userId);
+  return schedules.find((s) => s.is_active) || null;
+}
+
+export async function saveWeeklySchedule(userId, schedule) {
+  const entry = {
+    user_id: userId,
+    name: schedule.name,
+    sessions_per_week: schedule.sessions_per_week,
+    days: schedule.days,
+    is_active: true,
+  };
+
+  // Deactivate other schedules in localStorage
+  const cached = JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]').map((s) => ({ ...s, is_active: false }));
+  const localEntry = { ...entry, id: `local_${Date.now()}`, created_at: new Date().toISOString() };
+  cached.unshift(localEntry);
+  localStorage.setItem(SCHEDULE_KEY, JSON.stringify(cached));
+
+  if (!guestSkip(userId)) {
+    try {
+      // Deactivate all existing
+      await supabase
+        .from('weekly_schedules')
+        .update({ is_active: false })
+        .eq('user_id', userId);
+
+      const { data } = await supabase
+        .from('weekly_schedules')
+        .insert(entry)
+        .select()
+        .single();
+
+      if (data) {
+        const updated = JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]');
+        const idx = updated.findIndex((s) => s.id === localEntry.id);
+        if (idx >= 0) updated[idx] = data;
+        localStorage.setItem(SCHEDULE_KEY, JSON.stringify(updated));
+        return { data, error: null };
+      }
+    } catch (err) {
+      console.error('Failed to save weekly schedule:', err);
+    }
+  }
+
+  return { data: localEntry, error: null };
+}
+
+export async function deleteWeeklySchedule(userId, scheduleId) {
+  const cached = JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]');
+  localStorage.setItem(SCHEDULE_KEY, JSON.stringify(cached.filter((s) => s.id !== scheduleId)));
+
+  if (!guestSkip(userId) && !scheduleId.startsWith('local_')) {
+    try {
+      await supabase.from('weekly_schedules').delete().eq('id', scheduleId);
+    } catch (err) {
+      console.error('Failed to delete weekly schedule:', err);
+    }
+  }
+}
+
+export function getScheduledDaysForMonth(schedule, year, month) {
+  if (!schedule?.days) return new Set();
+  const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const scheduled = new Set();
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(year, month, d);
+    const dayKey = DAY_KEYS[date.getDay()];
+    if (schedule.days[dayKey]) {
+      scheduled.add(d);
+    }
+  }
+  return scheduled;
+}

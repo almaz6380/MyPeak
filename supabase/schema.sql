@@ -445,3 +445,18 @@ CREATE TABLE active_diet (
 ALTER TABLE active_diet ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users manage own active diet" ON active_diet
   FOR ALL USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+
+-- 23. Weekly Schedules (Wochenplan-System)
+CREATE TABLE weekly_schedules (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  name text NOT NULL,
+  sessions_per_week integer NOT NULL DEFAULT 3,
+  days jsonb NOT NULL DEFAULT '{}',
+  is_active boolean DEFAULT false,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE weekly_schedules ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users manage own weekly schedules" ON weekly_schedules
+  FOR ALL USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
