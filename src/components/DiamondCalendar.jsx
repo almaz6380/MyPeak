@@ -97,11 +97,11 @@ export default function DiamondCalendar({ selectedDay, onSelectDay, scheduledDay
         </button>
       </div>
 
-      {/* Fixed diamond row */}
+      {/* Fixed circle row */}
       <div
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
-        className="flex items-end justify-center select-none"
+        className="flex items-end justify-center gap-[6px] select-none"
         style={{ height: 72, touchAction: 'none' }}
       >
         {slots.map((slot, i) => (
@@ -109,7 +109,7 @@ export default function DiamondCalendar({ selectedDay, onSelectDay, scheduledDay
             key={i}
             onClick={() => slot.day && slot.day !== selectedDay && (triggerPulse(), onSelectDay(slot.day))}
             className="flex-shrink-0 flex items-center justify-center"
-            style={{ width: 42, height: 72, paddingTop: slot.offsetY, opacity: slot.day ? slot.opacity : 0 }}
+            style={{ height: 72, paddingTop: slot.offsetY, opacity: slot.day ? slot.opacity : 0 }}
           >
             {slot.day && (
               <div
