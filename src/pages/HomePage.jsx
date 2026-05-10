@@ -128,7 +128,7 @@ export default function HomePage() {
           setShowCycle(true);
         } else {
           setCyclePhase(null);
-          setShowCycle(false);
+          setShowCycle(true); // Show setup prompt
         }
       }
     } catch (err) {
@@ -293,6 +293,23 @@ export default function HomePage() {
               <p className="text-xs text-slate-400">
                 {getPhaseRecommendations(cyclePhase.phase, lang)?.training?.split('.')[0]}.
               </p>
+            </button>
+          )}
+          {showCycle && !cyclePhase && (
+            <button
+              onClick={() => navigate('/cycle')}
+              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm text-left hover:shadow-md transition-shadow border-2 border-dashed border-pink-300 dark:border-pink-700"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-pink-100 dark:bg-pink-900/20 flex items-center justify-center">
+                  <span className="text-lg">🌸</span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">{t('cycle.title')}</p>
+                  <p className="text-xs text-slate-400">{lang === 'de' ? 'Zyklus einrichten und Empfehlungen erhalten' : 'Set up cycle and get recommendations'}</p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-slate-300" />
+              </div>
             </button>
           )}
 
