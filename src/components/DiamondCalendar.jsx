@@ -101,15 +101,19 @@ export default function DiamondCalendar({ selectedDay, onSelectDay, scheduledDay
       <div
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
-        className="flex items-end justify-center gap-[6px] select-none"
+        className="flex items-end justify-center select-none"
         style={{ height: 72, touchAction: 'none' }}
       >
-        {slots.map((slot, i) => (
+        {slots.map((slot, i) => {
+          // Calculate margin so the gap between circle EDGES is always 6px
+          const nextSize = i < slots.length - 1 ? slots[i + 1].size : 0;
+          const marginRight = i < slots.length - 1 ? 6 : 0;
+          return (
           <div
             key={i}
             onClick={() => slot.day && slot.day !== selectedDay && (triggerPulse(), onSelectDay(slot.day))}
             className="flex-shrink-0 flex items-center justify-center"
-            style={{ height: 72, paddingTop: slot.offsetY, opacity: slot.day ? slot.opacity : 0 }}
+            style={{ height: 72, paddingTop: slot.offsetY, opacity: slot.day ? slot.opacity : 0, marginRight }}
           >
             {slot.day && (
               <div
@@ -128,7 +132,8 @@ export default function DiamondCalendar({ selectedDay, onSelectDay, scheduledDay
               </div>
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Selected day label */}
