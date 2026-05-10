@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState, useCallback } from 'react';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const DAY_LABELS_DE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
@@ -21,19 +21,24 @@ export default function DiamondCalendar({ selectedDay, onSelectDay, scheduledDay
   const startXRef = useRef(0);
   const selectedRef = useRef(selectedDay);
   selectedRef.current = selectedDay;
+  const [pulse, setPulse] = useState(false);
+  const pulseTimer = useRef(null);
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const dayLabels = lang === 'de' ? DAY_LABELS_DE : DAY_LABELS_EN;
   const monthName = new Date(year, month).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US', { month: 'long' });
 
-  function vibrate() {
+  const triggerPulse = useCallback(() => {
+    setPulse(true);
+    clearTimeout(pulseTimer.current);
+    pulseTimer.current = setTimeout(() => setPulse(false), 120);
     try { navigator.vibrate?.(12); } catch {}
-  }
+  }, []);
 
   function go(dir) {
     const next = selectedRef.current + dir;
     if (next >= 1 && next <= daysInMonth) {
-      vibrate();
+      triggerPulse();
       onSelectDay(next);
     }
   }
@@ -102,7 +107,7 @@ export default function DiamondCalendar({ selectedDay, onSelectDay, scheduledDay
         {slots.map((slot, i) => (
           <div
             key={i}
-            onClick={() => slot.day && slot.day !== selectedDay && (vibrate(), onSelectDay(slot.day))}
+            onClick={() => slot.day && slot.day !== selectedDay && (triggerPulse(), onSelectDay(slot.day))}
             className="flex-shrink-0 flex items-center justify-center"
             style={{ width: 42, height: 72, paddingTop: slot.offsetY, opacity: slot.day ? slot.opacity : 0 }}
           >
@@ -112,8 +117,9 @@ export default function DiamondCalendar({ selectedDay, onSelectDay, scheduledDay
                 style={{
                   width: slot.size,
                   height: slot.size,
-                  transform: 'rotate(45deg)',
+                  transform: `rotate(45deg)${i === 4 && pulse ? ' scale(1.2)' : ''}`,
                   borderRadius: Math.max(3, slot.size * 0.15),
+                  transition: i === 4 ? 'transform 0.1s ease-out' : 'none',
                 }}
               >
                 <span className="font-bold text-white" style={{ transform: 'rotate(-45deg)', fontSize: slot.fs }}>
