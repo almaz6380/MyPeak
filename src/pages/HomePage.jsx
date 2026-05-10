@@ -59,7 +59,9 @@ export default function HomePage() {
   const [showWeightChart, setShowWeightChart] = useState(false);
   const [showWeightInput, setShowWeightInput] = useState(false);
   const [weightInput, setWeightInput] = useState('');
-  const [weightRange, setWeightRange] = useState('3m'); // '1m', '3m', '6m', '1y', 'all'
+  const [weightRange, setWeightRange] = useState('3m');
+  const [weightCustomFrom, setWeightCustomFrom] = useState('');
+  const [weightCustomTo, setWeightCustomTo] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -369,8 +371,10 @@ export default function HomePage() {
                 )}
 
                 {/* Time range selector */}
-                <div className="flex gap-1 mb-3">
+                <div className="flex gap-1 mb-2 flex-wrap">
                   {[
+                    { key: '7d', label: '7T' },
+                    { key: '14d', label: '14T' },
                     { key: '1m', label: '1M' },
                     { key: '3m', label: '3M' },
                     { key: '6m', label: '6M' },
@@ -379,9 +383,9 @@ export default function HomePage() {
                   ].map((r) => (
                     <button
                       key={r.key}
-                      onClick={() => setWeightRange(r.key)}
-                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                        weightRange === r.key
+                      onClick={() => { setWeightRange(r.key); setWeightCustomFrom(''); setWeightCustomTo(''); }}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors min-w-[36px] ${
+                        weightRange === r.key && !weightCustomFrom
                           ? 'bg-primary-500 text-white'
                           : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                       }`}
@@ -390,10 +394,27 @@ export default function HomePage() {
                     </button>
                   ))}
                 </div>
+                {/* Custom date range */}
+                <div className="flex gap-2 mb-3">
+                  <input
+                    type="date"
+                    value={weightCustomFrom}
+                    onChange={(e) => { setWeightCustomFrom(e.target.value); setWeightRange('custom'); }}
+                    className="flex-1 px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                  <span className="text-xs text-slate-400 self-center">–</span>
+                  <input
+                    type="date"
+                    value={weightCustomTo}
+                    onChange={(e) => { setWeightCustomTo(e.target.value); setWeightRange('custom'); }}
+                    max={formatDate(new Date())}
+                    className="flex-1 px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
 
                 {/* Chart */}
                 {weightEntries.length >= 2 ? (
-                  <WeightChart entries={weightEntries} range={weightRange} />
+                  <WeightChart entries={weightEntries} range={weightRange} customFrom={weightCustomFrom} customTo={weightCustomTo} />
                 ) : (
                   <p className="text-xs text-slate-400 text-center py-4">
                     {t('home.weightNoData')}
@@ -536,18 +557,29 @@ function CalendarModal({ selectedDate, onSelect, onClose, lang }) {
   );
 }
 
-function WeightChart({ entries, range = '3m' }) {
+function WeightChart({ entries, range = '3m', customFrom = '', customTo = '' }) {
   const now = new Date();
-  const cutoff = new Date(now);
-  switch (range) {
-    case '1m': cutoff.setMonth(cutoff.getMonth() - 1); break;
-    case '3m': cutoff.setMonth(cutoff.getMonth() - 3); break;
-    case '6m': cutoff.setMonth(cutoff.getMonth() - 6); break;
-    case '1y': cutoff.setFullYear(cutoff.getFullYear() - 1); break;
-    default: cutoff.setFullYear(2000); break; // 'all'
+  let fromStr, toStr;
+
+  if (range === 'custom' && customFrom) {
+    fromStr = customFrom;
+    toStr = customTo || formatDate(now);
+  } else {
+    const cutoff = new Date(now);
+    switch (range) {
+      case '7d': cutoff.setDate(cutoff.getDate() - 7); break;
+      case '14d': cutoff.setDate(cutoff.getDate() - 14); break;
+      case '1m': cutoff.setMonth(cutoff.getMonth() - 1); break;
+      case '3m': cutoff.setMonth(cutoff.getMonth() - 3); break;
+      case '6m': cutoff.setMonth(cutoff.getMonth() - 6); break;
+      case '1y': cutoff.setFullYear(cutoff.getFullYear() - 1); break;
+      default: cutoff.setFullYear(2000); break;
+    }
+    fromStr = cutoff.toISOString().split('T')[0];
+    toStr = formatDate(now);
   }
-  const cutoffStr = cutoff.toISOString().split('T')[0];
-  const filtered = entries.filter((e) => e.date >= cutoffStr);
+
+  const filtered = entries.filter((e) => e.date >= fromStr && e.date <= toStr);
   const last30 = filtered.length > 60 ? filtered.slice(-60) : filtered;
   if (last30.length < 2) return null;
 
