@@ -1,18 +1,13 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { Calendar } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const DAY_LABELS_DE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 const DAY_LABELS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-const ITEM_WIDTH = 52; // width per diamond slot
-const CENTER_SIZE = 44;
-const MIN_SIZE = 22;
-
 export default function DiamondCalendar({ selectedDay, onSelectDay, scheduledDays, completedDays, year, month, lang = 'de', onOpenCalendar }) {
-  const scrollRef = useRef(null);
-  const isScrollingRef = useRef(false);
-  const snapTimerRef = useRef(null);
-  const [scrollCenter, setScrollCenter] = useState(0);
+  const containerRef = useRef(null);
+  const startXRef = useRef(0);
+  const lastDayRef = useRef(selectedDay);
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const dayLabels = lang === 'de' ? DAY_LABELS_DE : DAY_LABELS_EN;
 
@@ -21,77 +16,54 @@ export default function DiamondCalendar({ selectedDay, onSelectDay, scheduledDay
     { month: 'long' }
   );
 
-  // Scroll to a specific day
-  const scrollToDay = useCallback((day, smooth = true) => {
-    if (!scrollRef.current) return;
-    const container = scrollRef.current;
-    const containerCenter = container.clientWidth / 2;
-    const targetLeft = (day - 1) * ITEM_WIDTH + ITEM_WIDTH / 2 - containerCenter + container.clientWidth / 2;
-    // Account for left padding
-    const paddingLeft = container.clientWidth / 2 - ITEM_WIDTH / 2;
-    const scrollLeft = (day - 1) * ITEM_WIDTH;
-    container.scrollTo({ left: scrollLeft, behavior: smooth ? 'smooth' : 'instant' });
-  }, []);
+  // Vibrate on day change
+  function vibrate() {
+    if (navigator.vibrate) navigator.vibrate(10);
+  }
 
-  // Initial scroll
-  useEffect(() => {
-    scrollToDay(selectedDay, false);
-  }, []);
+  // Touch swipe handling
+  function handleTouchStart(e) {
+    startXRef.current = e.touches[0].clientX;
+  }
 
-  // Update on selectedDay change (from calendar picker)
-  useEffect(() => {
-    scrollToDay(selectedDay, true);
-  }, [selectedDay, scrollToDay]);
+  function handleTouchMove(e) {
+    const diff = startXRef.current - e.touches[0].clientX;
+    const threshold = 30;
 
-  // Handle scroll — update sizes in real-time + snap to nearest day
-  const handleScroll = useCallback(() => {
-    if (!scrollRef.current) return;
-    const container = scrollRef.current;
-    const center = container.scrollLeft + container.clientWidth / 2 - container.clientWidth / 2 + ITEM_WIDTH / 2;
-    setScrollCenter(container.scrollLeft);
-
-    // Snap to nearest day after scroll ends
-    clearTimeout(snapTimerRef.current);
-    snapTimerRef.current = setTimeout(() => {
-      const nearestDay = Math.round(container.scrollLeft / ITEM_WIDTH) + 1;
-      const clamped = Math.max(1, Math.min(daysInMonth, nearestDay));
-      if (clamped !== selectedDay) {
-        onSelectDay(clamped);
+    if (Math.abs(diff) >= threshold) {
+      const direction = diff > 0 ? 1 : -1; // right swipe = -1 (prev), left swipe = +1 (next)
+      const newDay = Math.max(1, Math.min(daysInMonth, selectedDay + direction));
+      if (newDay !== selectedDay) {
+        vibrate();
+        onSelectDay(newDay);
       }
-      // Snap scroll position
-      const targetScroll = (clamped - 1) * ITEM_WIDTH;
-      if (Math.abs(container.scrollLeft - targetScroll) > 2) {
-        container.scrollTo({ left: targetScroll, behavior: 'smooth' });
-      }
-    }, 80);
-  }, [daysInMonth, onSelectDay, selectedDay]);
+      startXRef.current = e.touches[0].clientX; // Reset so next swipe step works
+    }
+  }
 
   function getDiamondColor(day) {
     if (completedDays.has(day)) return 'bg-primary-500';
     if (scheduledDays.has(day)) return 'bg-blue-500';
-    return 'bg-slate-700 dark:bg-slate-700';
+    return 'bg-slate-700';
   }
 
-  function getDiamondStyle(day) {
-    if (!scrollRef.current) {
-      const diff = Math.abs(day - selectedDay);
-      const t = Math.max(0, 1 - diff * 0.2);
-      const size = MIN_SIZE + (CENTER_SIZE - MIN_SIZE) * t;
-      const offsetY = (1 - t) * 16;
-      return { size, offsetY, opacity: 0.3 + t * 0.7 };
+  function getDiamondProps(day) {
+    const diff = Math.abs(day - selectedDay);
+    if (diff === 0) return { size: 48, offset: 0, opacity: 1, fontSize: 15 };
+    if (diff === 1) return { size: 38, offset: 6, opacity: 0.85, fontSize: 12 };
+    if (diff === 2) return { size: 30, offset: 12, opacity: 0.6, fontSize: 10 };
+    if (diff === 3) return { size: 24, offset: 16, opacity: 0.4, fontSize: 9 };
+    return { size: 20, offset: 18, opacity: 0.25, fontSize: 8 };
+  }
+
+  // Show 9 diamonds centered on selectedDay
+  const visibleRange = 4;
+  const visibleDays = [];
+  for (let i = -visibleRange; i <= visibleRange; i++) {
+    const day = selectedDay + i;
+    if (day >= 1 && day <= daysInMonth) {
+      visibleDays.push(day);
     }
-
-    const container = scrollRef.current;
-    const containerCenter = container.scrollLeft + container.clientWidth / 2;
-    const itemCenter = (day - 1) * ITEM_WIDTH + ITEM_WIDTH / 2 + (container.clientWidth / 2 - ITEM_WIDTH / 2);
-    const distance = Math.abs(containerCenter - itemCenter);
-    const maxDist = container.clientWidth / 2;
-    const t = Math.max(0, 1 - distance / maxDist);
-    const size = MIN_SIZE + (CENTER_SIZE - MIN_SIZE) * Math.pow(t, 0.8);
-    const offsetY = (1 - Math.pow(t, 0.6)) * 18;
-    const opacity = 0.25 + t * 0.75;
-
-    return { size, offsetY, opacity };
   }
 
   const date = new Date(year, month, selectedDay);
@@ -99,50 +71,68 @@ export default function DiamondCalendar({ selectedDay, onSelectDay, scheduledDay
 
   return (
     <div className="mb-4">
-      {/* Month label + calendar button */}
-      <div className="flex items-center justify-center gap-2 mb-3">
-        <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">{monthName} {year}</p>
-        {onOpenCalendar && (
-          <button onClick={onOpenCalendar} className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
-            <Calendar className="w-3.5 h-3.5 text-slate-400" />
-          </button>
-        )}
+      {/* Month label + navigation */}
+      <div className="flex items-center justify-center gap-3 mb-3">
+        <button
+          onClick={() => { const nd = Math.max(1, selectedDay - 1); if (nd !== selectedDay) { vibrate(); onSelectDay(nd); } }}
+          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+        >
+          <ChevronLeft className="w-4 h-4 text-slate-400" />
+        </button>
+        <button
+          onClick={onOpenCalendar}
+          className="flex items-center gap-1.5 px-3 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+        >
+          <Calendar className="w-3.5 h-3.5 text-primary-500" />
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 capitalize">{monthName} {year}</span>
+        </button>
+        <button
+          onClick={() => { const nd = Math.min(daysInMonth, selectedDay + 1); if (nd !== selectedDay) { vibrate(); onSelectDay(nd); } }}
+          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+        >
+          <ChevronRight className="w-4 h-4 text-slate-400" />
+        </button>
       </div>
 
-      {/* Diamond scroll area — fixed height, no vertical scroll */}
+      {/* Diamond row — touch swipe area */}
       <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="flex items-end overflow-x-auto scrollbar-hide overscroll-x-contain touch-pan-x"
-        style={{ height: 72, overflowY: 'hidden' }}
+        ref={containerRef}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        className="flex items-end justify-center gap-0 touch-pan-x select-none"
+        style={{ height: 70, overflowY: 'hidden' }}
       >
-        {/* Left padding */}
-        <div className="flex-shrink-0" style={{ width: `calc(50% - ${ITEM_WIDTH / 2}px)` }} />
-
-        {Array.from({ length: daysInMonth }, (_, i) => {
-          const day = i + 1;
-          const { size, offsetY, opacity } = getDiamondStyle(day);
+        {visibleDays.map((day) => {
+          const { size, offset, opacity, fontSize } = getDiamondProps(day);
           const color = getDiamondColor(day);
+          const isSelected = day === selectedDay;
 
           return (
             <button
               key={day}
-              onClick={() => { onSelectDay(day); scrollToDay(day); }}
+              onClick={() => { if (day !== selectedDay) { vibrate(); onSelectDay(day); } }}
               className="flex-shrink-0 flex items-center justify-center"
-              style={{ width: ITEM_WIDTH, height: 72, paddingTop: offsetY, opacity }}
+              style={{
+                width: 52,
+                height: 70,
+                paddingTop: offset,
+                opacity,
+                transition: 'all 0.15s ease-out',
+              }}
             >
               <div
-                className={`${color} flex items-center justify-center`}
+                className={`${color} flex items-center justify-center ${isSelected ? 'shadow-lg' : ''}`}
                 style={{
                   width: size,
                   height: size,
                   transform: 'rotate(45deg)',
                   borderRadius: Math.max(4, size * 0.15),
+                  transition: 'all 0.15s ease-out',
                 }}
               >
                 <span
                   className="font-bold text-white"
-                  style={{ transform: 'rotate(-45deg)', fontSize: Math.max(9, size * 0.3) }}
+                  style={{ transform: 'rotate(-45deg)', fontSize, transition: 'font-size 0.15s ease-out' }}
                 >
                   {day}
                 </span>
@@ -150,9 +140,6 @@ export default function DiamondCalendar({ selectedDay, onSelectDay, scheduledDay
             </button>
           );
         })}
-
-        {/* Right padding */}
-        <div className="flex-shrink-0" style={{ width: `calc(50% - ${ITEM_WIDTH / 2}px)` }} />
       </div>
 
       {/* Selected day info */}
