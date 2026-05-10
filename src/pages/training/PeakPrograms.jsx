@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ChevronRight, Dumbbell, Heart, Zap, Swords, Star, Clock, Calendar, Play, Check } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
