@@ -36,10 +36,7 @@ export default function TrainingPage() {
   const [martialArtsConfig, setMartialArtsConfig] = useState(null);
 
   // Diamond Calendar state
-  const now = new Date();
-  const [calYear, setCalYear] = useState(now.getFullYear());
-  const [calMonth, setCalMonth] = useState(now.getMonth());
-  const [selectedDay, setSelectedDay] = useState(now.getDate());
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [scheduledDays, setScheduledDays] = useState(new Set());
   const [completedDays, setCompletedDays] = useState(new Set());
   const [showTrainingCalendar, setShowTrainingCalendar] = useState(false);
@@ -47,7 +44,7 @@ export default function TrainingPage() {
 
   useEffect(() => {
     if (user) loadCalendarData();
-  }, [user, calYear, calMonth]);
+  }, [user, selectedDate]);
 
   async function loadCalendarData() {
     const [schedule, workouts] = await Promise.all([
@@ -55,18 +52,26 @@ export default function TrainingPage() {
       getWorkouts(user.id),
     ]);
 
-    // Scheduled days from weekly plan
-    if (schedule) {
-      setScheduledDays(getScheduledDaysForMonth(schedule, calYear, calMonth));
+    // Scheduled days from weekly plan (date strings)
+    const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    const scheduled = new Set();
+    if (schedule?.days) {
+      // Check ±30 days around selected date
+      for (let offset = -30; offset <= 30; offset++) {
+        const d = new Date(selectedDate + 'T12:00:00');
+        d.setDate(d.getDate() + offset);
+        const dayKey = DAY_KEYS[d.getDay()];
+        if (schedule.days[dayKey]) {
+          scheduled.add(d.toISOString().split('T')[0]);
+        }
+      }
     }
+    setScheduledDays(scheduled);
 
-    // Completed days from workout history
+    // Completed days from workout history (date strings)
     const completed = new Set();
     (workouts || []).forEach((w) => {
-      const d = new Date(w.date);
-      if (d.getFullYear() === calYear && d.getMonth() === calMonth) {
-        completed.add(d.getDate());
-      }
+      if (w.date) completed.add(w.date);
     });
     setCompletedDays(completed);
   }
@@ -272,12 +277,10 @@ export default function TrainingPage() {
 
       {/* Diamond Calendar */}
       <DiamondCalendar
-        selectedDay={selectedDay}
-        onSelectDay={setSelectedDay}
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
         scheduledDays={scheduledDays}
         completedDays={completedDays}
-        year={calYear}
-        month={calMonth}
         lang={lang}
         onOpenCalendar={() => setShowTrainingCalendar(true)}
       />
@@ -328,14 +331,10 @@ export default function TrainingPage() {
       {/* Training Calendar Modal */}
       {showTrainingCalendar && (
         <TrainingCalendarModal
-          selectedDay={selectedDay}
-          year={calYear}
-          month={calMonth}
+          selectedDate={selectedDate}
           lang={lang}
-          onSelect={(day, yr, mo) => {
-            setCalYear(yr);
-            setCalMonth(mo);
-            setSelectedDay(day);
+          onSelect={(dateStr) => {
+            setSelectedDate(dateStr);
             setShowTrainingCalendar(false);
           }}
           onClose={() => setShowTrainingCalendar(false)}
@@ -1204,9 +1203,10 @@ function MartialArtsSetup({ onBack, onStart, t }) {
   );
 }
 
-function TrainingCalendarModal({ selectedDay, year, month, lang, onSelect, onClose }) {
-  const [viewYear, setViewYear] = useState(year);
-  const [viewMonth, setViewMonth] = useState(month);
+function TrainingCalendarModal({ selectedDate, lang, onSelect, onClose }) {
+  const selDate = new Date(selectedDate + 'T12:00:00');
+  const [viewYear, setViewYear] = useState(selDate.getFullYear());
+  const [viewMonth, setViewMonth] = useState(selDate.getMonth());
 
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
   const firstDay = new Date(viewYear, viewMonth, 1).getDay();
@@ -1257,12 +1257,12 @@ function TrainingCalendarModal({ selectedDay, year, month, lang, onSelect, onClo
           {Array.from({ length: daysInMonth }).map((_, i) => {
             const day = i + 1;
             const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const isSelected = day === selectedDay && viewYear === year && viewMonth === month;
+            const isSelected = dateStr === selectedDate;
             const isToday = dateStr === todayStr;
             return (
               <button
                 key={day}
-                onClick={() => onSelect(day, viewYear, viewMonth)}
+                onClick={() => onSelect(dateStr)}
                 className={`h-9 w-9 mx-auto rounded-full text-sm font-medium flex items-center justify-center transition-colors ${
                   isSelected
                     ? 'bg-primary-500 text-white'
@@ -1279,7 +1279,7 @@ function TrainingCalendarModal({ selectedDay, year, month, lang, onSelect, onClo
 
         <div className="flex gap-2 px-5 pb-5">
           <button
-            onClick={() => { const n = new Date(); onSelect(n.getDate(), n.getFullYear(), n.getMonth()); }}
+            onClick={() => onSelect(new Date().toISOString().split('T')[0])}
             className="flex-1 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-semibold"
           >
             {lang === 'de' ? 'Heute' : 'Today'}
