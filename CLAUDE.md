@@ -84,7 +84,12 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Kreiskalender: Tage laufen über Monatsgrenzen hinweg, Monatsname passt sich automatisch an
 - [x] Kreiskalender: Kalender-Picker für exakte Tagesauswahl
 - [x] Wochenplan-System: Einheiten/Woche wählen → Tage verteilen → Split-Typ oder Übungen zuweisen
-- [x] Supabase: weekly_schedules Tabelle, aktiver Plan bestimmt blaue Rauten im Kalender
+- [x] Supabase: weekly_schedules Tabelle, aktiver Plan bestimmt blaue Kreise im Kalender
+- [x] Training-Tabs: "Meine Pläne" (eigene Wochenpläne) + "Peak-Programme" (vorgefertigte)
+- [x] 21 Peak-Programme: 6 Kraft (PPL, OK/UK, 5er-Split, Ganzkörper, Push/Pull, Bro-Split), 5 Cardio, 5 HIIT, 5 Kampfsport
+- [x] Peak-Programme anpassbar: Tage tauschen (Ruhetage verschieben), Übungen entfernen, Zurücksetzen
+- [x] Level-Badges + "Empfohlen" basierend auf Onboarding-Ziel/Erfahrung
+- [x] Programm starten → wird als Wochenplan gespeichert → Kreiskalender zeigt blaue Tage
 
 ### Phase 3: Ernährungs-Tracking — FERTIG
 - [x] Lebensmittel-Suche (150 lokale Lebensmittel + Open Food Facts API)
@@ -199,7 +204,8 @@ src/
 │       ├── ExerciseLibrary.jsx   # Übungsbibliothek mit Filter + Suche
 │       ├── TrainingPlans.jsx     # Vorgefertigte + eigene Pläne
 │       ├── WorkoutHistory.jsx    # Verlauf mit Details + Vergleich + Edit-Modal
-│       └── WeeklyPlanBuilder.jsx # 3-Schritte Wochenplan-Erstellung
+│       ├── WeeklyPlanBuilder.jsx # 3-Schritte Wochenplan-Erstellung
+│       └── PeakPrograms.jsx     # Peak-Programme Übersicht + Detail + Anpassung
 │       ├── FriendsList.jsx       # Freundesliste + Anfragen
 │       ├── Leaderboard.jsx       # Wöchentliches Ranking
 │       ├── ChallengesList.jsx    # Challenges verwalten
@@ -234,6 +240,7 @@ src/
 │   ├── weightStorage.js          # Gewichtsverlauf CRUD
 │   ├── dietsData.js              # 8 Diätformen × 7 Kapitel (DE+EN, mit Studien)
 │   ├── dietStorage.js            # Active Diet CRUD + Ziel-Berechnung + Phasen-Tracking
+│   ├── peakPrograms.js           # 21 vorgefertigte Peak-Programme (4 Kategorien)
 │   └── recipesData.js            # 25 Rezepte mit Nährwerten (DE + EN)
 ├── lib/
 │   └── supabase.js               # Supabase Client (URL + Anon Key aus .env)
