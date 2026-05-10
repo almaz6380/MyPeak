@@ -196,78 +196,7 @@ export default function BarcodeScanner({ onScanned, onClose }) {
 
   // ── FOUND PRODUCT SCREEN ──
   if (status === 'found' && foundProduct) {
-    const displayName = lang === 'de' ? (foundProduct.nameDE || foundProduct.nameEN) : (foundProduct.nameEN || foundProduct.nameDE);
-    return (
-      <div className="fixed inset-0 bg-black z-50 flex flex-col">
-        <div className="relative z-10 flex items-center justify-between px-4 pt-4 pb-2" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
-          <div className="flex items-center gap-2 text-white">
-            <Check className="w-5 h-5 text-green-400" />
-            <h2 className="text-base font-semibold">{lang === 'de' ? 'Produkt gefunden' : 'Product found'}</h2>
-          </div>
-          <button onClick={handleClose} className="p-2 rounded-xl bg-white/10 text-white">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="flex-1 flex flex-col items-center justify-center px-6">
-          {/* Product image */}
-          {foundProduct.image_url ? (
-            <div className="w-40 h-40 rounded-2xl bg-white overflow-hidden mb-5 shadow-lg">
-              <img src={foundProduct.image_url} alt="" className="w-full h-full object-contain" />
-            </div>
-          ) : (
-            <div className="w-40 h-40 rounded-2xl bg-slate-800 flex items-center justify-center mb-5">
-              <span className="text-6xl">🏷️</span>
-            </div>
-          )}
-
-          {/* Product name */}
-          <h3 className="text-xl font-bold text-white text-center mb-1">{displayName}</h3>
-          {foundProduct.brand && (
-            <p className="text-sm text-slate-400 mb-4">{foundProduct.brand}</p>
-          )}
-
-          {/* Macros */}
-          <div className="flex gap-3 mb-8">
-            <div className="bg-slate-800 rounded-xl px-4 py-3 text-center">
-              <p className="text-lg font-bold text-primary-400">{foundProduct.calories}</p>
-              <p className="text-[10px] text-slate-500">kcal</p>
-            </div>
-            <div className="bg-slate-800 rounded-xl px-4 py-3 text-center">
-              <p className="text-lg font-bold text-blue-400">{foundProduct.protein}g</p>
-              <p className="text-[10px] text-slate-500">Protein</p>
-            </div>
-            <div className="bg-slate-800 rounded-xl px-4 py-3 text-center">
-              <p className="text-lg font-bold text-amber-400">{foundProduct.carbs}g</p>
-              <p className="text-[10px] text-slate-500">Carbs</p>
-            </div>
-            <div className="bg-slate-800 rounded-xl px-4 py-3 text-center">
-              <p className="text-lg font-bold text-rose-400">{foundProduct.fat}g</p>
-              <p className="text-[10px] text-slate-500">Fat</p>
-            </div>
-          </div>
-
-          <p className="text-[10px] text-slate-600 mb-4">{lang === 'de' ? 'pro 100g' : 'per 100g'}</p>
-
-          {/* Actions */}
-          <div className="w-full max-w-xs flex flex-col gap-2">
-            <button
-              onClick={() => onScanned(foundProduct)}
-              className="w-full py-3.5 rounded-xl bg-primary-500 text-white font-semibold flex items-center justify-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              {lang === 'de' ? 'Hinzufügen' : 'Add'}
-            </button>
-            <button
-              onClick={() => { isProcessingRef.current = false; setFoundProduct(null); startScanner(); }}
-              className="w-full py-3 rounded-xl bg-white/10 text-white font-medium text-sm"
-            >
-              {t('nutrition.scanAgain')}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return <FoundProductScreen product={foundProduct} lang={lang} onConfirm={() => onScanned(foundProduct)} onScanAgain={() => { isProcessingRef.current = false; setFoundProduct(null); startScanner(); }} onClose={handleClose} t={t} />;
   }
 
   // ── ADD PRODUCT FORM ──
@@ -419,6 +348,77 @@ export default function BarcodeScanner({ onScanned, onClose }) {
           <p className="text-slate-400 text-sm">{t('nutrition.scanHint')}</p>
         </div>
       )}
+    </div>
+  );
+}
+
+function FoundProductScreen({ product, lang, onConfirm, onScanAgain, onClose, t }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const displayName = lang === 'de' ? (product.nameDE || product.nameEN) : (product.nameEN || product.nameDE);
+  const showImage = product.image_url && !imgFailed;
+
+  return (
+    <div className="fixed inset-0 bg-black z-50 flex flex-col">
+      <div className="relative z-10 flex items-center justify-between px-4 pt-4 pb-2" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
+        <div className="flex items-center gap-2 text-white">
+          <Check className="w-5 h-5 text-green-400" />
+          <h2 className="text-base font-semibold">{lang === 'de' ? 'Produkt gefunden' : 'Product found'}</h2>
+        </div>
+        <button onClick={onClose} className="p-2 rounded-xl bg-white/10 text-white">
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+
+      <div className="flex-1 flex flex-col items-center justify-center px-6">
+        {showImage ? (
+          <div className="w-40 h-40 rounded-2xl bg-slate-800 overflow-hidden mb-5 shadow-lg">
+            <img
+              src={product.image_url}
+              alt=""
+              className="w-full h-full object-contain"
+              onError={() => setImgFailed(true)}
+            />
+          </div>
+        ) : (
+          <div className="w-40 h-40 rounded-2xl bg-slate-800 flex items-center justify-center mb-5">
+            <span className="text-6xl">🏷️</span>
+          </div>
+        )}
+
+        <h3 className="text-xl font-bold text-white text-center mb-1">{displayName}</h3>
+        {product.brand && <p className="text-sm text-slate-400 mb-4">{product.brand}</p>}
+
+        <div className="flex gap-3 mb-8">
+          <div className="bg-slate-800 rounded-xl px-4 py-3 text-center">
+            <p className="text-lg font-bold text-primary-400">{product.calories}</p>
+            <p className="text-[10px] text-slate-500">kcal</p>
+          </div>
+          <div className="bg-slate-800 rounded-xl px-4 py-3 text-center">
+            <p className="text-lg font-bold text-blue-400">{product.protein}g</p>
+            <p className="text-[10px] text-slate-500">Protein</p>
+          </div>
+          <div className="bg-slate-800 rounded-xl px-4 py-3 text-center">
+            <p className="text-lg font-bold text-amber-400">{product.carbs}g</p>
+            <p className="text-[10px] text-slate-500">Carbs</p>
+          </div>
+          <div className="bg-slate-800 rounded-xl px-4 py-3 text-center">
+            <p className="text-lg font-bold text-rose-400">{product.fat}g</p>
+            <p className="text-[10px] text-slate-500">Fat</p>
+          </div>
+        </div>
+
+        <p className="text-[10px] text-slate-600 mb-4">{lang === 'de' ? 'pro 100g' : 'per 100g'}</p>
+
+        <div className="w-full max-w-xs flex flex-col gap-2">
+          <button onClick={onConfirm} className="w-full py-3.5 rounded-xl bg-primary-500 text-white font-semibold flex items-center justify-center gap-2">
+            <Plus className="w-5 h-5" />
+            {lang === 'de' ? 'Hinzufügen' : 'Add'}
+          </button>
+          <button onClick={onScanAgain} className="w-full py-3 rounded-xl bg-white/10 text-white font-medium text-sm">
+            {t('nutrition.scanAgain')}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
