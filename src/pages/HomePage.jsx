@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Droplets, Dumbbell, Flame, ChevronRight, Pill } from 'lucide-react';
+import { Droplets, Dumbbell, Flame, ChevronRight, Pill, User } from 'lucide-react';
 import MyPeakLogo from '../components/MyPeakLogo';
 import { useAuth } from '../context/AuthContext';
 import { getNutritionEntries, getNutritionGoals, getWaterTotal } from '../data/nutritionStorage';
 import { getWorkouts } from '../data/workoutStorage';
-import { getXP, calculateLevel, getLevelTitle } from '../data/socialStorage';
+import { getXP } from '../data/socialStorage';
 import { getSupplements, getSupplementLogs, getTodayScheduledSupplements, getSupplementProgress } from '../data/supplementStorage';
 
 function formatDate(d) {
@@ -97,21 +97,23 @@ export default function HomePage() {
     setLoading(false);
   }
 
-  const levelInfo = calculateLevel(xpData.total_xp || 0);
-  const title = getLevelTitle(levelInfo.level);
   const calPercent = goals.calories > 0 ? Math.min(100, Math.round((nutrition.calories / goals.calories) * 100)) : 0;
   const waterPercent = (goals.water_ml || 3000) > 0 ? Math.min(100, Math.round((waterTotal / (goals.water_ml || 3000)) * 100)) : 0;
 
   return (
     <div className="p-4 pt-16 pb-24">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-1">
+      <div className="flex items-center justify-between mb-1">
+        <button onClick={() => navigate('/profile')} className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+          <User className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+        </button>
         <MyPeakLogo size={32} />
+        <div className="w-9" />
       </div>
-      <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+      <h1 className="text-xl font-bold text-slate-900 dark:text-white text-center">
         {getGreeting(t)}, {profile?.name || 'User'}
       </h1>
-      <p className="text-sm text-slate-400 dark:text-slate-500 mb-6">
+      <p className="text-sm text-slate-400 dark:text-slate-500 mb-6 text-center">
         {getDateString(lang)}
       </p>
 
@@ -219,33 +221,6 @@ export default function HomePage() {
             </div>
           </button>
 
-          {/* Level + XP Card */}
-          <button
-            onClick={() => navigate('/profile')}
-            className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm text-left hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">{title.emoji}</span>
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                  {t('home.level')} {levelInfo.level} — {lang === 'de' ? title.de : title.en}
-                </span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-slate-300" />
-            </div>
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs text-slate-400">{t('home.xpProgress')}</span>
-              <span className="text-xs font-medium text-primary-500">
-                {levelInfo.xpInCurrentLevel}/{levelInfo.xpToNextLevel} XP
-              </span>
-            </div>
-            <div className="h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-primary-500 rounded-full transition-all duration-500"
-                style={{ width: `${Math.round(levelInfo.progress * 100)}%` }}
-              />
-            </div>
-          </button>
         </div>
       )}
     </div>
