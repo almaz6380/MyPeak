@@ -113,11 +113,11 @@ export default function HomePage() {
     <div className="p-4 pt-16 pb-24">
       {/* Header */}
       <div className="flex items-center justify-between mb-1">
+        <div className="w-9" />
+        <MyPeakLogo size={32} />
         <button onClick={() => navigate('/profile')} className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
           <User className="w-5 h-5 text-slate-500 dark:text-slate-400" />
         </button>
-        <MyPeakLogo size={32} />
-        <div className="w-9" />
       </div>
       <h1 className="text-xl font-bold text-slate-900 dark:text-white text-center">
         {getGreeting(t)}, {profile?.name || 'User'}
