@@ -17,7 +17,10 @@
     "streak": "Streak",
     "days": "Tage",
     "level": "Level",
-    "xpProgress": "XP-Fortschritt"
+    "xpProgress": "XP-Fortschritt",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "tomorrow": "Morgen"
   },
   "training": {
     "title": "Training",
