@@ -349,19 +349,33 @@ export default function TrainingPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <QuickAction icon={<ClipboardList className="w-6 h-6" />} label={t('training.plans')} onClick={() => setView('plans')} vertical />
-        <QuickAction icon={<Dumbbell className="w-6 h-6" />} label={t('training.exercises')} onClick={() => setView('exercises')} vertical />
-        <QuickAction icon={<History className="w-6 h-6" />} label={t('training.history')} onClick={() => setView('history')} vertical />
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <QuickAction icon={<ClipboardList className="w-6 h-6" />} label={t('training.plans')} onClick={() => setView('plans')} />
+        <QuickAction icon={<Dumbbell className="w-6 h-6" />} label={t('training.exercises')} onClick={() => setView('exercises')} />
       </div>
 
       {/* Social */}
       <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">{t('common.back') === 'Zurück' ? 'Social' : 'Social'}</h2>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-3 mb-6">
         <QuickAction icon={<Medal className="w-6 h-6" />} label={t('common.back') === 'Zurück' ? 'Ranking' : 'Ranking'} onClick={() => setView('leaderboard')} vertical />
         <QuickAction icon={<Swords className="w-6 h-6" />} label="Challenges" onClick={() => setView('challenges')} vertical />
         <QuickAction icon={<Users className="w-6 h-6" />} label={t('common.back') === 'Zurück' ? 'Freunde' : 'Friends'} onClick={() => setView('friends')} vertical />
       </div>
+
+      {/* History */}
+      <button
+        onClick={() => setView('history')}
+        className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow mb-4"
+      >
+        <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+          <History className="w-5 h-5 text-slate-500" />
+        </div>
+        <div className="flex-1 text-left">
+          <p className="text-sm font-semibold text-slate-900 dark:text-white">{t('training.history')}</p>
+          <p className="text-xs text-slate-400">{lang === 'de' ? 'Alle vergangenen Trainingseinheiten' : 'All past training sessions'}</p>
+        </div>
+        <ChevronRight className="w-5 h-5 text-slate-300" />
+      </button>
 
       {/* Training Calendar Modal */}
       {showTrainingCalendar && (
