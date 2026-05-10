@@ -284,14 +284,14 @@ function QuickAction({ icon, label, onClick, className = '', vertical = false })
   return (
     <button
       onClick={onClick}
-      className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:shadow-md transition-shadow ${
+      className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden ${
         vertical
-          ? 'flex flex-col items-center justify-center gap-1.5 py-5 px-2 text-center'
+          ? 'flex flex-col items-center justify-center gap-1.5 py-4 px-1 text-center min-h-[88px]'
           : 'flex items-center gap-3 p-4 text-left'
       } ${className}`}
     >
       <span className="text-primary-500 flex-shrink-0">{icon}</span>
-      <span className={`font-medium leading-tight ${vertical ? 'text-xs w-full truncate' : 'text-sm'}`}>{label}</span>
+      <span className={`font-medium leading-tight ${vertical ? 'text-[11px]' : 'text-sm'}`}>{label}</span>
     </button>
   );
 }
