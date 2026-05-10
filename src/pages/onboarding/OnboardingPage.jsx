@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowRight, Check, Dumbbell, User, Users, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Dumbbell, User, Users, Loader2, Target, Scale, TrendingDown, Zap, Activity, Flame, Baby, Award, Crown } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 
@@ -10,33 +10,45 @@ export default function OnboardingPage() {
   const { t } = useTranslation();
   const { user, refreshProfile } = useAuth();
   const [step, setStep] = useState(1);
+  const [direction, setDirection] = useState(1); // 1=forward, -1=back
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [data, setData] = useState({
     name: '',
+    birthdate: '',
     gender: '',
-    age: 25,
-    weight_kg: 75,
     height_cm: 175,
+    weight_kg: 75.0,
     goal: '',
     activity_level: '',
     experience: '',
+    terms_accepted: false,
   });
 
   function updateField(field, value) {
     setData((prev) => ({ ...prev, [field]: value }));
   }
 
+  function getAge(birthdate) {
+    if (!birthdate) return 0;
+    const today = new Date();
+    const birth = new Date(birthdate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+    return age;
+  }
+
   function canProceed() {
     switch (step) {
-      case 1: return data.name.trim().length > 0;
+      case 1: return data.name.trim().length > 0 && data.birthdate.length > 0 && getAge(data.birthdate) >= 14;
       case 2: return !!data.gender;
-      case 3: return data.age > 0;
-      case 4: return data.weight_kg > 0;
-      case 5: return data.height_cm > 0;
-      case 6: return !!data.goal;
-      case 7: return !!data.activity_level;
-      case 8: return !!data.experience;
+      case 3: return data.height_cm >= 120 && data.height_cm <= 230;
+      case 4: return data.weight_kg >= 30 && data.weight_kg <= 300;
+      case 5: return !!data.goal;
+      case 6: return !!data.activity_level;
+      case 7: return !!data.experience;
+      case 8: return data.terms_accepted;
       default: return false;
     }
   }
@@ -45,25 +57,31 @@ export default function OnboardingPage() {
     setLoading(true);
     setError('');
     try {
-      const payload = { ...data, onboarding_completed: true, updated_at: new Date().toISOString() };
-      console.log('Onboarding payload:', payload);
-      console.log('User ID:', user.id);
+      const age = getAge(data.birthdate);
+      const payload = {
+        name: data.name,
+        gender: data.gender,
+        age,
+        weight_kg: data.weight_kg,
+        height_cm: data.height_cm,
+        goal: data.goal,
+        activity_level: data.activity_level,
+        experience: data.experience,
+        onboarding_completed: true,
+        updated_at: new Date().toISOString(),
+      };
 
-      const { error: updateError, count } = await supabase
+      const { error: updateError } = await supabase
         .from('profiles')
         .upsert({ id: user.id, ...payload }, { onConflict: 'id' })
         .select();
 
-      console.log('Supabase response — error:', updateError, 'count:', count);
-
       if (updateError) {
-        console.error('Onboarding save error:', updateError);
         setError(`${t('onboarding.saveError')} (${updateError.message})`);
         return;
       }
       await refreshProfile();
     } catch (err) {
-      console.error('Onboarding error:', err);
       setError(`${t('onboarding.saveError')} (${err.message})`);
     } finally {
       setLoading(false);
@@ -72,55 +90,67 @@ export default function OnboardingPage() {
 
   function handleNext() {
     if (step < TOTAL_STEPS) {
+      setDirection(1);
       setStep(step + 1);
     } else {
       handleFinish();
     }
   }
 
+  function handleBack() {
+    if (step > 1) {
+      setDirection(-1);
+      setStep(step - 1);
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-surface-dark flex flex-col p-4 pt-14">
-      <div className="w-full max-w-sm mx-auto flex-1 flex flex-col">
-        {/* Progress bar */}
-        <div className="mb-8 mt-4">
-          <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-3">
-            {t('onboarding.step', { current: step, total: TOTAL_STEPS })}
-          </p>
-          <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-primary-500 rounded-full transition-all duration-300"
-              style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
-            />
-          </div>
+    <div className="min-h-screen bg-slate-50 dark:bg-surface-dark flex flex-col">
+      {/* Progress bar */}
+      <div className="px-6 pt-14 pb-4">
+        <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-primary-500 rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
+          />
         </div>
+      </div>
 
-        {/* Step content */}
-        <div className="flex-1 flex flex-col justify-center">
-          {step === 1 && <NameStep value={data.name} onChange={(v) => updateField('name', v)} />}
+      {/* Step content */}
+      <div className="flex-1 flex flex-col px-6 overflow-hidden">
+        <div
+          key={step}
+          className="flex-1 flex flex-col animate-fade-in"
+        >
+          {step === 1 && <NameBirthdateStep data={data} updateField={updateField} />}
           {step === 2 && <GenderStep value={data.gender} onChange={(v) => updateField('gender', v)} />}
-          {step === 3 && <AgeStep value={data.age} onChange={(v) => updateField('age', v)} />}
+          {step === 3 && <HeightStep value={data.height_cm} onChange={(v) => updateField('height_cm', v)} />}
           {step === 4 && <WeightStep value={data.weight_kg} onChange={(v) => updateField('weight_kg', v)} />}
-          {step === 5 && <HeightStep value={data.height_cm} onChange={(v) => updateField('height_cm', v)} />}
-          {step === 6 && <GoalStep value={data.goal} onChange={(v) => updateField('goal', v)} />}
-          {step === 7 && <ActivityStep value={data.activity_level} onChange={(v) => updateField('activity_level', v)} />}
-          {step === 8 && <ExperienceStep value={data.experience} onChange={(v) => updateField('experience', v)} />}
+          {step === 5 && <GoalStep value={data.goal} onChange={(v) => updateField('goal', v)} />}
+          {step === 6 && <ActivityStep value={data.activity_level} onChange={(v) => updateField('activity_level', v)} />}
+          {step === 7 && <ExperienceStep value={data.experience} onChange={(v) => updateField('experience', v)} />}
+          {step === 8 && <TermsStep value={data.terms_accepted} onChange={(v) => updateField('terms_accepted', v)} />}
         </div>
+      </div>
 
-        {/* Navigation */}
-        <div className="flex gap-3 mt-8 mb-6">
+      {/* Navigation */}
+      <div className="px-6 pb-8 pt-4">
+        {error && (
+          <p className="text-red-500 text-sm text-center mb-4">{error}</p>
+        )}
+        <div className="flex gap-3">
           {step > 1 && (
             <button
-              onClick={() => setStep(step - 1)}
-              className="flex-1 py-3.5 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-2xl flex items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              onClick={handleBack}
+              className="w-14 h-14 flex items-center justify-center border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex-shrink-0"
             >
               <ArrowLeft className="w-5 h-5" />
-              {t('onboarding.back')}
             </button>
           )}
           <button
             onClick={handleNext}
             disabled={!canProceed() || loading}
-            className="flex-1 py-3.5 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold rounded-2xl flex items-center justify-center gap-2 transition-colors"
+            className="flex-1 h-14 bg-primary-500 hover:bg-primary-600 disabled:opacity-40 disabled:hover:bg-primary-500 text-white font-semibold rounded-2xl flex items-center justify-center gap-2 transition-colors"
           >
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -137,69 +167,197 @@ export default function OnboardingPage() {
             )}
           </button>
         </div>
-
-        {error && (
-          <p className="text-red-500 text-sm text-center mb-4">{error}</p>
-        )}
       </div>
     </div>
   );
 }
 
-function SelectionCard({ selected, onClick, icon, label, description }) {
+// ── Step 1: Name + Birthdate ────────────────────────────────────
+function NameBirthdateStep({ data, updateField }) {
+  const { t } = useTranslation();
   return (
-    <button
-      onClick={onClick}
-      className={`w-full p-4 rounded-2xl border-2 text-left transition-all ${
-        selected
-          ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark-alt hover:border-slate-300 dark:hover:border-slate-600'
-      }`}
-    >
-      <div className="flex items-center gap-3">
-        {icon && <div className={`${selected ? 'text-primary-600' : 'text-slate-400'}`}>{icon}</div>}
+    <div className="flex-1 flex flex-col justify-center space-y-8">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+          {t('onboarding.welcomeTitle')}
+        </h1>
+        <p className="text-slate-500 dark:text-slate-400">
+          {t('onboarding.welcomeSubtitle')}
+        </p>
+      </div>
+
+      <div className="space-y-6">
         <div>
-          <p className={`font-semibold ${selected ? 'text-primary-500 dark:text-primary-400' : 'text-slate-900 dark:text-white'}`}>
-            {label}
-          </p>
-          {description && (
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>
-          )}
+          <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+            {t('onboarding.name')}
+          </label>
+          <input
+            type="text"
+            value={data.name}
+            onChange={(e) => updateField('name', e.target.value)}
+            placeholder={t('onboarding.namePlaceholder')}
+            className="w-full px-4 py-4 bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 rounded-2xl text-lg font-medium text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            autoFocus
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+            {t('onboarding.birthdate')}
+          </label>
+          <input
+            type="date"
+            value={data.birthdate}
+            onChange={(e) => updateField('birthdate', e.target.value)}
+            max={new Date(new Date().setFullYear(new Date().getFullYear() - 14)).toISOString().split('T')[0]}
+            min="1930-01-01"
+            className="w-full px-4 py-4 bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 rounded-2xl text-lg font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          />
         </div>
       </div>
-    </button>
+    </div>
   );
 }
 
-function NumberInput({ value, onChange, min, max, unit, label, step = 1, decimal = false }) {
+// ── Step 2: Gender ──────────────────────────────────────────────
+function GenderStep({ value, onChange }) {
   const { t } = useTranslation();
-  const displayValue = decimal ? parseFloat(value).toFixed(1) : value;
+  const options = [
+    { id: 'male', icon: <User className="w-8 h-8" />, label: t('onboarding.male'), emoji: '👨' },
+    { id: 'female', icon: <User className="w-8 h-8" />, label: t('onboarding.female'), emoji: '👩' },
+    { id: 'diverse', icon: <Users className="w-8 h-8" />, label: t('onboarding.diverse'), emoji: '🧑' },
+  ];
+
   return (
-    <div className="text-center space-y-6">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white">{label}</h2>
-      <div className="flex items-center justify-center gap-4">
+    <div className="flex-1 flex flex-col justify-center">
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-2">
+        {t('onboarding.gender')}
+      </h1>
+      <p className="text-slate-500 dark:text-slate-400 text-center mb-8">
+        {t('onboarding.genderSubtitle')}
+      </p>
+
+      <div className="space-y-3">
+        {options.map((opt) => (
+          <button
+            key={opt.id}
+            onClick={() => onChange(opt.id)}
+            className={`w-full p-5 rounded-2xl border-2 transition-all flex items-center gap-4 ${
+              value === opt.id
+                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-lg shadow-primary-500/10'
+                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark-alt hover:border-slate-300 dark:hover:border-slate-600'
+            }`}
+          >
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${
+              value === opt.id
+                ? 'bg-primary-100 dark:bg-primary-900/40'
+                : 'bg-slate-100 dark:bg-slate-800'
+            }`}>
+              {opt.emoji}
+            </div>
+            <span className={`text-lg font-semibold ${
+              value === opt.id ? 'text-primary-600 dark:text-primary-400' : 'text-slate-900 dark:text-white'
+            }`}>
+              {opt.label}
+            </span>
+            {value === opt.id && (
+              <div className="ml-auto">
+                <Check className="w-6 h-6 text-primary-500" />
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Step 3: Height (Slider) ─────────────────────────────────────
+function HeightStep({ value, onChange }) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex-1 flex flex-col justify-center">
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-2">
+        {t('onboarding.height')}
+      </h1>
+      <p className="text-slate-500 dark:text-slate-400 text-center mb-10">
+        {t('onboarding.heightSubtitle')}
+      </p>
+
+      {/* Big display */}
+      <div className="text-center mb-10">
+        <span className="text-6xl font-bold text-slate-900 dark:text-white">{value}</span>
+        <span className="text-2xl font-medium text-slate-400 ml-2">cm</span>
+      </div>
+
+      {/* Slider */}
+      <div className="px-4">
+        <input
+          type="range"
+          min={120}
+          max={230}
+          step={1}
+          value={value}
+          onChange={(e) => onChange(parseInt(e.target.value))}
+          className="w-full h-3 rounded-full appearance-none cursor-pointer slider-primary"
+        />
+        <div className="flex justify-between mt-3 text-xs text-slate-400">
+          <span>120 cm</span>
+          <span>230 cm</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Step 4: Weight (Slider) ─────────────────────────────────────
+function WeightStep({ value, onChange }) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex-1 flex flex-col justify-center">
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-2">
+        {t('onboarding.weight')}
+      </h1>
+      <p className="text-slate-500 dark:text-slate-400 text-center mb-10">
+        {t('onboarding.weightSubtitle')}
+      </p>
+
+      {/* Big display */}
+      <div className="text-center mb-10">
+        <span className="text-6xl font-bold text-slate-900 dark:text-white">{value.toFixed(1)}</span>
+        <span className="text-2xl font-medium text-slate-400 ml-2">kg</span>
+      </div>
+
+      {/* Slider */}
+      <div className="px-4">
+        <input
+          type="range"
+          min={30}
+          max={200}
+          step={0.5}
+          value={value}
+          onChange={(e) => onChange(parseFloat(e.target.value))}
+          className="w-full h-3 rounded-full appearance-none cursor-pointer slider-primary"
+        />
+        <div className="flex justify-between mt-3 text-xs text-slate-400">
+          <span>30 kg</span>
+          <span>200 kg</span>
+        </div>
+      </div>
+
+      {/* Fine-tune buttons */}
+      <div className="flex items-center justify-center gap-4 mt-8">
         <button
-          onClick={() => onChange(Math.max(min, parseFloat((value - step).toFixed(1))))}
-          className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-2xl font-bold flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700"
+          onClick={() => onChange(Math.max(30, parseFloat((value - 0.5).toFixed(1))))}
+          className="w-12 h-12 rounded-2xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xl font-bold flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
         >
           -
         </button>
-        <div className="text-center">
-          <input
-            type="number"
-            step={step}
-            value={displayValue}
-            onChange={(e) => {
-              const v = decimal ? (parseFloat(e.target.value) || min) : (parseInt(e.target.value) || min);
-              onChange(Math.min(max, Math.max(min, parseFloat(v.toFixed(1)))));
-            }}
-            className="w-24 text-center text-4xl font-bold bg-transparent text-slate-900 dark:text-white focus:outline-none"
-          />
-          <p className="text-slate-500 dark:text-slate-400 text-sm">{unit}</p>
-        </div>
         <button
-          onClick={() => onChange(Math.min(max, parseFloat((value + step).toFixed(1))))}
-          className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-2xl font-bold flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700"
+          onClick={() => onChange(Math.min(200, parseFloat((value + 0.5).toFixed(1))))}
+          className="w-12 h-12 rounded-2xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xl font-bold flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
         >
           +
         </button>
@@ -208,148 +366,214 @@ function NumberInput({ value, onChange, min, max, unit, label, step = 1, decimal
   );
 }
 
-function NameStep({ value, onChange }) {
-  const { t } = useTranslation();
-  return (
-    <div className="text-center space-y-6">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t('onboarding.name')}</h2>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={t('onboarding.namePlaceholder')}
-        className="w-full text-center text-2xl font-semibold bg-transparent text-slate-900 dark:text-white border-b-2 border-slate-300 dark:border-slate-600 focus:border-primary-500 focus:outline-none py-3 placeholder:text-slate-400 dark:placeholder:text-slate-500"
-        autoFocus
-      />
-    </div>
-  );
-}
-
-function GenderStep({ value, onChange }) {
-  const { t } = useTranslation();
-  return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white text-center mb-6">
-        {t('onboarding.gender')}
-      </h2>
-      <SelectionCard
-        selected={value === 'male'}
-        onClick={() => onChange('male')}
-        icon={<User className="w-6 h-6" />}
-        label={t('onboarding.male')}
-      />
-      <SelectionCard
-        selected={value === 'female'}
-        onClick={() => onChange('female')}
-        icon={<User className="w-6 h-6" />}
-        label={t('onboarding.female')}
-      />
-      <SelectionCard
-        selected={value === 'diverse'}
-        onClick={() => onChange('diverse')}
-        icon={<Users className="w-6 h-6" />}
-        label={t('onboarding.diverse')}
-      />
-    </div>
-  );
-}
-
-function AgeStep({ value, onChange }) {
-  const { t } = useTranslation();
-  return <NumberInput value={value} onChange={onChange} min={14} max={100} unit={t('onboarding.years')} label={t('onboarding.age')} />;
-}
-
-function WeightStep({ value, onChange }) {
-  const { t } = useTranslation();
-  return <NumberInput value={value} onChange={onChange} min={30} max={300} unit="kg" label={t('onboarding.weight')} step={0.5} decimal />;
-}
-
-function HeightStep({ value, onChange }) {
-  const { t } = useTranslation();
-  return <NumberInput value={value} onChange={onChange} min={120} max={230} unit={t('onboarding.heightCm')} label={t('onboarding.height')} />;
-}
-
+// ── Step 5: Goal ────────────────────────────────────────────────
 function GoalStep({ value, onChange }) {
   const { t } = useTranslation();
+  const options = [
+    { id: 'muscle_gain', icon: <Dumbbell className="w-7 h-7" />, label: t('onboarding.muscleGain'), color: 'text-blue-500' },
+    { id: 'maintenance', icon: <Target className="w-7 h-7" />, label: t('onboarding.maintenance'), color: 'text-green-500' },
+    { id: 'weight_loss', icon: <TrendingDown className="w-7 h-7" />, label: t('onboarding.weightLoss'), color: 'text-orange-500' },
+  ];
+
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white text-center mb-6">
+    <div className="flex-1 flex flex-col justify-center">
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-2">
         {t('onboarding.goal')}
-      </h2>
-      <SelectionCard
-        selected={value === 'muscle_gain'}
-        onClick={() => onChange('muscle_gain')}
-        icon={<Dumbbell className="w-6 h-6" />}
-        label={t('onboarding.muscleGain')}
-      />
-      <SelectionCard
-        selected={value === 'maintenance'}
-        onClick={() => onChange('maintenance')}
-        label={t('onboarding.maintenance')}
-      />
-      <SelectionCard
-        selected={value === 'weight_loss'}
-        onClick={() => onChange('weight_loss')}
-        label={t('onboarding.weightLoss')}
-      />
+      </h1>
+      <p className="text-slate-500 dark:text-slate-400 text-center mb-8">
+        {t('onboarding.goalSubtitle')}
+      </p>
+
+      <div className="space-y-3">
+        {options.map((opt) => (
+          <button
+            key={opt.id}
+            onClick={() => onChange(opt.id)}
+            className={`w-full p-5 rounded-2xl border-2 transition-all flex items-center gap-4 ${
+              value === opt.id
+                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-lg shadow-primary-500/10'
+                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark-alt hover:border-slate-300 dark:hover:border-slate-600'
+            }`}
+          >
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
+              value === opt.id
+                ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400'
+                : `bg-slate-100 dark:bg-slate-800 ${opt.color}`
+            }`}>
+              {opt.icon}
+            </div>
+            <span className={`text-lg font-semibold ${
+              value === opt.id ? 'text-primary-600 dark:text-primary-400' : 'text-slate-900 dark:text-white'
+            }`}>
+              {opt.label}
+            </span>
+            {value === opt.id && (
+              <div className="ml-auto">
+                <Check className="w-6 h-6 text-primary-500" />
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
 
+// ── Step 6: Activity Level ──────────────────────────────────────
 function ActivityStep({ value, onChange }) {
   const { t } = useTranslation();
+  const options = [
+    { id: 'sedentary', icon: <Activity className="w-7 h-7" />, label: t('onboarding.sedentary'), desc: t('onboarding.sedentaryDesc') },
+    { id: 'moderate', icon: <Zap className="w-7 h-7" />, label: t('onboarding.moderate'), desc: t('onboarding.moderateDesc') },
+    { id: 'very_active', icon: <Flame className="w-7 h-7" />, label: t('onboarding.veryActive'), desc: t('onboarding.veryActiveDesc') },
+  ];
+
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white text-center mb-6">
+    <div className="flex-1 flex flex-col justify-center">
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-2">
         {t('onboarding.activityLevel')}
-      </h2>
-      <SelectionCard
-        selected={value === 'sedentary'}
-        onClick={() => onChange('sedentary')}
-        label={t('onboarding.sedentary')}
-        description={t('onboarding.sedentaryDesc')}
-      />
-      <SelectionCard
-        selected={value === 'moderate'}
-        onClick={() => onChange('moderate')}
-        label={t('onboarding.moderate')}
-        description={t('onboarding.moderateDesc')}
-      />
-      <SelectionCard
-        selected={value === 'very_active'}
-        onClick={() => onChange('very_active')}
-        label={t('onboarding.veryActive')}
-        description={t('onboarding.veryActiveDesc')}
-      />
+      </h1>
+      <p className="text-slate-500 dark:text-slate-400 text-center mb-8">
+        {t('onboarding.activitySubtitle')}
+      </p>
+
+      <div className="space-y-3">
+        {options.map((opt) => (
+          <button
+            key={opt.id}
+            onClick={() => onChange(opt.id)}
+            className={`w-full p-5 rounded-2xl border-2 transition-all flex items-center gap-4 ${
+              value === opt.id
+                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-lg shadow-primary-500/10'
+                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark-alt hover:border-slate-300 dark:hover:border-slate-600'
+            }`}
+          >
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
+              value === opt.id
+                ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+            }`}>
+              {opt.icon}
+            </div>
+            <div className="text-left flex-1">
+              <span className={`text-base font-semibold block ${
+                value === opt.id ? 'text-primary-600 dark:text-primary-400' : 'text-slate-900 dark:text-white'
+              }`}>
+                {opt.label}
+              </span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">{opt.desc}</span>
+            </div>
+            {value === opt.id && (
+              <div className="flex-shrink-0">
+                <Check className="w-6 h-6 text-primary-500" />
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
 
+// ── Step 7: Experience ──────────────────────────────────────────
 function ExperienceStep({ value, onChange }) {
   const { t } = useTranslation();
+  const options = [
+    { id: 'beginner', icon: <Baby className="w-7 h-7" />, label: t('onboarding.beginner'), desc: t('onboarding.beginnerDesc') },
+    { id: 'intermediate', icon: <Award className="w-7 h-7" />, label: t('onboarding.intermediate'), desc: t('onboarding.intermediateDesc') },
+    { id: 'pro', icon: <Crown className="w-7 h-7" />, label: t('onboarding.pro'), desc: t('onboarding.proDesc') },
+  ];
+
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-white text-center mb-6">
+    <div className="flex-1 flex flex-col justify-center">
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-2">
         {t('onboarding.experience')}
-      </h2>
-      <SelectionCard
-        selected={value === 'beginner'}
-        onClick={() => onChange('beginner')}
-        label={t('onboarding.beginner')}
-        description={t('onboarding.beginnerDesc')}
-      />
-      <SelectionCard
-        selected={value === 'intermediate'}
-        onClick={() => onChange('intermediate')}
-        label={t('onboarding.intermediate')}
-        description={t('onboarding.intermediateDesc')}
-      />
-      <SelectionCard
-        selected={value === 'pro'}
-        onClick={() => onChange('pro')}
-        label={t('onboarding.pro')}
-        description={t('onboarding.proDesc')}
-      />
+      </h1>
+      <p className="text-slate-500 dark:text-slate-400 text-center mb-8">
+        {t('onboarding.experienceSubtitle')}
+      </p>
+
+      <div className="space-y-3">
+        {options.map((opt) => (
+          <button
+            key={opt.id}
+            onClick={() => onChange(opt.id)}
+            className={`w-full p-5 rounded-2xl border-2 transition-all flex items-center gap-4 ${
+              value === opt.id
+                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-lg shadow-primary-500/10'
+                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark-alt hover:border-slate-300 dark:hover:border-slate-600'
+            }`}
+          >
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
+              value === opt.id
+                ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+            }`}>
+              {opt.icon}
+            </div>
+            <div className="text-left flex-1">
+              <span className={`text-base font-semibold block ${
+                value === opt.id ? 'text-primary-600 dark:text-primary-400' : 'text-slate-900 dark:text-white'
+              }`}>
+                {opt.label}
+              </span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">{opt.desc}</span>
+            </div>
+            {value === opt.id && (
+              <div className="flex-shrink-0">
+                <Check className="w-6 h-6 text-primary-500" />
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Step 8: Terms & Privacy ─────────────────────────────────────
+function TermsStep({ value, onChange }) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex-1 flex flex-col justify-center">
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-2">
+        {t('onboarding.termsTitle')}
+      </h1>
+      <p className="text-slate-500 dark:text-slate-400 text-center mb-8">
+        {t('onboarding.termsSubtitle')}
+      </p>
+
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl border border-slate-200 dark:border-slate-700 p-5 mb-6">
+        <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 max-h-48 overflow-y-auto">
+          <p className="font-semibold text-slate-900 dark:text-white">{t('onboarding.termsHeading')}</p>
+          <p>{t('onboarding.termsText1')}</p>
+          <p className="font-semibold text-slate-900 dark:text-white">{t('onboarding.privacyHeading')}</p>
+          <p>{t('onboarding.privacyText1')}</p>
+        </div>
+      </div>
+
+      <button
+        onClick={() => onChange(!value)}
+        className={`w-full p-5 rounded-2xl border-2 transition-all flex items-center gap-4 ${
+          value
+            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark-alt'
+        }`}
+      >
+        <div className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all ${
+          value
+            ? 'border-primary-500 bg-primary-500'
+            : 'border-slate-300 dark:border-slate-600'
+        }`}>
+          {value && <Check className="w-4 h-4 text-white" />}
+        </div>
+        <span className={`text-sm font-medium flex-1 text-left ${
+          value ? 'text-primary-600 dark:text-primary-400' : 'text-slate-700 dark:text-slate-300'
+        }`}>
+          {t('onboarding.termsAccept')}
+        </span>
+      </button>
     </div>
   );
 }

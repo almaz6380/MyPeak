@@ -8,7 +8,7 @@ import { getNutritionEntries, getNutritionGoals, deleteNutritionEntry, saveNutri
 
 const MEAL_SLOTS = ['breakfast', 'lunch', 'dinner', 'snack'];
 
-export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOpenCustomMeals, onOpenCookbook }) {
+export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOpenCustomMeals, onOpenCookbook, onOpenSupplements }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
@@ -303,6 +303,21 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
           </div>
         )}
       </div>
+
+      {/* Supplements Card */}
+      <button
+        onClick={onOpenSupplements}
+        className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4 flex items-center gap-3 text-left hover:shadow-md transition-shadow"
+      >
+        <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
+          <span className="text-lg">💊</span>
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('supplements.title')}</p>
+          <p className="text-xs text-slate-400">{t('supplements.cardSubtitle')}</p>
+        </div>
+        <ChevronRight className="w-5 h-5 text-slate-300 dark:text-slate-600" />
+      </button>
 
       {!goals.tdee && (
         <button

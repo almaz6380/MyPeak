@@ -349,3 +349,38 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+
+-- 17. Supplements
+CREATE TABLE supplements (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  name text NOT NULL,
+  brand text,
+  form text NOT NULL DEFAULT 'capsule',
+  dosage_amount numeric NOT NULL DEFAULT 1,
+  dosage_unit text NOT NULL DEFAULT 'Stück',
+  notes text DEFAULT '',
+  barcode text,
+  schedule jsonb NOT NULL DEFAULT '{}',
+  created_at timestamptz DEFAULT now(),
+  deleted_at timestamptz
+);
+
+ALTER TABLE supplements ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users manage own supplements" ON supplements
+  FOR ALL USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+
+-- 18. Supplement Logs (Einnahme-Bestätigungen)
+CREATE TABLE supplement_logs (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  supplement_id uuid NOT NULL REFERENCES supplements(id) ON DELETE CASCADE,
+  date date NOT NULL DEFAULT CURRENT_DATE,
+  time_slot text NOT NULL,
+  taken_at timestamptz DEFAULT now(),
+  UNIQUE (user_id, supplement_id, date, time_slot)
+);
+
+ALTER TABLE supplement_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users manage own supplement logs" ON supplement_logs
+  FOR ALL USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());

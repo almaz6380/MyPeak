@@ -7,6 +7,9 @@ import CustomMealBuilder from './nutrition/CustomMealBuilder';
 import PortionPicker from './nutrition/PortionPicker';
 import Cookbook from './nutrition/Cookbook';
 import RecipeDetail from './nutrition/RecipeDetail';
+import SupplementsOverview from './nutrition/SupplementsOverview';
+import SupplementsList from './nutrition/SupplementsList';
+import AddSupplement from './nutrition/AddSupplement';
 import { useAuth } from '../context/AuthContext';
 import { updateNutritionEntry } from '../data/nutritionStorage';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +25,7 @@ export default function NutritionPage() {
   const [editingEntry, setEditingEntry] = useState(null);
   const [editMeal, setEditMeal] = useState(null);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [editSupplement, setEditSupplement] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   function refresh() {
@@ -135,6 +139,36 @@ export default function NutritionPage() {
     );
   }
 
+  if (view === 'supplements') {
+    return (
+      <SupplementsOverview
+        onBack={() => setView('home')}
+        onManage={() => setView('supplementsList')}
+        onAdd={() => { setEditSupplement(null); setView('addSupplement'); }}
+      />
+    );
+  }
+
+  if (view === 'supplementsList') {
+    return (
+      <SupplementsList
+        onBack={() => setView('supplements')}
+        onAdd={() => { setEditSupplement(null); setView('addSupplement'); }}
+        onEdit={(supp) => { setEditSupplement(supp); setView('addSupplement'); }}
+      />
+    );
+  }
+
+  if (view === 'addSupplement') {
+    return (
+      <AddSupplement
+        editSupplement={editSupplement}
+        onBack={() => setView(editSupplement ? 'supplementsList' : 'supplements')}
+        onSaved={() => { setEditSupplement(null); setView('supplements'); }}
+      />
+    );
+  }
+
   // Default: Daily Overview
   return (
     <DailyOverview
@@ -144,6 +178,7 @@ export default function NutritionPage() {
       onOpenTDEE={() => setView('tdee')}
       onOpenCustomMeals={() => setView('customMeals')}
       onOpenCookbook={() => setView('cookbook')}
+      onOpenSupplements={() => setView('supplements')}
     />
   );
 }
