@@ -59,6 +59,7 @@ export default function HomePage() {
   const [showWeightChart, setShowWeightChart] = useState(false);
   const [showWeightInput, setShowWeightInput] = useState(false);
   const [weightInput, setWeightInput] = useState('');
+  const [weightRange, setWeightRange] = useState('3m'); // '1m', '3m', '6m', '1y', 'all'
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -102,8 +103,15 @@ export default function HomePage() {
       const progress = getSupplementProgress(scheduled, suppLogs || []);
       setSuppProgress(progress);
 
-      // Weight
+      // Weight (prepend profile weight as starting point if no entries exist for that date)
       const weights = await getWeightEntries(user.id);
+      if (profile?.weight_kg && (weights.length === 0 || weights[0].date > (profile?.updated_at || profile?.created_at || '').split('T')[0])) {
+        const profileDate = (profile?.updated_at || profile?.created_at || new Date().toISOString()).split('T')[0];
+        const hasProfileDate = weights.some((w) => w.date === profileDate);
+        if (!hasProfileDate) {
+          weights.unshift({ date: profileDate, weight_kg: profile.weight_kg, id: 'profile_initial' });
+        }
+      }
       setWeightEntries(weights);
 
       // Cycle (only for female users)
@@ -360,9 +368,32 @@ export default function HomePage() {
                   </div>
                 )}
 
+                {/* Time range selector */}
+                <div className="flex gap-1 mb-3">
+                  {[
+                    { key: '1m', label: '1M' },
+                    { key: '3m', label: '3M' },
+                    { key: '6m', label: '6M' },
+                    { key: '1y', label: '1J' },
+                    { key: 'all', label: t('home.weightAll') },
+                  ].map((r) => (
+                    <button
+                      key={r.key}
+                      onClick={() => setWeightRange(r.key)}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                        weightRange === r.key
+                          ? 'bg-primary-500 text-white'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                      }`}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
+                </div>
+
                 {/* Chart */}
                 {weightEntries.length >= 2 ? (
-                  <WeightChart entries={weightEntries} />
+                  <WeightChart entries={weightEntries} range={weightRange} />
                 ) : (
                   <p className="text-xs text-slate-400 text-center py-4">
                     {t('home.weightNoData')}
@@ -505,14 +536,25 @@ function CalendarModal({ selectedDate, onSelect, onClose, lang }) {
   );
 }
 
-function WeightChart({ entries }) {
-  const last30 = entries.slice(-30);
+function WeightChart({ entries, range = '3m' }) {
+  const now = new Date();
+  const cutoff = new Date(now);
+  switch (range) {
+    case '1m': cutoff.setMonth(cutoff.getMonth() - 1); break;
+    case '3m': cutoff.setMonth(cutoff.getMonth() - 3); break;
+    case '6m': cutoff.setMonth(cutoff.getMonth() - 6); break;
+    case '1y': cutoff.setFullYear(cutoff.getFullYear() - 1); break;
+    default: cutoff.setFullYear(2000); break; // 'all'
+  }
+  const cutoffStr = cutoff.toISOString().split('T')[0];
+  const filtered = entries.filter((e) => e.date >= cutoffStr);
+  const last30 = filtered.length > 60 ? filtered.slice(-60) : filtered;
   if (last30.length < 2) return null;
 
   const weights = last30.map((e) => e.weight_kg);
   const minW = Math.floor(Math.min(...weights) - 1);
   const maxW = Math.ceil(Math.max(...weights) + 1);
-  const range = maxW - minW || 1;
+  const valueRange = maxW - minW || 1;
 
   const chartW = 320;
   const chartH = 120;
@@ -523,7 +565,7 @@ function WeightChart({ entries }) {
 
   const points = last30.map((e, i) => {
     const x = padX + (i / (last30.length - 1)) * w;
-    const y = padY + h - ((e.weight_kg - minW) / range) * h;
+    const y = padY + h - ((e.weight_kg - minW) / valueRange) * h;
     return `${x},${y}`;
   }).join(' ');
 
@@ -532,18 +574,18 @@ function WeightChart({ entries }) {
   const lastX = padX + w;
   const areaPath = `M${firstX},${padY + h} ` + last30.map((e, i) => {
     const x = padX + (i / (last30.length - 1)) * w;
-    const y = padY + h - ((e.weight_kg - minW) / range) * h;
+    const y = padY + h - ((e.weight_kg - minW) / valueRange) * h;
     return `L${x},${y}`;
   }).join(' ') + ` L${lastX},${padY + h} Z`;
 
   const gridLines = 3;
-  const gridValues = Array.from({ length: gridLines }, (_, i) => minW + (range / (gridLines - 1)) * i);
+  const gridValues = Array.from({ length: gridLines }, (_, i) => minW + (valueRange / (gridLines - 1)) * i);
 
   return (
     <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full" style={{ maxHeight: 140 }}>
       {/* Grid lines + labels */}
       {gridValues.map((v, i) => {
-        const y = padY + h - ((v - minW) / range) * h;
+        const y = padY + h - ((v - minW) / valueRange) * h;
         return (
           <g key={i}>
             <line x1={padX} y1={y} x2={chartW} y2={y} stroke="currentColor" className="text-slate-200 dark:text-slate-700" strokeWidth="0.5" />
@@ -562,7 +604,7 @@ function WeightChart({ entries }) {
       {[last30[0], last30[last30.length - 1]].map((e, idx) => {
         const i = idx === 0 ? 0 : last30.length - 1;
         const x = padX + (i / (last30.length - 1)) * w;
-        const y = padY + h - ((e.weight_kg - minW) / range) * h;
+        const y = padY + h - ((e.weight_kg - minW) / valueRange) * h;
         return <circle key={idx} cx={x} cy={y} r="3" fill="#f59e0b" />;
       })}
 
