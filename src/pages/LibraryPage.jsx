@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dumbbell, Apple, Pill, Droplets, Syringe, ChevronRight } from 'lucide-react';
+import { Dumbbell, Apple, Pill, Droplets, Syringe, ChevronRight, Scale } from 'lucide-react';
 import MyPeakLogo from '../components/MyPeakLogo';
 import PeptidesPage from './library/PeptidesPage';
+import DietsPage from './library/DietsPage';
 
 export default function LibraryPage() {
   const { t } = useTranslation();
@@ -12,9 +13,14 @@ export default function LibraryPage() {
     return <PeptidesPage onBack={() => setView('home')} />;
   }
 
+  if (view === 'diets') {
+    return <DietsPage onBack={() => setView('home')} />;
+  }
+
   const sections = [
     { id: 'training', icon: <Dumbbell className="w-6 h-6" />, label: t('library.training'), color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400', ready: false },
     { id: 'nutrition', icon: <Apple className="w-6 h-6" />, label: t('library.nutrition'), color: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400', ready: false },
+    { id: 'diets', icon: <Scale className="w-6 h-6" />, label: t('library.diets'), color: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400', ready: true },
     { id: 'supplements', icon: <Pill className="w-6 h-6" />, label: t('library.supplements'), color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400', ready: false },
     { id: 'peptides', icon: <Syringe className="w-6 h-6" />, label: t('library.peptides'), color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400', ready: true },
     { id: 'bloodwork', icon: <Droplets className="w-6 h-6" />, label: t('library.bloodwork'), color: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400', ready: false },

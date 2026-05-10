@@ -432,3 +432,16 @@ CREATE TABLE weight_entries (
 ALTER TABLE weight_entries ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users manage own weight entries" ON weight_entries
   FOR ALL USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+
+-- 22. Active Diet (aktive Diätform)
+CREATE TABLE active_diet (
+  user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  diet_id text NOT NULL,
+  started_at date NOT NULL DEFAULT CURRENT_DATE,
+  config jsonb DEFAULT '{}',
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE active_diet ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users manage own active diet" ON active_diet
+  FOR ALL USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
