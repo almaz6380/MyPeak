@@ -1,4 +1,6 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, createContext } from 'react';
+
+export const PullToRefreshContext = createContext(null);
 
 const THRESHOLD = 80;
 const MAX_PULL = 120;
@@ -44,7 +46,7 @@ export default function PullToRefresh({ children }) {
 
     if (pullDistance >= THRESHOLD) {
       setRefreshing(true);
-      setPullDistance(THRESHOLD);
+      setPullDistance(0);
       setTimeout(() => {
         window.location.reload();
       }, 900);
@@ -53,59 +55,15 @@ export default function PullToRefresh({ children }) {
     }
   }
 
-  const progress = Math.min(1, pullDistance / THRESHOLD);
-  const showIndicator = pullDistance > 10 || refreshing;
-
   return (
-    <div
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      className="relative"
-    >
-      {/* Pull indicator */}
-      {showIndicator && (
-        <div
-          className="fixed top-0 left-0 right-0 flex items-center justify-center z-[100] pointer-events-none"
-          style={{ height: `${pullDistance}px` }}
-        >
-          <div style={{ opacity: progress, transform: `scale(${0.5 + progress * 0.5})` }}>
-            <svg width="48" height="48" viewBox="0 0 512 512" fill="none">
-              <polyline
-                points="45,400 130,270 195,340 275,210 340,280 430,150"
-                stroke="#fbbf24"
-                strokeWidth="9"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeDasharray="900"
-                strokeDashoffset={refreshing ? undefined : 900 * (1 - progress)}
-                className={refreshing ? 'ptr-line-animate' : ''}
-              />
-              <path
-                d="M400,165 L430,150 L432,183"
-                stroke="#fbbf24"
-                strokeWidth="9"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                opacity={refreshing ? undefined : (progress > 0.8 ? (progress - 0.8) * 5 : 0)}
-                className={refreshing ? 'ptr-arrow-animate' : ''}
-              />
-            </svg>
-          </div>
-        </div>
-      )}
-
-      {/* Content with pull offset */}
+    <PullToRefreshContext.Provider value={{ refreshing }}>
       <div
-        style={{
-          transform: pullDistance > 0 ? `translateY(${pullDistance}px)` : undefined,
-          transition: pulling.current ? 'none' : 'transform 0.3s ease-out',
-        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         {children}
       </div>
-    </div>
+    </PullToRefreshContext.Provider>
   );
 }
