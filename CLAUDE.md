@@ -147,6 +147,17 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Gold-Linie mit Gradient-Füllung, letzte 30 Einträge
 - [x] Supabase: weight_entries Tabelle
 
+### Phase 4.1: Diäten-Bibliothek — FERTIG
+- [x] 8 Diätformen als ausführliche E-Books (je 7 Kapitel, DE+EN, mit wissenschaftlichen Studien)
+- [x] Diätformen: Kaloriendefizit, Reverse Dieting, Body Recomp, IF 16:8, High Protein, Carb Cycling, Diet Break, Mini Cut
+- [x] Kategorie-Filter (Fettabbau, Rekomposition, Mahlzeiten-Timing, Fortgeschritten)
+- [x] "Diät starten" → berechnet Kalorien/Makros basierend auf Profil-TDEE → setzt Ernährungsziele automatisch
+- [x] Bestätigungs-Dialog mit berechneten Werten vor Aktivierung
+- [x] Aktive Diät markiert in der Liste, Diät beenden möglich
+- [x] Phasen-Tracking für progressive Diäten (Reverse Dieting, Carb Cycling)
+- [x] Supabase: active_diet Tabelle
+- [x] dietStorage.js: CRUD + Ziel-Berechnung + Phasen-Tracking
+
 ### Phase 3.5–6: Noch offen (siehe Bauplan unten)
 
 ---
@@ -215,6 +226,8 @@ src/
 │   ├── supplementStorage.js      # Supplements CRUD + Einnahme-Logs
 │   ├── cycleStorage.js           # Zyklustracking: Settings, Logs, Phasenberechnung
 │   ├── weightStorage.js          # Gewichtsverlauf CRUD
+│   ├── dietsData.js              # 8 Diätformen × 7 Kapitel (DE+EN, mit Studien)
+│   ├── dietStorage.js            # Active Diet CRUD + Ziel-Berechnung + Phasen-Tracking
 │   └── recipesData.js            # 25 Rezepte mit Nährwerten (DE + EN)
 ├── lib/
 │   └── supabase.js               # Supabase Client (URL + Anon Key aus .env)
@@ -249,6 +262,7 @@ src/
 - **exercise_notes** — Notizen + Geräte-Einstellungen pro User/Übung (note, settings als JSONB)
 - **supplements** — Supplement-Einträge (name, brand, form, dosage, schedule als JSONB, Soft-Delete)
 - **supplement_logs** — Einnahme-Bestätigungen pro Supplement/Tag/Zeitslot (UNIQUE constraint)
+- **active_diet** — Aktive Diätform pro User (diet_id, started_at, config als JSONB)
 - **cycle_settings** — Zyklustracking-Einstellungen (cycle_length, period_length, last_period_start)
 - **cycle_logs** — Symptom-Tagebuch pro Tag (mood, energy, pain, sleep, bloating, headache, cravings)
 - **weight_entries** — Gewichtsverlauf pro Tag (date, weight_kg, UNIQUE user+date)
