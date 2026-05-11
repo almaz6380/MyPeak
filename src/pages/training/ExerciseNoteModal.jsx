@@ -145,8 +145,8 @@ export default function ExerciseNoteModal({ exerciseId, exerciseName, initialNot
           </div>
         </div>
 
-      {/* Save */}
-      <div className="px-5 pt-3 pb-5 shrink-0 border-t border-slate-100 dark:border-slate-700" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
+      {/* Save — fixed above bottom nav */}
+      <div className="px-5 py-4 shrink-0 border-t border-slate-100 dark:border-slate-700 mb-20">
         <button onClick={handleSave} disabled={saving}
           className="w-full py-3.5 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors">
           <Check className="w-4 h-4" />
