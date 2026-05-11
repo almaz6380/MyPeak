@@ -55,6 +55,8 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Eigene Trainingspläne erstellen, speichern und löschen
 - [x] Workout starten: Auswahl zwischen Trainingsplan oder freiem Workout
 - [x] Workout beenden (speichert) vs. Workout verwerfen (löscht) — klar getrennte Aktionen
+- [x] Fix: Workout beenden blockiert nicht mehr (saveWorkout fire-and-forget, kein await auf Supabase)
+- [x] Fix: Plan speichern enthält alle Übungen inkl. während des Trainings hinzugefügter
 - [x] Während des Workouts jederzeit Übungen hinzufügen/entfernen (ohne State-Verlust)
 - [x] PR-Erkennung (Neuer persönlicher Rekord)
 - [x] Workout-Verlauf mit aufklappbaren Details (alle Sätze pro Übung)
