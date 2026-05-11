@@ -96,6 +96,8 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Programm starten → wird als Wochenplan gespeichert → Kreiskalender zeigt blaue Tage
 - [x] Meine Pläne: Übersicht gespeicherter Wochenpläne + Freies Training Button + Plan erstellen
 - [x] Verlauf als eigene Karte unter den QuickActions, über Social
+- [x] Eigene Übungen löschen: Papierkorb-Button + Bestätigungsdialog, goldenes "Eigene" Badge bei Custom Exercises
+- [x] Fix: Eigene Übungen erstellen funktioniert jetzt auch im Gastmodus und während aktivem Workout (user?.id Fallback + try/catch)
 - [ ] **BUG: Plan-Detailansicht** — Klick auf Plan startet sofort Workout statt Detailansicht. PlanDetail.jsx existiert, aber View-Flow greift nicht. Alle Stellen wo Plans gestartet werden müssen auf planDetail umgeleitet werden. User will: Plan ansehen → Übungen hinzufügen/entfernen → erst bei explizitem "Workout starten" das Training beginnen.
 
 ### Phase 3: Ernährungs-Tracking — FERTIG
