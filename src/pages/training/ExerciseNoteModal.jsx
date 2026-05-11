@@ -54,18 +54,17 @@ export default function ExerciseNoteModal({ exerciseId, exerciseName, initialNot
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-end justify-center z-50" onClick={onClose}>
-      <div className="bg-white dark:bg-surface-dark-alt rounded-t-2xl w-full max-w-lg shadow-xl max-h-[85vh] flex flex-col animate-slide-up" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 pt-5 pb-3 shrink-0">
-          <h3 className="text-lg font-bold truncate">{exerciseName}</h3>
-          <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+    <div className="fixed inset-0 bg-white dark:bg-surface-dark z-50 flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 pt-14 pb-3 shrink-0">
+        <h3 className="text-lg font-bold truncate">{exerciseName}</h3>
+        <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+          <X className="w-5 h-5" />
+        </button>
+      </div>
 
-        {/* Content */}
-        <div className="overflow-y-auto flex-1 px-5 space-y-4">
+      {/* Content */}
+      <div className="overflow-y-auto flex-1 px-5 space-y-4">
           {/* Free text note */}
           <div>
             <label className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-1 block">
@@ -146,14 +145,13 @@ export default function ExerciseNoteModal({ exerciseId, exerciseName, initialNot
           </div>
         </div>
 
-        {/* Save */}
-        <div className="px-5 pt-3 pb-5 shrink-0 border-t border-slate-100 dark:border-slate-700" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
-          <button onClick={handleSave} disabled={saving}
-            className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors">
-            <Check className="w-4 h-4" />
-            {saving ? '...' : t('common.save')}
-          </button>
-        </div>
+      {/* Save */}
+      <div className="px-5 pt-3 pb-5 shrink-0 border-t border-slate-100 dark:border-slate-700" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
+        <button onClick={handleSave} disabled={saving}
+          className="w-full py-3.5 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors">
+          <Check className="w-4 h-4" />
+          {saving ? '...' : t('common.save')}
+        </button>
       </div>
     </div>
   );
