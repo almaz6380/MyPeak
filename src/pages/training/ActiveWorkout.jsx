@@ -262,9 +262,12 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
 
               <div className="grid grid-cols-[2.5rem_1fr_1fr_2rem] gap-2 items-center text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">
                 <span className="text-center">{t('training.set')}</span>
-                <button onClick={() => ctx.toggleExerciseUnit(exIdx)} className="text-center text-primary-500 underline underline-offset-2 font-medium">
-                  {t('training.weight')} ({exerciseUnit})
-                </button>
+                <span className="text-center">
+                  {t('training.weight')}{' '}
+                  <button type="button" onClick={() => ctx.toggleExerciseUnit(exIdx)} className="inline-flex items-center px-1.5 py-0.5 rounded bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 font-semibold cursor-pointer">
+                    {exerciseUnit}
+                  </button>
+                </span>
                 <span className="text-center">{t('training.reps')}</span>
                 <span></span>
               </div>

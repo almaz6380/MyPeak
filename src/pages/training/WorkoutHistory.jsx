@@ -138,7 +138,8 @@ export default function WorkoutHistory({ onBack }) {
       const newBest = newEx ? bestSet(newEx.sets) : null;
       const weightDiff = oldBest && newBest ? newBest.weight - oldBest.weight : null;
 
-      comparisons.push({ exId, nameKey, oldEx, newEx, oldBest, newBest, weightDiff });
+      const exUnit = (newEx || oldEx).unit || weightUnit;
+      comparisons.push({ exId, nameKey, oldEx, newEx, oldBest, newBest, weightDiff, exUnit });
     }
 
     return (
@@ -164,7 +165,7 @@ export default function WorkoutHistory({ onBack }) {
 
         {/* Exercise comparisons */}
         <div className="flex flex-col gap-3">
-          {comparisons.map(({ exId, nameKey, oldBest, newBest, weightDiff }) => (
+          {comparisons.map(({ exId, nameKey, oldBest, newBest, weightDiff, exUnit }) => (
             <div key={exId} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
               <h3 className="font-semibold mb-3">{t(nameKey)}</h3>
               <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-center">
@@ -172,7 +173,7 @@ export default function WorkoutHistory({ onBack }) {
                 <div className="text-center">
                   {oldBest ? (
                     <p className="text-sm text-slate-600 dark:text-slate-300">
-                      {oldBest.weight} {t(`training.${weightUnit}`)} x {oldBest.reps}
+                      {oldBest.weight} {exUnit} x {oldBest.reps}
                     </p>
                   ) : (
                     <p className="text-sm text-slate-400">—</p>
@@ -185,12 +186,12 @@ export default function WorkoutHistory({ onBack }) {
                     weightDiff > 0 ? (
                       <div className="flex items-center gap-1 text-green-500">
                         <ArrowUpRight className="w-4 h-4" />
-                        <span className="text-xs font-bold">+{weightDiff} {t(`training.${weightUnit}`)}</span>
+                        <span className="text-xs font-bold">+{weightDiff} {exUnit}</span>
                       </div>
                     ) : weightDiff < 0 ? (
                       <div className="flex items-center gap-1 text-red-500">
                         <ArrowDownRight className="w-4 h-4" />
-                        <span className="text-xs font-bold">{weightDiff} {t(`training.${weightUnit}`)}</span>
+                        <span className="text-xs font-bold">{weightDiff} {exUnit}</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-1 text-slate-400">
@@ -207,7 +208,7 @@ export default function WorkoutHistory({ onBack }) {
                 <div className="text-center">
                   {newBest ? (
                     <p className={`text-sm font-medium ${weightDiff && weightDiff > 0 ? 'text-green-600 dark:text-green-400' : 'text-slate-600 dark:text-slate-300'}`}>
-                      {newBest.weight} {t(`training.${weightUnit}`)} x {newBest.reps}
+                      {newBest.weight} {exUnit} x {newBest.reps}
                     </p>
                   ) : (
                     <p className="text-sm text-slate-400">—</p>
@@ -440,7 +441,7 @@ export default function WorkoutHistory({ onBack }) {
                               </button>
                               {isStrength && best && (
                                 <span className="text-xs text-primary-500 font-medium">
-                                  {t('training.bestSet')}: {best.weight}{t(`training.${weightUnit}`)} x {best.reps}
+                                  {t('training.bestSet')}: {best.weight}{ex.unit || weightUnit} x {best.reps}
                                 </span>
                               )}
                             </div>
@@ -467,7 +468,7 @@ export default function WorkoutHistory({ onBack }) {
                               {ex.sets.map((set, si) => (
                                 <div key={si} className="contents">
                                   <span className="text-slate-400 text-center">{si + 1}</span>
-                                  <span className="text-center text-slate-700 dark:text-slate-300">{set.weight} {t(`training.${weightUnit}`)}</span>
+                                  <span className="text-center text-slate-700 dark:text-slate-300">{set.weight} {ex.unit || weightUnit}</span>
                                   <span className="text-center text-slate-700 dark:text-slate-300">{set.reps}</span>
                                 </div>
                               ))}

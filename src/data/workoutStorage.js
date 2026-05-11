@@ -141,6 +141,26 @@ export async function saveCustomExercise(userId, exercise) {
   return { data: exercise, error: null };
 }
 
+export async function deleteCustomExercise(userId, exerciseId) {
+  // Remove from localStorage
+  const cached = JSON.parse(localStorage.getItem(CUSTOM_EXERCISES_KEY) || '[]');
+  const updated = cached.filter((e) => e.exercise_id !== exerciseId);
+  localStorage.setItem(CUSTOM_EXERCISES_KEY, JSON.stringify(updated));
+
+  // Remove from Supabase
+  if (!isGuest(userId)) {
+    try {
+      await supabase
+        .from('custom_exercises')
+        .delete()
+        .eq('user_id', userId)
+        .eq('exercise_id', exerciseId);
+    } catch (err) {
+      console.error('Failed to delete custom exercise from Supabase:', err);
+    }
+  }
+}
+
 // ── Exercise History & PR ─────────────────────────────────
 
 export async function getExerciseHistory(userId, exerciseId) {
@@ -152,6 +172,7 @@ export async function getExerciseHistory(userId, exerciseId) {
         history.push({
           date: workout.date,
           sets: exercise.sets,
+          unit: exercise.unit || null,
         });
       }
     }
@@ -161,13 +182,17 @@ export async function getExerciseHistory(userId, exerciseId) {
 
 export async function getPersonalRecord(userId, exerciseId) {
   const history = await getExerciseHistory(userId, exerciseId);
+  const globalUnit = localStorage.getItem('weightUnit') || 'kg';
+  const toKg = (v, unit) => unit === 'lbs' ? v * 0.453592 : v;
   let maxWeight = 0;
   let maxVolume = 0;
   for (const entry of history) {
     if (!entry.sets) continue;
+    const entryUnit = entry.unit || globalUnit;
     for (const set of entry.sets) {
-      if (set.weight > maxWeight) maxWeight = set.weight;
-      const volume = (set.weight || 0) * (set.reps || 0);
+      const wKg = toKg(set.weight, entryUnit);
+      if (wKg > maxWeight) maxWeight = wKg;
+      const volume = (wKg || 0) * (set.reps || 0);
       if (volume > maxVolume) maxVolume = volume;
     }
   }

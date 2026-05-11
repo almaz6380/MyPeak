@@ -115,7 +115,7 @@ export default function PostWorkoutSummary({ exercises, prs = {}, duration, user
                   <div className="flex items-center gap-1 text-green-500">
                     <ArrowUpRight className="w-4 h-4" />
                     <span className="text-xs font-bold">
-                      {r.weightDiff !== 0 ? `${r.weightDiff > 0 ? '+' : ''}${r.weightDiff}${t(`training.${weightUnit}`)}` : `+${r.repsDiff} ${t('training.reps')}`}
+                      {r.weightDiff !== 0 ? `${r.weightDiff > 0 ? '+' : ''}${r.weightDiff}${r.unit || weightUnit}` : `+${r.repsDiff} ${t('training.reps')}`}
                     </span>
                   </div>
                 )}
@@ -129,7 +129,7 @@ export default function PostWorkoutSummary({ exercises, prs = {}, duration, user
                   <div className="flex items-center gap-1 text-red-500">
                     <ArrowDownRight className="w-4 h-4" />
                     <span className="text-xs font-bold">
-                      {r.weightDiff !== 0 ? `${r.weightDiff}${t(`training.${weightUnit}`)}` : `${r.repsDiff} ${t('training.reps')}`}
+                      {r.weightDiff !== 0 ? `${r.weightDiff}${r.unit || weightUnit}` : `${r.repsDiff} ${t('training.reps')}`}
                     </span>
                   </div>
                 )}
@@ -140,10 +140,10 @@ export default function PostWorkoutSummary({ exercises, prs = {}, duration, user
             </div>
             {r.currentBest && r.lastBest && (
               <div className="flex items-center gap-2 mt-1 text-xs text-slate-400">
-                <span>{r.lastBest.weight}{t(`training.${weightUnit}`)} × {r.lastBest.reps}</span>
+                <span>{r.lastBest.weight}{r.unit || weightUnit} × {r.lastBest.reps}</span>
                 <span>→</span>
                 <span className={r.status === 'improved' ? 'text-green-500 font-medium' : r.status === 'worse' ? 'text-red-500' : ''}>
-                  {r.currentBest.weight}{t(`training.${weightUnit}`)} × {r.currentBest.reps}
+                  {r.currentBest.weight}{r.unit || weightUnit} × {r.currentBest.reps}
                 </span>
               </div>
             )}

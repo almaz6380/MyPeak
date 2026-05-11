@@ -32,6 +32,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Mehrsprachigkeit (DE/EN) mit i18next eingerichtet
 - [x] Basis-Design mit Farbschema, Typografie, Dark/Light Mode
 - [x] Einheiten umschaltbar (kg/lbs) im Profil
+- [x] Per-Exercise kg/lbs Toggle: Während des Workouts kann pro Übung zwischen kg und lbs gewechselt werden (tappbarer Badge neben "Gewicht"), ohne die globale Einstellung zu ändern. Einheit wird pro Übung im Workout gespeichert und in History korrekt angezeigt. PR-Erkennung normalisiert auf kg.
 
 ### Phase 1.5: Auth & Onboarding — FERTIG
 - [x] Supabase als Backend (Auth + Datenbank)
