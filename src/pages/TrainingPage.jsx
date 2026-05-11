@@ -196,18 +196,6 @@ export default function TrainingPage() {
     );
   }
 
-  if (view === 'selectForPlanDetail') {
-    return (
-      <ExerciseLibrary
-        onBack={() => setView('planDetail')}
-        onSelect={(selected) => {
-          setPendingPlanExercises(selected);
-          setView('planDetail');
-        }}
-        selectionMode
-      />
-    );
-  }
 
   if (view === 'activeWorkout') {
     return (
@@ -302,11 +290,8 @@ export default function TrainingPage() {
       <PlanDetail
         plan={viewingPlan}
         dayIndex={viewingDayIndex}
-        newExercises={pendingPlanExercises}
-        onClearNewExercises={() => setPendingPlanExercises(null)}
-        onBack={() => { setPendingPlanExercises(null); setView('plans'); }}
+        onBack={() => setView('plans')}
         onStartWorkout={(exs, planId, planName) => handleStartPlan(exs, planId, planName)}
-        onAddExercise={() => setView('selectForPlanDetail')}
       />
     );
   }
