@@ -22,16 +22,30 @@ const SPLIT_TYPES = [
   { id: 'cardio', labelDE: 'Cardio', labelEN: 'Cardio' },
 ];
 
-export default function WeeklyPlanBuilder({ onBack, onSaved, onSelectExercises }) {
+export default function WeeklyPlanBuilder({ onBack, onSaved, onSelectExercises, editPlan }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const isEditing = !!editPlan;
 
-  const [step, setStep] = useState(1); // 1: Name + Count, 2: Days, 3: Configure
-  const [planName, setPlanName] = useState('');
-  const [sessionsPerWeek, setSessionsPerWeek] = useState(4);
-  const [selectedDays, setSelectedDays] = useState(new Set());
-  const [dayConfigs, setDayConfigs] = useState({}); // { mon: { type, label, exercises }, ... }
+  // Initialize from editPlan if editing
+  const [step, setStep] = useState(isEditing ? 3 : 1);
+  const [planName, setPlanName] = useState(editPlan?.name || '');
+  const [sessionsPerWeek, setSessionsPerWeek] = useState(() => {
+    if (editPlan?.sessions_per_week) return editPlan.sessions_per_week;
+    if (editPlan?.days) return Object.values(editPlan.days).filter(Boolean).length;
+    return 4;
+  });
+  const [selectedDays, setSelectedDays] = useState(() => {
+    if (!editPlan?.days) return new Set();
+    return new Set(DAY_KEYS.filter((k) => editPlan.days[k]));
+  });
+  const [dayConfigs, setDayConfigs] = useState(() => {
+    if (!editPlan?.days) return {};
+    const configs = {};
+    DAY_KEYS.forEach((k) => { if (editPlan.days[k]) configs[k] = editPlan.days[k]; });
+    return configs;
+  });
   const [configuringDay, setConfiguringDay] = useState(null);
   const [saving, setSaving] = useState(false);
 
@@ -64,7 +78,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, onSelectExercises }
   }
 
   async function handleSave() {
-    if (!planName.trim() || selectedDays.size !== sessionsPerWeek) return;
+    if (!planName.trim()) return;
     setSaving(true);
 
     const days = {};
@@ -76,9 +90,15 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, onSelectExercises }
       }
     });
 
+    if (isEditing && editPlan.id) {
+      // Update existing plan
+      const { deleteWeeklySchedule } = await import('../../data/workoutStorage');
+      await deleteWeeklySchedule(user.id, editPlan.id);
+    }
+
     await saveWeeklySchedule(user.id, {
       name: planName.trim(),
-      sessions_per_week: sessionsPerWeek,
+      sessions_per_week: Object.values(days).filter(Boolean).length,
       days,
     });
 

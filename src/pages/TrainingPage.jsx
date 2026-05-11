@@ -36,6 +36,7 @@ export default function TrainingPage() {
   const [hiitConfig, setHiitConfig] = useState(null);
   const [circuitConfig, setCircuitConfig] = useState(null);
   const [martialArtsConfig, setMartialArtsConfig] = useState(null);
+  const [editingPlan, setEditingPlan] = useState(null);
 
   // Diamond Calendar state
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -271,11 +272,11 @@ export default function TrainingPage() {
   }
 
   if (view === 'myPlans') {
-    return <MyPlans onBack={() => setView('home')} onCreate={() => setView('weeklyPlan')} onStartFreeWorkout={() => setView('startChoice')} />;
+    return <MyPlans onBack={() => setView('home')} onCreate={() => { setEditingPlan(null); setView('weeklyPlan'); }} onEdit={(plan) => { setEditingPlan(plan); setView('weeklyPlan'); }} onStartFreeWorkout={() => setView('startChoice')} />;
   }
 
   if (view === 'weeklyPlan') {
-    return <WeeklyPlanBuilder onBack={() => setView('myPlans')} onSaved={() => { loadCalendarData(); setView('myPlans'); }} />;
+    return <WeeklyPlanBuilder editPlan={editingPlan} onBack={() => setView('myPlans')} onSaved={() => { setEditingPlan(null); loadCalendarData(); setView('myPlans'); }} />;
   }
 
   if (view === 'peakPrograms') {

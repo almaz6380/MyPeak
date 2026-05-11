@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Plus, Trash2, Check, Dumbbell, Play, Zap } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Check, Dumbbell, Play, Zap, Pencil } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getWeeklySchedules, deleteWeeklySchedule, saveWeeklySchedule } from '../../data/workoutStorage';
 
 const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
-export default function MyPlans({ onBack, onCreate, onStartFreeWorkout }) {
+export default function MyPlans({ onBack, onCreate, onEdit, onStartFreeWorkout }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
@@ -101,6 +101,9 @@ export default function MyPlans({ onBack, onCreate, onStartFreeWorkout }) {
                   )}
                 </div>
                 <div className="flex gap-1">
+                  <button onClick={() => onEdit(plan)} className="p-1.5 text-slate-400 hover:text-primary-500">
+                    <Pencil className="w-4 h-4" />
+                  </button>
                   {!plan.is_active && (
                     <button onClick={() => handleActivate(plan)} className="p-1.5 text-slate-400 hover:text-green-500">
                       <Check className="w-4 h-4" />
