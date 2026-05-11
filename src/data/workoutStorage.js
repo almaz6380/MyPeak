@@ -7,27 +7,35 @@ const CUSTOM_EXERCISES_KEY = 'custom_exercises';
 // ── Workouts ──────────────────────────────────────────────
 
 export async function getWorkouts(userId) {
-  if (!isGuest(userId)) {
-    const { data, error } = await supabase
-      .from('workouts')
-      .select('*')
-      .eq('user_id', userId)
-      .order('date', { ascending: false });
+  // localStorage first — instant
+  const cached = localStorage.getItem(WORKOUTS_KEY);
+  const localData = cached ? JSON.parse(cached) : [];
 
-    if (!error && data) {
-      const workouts = data.map((row) => ({
-        id: row.id,
-        date: row.date,
-        duration: row.duration,
-        exercises: row.exercises,
-      }));
-      localStorage.setItem(WORKOUTS_KEY, JSON.stringify(workouts));
-      return workouts;
+  if (!isGuest(userId)) {
+    // Supabase in background — update cache silently
+    try {
+      const { data, error } = await supabase
+        .from('workouts')
+        .select('*')
+        .eq('user_id', userId)
+        .order('date', { ascending: false });
+
+      if (!error && data) {
+        const workouts = data.map((row) => ({
+          id: row.id,
+          date: row.date,
+          duration: row.duration,
+          exercises: row.exercises,
+        }));
+        localStorage.setItem(WORKOUTS_KEY, JSON.stringify(workouts));
+        return workouts;
+      }
+    } catch (err) {
+      console.error('Failed to load workouts from Supabase:', err);
     }
   }
 
-  const cached = localStorage.getItem(WORKOUTS_KEY);
-  return cached ? JSON.parse(cached) : [];
+  return localData;
 }
 
 export async function saveWorkout(userId, workout) {
@@ -71,35 +79,35 @@ export async function saveWorkout(userId, workout) {
 }
 
 export async function updateWorkout(userId, workoutId, updates) {
-  const { data, error } = await supabase
-    .from('workouts')
-    .update({ exercises: updates.exercises, duration: updates.duration })
-    .eq('id', workoutId)
-    .eq('user_id', userId)
-    .select()
-    .single();
-
-  if (!error && data) {
-    const cached = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
-    const idx = cached.findIndex((w) => w.id === workoutId);
-    if (idx >= 0) {
-      cached[idx] = { ...cached[idx], exercises: data.exercises, duration: data.duration };
-      localStorage.setItem(WORKOUTS_KEY, JSON.stringify(cached));
-    }
+  // localStorage first
+  const cached = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
+  const idx = cached.findIndex((w) => w.id === workoutId);
+  if (idx >= 0) {
+    cached[idx] = { ...cached[idx], exercises: updates.exercises, duration: updates.duration };
+    localStorage.setItem(WORKOUTS_KEY, JSON.stringify(cached));
   }
 
-  return { data, error };
+  if (!isGuest(userId) && !workoutId.startsWith('local_')) {
+    try {
+      await supabase.from('workouts')
+        .update({ exercises: updates.exercises, duration: updates.duration })
+        .eq('id', workoutId).eq('user_id', userId);
+    } catch (err) { console.error('Failed to update workout:', err); }
+  }
+
+  return { data: cached[idx], error: null };
 }
 
 export async function deleteWorkout(userId, workoutId) {
-  await supabase
-    .from('workouts')
-    .delete()
-    .eq('id', workoutId)
-    .eq('user_id', userId);
-
+  // localStorage first
   const cached = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
   localStorage.setItem(WORKOUTS_KEY, JSON.stringify(cached.filter((w) => w.id !== workoutId)));
+
+  if (!isGuest(userId) && !workoutId.startsWith('local_')) {
+    try {
+      await supabase.from('workouts').delete().eq('id', workoutId).eq('user_id', userId);
+    } catch (err) { console.error('Failed to delete workout:', err); }
+  }
 }
 
 // ── Custom Exercises ──────────────────────────────────────
@@ -256,30 +264,30 @@ export async function updateCustomPlan(userId, planId, plan) {
 // ── Custom Plans ──────────────────────────────────────────
 
 export async function getCustomPlans(userId) {
-  if (!isGuest(userId)) {
-    const { data, error } = await supabase
-      .from('custom_plans')
-      .select('*')
-      .eq('user_id', userId)
-      .is('deleted_at', null)
-      .order('created_at', { ascending: false });
+  // localStorage first — instant
+  let localData = [];
+  try { localData = JSON.parse(localStorage.getItem('customPlans') || '[]'); } catch {}
 
-    if (!error && data) {
-      const plans = data.map((row) => ({
-        id: row.id,
-        name: row.name,
-        days: row.days,
-      }));
-      localStorage.setItem('customPlans', JSON.stringify(plans));
-      return plans;
+  if (!isGuest(userId)) {
+    try {
+      const { data, error } = await supabase
+        .from('custom_plans')
+        .select('*')
+        .eq('user_id', userId)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        const plans = data.map((row) => ({ id: row.id, name: row.name, days: row.days }));
+        localStorage.setItem('customPlans', JSON.stringify(plans));
+        return plans;
+      }
+    } catch (err) {
+      console.error('Failed to load custom plans from Supabase:', err);
     }
   }
 
-  try {
-    return JSON.parse(localStorage.getItem('customPlans') || '[]');
-  } catch {
-    return [];
-  }
+  return localData;
 }
 
 export async function saveCustomPlan(userId, plan) {

@@ -103,82 +103,81 @@ export async function deleteNutritionEntry(userId, entryId, date) {
 // ── Custom Meals ─────────────────────────────────────────────
 
 export async function getCustomMeals(userId) {
-  const { data, error } = await supabase
-    .from('custom_meals')
-    .select('*')
-    .eq('user_id', userId)
-    .is('deleted_at', null)
-    .order('created_at', { ascending: false });
+  let localData = [];
+  try { localData = JSON.parse(localStorage.getItem(CUSTOM_MEALS_KEY) || '[]'); } catch {}
 
-  if (!error && data) {
-    localStorage.setItem(CUSTOM_MEALS_KEY, JSON.stringify(data));
-    return data;
+  if (!guestSkip(userId)) {
+    try {
+      const { data, error } = await supabase
+        .from('custom_meals')
+        .select('*')
+        .eq('user_id', userId)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        localStorage.setItem(CUSTOM_MEALS_KEY, JSON.stringify(data));
+        return data;
+      }
+    } catch (err) {
+      console.error('Failed to load custom meals:', err);
+    }
   }
 
-  try {
-    return JSON.parse(localStorage.getItem(CUSTOM_MEALS_KEY) || '[]');
-  } catch {
-    return [];
-  }
+  return localData;
 }
 
 export async function saveCustomMeal(userId, meal) {
-  const { data, error } = await supabase
-    .from('custom_meals')
-    .insert({
-      user_id: userId,
-      name: meal.name,
-      items: meal.items,
-      total_calories: meal.total_calories,
-      total_protein: meal.total_protein,
-      total_carbs: meal.total_carbs,
-      total_fat: meal.total_fat,
-    })
-    .select()
-    .single();
-
+  // localStorage first
   const cached = JSON.parse(localStorage.getItem(CUSTOM_MEALS_KEY) || '[]');
-  cached.unshift(data || meal);
+  const localEntry = { ...meal, id: `local_${Date.now()}` };
+  cached.unshift(localEntry);
   localStorage.setItem(CUSTOM_MEALS_KEY, JSON.stringify(cached));
 
-  return { data, error };
+  if (!guestSkip(userId)) {
+    try {
+      const { data } = await supabase
+        .from('custom_meals')
+        .insert({ user_id: userId, name: meal.name, items: meal.items, total_calories: meal.total_calories, total_protein: meal.total_protein, total_carbs: meal.total_carbs, total_fat: meal.total_fat })
+        .select().single();
+      if (data) {
+        const c = JSON.parse(localStorage.getItem(CUSTOM_MEALS_KEY) || '[]');
+        const idx = c.findIndex((m) => m.id === localEntry.id);
+        if (idx >= 0) { c[idx] = data; localStorage.setItem(CUSTOM_MEALS_KEY, JSON.stringify(c)); }
+      }
+    } catch (err) { console.error('Failed to save custom meal:', err); }
+  }
+
+  return { data: localEntry, error: null };
 }
 
 export async function updateCustomMeal(userId, mealId, meal) {
-  const { data, error } = await supabase
-    .from('custom_meals')
-    .update({
-      name: meal.name,
-      items: meal.items,
-      total_calories: meal.total_calories,
-      total_protein: meal.total_protein,
-      total_carbs: meal.total_carbs,
-      total_fat: meal.total_fat,
-    })
-    .eq('id', mealId)
-    .eq('user_id', userId)
-    .select()
-    .single();
-
+  // localStorage first
   const cached = JSON.parse(localStorage.getItem(CUSTOM_MEALS_KEY) || '[]');
   const idx = cached.findIndex((m) => m.id === mealId);
-  if (idx >= 0) {
-    cached[idx] = data || { ...cached[idx], ...meal };
-    localStorage.setItem(CUSTOM_MEALS_KEY, JSON.stringify(cached));
+  if (idx >= 0) { cached[idx] = { ...cached[idx], ...meal }; localStorage.setItem(CUSTOM_MEALS_KEY, JSON.stringify(cached)); }
+
+  if (!guestSkip(userId) && !mealId.startsWith('local_')) {
+    try {
+      await supabase.from('custom_meals')
+        .update({ name: meal.name, items: meal.items, total_calories: meal.total_calories, total_protein: meal.total_protein, total_carbs: meal.total_carbs, total_fat: meal.total_fat })
+        .eq('id', mealId).eq('user_id', userId);
+    } catch (err) { console.error('Failed to update custom meal:', err); }
   }
 
-  return { data, error };
+  return { data: cached[idx], error: null };
 }
 
 export async function deleteCustomMeal(userId, mealId) {
-  await supabase
-    .from('custom_meals')
-    .update({ deleted_at: new Date().toISOString() })
-    .eq('id', mealId)
-    .eq('user_id', userId);
-
+  // localStorage first
   const cached = JSON.parse(localStorage.getItem(CUSTOM_MEALS_KEY) || '[]');
   localStorage.setItem(CUSTOM_MEALS_KEY, JSON.stringify(cached.filter((m) => m.id !== mealId)));
+
+  if (!guestSkip(userId) && !mealId.startsWith('local_')) {
+    try {
+      await supabase.from('custom_meals').update({ deleted_at: new Date().toISOString() }).eq('id', mealId).eq('user_id', userId);
+    } catch (err) { console.error('Failed to delete custom meal:', err); }
+  }
 }
 
 export async function logCustomMeal(userId, meal, date, mealSlot) {
@@ -276,12 +275,16 @@ export async function getRecentFoods(userId, limit = 10) {
   let data = null;
 
   if (!guestSkip(userId)) {
-    ({ data } = await supabase
-      .from('nutrition_entries')
-      .select('food_name, brand, serving_size, serving_unit, calories, protein, carbs, fat, source, source_id')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(50));
+    try {
+      ({ data } = await supabase
+        .from('nutrition_entries')
+        .select('food_name, brand, serving_size, serving_unit, calories, protein, carbs, fat, source, source_id')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(50));
+    } catch (err) {
+      console.error('Failed to load recent foods:', err);
+    }
   }
 
   if (!data) return [];

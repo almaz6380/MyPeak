@@ -70,10 +70,10 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    // Timeout: if Supabase doesn't respond in 5s, show login
+    // Timeout: if Supabase doesn't respond in 3s, show login
     const timeout = setTimeout(() => {
       if (loading) setLoading(false);
-    }, 5000);
+    }, 3000);
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       clearTimeout(timeout);

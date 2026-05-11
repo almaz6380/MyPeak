@@ -130,7 +130,11 @@ export async function getFriends(userId) {
 }
 
 export async function removeFriend(friendshipId) {
-  await supabase.from('friendships').delete().eq('id', friendshipId);
+  try {
+    await supabase.from('friendships').delete().eq('id', friendshipId);
+  } catch (err) {
+    console.error('Failed to remove friend:', err);
+  }
 }
 
 // ── Challenges ───────────────────────────────────────────────
