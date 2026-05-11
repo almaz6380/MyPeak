@@ -131,12 +131,11 @@ export default function TrainingPage() {
         };
       })
       .filter(Boolean);
-    activeWorkout.startWorkout('strength', enriched, null);
-    if (activeWorkout.workout) {
-      activeWorkout.workout.fromPlan = true;
-      activeWorkout.workout.planId = planId || null;
-      activeWorkout.workout.planName = planName || null;
-    }
+    activeWorkout.startWorkout('strength', enriched, null, {
+      fromPlan: true,
+      planId: planId || null,
+      planName: planName || null,
+    });
     setView('activeWorkout');
   };
 

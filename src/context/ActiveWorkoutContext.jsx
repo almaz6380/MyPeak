@@ -31,7 +31,7 @@ export function ActiveWorkoutProvider({ children }) {
     }
   }, [workout]);
 
-  const startWorkout = useCallback((type, exercises, config = null) => {
+  const startWorkout = useCallback((type, exercises, config = null, planMeta = null) => {
     const initial = {
       isActive: true,
       startTime: Date.now(),
@@ -39,9 +39,13 @@ export function ActiveWorkoutProvider({ children }) {
       exercises: exercises.map((ex) => ({
         exerciseId: ex.exerciseId || ex.id,
         nameKey: ex.nameKey,
+        unit: localStorage.getItem('weightUnit') || 'kg',
         sets: ex.sets || [{ reps: '', weight: '' }],
       })),
       config,
+      fromPlan: planMeta?.fromPlan || false,
+      planId: planMeta?.planId || null,
+      planName: planMeta?.planName || null,
     };
     setWorkout(initial);
   }, []);
@@ -62,6 +66,7 @@ export function ActiveWorkoutProvider({ children }) {
         .map((ex) => ({
           exerciseId: ex.exerciseId || ex.id,
           nameKey: ex.nameKey,
+          unit: localStorage.getItem('weightUnit') || 'kg',
           sets: [{ reps: '', weight: '' }],
         }));
       if (toAdd.length === 0) return prev;
@@ -98,6 +103,18 @@ export function ActiveWorkoutProvider({ children }) {
         if (ei !== exIdx) return ex;
         const lastSet = ex.sets[ex.sets.length - 1] || { reps: '', weight: '' };
         return { ...ex, sets: [...ex.sets, { reps: lastSet.reps, weight: lastSet.weight }] };
+      });
+      return { ...prev, exercises };
+    });
+  }, []);
+
+  const toggleExerciseUnit = useCallback((exIdx) => {
+    setWorkout((prev) => {
+      if (!prev) return prev;
+      const exercises = prev.exercises.map((ex, ei) => {
+        if (ei !== exIdx) return ex;
+        const currentUnit = ex.unit || localStorage.getItem('weightUnit') || 'kg';
+        return { ...ex, unit: currentUnit === 'kg' ? 'lbs' : 'kg' };
       });
       return { ...prev, exercises };
     });
@@ -141,6 +158,7 @@ export function ActiveWorkoutProvider({ children }) {
     updateExercises,
     addExercises,
     removeExercise,
+    toggleExerciseUnit,
     updateSet,
     addSet,
     removeSet,
