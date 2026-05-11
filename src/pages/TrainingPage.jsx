@@ -40,7 +40,7 @@ export default function TrainingPage() {
   const [editingPlan, setEditingPlan] = useState(null);
   const [viewingPlan, setViewingPlan] = useState(null);
   const [viewingDayIndex, setViewingDayIndex] = useState(0);
-  const [pendingPlanExercises, setPendingPlanExercises] = useState(null);
+  const [planDetailExercises, setPlanDetailExercises] = useState(null); // persisted exercise list for PlanDetail
 
   // Diamond Calendar state
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -285,13 +285,29 @@ export default function TrainingPage() {
     return <WeeklyPlanBuilder editPlan={editingPlan} onBack={() => setView('myPlans')} onSaved={() => { setEditingPlan(null); loadCalendarData(); setView('myPlans'); }} />;
   }
 
+  if (view === 'selectForPlanDetail') {
+    return (
+      <ExerciseLibrary
+        onBack={() => setView('planDetail')}
+        onSelect={(selected) => {
+          setPlanDetailExercises((prev) => [...(prev || []), ...selected.map((ex) => ({ id: ex.id, nameKey: ex.nameKey }))]);
+          setView('planDetail');
+        }}
+        selectionMode
+      />
+    );
+  }
+
   if (view === 'planDetail' && viewingPlan) {
     return (
       <PlanDetail
         plan={viewingPlan}
         dayIndex={viewingDayIndex}
-        onBack={() => setView('plans')}
-        onStartWorkout={(exs, planId, planName) => handleStartPlan(exs, planId, planName)}
+        exercises={planDetailExercises}
+        onExercisesChange={setPlanDetailExercises}
+        onBack={() => { setPlanDetailExercises(null); setView('plans'); }}
+        onStartWorkout={(exs, planId, planName) => { setPlanDetailExercises(null); handleStartPlan(exs, planId, planName); }}
+        onAddExercise={() => setView('selectForPlanDetail')}
       />
     );
   }
