@@ -98,7 +98,9 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Verlauf als eigene Karte unter den QuickActions, über Social
 - [x] Eigene Übungen löschen: Papierkorb-Button + Bestätigungsdialog, goldenes "Eigene" Badge bei Custom Exercises
 - [x] Fix: Eigene Übungen erstellen funktioniert jetzt auch im Gastmodus und während aktivem Workout (user?.id Fallback + try/catch)
-- [ ] **BUG: Plan-Detailansicht** — Klick auf Plan startet sofort Workout statt Detailansicht. PlanDetail.jsx existiert, aber View-Flow greift nicht. Alle Stellen wo Plans gestartet werden müssen auf planDetail umgeleitet werden. User will: Plan ansehen → Übungen hinzufügen/entfernen → erst bei explizitem "Workout starten" das Training beginnen.
+- [x] ~~BUG: Plan-Detailansicht~~ — GEFIXT. Klick auf Plan öffnet Detailansicht, Übungen hinzufügen/entfernen, Workout startet erst bei Button.
+- [x] Performance: Alle Storage-Funktionen auf localStorage-first (kein Supabase-Blocking mehr, Session-Timeout 3s)
+- [ ] **BUG: Mahlzeit-Foto KI** — Fehlermeldung beim Fotografieren einer Mahlzeit zur KI-Kalorien-Erkennung. Muss debuggt werden (API-Key, Endpoint, Bildformat prüfen).
 
 ### Phase 3: Ernährungs-Tracking — FERTIG
 - [x] Lebensmittel-Suche (150 lokale Lebensmittel + Open Food Facts API)
