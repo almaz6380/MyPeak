@@ -525,7 +525,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
                   {plan.days.map((day, i) => (
                     <button
                       key={i}
-                      onClick={() => onStartPlan(day.exercises)}
+                      onClick={() => onViewPlan({ ...plan, name: t(plan.nameKey), days: plan.days.map((d) => ({ name: t(d.nameKey), exercises: d.exercises.map((e) => e.id || e) })) }, i)}
                       className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                     >
                       <span className="text-sm font-medium">{t(day.nameKey)}</span>
