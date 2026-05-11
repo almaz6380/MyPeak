@@ -40,6 +40,7 @@ export default function TrainingPage() {
   const [editingPlan, setEditingPlan] = useState(null);
   const [viewingPlan, setViewingPlan] = useState(null);
   const [viewingDayIndex, setViewingDayIndex] = useState(0);
+  const [pendingPlanExercises, setPendingPlanExercises] = useState(null);
 
   // Diamond Calendar state
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -200,10 +201,7 @@ export default function TrainingPage() {
       <ExerciseLibrary
         onBack={() => setView('planDetail')}
         onSelect={(selected) => {
-          if (window.__planDetailAddCallback) {
-            window.__planDetailAddCallback(selected);
-            window.__planDetailAddCallback = null;
-          }
+          setPendingPlanExercises(selected);
           setView('planDetail');
         }}
         selectionMode
@@ -304,13 +302,11 @@ export default function TrainingPage() {
       <PlanDetail
         plan={viewingPlan}
         dayIndex={viewingDayIndex}
-        onBack={() => setView('plans')}
+        newExercises={pendingPlanExercises}
+        onClearNewExercises={() => setPendingPlanExercises(null)}
+        onBack={() => { setPendingPlanExercises(null); setView('plans'); }}
         onStartWorkout={(exs, planId, planName) => handleStartPlan(exs, planId, planName)}
-        onAddExercise={(callback) => {
-          // Store callback, switch to exercise selector, then come back
-          window.__planDetailAddCallback = callback;
-          setView('selectForPlanDetail');
-        }}
+        onAddExercise={() => setView('selectForPlanDetail')}
       />
     );
   }

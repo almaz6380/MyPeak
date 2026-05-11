@@ -1,11 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Play, Plus, Trash2, GripVertical } from 'lucide-react';
+import { ArrowLeft, Play, Plus, Trash2 } from 'lucide-react';
 import { getExerciseById } from '../../data/exercises';
 import { useAuth } from '../../context/AuthContext';
 import { updateCustomPlan } from '../../data/workoutStorage';
 
-export default function PlanDetail({ plan, dayIndex, onBack, onStartWorkout, onAddExercise }) {
+function mapExercise(id, t, lang) {
+  const rawId = typeof id === 'object' ? id.id : id;
+  const ex = getExerciseById(rawId);
+  return ex ? { id: ex.id, nameKey: ex.nameKey, name: t(ex.nameKey) } : { id: rawId, name: rawId };
+}
+
+export default function PlanDetail({ plan, dayIndex, onBack, onStartWorkout, onAddExercise, newExercises, onClearNewExercises }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
@@ -14,23 +20,24 @@ export default function PlanDetail({ plan, dayIndex, onBack, onStartWorkout, onA
   if (!day) return null;
 
   const [exercises, setExercises] = useState(() => {
-    return (day.exercises || []).map((id) => {
-      const ex = getExerciseById(typeof id === 'object' ? id.id : id);
-      return ex ? { id: ex.id, nameKey: ex.nameKey, name: lang === 'de' ? t(ex.nameKey) : t(ex.nameKey) } : { id, name: id };
-    });
+    return (day.exercises || []).map((id) => mapExercise(id, t, lang));
   });
   const [changed, setChanged] = useState(false);
 
+  // Merge newly selected exercises from ExerciseLibrary
+  useEffect(() => {
+    if (newExercises && newExercises.length > 0) {
+      setExercises((prev) => [
+        ...prev,
+        ...newExercises.map((ex) => mapExercise(ex.id || ex, t, lang)),
+      ]);
+      setChanged(true);
+      onClearNewExercises?.();
+    }
+  }, [newExercises]);
+
   function removeExercise(index) {
     setExercises((prev) => prev.filter((_, i) => i !== index));
-    setChanged(true);
-  }
-
-  function addExercises(newExercises) {
-    setExercises((prev) => [
-      ...prev,
-      ...newExercises.map((ex) => ({ id: ex.id, nameKey: ex.nameKey, name: lang === 'de' ? t(ex.nameKey) : t(ex.nameKey) })),
-    ]);
     setChanged(true);
   }
 
@@ -87,7 +94,7 @@ export default function PlanDetail({ plan, dayIndex, onBack, onStartWorkout, onA
 
       {/* Add exercise button */}
       <button
-        onClick={() => onAddExercise(addExercises)}
+        onClick={() => onAddExercise()}
         className="w-full py-3 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl text-sm font-medium text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2 hover:border-primary-400 hover:text-primary-500 transition-colors mb-6"
       >
         <Plus className="w-4 h-4" />
