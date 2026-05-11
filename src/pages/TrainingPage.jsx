@@ -270,6 +270,7 @@ export default function TrainingPage() {
       <TrainingPlans
         onBack={() => setView('home')}
         onStartPlan={handleStartPlan}
+        onViewPlan={(plan, dayIdx) => { setViewingPlan(plan); setViewingDayIndex(dayIdx); setView('planDetail'); }}
         onStartHiit={handleStartHiit}
         onStartCircuit={handleStartCircuit}
         onStartCardio={handleStartCardio}
@@ -303,7 +304,7 @@ export default function TrainingPage() {
       <PlanDetail
         plan={viewingPlan}
         dayIndex={viewingDayIndex}
-        onBack={() => setView('startChoice')}
+        onBack={() => setView('plans')}
         onStartWorkout={(exs, planId, planName) => handleStartPlan(exs, planId, planName)}
         onAddExercise={(callback) => {
           // Store callback, switch to exercise selector, then come back

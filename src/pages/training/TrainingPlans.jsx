@@ -11,7 +11,7 @@ import DeletedPlans from './DeletedPlans';
 // Re-export for backward compatibility (WorkoutStartChooser imports this)
 export const defaultPlans = defaultStrengthPlans;
 
-export default function TrainingPlans({ onBack, onStartPlan, onStartHiit, onStartCircuit, onStartCardio, onStartMartialArts }) {
+export default function TrainingPlans({ onBack, onStartPlan, onViewPlan, onStartHiit, onStartCircuit, onStartCardio, onStartMartialArts }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [allCustomPlans, setAllCustomPlans] = useState([]);
@@ -81,6 +81,20 @@ export default function TrainingPlans({ onBack, onStartPlan, onStartHiit, onStar
   // ── Start plan handlers per type ──
   const handleStartStrengthPlan = (dayExercises) => {
     if (onStartPlan) onStartPlan(dayExercises);
+  };
+
+  const handleViewStrengthPlan = (plan, dayIdx) => {
+    if (onViewPlan) {
+      const normalizedPlan = {
+        id: plan.id,
+        name: plan.name || t(plan.nameKey || ''),
+        days: Array.isArray(plan.days) ? plan.days.map((d) => ({
+          name: d.name || t(d.nameKey || ''),
+          exercises: d.exercises.map((e) => typeof e === 'object' ? (e.id || e) : e),
+        })) : [],
+      };
+      onViewPlan(normalizedPlan, dayIdx);
+    }
   };
 
   const handleStartHiitPlan = (plan) => {
@@ -341,6 +355,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onStartHiit, onStar
                     type={selectedArea}
                     t={t}
                     onStart={selectedArea === 'strength' ? handleStartStrengthPlan : selectedArea === 'hiit' ? handleStartHiitPlan : selectedArea === 'circuit' ? handleStartCircuitPlan : selectedArea === 'martial-arts' ? handleStartMartialArtsPlan : handleStartCardioSession}
+                    onView={selectedArea === 'strength' ? handleViewStrengthPlan : null}
                     onDelete={() => setDeleteConfirm({ type: 'custom', id: plan.id })}
                     isCustom
                   />
@@ -359,6 +374,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onStartHiit, onStar
                   type={selectedArea}
                   t={t}
                   onStart={selectedArea === 'strength' ? handleStartStrengthPlan : selectedArea === 'hiit' ? handleStartHiitPlan : selectedArea === 'circuit' ? handleStartCircuitPlan : selectedArea === 'martial-arts' ? handleStartMartialArtsPlan : handleStartCardioSession}
+                  onView={selectedArea === 'strength' ? handleViewStrengthPlan : null}
                   onDelete={() => setDeleteConfirm({ type: 'default', id: plan.id })}
                 />
               ))}
@@ -396,7 +412,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onStartHiit, onStar
 }
 
 // ── Plan Card Component ──────────────────────────────────────
-function PlanCard({ plan, type, t, onStart, onDelete, isCustom }) {
+function PlanCard({ plan, type, t, onStart, onView, onDelete, isCustom }) {
   const weightUnit = localStorage.getItem('weightUnit') || 'kg';
 
   // Strength plans (days array)
@@ -411,7 +427,7 @@ function PlanCard({ plan, type, t, onStart, onDelete, isCustom }) {
         {plan.descKey && <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">{t(plan.descKey)}</p>}
         <div className="flex flex-col gap-2">
           {days.map((day, i) => (
-            <button key={i} onClick={() => onStart(isCustom ? day.exercises.map((id) => ({ id, sets: 3, reps: 10 })) : day.exercises)} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+            <button key={i} onClick={() => onView ? onView(plan, i) : onStart(isCustom ? day.exercises.map((id) => ({ id, sets: 3, reps: 10 })) : day.exercises)} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
               <span className="text-sm font-medium">{isCustom ? day.name : t(day.nameKey)}</span>
               <div className="flex items-center gap-1 text-xs text-slate-400">
                 <span>{day.exercises.length} {t('training.exercises')}</span>
