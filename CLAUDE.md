@@ -78,7 +78,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] XP-System: Workout +10 XP, Challenge gewinnen +50 XP, 7-Tage-Streak +25 XP, Level-Anzeige im Profil
 - [x] Social-Karten auf Training-Startseite (Ranking, Challenges, Freunde)
 - [x] Level-System: Titel (Rookie/Warrior/Champion/Legend/GOAT), progressive XP, Level-Up Animation
-- [x] Übungsbibliothek erweitert: 90 Kraftübungen (48 neue Brust+Rücken), hierarchische Navigation (Bereich→Filter)
+- [x] Übungsbibliothek erweitert: 117 Kraftübungen (Brust, Rücken, Schultern, Bizeps, Trizeps, Beine, Glutes, Abs, Calves, Forearms), hierarchische Navigation (Bereich→Filter)
 - [x] Equipment-Filter (Langhantel/Kurzhantel/Kabelzug/Maschine/Körpergewicht) in der Bibliothek
 - [x] Karate entfernt, Seilspringen bei Cardio hinzugefügt
 - [x] Übungsnotizen + Geräte-Einstellungen pro Übung (Supabase exercise_notes)
@@ -96,6 +96,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Programm starten → wird als Wochenplan gespeichert → Kreiskalender zeigt blaue Tage
 - [x] Meine Pläne: Übersicht gespeicherter Wochenpläne + Freies Training Button + Plan erstellen
 - [x] Verlauf als eigene Karte unter den QuickActions, über Social
+- [ ] **BUG: Plan-Detailansicht** — Klick auf Plan startet sofort Workout statt Detailansicht. PlanDetail.jsx existiert, aber View-Flow greift nicht. Alle Stellen wo Plans gestartet werden müssen auf planDetail umgeleitet werden. User will: Plan ansehen → Übungen hinzufügen/entfernen → erst bei explizitem "Workout starten" das Training beginnen.
 
 ### Phase 3: Ernährungs-Tracking — FERTIG
 - [x] Lebensmittel-Suche (150 lokale Lebensmittel + Open Food Facts API)
@@ -123,6 +124,11 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Kochbuch: 25 Rezepte (5 pro Mahlzeit), 2 Filter-Ebenen (Mahlzeit + Ernährungsform)
 - [x] Portionsrechner (skaliert Zutaten + Nährwerte), Favoriten, Suche
 - [x] "Gegessen"-Button → Mahlzeit wählen → ins Tagestracking übernehmen
+- [x] KI-Foto-Erkennung: Mahlzeit fotografieren → Gemini Vision analysiert → kcal + Makros pro Lebensmittel
+- [x] Öl-Level-Auswahl (wenig/normal/viel) zur Fett-/Kalorien-Anpassung
+- [x] Vercel Serverless Function (api/analyze-meal.js) als Proxy für Gemini 2.0 Flash (kostenlos)
+- [x] Confidence-Badges (Sicher/Geschätzt/Unsicher) pro erkanntem Lebensmittel
+- [x] Ergebnis-Items landen im Multi-Select-Queue (kombinierbar mit Suche/Barcode)
 
 ### PWA-Setup — FERTIG
 - [x] manifest.json mit App-Name, Icons, standalone display
@@ -190,6 +196,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - **Lebensmittel-API:** Open Food Facts (kostenlos, keine API-Keys)
 - **PWA:** manifest.json + Service Worker (installierbar auf Homescreen)
 - **Icons:** Lucide React
+- **KI-Foto-Erkennung:** Google Gemini 2.0 Flash (kostenlos, Vision API via Vercel Serverless Function)
 - **Schrift:** Inter (Google Fonts)
 
 ### Dateistruktur (Kernkomponenten)
@@ -219,7 +226,9 @@ src/
 │       └── ExerciseNoteModal.jsx # Notizen + Settings + Foto pro Übung
 │   └── nutrition/
 │       ├── DailyOverview.jsx     # Tagesansicht mit Makro-Ringen + Mahlzeit-Slots
-│       ├── AddFoodEntry.jsx      # Food-Eingabe-Flow (Suche, Scanner, Manuell)
+│       ├── AddFoodEntry.jsx      # Food-Eingabe-Flow (Suche, Scanner, Foto-KI, Manuell)
+│       ├── MealPhotoCapture.jsx  # Kamera-UI für Mahlzeit-Foto + Öl-Auswahl
+│       ├── MealAnalysisResult.jsx # KI-Ergebnis-Screen mit Makros + Confidence-Badges
 │       ├── FoodSearch.jsx        # Suche lokal + Open Food Facts API
 │       ├── PortionPicker.jsx     # Portionsgröße mit Live-Makro-Berechnung
 │       ├── BarcodeScanner.jsx    # Kamera-basierter Barcode-Scanner
@@ -238,6 +247,7 @@ src/
 │   ├── exercises.js              # 90+ Kraftübungen + Cardio/HIIT/Kampfsport
 │   ├── workoutStorage.js         # Supabase CRUD für Workouts + Notes + Migration
 │   ├── exercisePhotos.js         # IndexedDB CRUD für Übungs- + Produktfotos (lokal)
+│   ├── mealPhotoAnalysis.js     # KI-Foto-Analyse: Gemini API Call, Öl-Anpassung, Konvertierung
 │   ├── settingsStorage.js        # Supabase CRUD für User-Settings
 │   ├── nutritionStorage.js       # Supabase CRUD für Nutrition (Entries, Meals, Goals)
 │   ├── foodDatabase.js           # 150 lokale Lebensmittel + Open Food Facts API
@@ -259,8 +269,12 @@ src/
 │   ├── AuthContext.jsx           # Auth-State, Login/Logout, Profil-Verwaltung
 │   ├── ThemeContext.jsx          # Dark/Light Mode
 │   └── ActiveWorkoutContext.jsx  # Aktives Workout State + localStorage Persistence
+├── components/
+│   └── OilLevelPicker.jsx       # Öl-Level-Auswahl (wenig/normal/viel) für Foto-KI
 └── supabase/
     └── schema.sql                # Komplettes DB-Schema (Tabellen, RLS, Trigger)
+api/
+└── analyze-meal.js              # Vercel Serverless Function → Gemini Vision API Proxy
 ```
 
 ### Supabase-Tabellen
@@ -378,6 +392,7 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 - [x] Zuletzt verwendete Lebensmittel
 - [x] Farbcodierte Makro-Badges (P/C/F Pills)
 - [x] Wasser-Tracking mit Fortschrittsbalken + Quick-Add Buttons
+- [x] KI-Mahlzeit-Foto-Erkennung (Gemini Vision, kostenlos)
 - [ ] Foto von Nährwerttabelle per KI auslesen (Premium)
 - [ ] Fehlende Barcode-Produkte an Open Food Facts übermitteln
 - [ ] KI-Ernährungsplan (Premium)
