@@ -107,9 +107,10 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
 
   const handleSaveAsPlan = async () => {
     if (!planName.trim()) return;
+    const exIds = (savedWorkoutExercises || []).map((ex) => ex.exerciseId);
     await saveCustomPlan(user.id, {
       name: planName.trim(),
-      days: [{ name: planName.trim(), exercises: exercises.map((ex) => ex.exerciseId) }],
+      days: [{ name: planName.trim(), exercises: exIds }],
     });
     onFinish(pendingPrs);
   };
