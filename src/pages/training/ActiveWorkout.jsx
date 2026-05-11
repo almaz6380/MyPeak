@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Trash2, X, Check, Save, Target, StickyNote } from 'lucide-react';
-import { saveWorkout, getPersonalRecord, saveCustomPlan, getAllExerciseNotes } from '../../data/workoutStorage';
+import { saveWorkout, getPersonalRecord, saveCustomPlan, updateCustomPlan, getAllExerciseNotes } from '../../data/workoutStorage';
 import ExerciseNoteModal from './ExerciseNoteModal';
 import { useAuth } from '../../context/AuthContext';
 import { useActiveWorkout } from '../../context/ActiveWorkoutContext';
@@ -37,6 +37,8 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
   }, [user]);
 
   const wasFromPlan = ctx.workout?.fromPlan || false;
+  const sourcePlanId = ctx.workout?.planId || null;
+  const sourcePlanName = ctx.workout?.planName || null;
   const progress = useProgressComparison(user?.id);
 
   // Timer — derived from context startTime
@@ -89,6 +91,15 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
 
     // PR check in background
     checkForPRs().then((prs) => setPendingPrs(prs || {})).catch(() => {});
+
+    // Auto-update the source plan if started from a plan
+    if (wasFromPlan && sourcePlanId) {
+      const allExIds = validExercises.map((ex) => ex.exerciseId);
+      updateCustomPlan(user.id, sourcePlanId, {
+        name: sourcePlanName || 'Plan',
+        days: [{ name: sourcePlanName || 'Plan', exercises: allExIds }],
+      }).catch((err) => console.error('Plan update error:', err));
+    }
 
     // Save data before clearing context
     setSavedWorkoutExercises(workout.exercises);

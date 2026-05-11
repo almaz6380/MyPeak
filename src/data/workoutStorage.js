@@ -205,23 +205,27 @@ export async function getCustomPlansByType(userId, type) {
 }
 
 export async function updateCustomPlan(userId, planId, plan) {
-  const { data, error } = await supabase
-    .from('custom_plans')
-    .update({ name: plan.name, days: plan.days })
-    .eq('id', planId)
-    .eq('user_id', userId)
-    .select()
-    .single();
-
-  // Update localStorage cache
+  // localStorage first
   const cached = JSON.parse(localStorage.getItem('customPlans') || '[]');
   const idx = cached.findIndex((p) => p.id === planId);
   if (idx >= 0) {
-    cached[idx] = { id: planId, name: plan.name, days: plan.days };
+    cached[idx] = { ...cached[idx], name: plan.name, days: plan.days };
     localStorage.setItem('customPlans', JSON.stringify(cached));
   }
 
-  return { data, error };
+  if (!guestSkip(userId) && !planId.startsWith('local_')) {
+    try {
+      await supabase
+        .from('custom_plans')
+        .update({ name: plan.name, days: plan.days })
+        .eq('id', planId)
+        .eq('user_id', userId);
+    } catch (err) {
+      console.error('Failed to update plan in Supabase:', err);
+    }
+  }
+
+  return { data: plan, error: null };
 }
 
 // ── Custom Plans ──────────────────────────────────────────

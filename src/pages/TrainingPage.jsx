@@ -118,7 +118,7 @@ export default function TrainingPage() {
     setView('home');
   };
 
-  const handleStartPlan = (planExercises) => {
+  const handleStartPlan = (planExercises, planId, planName) => {
     const enriched = planExercises
       .map((pe) => {
         const ex = getExerciseById(pe.id);
@@ -131,8 +131,11 @@ export default function TrainingPage() {
       })
       .filter(Boolean);
     activeWorkout.startWorkout('strength', enriched, null);
-    // Mark as from plan so we don't offer "save as plan" after
-    if (activeWorkout.workout) activeWorkout.workout.fromPlan = true;
+    if (activeWorkout.workout) {
+      activeWorkout.workout.fromPlan = true;
+      activeWorkout.workout.planId = planId || null;
+      activeWorkout.workout.planName = planName || null;
+    }
     setView('activeWorkout');
   };
 
@@ -459,7 +462,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onStartEmpty, onStartCardio,
                     {plan.days.map((day, i) => (
                       <button
                         key={i}
-                        onClick={() => onStartPlan(day.exercises.map((id) => ({ id, sets: 3, reps: 10 })))}
+                        onClick={() => onStartPlan(day.exercises.map((id) => ({ id, sets: 3, reps: 10 })), plan.id, plan.name)}
                         className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                       >
                         <span className="text-sm font-medium">{day.name}</span>
