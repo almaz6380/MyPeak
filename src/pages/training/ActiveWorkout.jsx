@@ -36,9 +36,14 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
     if (user) getAllExerciseNotes(user.id).then(setExerciseNotes);
   }, [user]);
 
-  const wasFromPlan = ctx.workout?.fromPlan || false;
-  const sourcePlanId = ctx.workout?.planId || null;
-  const sourcePlanName = ctx.workout?.planName || null;
+  const [savedPlanInfo] = useState(() => ({
+    fromPlan: ctx.workout?.fromPlan || false,
+    planId: ctx.workout?.planId || null,
+    planName: ctx.workout?.planName || null,
+  }));
+  const wasFromPlan = savedPlanInfo.fromPlan;
+  const sourcePlanId = savedPlanInfo.planId;
+  const sourcePlanName = savedPlanInfo.planName;
   const progress = useProgressComparison(user?.id);
 
   // Timer — derived from context startTime
@@ -54,13 +59,17 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const toKg = (value, unit) => unit === 'lbs' ? value * 0.453592 : value;
+
   const checkForPRs = async () => {
     const newPrs = {};
     for (const ex of exercises) {
       const record = await getPersonalRecord(user.id, ex.exerciseId);
+      const exUnit = ex.unit || weightUnit;
       for (const set of ex.sets) {
         const w = parseFloat(set.weight);
-        if (w && w > record.maxWeight) newPrs[ex.exerciseId] = true;
+        const wKg = toKg(w, exUnit);
+        if (wKg && wKg > record.maxWeight) newPrs[ex.exerciseId] = true;
       }
     }
     return newPrs;
@@ -82,6 +91,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
       exercises: validExercises.map((ex) => ({
         exerciseId: ex.exerciseId,
         nameKey: ex.nameKey,
+        unit: ex.unit || weightUnit,
         sets: ex.sets.map((s) => ({ reps: parseFloat(s.reps), weight: parseFloat(s.weight) })),
       })),
     };
@@ -171,7 +181,8 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
           const target = getExerciseTarget(ex.exerciseId);
           const setsAtTarget = ex.sets.filter((s) => parseFloat(s.reps) >= target && s.reps !== '').length;
           const allAtTarget = setsAtTarget === ex.sets.length && ex.sets.length > 0 && ex.sets.every((s) => s.reps !== '');
-          const increment = weightUnit === 'kg' ? '2.5kg' : '5lbs';
+          const exerciseUnit = ex.unit || weightUnit;
+          const increment = exerciseUnit === 'kg' ? '2.5kg' : '5lbs';
 
           return (
             <div key={`${ex.exerciseId}-${exIdx}`} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
@@ -194,7 +205,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
 
               {lastSession ? (
                 <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">
-                  {t('training.lastTime')}: {lastSession.sets.map((s) => `${s.weight}${t(`training.${weightUnit}`)} × ${s.reps}`).join(', ')}
+                  {t('training.lastTime')}: {lastSession.sets.map((s) => `${s.weight}${lastSession.unit || t(`training.${weightUnit}`)} × ${s.reps}`).join(', ')}
                 </p>
               ) : (
                 <p className="text-xs text-green-500 mb-2">{t('training.firstTime')}</p>
@@ -251,7 +262,9 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
 
               <div className="grid grid-cols-[2.5rem_1fr_1fr_2rem] gap-2 items-center text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">
                 <span className="text-center">{t('training.set')}</span>
-                <span className="text-center">{t('training.weight')} ({t(`training.${weightUnit}`)})</span>
+                <button onClick={() => ctx.toggleExerciseUnit(exIdx)} className="text-center text-primary-500 underline underline-offset-2 font-medium">
+                  {t('training.weight')} ({exerciseUnit})
+                </button>
                 <span className="text-center">{t('training.reps')}</span>
                 <span></span>
               </div>
