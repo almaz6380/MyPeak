@@ -4,7 +4,7 @@ import { ArrowLeft, Check, Pill } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { saveSupplement, updateSupplement } from '../../data/supplementStorage';
 
-const FORMS = ['tablet', 'capsule', 'powder', 'liquid'];
+const FORMS = ['tablet', 'powder', 'liquid'];
 const UNITS = ['Stück', 'mg', 'g', 'ml', 'IU'];
 const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const TIME_SLOTS = ['morning', 'midday', 'pre_workout', 'post_workout', 'evening'];
@@ -18,7 +18,7 @@ export default function AddSupplement({ onBack, onSaved, editSupplement }) {
 
   const [name, setName] = useState(editSupplement?.name || '');
   const [brand, setBrand] = useState(editSupplement?.brand || '');
-  const [form, setForm] = useState(editSupplement?.form || 'capsule');
+  const [form, setForm] = useState(editSupplement?.form || 'tablet');
   const [dosageAmount, setDosageAmount] = useState(editSupplement?.dosage_amount?.toString() || '1');
   const [dosageUnit, setDosageUnit] = useState(editSupplement?.dosage_unit || 'Stück');
   const [notes, setNotes] = useState(editSupplement?.notes || '');

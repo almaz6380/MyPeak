@@ -144,7 +144,7 @@ export async function saveCustomExercise(userId, exercise) {
 export async function deleteCustomExercise(userId, exerciseId) {
   // Remove from localStorage
   const cached = JSON.parse(localStorage.getItem(CUSTOM_EXERCISES_KEY) || '[]');
-  const updated = cached.filter((e) => e.exercise_id !== exerciseId);
+  const updated = cached.filter((e) => (e.exercise_id || e.id) !== exerciseId);
   localStorage.setItem(CUSTOM_EXERCISES_KEY, JSON.stringify(updated));
 
   // Remove from Supabase

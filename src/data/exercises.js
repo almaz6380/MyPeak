@@ -73,6 +73,8 @@ const exercises = [
   { id: 'snatch-grip-deadlift', type: 'strength', muscleGroup: 'back', equipment: 'barbell', nameKey: 'exercises.snatchGripDeadlift', descKey: 'exercises.snatchGripDeadliftDesc' },
   { id: 'deficit-deadlift', type: 'strength', muscleGroup: 'back', equipment: 'barbell', nameKey: 'exercises.deficitDeadlift', descKey: 'exercises.deficitDeadliftDesc' },
   { id: 'sumo-deadlift', type: 'strength', muscleGroup: 'back', equipment: 'barbell', nameKey: 'exercises.sumoDeadlift', descKey: 'exercises.sumoDeadliftDesc' },
+  { id: 'high-row', type: 'strength', muscleGroup: 'back', equipment: 'machine', nameKey: 'exercises.highRow', descKey: 'exercises.highRowDesc' },
+  { id: 'm-torture-2-way-row', type: 'strength', muscleGroup: 'back', equipment: 'machine', nameKey: 'exercises.mTorture2WayRow', descKey: 'exercises.mTorture2WayRowDesc' },
 
   // Shoulders
   { id: 'overhead-press', type: 'strength', muscleGroup: 'shoulders', equipment: 'barbell', nameKey: 'exercises.overheadPress', descKey: 'exercises.overheadPressDesc' },
@@ -100,6 +102,8 @@ const exercises = [
   { id: 'lu-raises', type: 'strength', muscleGroup: 'shoulders', equipment: 'dumbbell', nameKey: 'exercises.luRaises', descKey: 'exercises.luRaisesDesc' },
   { id: 'plate-front-raise', type: 'strength', muscleGroup: 'shoulders', equipment: 'bodyweight', nameKey: 'exercises.plateFrontRaise', descKey: 'exercises.plateFrontRaiseDesc' },
   { id: 'band-pull-apart', type: 'strength', muscleGroup: 'shoulders', equipment: 'bodyweight', nameKey: 'exercises.bandPullApart', descKey: 'exercises.bandPullApartDesc' },
+  { id: 'machine-lateral-raise', type: 'strength', muscleGroup: 'shoulders', equipment: 'machine', nameKey: 'exercises.machineLateralRaise', descKey: 'exercises.machineLateralRaiseDesc' },
+  { id: 'dumbbell-y-raise', type: 'strength', muscleGroup: 'shoulders', equipment: 'dumbbell', nameKey: 'exercises.dumbbellYRaise', descKey: 'exercises.dumbbellYRaiseDesc' },
 
   // Biceps
   { id: 'barbell-curl', type: 'strength', muscleGroup: 'biceps', equipment: 'barbell', nameKey: 'exercises.barbellCurl', descKey: 'exercises.barbellCurlDesc' },
@@ -122,6 +126,7 @@ const exercises = [
   { id: 'waiter-curl', type: 'strength', muscleGroup: 'biceps', equipment: 'dumbbell', nameKey: 'exercises.waiterCurl', descKey: 'exercises.waiterCurlDesc' },
   { id: '21s-curl', type: 'strength', muscleGroup: 'biceps', equipment: 'barbell', nameKey: 'exercises.twentyOnesCurl', descKey: 'exercises.twentyOnesCurlDesc' },
   { id: 'cable-preacher-curl', type: 'strength', muscleGroup: 'biceps', equipment: 'cable', nameKey: 'exercises.cablePreacherCurl', descKey: 'exercises.cablePreacherCurlDesc' },
+  { id: 'scott-curl-dumbbell', type: 'strength', muscleGroup: 'biceps', equipment: 'dumbbell', nameKey: 'exercises.scottCurlDumbbell', descKey: 'exercises.scottCurlDumbbellDesc' },
 
   // Triceps
   { id: 'tricep-pushdown', type: 'strength', muscleGroup: 'triceps', equipment: 'cable', nameKey: 'exercises.tricepPushdown', descKey: 'exercises.tricepPushdownDesc' },
@@ -144,6 +149,7 @@ const exercises = [
   { id: 'bodyweight-tricep-extension', type: 'strength', muscleGroup: 'triceps', equipment: 'bodyweight', nameKey: 'exercises.bodyweightTricepExtension', descKey: 'exercises.bodyweightTricepExtensionDesc' },
   { id: 'cable-tricep-kickback', type: 'strength', muscleGroup: 'triceps', equipment: 'cable', nameKey: 'exercises.cableTricepKickback', descKey: 'exercises.cableTricepKickbackDesc' },
   { id: 'ez-bar-skull-crusher', type: 'strength', muscleGroup: 'triceps', equipment: 'barbell', nameKey: 'exercises.ezBarSkullCrusher', descKey: 'exercises.ezBarSkullCrusherDesc' },
+  { id: 'dip-machine', type: 'strength', muscleGroup: 'triceps', equipment: 'machine', nameKey: 'exercises.dipMachine', descKey: 'exercises.dipMachineDesc' },
 
   // Legs
   { id: 'squat', type: 'strength', muscleGroup: 'legs', equipment: 'barbell', nameKey: 'exercises.squat', descKey: 'exercises.squatDesc' },
@@ -172,25 +178,45 @@ const exercises = [
   { id: 'glute-ham-raise', type: 'strength', muscleGroup: 'legs', equipment: 'bodyweight', nameKey: 'exercises.gluteHamRaise', descKey: 'exercises.gluteHamRaiseDesc' },
   { id: 'stiff-leg-deadlift', type: 'strength', muscleGroup: 'legs', equipment: 'barbell', nameKey: 'exercises.stiffLegDeadlift', descKey: 'exercises.stiffLegDeadliftDesc' },
   { id: 'belt-squat', type: 'strength', muscleGroup: 'legs', equipment: 'machine', nameKey: 'exercises.beltSquat', descKey: 'exercises.beltSquatDesc' },
+  { id: 'seated-leg-curl', type: 'strength', muscleGroup: 'legs', equipment: 'machine', nameKey: 'exercises.seatedLegCurl', descKey: 'exercises.seatedLegCurlDesc' },
+  { id: 'lying-leg-curl', type: 'strength', muscleGroup: 'legs', equipment: 'machine', nameKey: 'exercises.lyingLegCurl', descKey: 'exercises.lyingLegCurlDesc' },
+  { id: 'single-leg-press', type: 'strength', muscleGroup: 'legs', equipment: 'machine', nameKey: 'exercises.singleLegPress', descKey: 'exercises.singleLegPressDesc' },
 
   // Glutes
   { id: 'hip-thrust', type: 'strength', muscleGroup: 'glutes', equipment: 'barbell', nameKey: 'exercises.hipThrust', descKey: 'exercises.hipThrustDesc' },
   { id: 'cable-kickback', type: 'strength', muscleGroup: 'glutes', equipment: 'cable', nameKey: 'exercises.cableKickback', descKey: 'exercises.cableKickbackDesc' },
   { id: 'glute-bridge', type: 'strength', muscleGroup: 'glutes', equipment: 'bodyweight', nameKey: 'exercises.gluteBridge', descKey: 'exercises.gluteBridgeDesc' },
+  { id: 'barbell-glute-bridge', type: 'strength', muscleGroup: 'glutes', equipment: 'barbell', nameKey: 'exercises.barbellGluteBridge', descKey: 'exercises.barbellGluteBridgeDesc' },
+  { id: 'sumo-squat', type: 'strength', muscleGroup: 'glutes', equipment: 'dumbbell', nameKey: 'exercises.sumoSquat', descKey: 'exercises.sumoSquatDesc' },
+  { id: 'cable-pull-through', type: 'strength', muscleGroup: 'glutes', equipment: 'cable', nameKey: 'exercises.cablePullThrough', descKey: 'exercises.cablePullThroughDesc' },
+  { id: 'machine-hip-thrust', type: 'strength', muscleGroup: 'glutes', equipment: 'machine', nameKey: 'exercises.machineHipThrust', descKey: 'exercises.machineHipThrustDesc' },
+  { id: 'donkey-kick', type: 'strength', muscleGroup: 'glutes', equipment: 'bodyweight', nameKey: 'exercises.donkeyKick', descKey: 'exercises.donkeyKickDesc' },
 
   // Abs
   { id: 'crunches', type: 'strength', muscleGroup: 'abs', equipment: 'bodyweight', nameKey: 'exercises.crunches', descKey: 'exercises.crunchesDesc' },
   { id: 'hanging-leg-raise', type: 'strength', muscleGroup: 'abs', equipment: 'bodyweight', nameKey: 'exercises.hangingLegRaise', descKey: 'exercises.hangingLegRaiseDesc' },
   { id: 'cable-crunch', type: 'strength', muscleGroup: 'abs', equipment: 'cable', nameKey: 'exercises.cableCrunch', descKey: 'exercises.cableCrunchDesc' },
   { id: 'plank', type: 'strength', muscleGroup: 'abs', equipment: 'bodyweight', nameKey: 'exercises.plank', descKey: 'exercises.plankDesc' },
+  { id: 'russian-twist', type: 'strength', muscleGroup: 'abs', equipment: 'bodyweight', nameKey: 'exercises.russianTwist', descKey: 'exercises.russianTwistDesc' },
+  { id: 'ab-wheel-rollout', type: 'strength', muscleGroup: 'abs', equipment: 'bodyweight', nameKey: 'exercises.abWheelRollout', descKey: 'exercises.abWheelRolloutDesc' },
+  { id: 'bicycle-crunch', type: 'strength', muscleGroup: 'abs', equipment: 'bodyweight', nameKey: 'exercises.bicycleCrunch', descKey: 'exercises.bicycleCrunchDesc' },
+  { id: 'leg-raise-lying', type: 'strength', muscleGroup: 'abs', equipment: 'bodyweight', nameKey: 'exercises.legRaiseLying', descKey: 'exercises.legRaiseLyingDesc' },
+  { id: 'woodchop-cable', type: 'strength', muscleGroup: 'abs', equipment: 'cable', nameKey: 'exercises.woodchopCable', descKey: 'exercises.woodchopCableDesc' },
+  { id: 'dead-bug', type: 'strength', muscleGroup: 'abs', equipment: 'bodyweight', nameKey: 'exercises.deadBug', descKey: 'exercises.deadBugDesc' },
 
   // Calves
   { id: 'calf-raise-standing', type: 'strength', muscleGroup: 'calves', equipment: 'machine', nameKey: 'exercises.calfRaiseStanding', descKey: 'exercises.calfRaiseStandingDesc' },
   { id: 'calf-raise-seated', type: 'strength', muscleGroup: 'calves', equipment: 'machine', nameKey: 'exercises.calfRaiseSeated', descKey: 'exercises.calfRaiseSeatedDesc' },
+  { id: 'smith-machine-calf-raise', type: 'strength', muscleGroup: 'calves', equipment: 'machine', nameKey: 'exercises.smithMachineCalfRaise', descKey: 'exercises.smithMachineCalfRaiseDesc' },
+  { id: 'donkey-calf-raise', type: 'strength', muscleGroup: 'calves', equipment: 'machine', nameKey: 'exercises.donkeyCalfRaise', descKey: 'exercises.donkeyCalfRaiseDesc' },
+  { id: 'single-leg-calf-raise', type: 'strength', muscleGroup: 'calves', equipment: 'bodyweight', nameKey: 'exercises.singleLegCalfRaise', descKey: 'exercises.singleLegCalfRaiseDesc' },
 
   // Forearms
   { id: 'wrist-curl', type: 'strength', muscleGroup: 'forearms', equipment: 'dumbbell', nameKey: 'exercises.wristCurl', descKey: 'exercises.wristCurlDesc' },
   { id: 'reverse-wrist-curl', type: 'strength', muscleGroup: 'forearms', equipment: 'dumbbell', nameKey: 'exercises.reverseWristCurl', descKey: 'exercises.reverseWristCurlDesc' },
+  { id: 'farmers-walk', type: 'strength', muscleGroup: 'forearms', equipment: 'dumbbell', nameKey: 'exercises.farmersWalk', descKey: 'exercises.farmersWalkDesc' },
+  { id: 'plate-pinch', type: 'strength', muscleGroup: 'forearms', equipment: 'bodyweight', nameKey: 'exercises.platePinch', descKey: 'exercises.platePinchDesc' },
+  { id: 'behind-back-wrist-curl', type: 'strength', muscleGroup: 'forearms', equipment: 'barbell', nameKey: 'exercises.behindBackWristCurl', descKey: 'exercises.behindBackWristCurlDesc' },
 
   // === CARDIO ===
   { id: 'running', type: 'cardio', cardioType: 'running', nameKey: 'exercises.running', descKey: 'exercises.runningDesc' },

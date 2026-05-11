@@ -24,6 +24,7 @@ import DiamondCalendar from '../components/DiamondCalendar';
 import WeeklyPlanBuilder from './training/WeeklyPlanBuilder';
 import MyPlans from './training/MyPlans';
 import PeakPrograms from './training/PeakPrograms';
+import PlanDetail from './training/PlanDetail';
 
 export default function TrainingPage() {
   const { t } = useTranslation();
@@ -37,6 +38,8 @@ export default function TrainingPage() {
   const [circuitConfig, setCircuitConfig] = useState(null);
   const [martialArtsConfig, setMartialArtsConfig] = useState(null);
   const [editingPlan, setEditingPlan] = useState(null);
+  const [viewingPlan, setViewingPlan] = useState(null);
+  const [viewingDayIndex, setViewingDayIndex] = useState(0);
 
   // Diamond Calendar state
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -168,6 +171,7 @@ export default function TrainingPage() {
       <WorkoutStartChooser
         onBack={() => setView('home')}
         onStartPlan={handleStartPlan}
+        onViewPlan={(plan, dayIdx) => { setViewingPlan(plan); setViewingDayIndex(dayIdx); setView('planDetail'); }}
         onStartEmpty={startEmptyWorkout}
         onStartCardio={handleStartCardio}
         onStartHiit={handleStartHiit}
@@ -186,6 +190,22 @@ export default function TrainingPage() {
       <ExerciseLibrary
         onBack={() => activeWorkout.isActive ? setView('activeWorkout') : setView('home')}
         onSelect={handleExercisesSelected}
+        selectionMode
+      />
+    );
+  }
+
+  if (view === 'selectForPlanDetail') {
+    return (
+      <ExerciseLibrary
+        onBack={() => setView('planDetail')}
+        onSelect={(selected) => {
+          if (window.__planDetailAddCallback) {
+            window.__planDetailAddCallback(selected);
+            window.__planDetailAddCallback = null;
+          }
+          setView('planDetail');
+        }}
         selectionMode
       />
     );
@@ -276,6 +296,22 @@ export default function TrainingPage() {
 
   if (view === 'weeklyPlan') {
     return <WeeklyPlanBuilder editPlan={editingPlan} onBack={() => setView('myPlans')} onSaved={() => { setEditingPlan(null); loadCalendarData(); setView('myPlans'); }} />;
+  }
+
+  if (view === 'planDetail' && viewingPlan) {
+    return (
+      <PlanDetail
+        plan={viewingPlan}
+        dayIndex={viewingDayIndex}
+        onBack={() => setView('startChoice')}
+        onStartWorkout={(exs, planId, planName) => handleStartPlan(exs, planId, planName)}
+        onAddExercise={(callback) => {
+          // Store callback, switch to exercise selector, then come back
+          window.__planDetailAddCallback = callback;
+          setView('selectForPlanDetail');
+        }}
+      />
+    );
   }
 
   if (view === 'peakPrograms') {
@@ -419,7 +455,7 @@ function QuickAction({ icon, label, onClick, className = '', vertical = false })
   );
 }
 
-function WorkoutStartChooser({ onBack, onStartPlan, onStartEmpty, onStartCardio, onStartHiit, onStartCircuit, onStartMartialArts }) {
+function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, onStartCardio, onStartHiit, onStartCircuit, onStartMartialArts }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [step, setStep] = useState('type'); // 'type' | 'strengthChoice' | 'plans' | 'cardioChoice' | 'hiitChoice' | 'circuitChoice' | 'martialArtsChoice'
@@ -462,7 +498,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onStartEmpty, onStartCardio,
                     {plan.days.map((day, i) => (
                       <button
                         key={i}
-                        onClick={() => onStartPlan(day.exercises.map((id) => ({ id, sets: 3, reps: 10 })), plan.id, plan.name)}
+                        onClick={() => onViewPlan(plan, i)}
                         className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                       >
                         <span className="text-sm font-medium">{day.name}</span>

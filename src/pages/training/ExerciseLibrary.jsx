@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Search, Plus, X, Check, Dumbbell, Heart, Zap, RefreshCw, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Search, Plus, X, Check, Dumbbell, Heart, Zap, RefreshCw, ChevronRight, Trash2 } from 'lucide-react';
 import exercises, { muscleGroups, getExercisesByType } from '../../data/exercises';
-import { getCustomExercises, saveCustomExercise } from '../../data/workoutStorage';
+import { getCustomExercises, saveCustomExercise, deleteCustomExercise } from '../../data/workoutStorage';
 import { useAuth } from '../../context/AuthContext';
 import MuscleGroupIcon from '../../components/icons/MuscleGroupIcon';
 
@@ -49,14 +49,14 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
-    if (user) getCustomExercises(user.id).then(setCustomExercises);
+    getCustomExercises(user?.id || 'guest').then(setCustomExercises);
   }, [user]);
 
   const allExercises = [
     ...exercises,
     ...customExercises.map((ce) => ({
-      id: ce.exercise_id, type: 'strength', muscleGroup: ce.muscle_group || 'chest',
-      equipment: ce.equipment || 'bodyweight', nameKey: `__custom__${ce.name}`, descKey: '', _customName: ce.name,
+      id: ce.exercise_id || ce.id, type: 'strength', muscleGroup: ce.muscle_group || 'chest',
+      equipment: ce.equipment || 'bodyweight', nameKey: `__custom__${ce.name}`, descKey: '', _customName: ce.name, _isCustom: true,
     })),
   ];
 
@@ -81,9 +81,24 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
 
   async function handleCreateExercise(data) {
     const exercise = { exercise_id: `custom_${Date.now()}`, name: data.name, muscle_group: data.muscleGroup, equipment: data.equipment };
-    await saveCustomExercise(user.id, exercise);
+    try {
+      await saveCustomExercise(user?.id || 'guest', exercise);
+    } catch (err) {
+      console.error('Failed to save custom exercise:', err);
+    }
     setCustomExercises((prev) => [...prev, exercise]);
     setShowCreateModal(false);
+  }
+
+  async function handleDeleteCustomExercise(exerciseId) {
+    if (!confirm(t('training.confirmDeleteExercise'))) return;
+    try {
+      await deleteCustomExercise(user?.id || 'guest', exerciseId);
+    } catch (err) {
+      console.error('Failed to delete custom exercise:', err);
+    }
+    setCustomExercises((prev) => prev.filter((e) => (e.exercise_id || e.id) !== exerciseId));
+    setSelected((prev) => prev.filter((id) => id !== exerciseId));
   }
 
   // ── TYPE CHOOSER (Stufe 1) ──
@@ -185,10 +200,10 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
       <div className="flex flex-col gap-2">
         {filtered.map((ex) => {
           const displayName = ex._customName || t(ex.nameKey);
+          const isCustom = !!ex._isCustom;
           return (
-            <button key={ex.id} onClick={() => selectionMode ? toggleSelect(ex.id) : null}
-              className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-sm transition-all ${selected.includes(ex.id) ? 'ring-2 ring-primary-400' : ''}`}>
-              <div className="flex items-center justify-between">
+            <div key={ex.id} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-sm transition-all ${selected.includes(ex.id) ? 'ring-2 ring-primary-400' : ''}`}>
+              <div className="flex items-center justify-between" onClick={() => selectionMode ? toggleSelect(ex.id) : null}>
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div className="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center flex-shrink-0">
                     <MuscleGroupIcon group={ex.muscleGroup || ex.type} size={24} className="text-primary-500" />
@@ -197,22 +212,31 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
                     <p className="font-medium truncate">{displayName}</p>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       {ex.muscleGroup ? t(`muscleGroups.${ex.muscleGroup}`) : ''}{ex.equipment ? ` · ${t(`equipment.${ex.equipment}`)}` : ''}
+                      {isCustom && <span className="ml-1 text-primary-500">· {t('training.customExercise')}</span>}
                     </p>
                   </div>
                 </div>
-                {selectionMode && (
-                  <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 ml-3 flex items-center justify-center ${
-                    selected.includes(ex.id) ? 'bg-primary-500 border-primary-500' : 'border-slate-300 dark:border-slate-600'}`}>
-                    {selected.includes(ex.id) && (
-                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </div>
-                )}
+                <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                  {isCustom && (
+                    <button onClick={(e) => { e.stopPropagation(); handleDeleteCustomExercise(ex.id); }}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                  {selectionMode && (
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      selected.includes(ex.id) ? 'bg-primary-500 border-primary-500' : 'border-slate-300 dark:border-slate-600'}`}>
+                      {selected.includes(ex.id) && (
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
               {ex.descKey && <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 line-clamp-2">{t(ex.descKey)}</p>}
-            </button>
+            </div>
           );
         })}
       </div>

@@ -39,7 +39,7 @@ export async function saveSupplement(userId, supplement) {
     user_id: userId,
     name: supplement.name,
     brand: supplement.brand || null,
-    form: supplement.form || 'capsule',
+    form: supplement.form || 'tablet',
     dosage_amount: supplement.dosage_amount || 1,
     dosage_unit: supplement.dosage_unit || 'Stück',
     notes: supplement.notes || '',

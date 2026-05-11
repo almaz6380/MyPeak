@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Clock, UtensilsCrossed, PenLine, ScanBarcode, Check, Plus, X } from 'lucide-react';
+import { ArrowLeft, Clock, UtensilsCrossed, PenLine, ScanBarcode, Camera, Check, Plus, X } from 'lucide-react';
 import FoodSearch from './FoodSearch';
 import PortionPicker from './PortionPicker';
 import BarcodeScanner from './BarcodeScanner';
+import MealPhotoCapture from './MealPhotoCapture';
 import { useAuth } from '../../context/AuthContext';
 import { saveNutritionEntry, getRecentFoods, getCustomMeals, logCustomMeal } from '../../data/nutritionStorage';
 import { getCategoryEmoji } from '../../data/foodDatabase';
@@ -20,6 +21,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
   const [customMeals, setCustomMeals] = useState([]);
   const [showManual, setShowManual] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
+  const [showMealPhoto, setShowMealPhoto] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -89,6 +91,20 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
       source: 'manual',
     }]);
     setShowManual(false);
+  }
+
+  // Meal photo AI
+  if (showMealPhoto) {
+    return (
+      <MealPhotoCapture
+        onClose={() => setShowMealPhoto(false)}
+        onAddItems={(items) => {
+          setSelectedItems((prev) => [...prev, ...items]);
+          setShowMealPhoto(false);
+        }}
+        language={lang}
+      />
+    );
   }
 
   // Barcode scanner
@@ -170,30 +186,33 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
       {activeTab === 'search' && (
         <>
           {/* Quick Actions */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="grid grid-cols-3 gap-2 mb-4">
             <button
               onClick={() => setShowScanner(true)}
-              className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              className="flex flex-col items-center gap-1.5 px-2 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
             >
-              <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                 <ScanBarcode className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <div className="text-left min-w-0">
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{t('nutrition.scanBarcode')}</p>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">{t('nutrition.scanBarcodeDesc')}</p>
+              <p className="text-[11px] font-medium text-slate-700 dark:text-slate-200 text-center leading-tight">{t('nutrition.scanBarcode')}</p>
+            </button>
+            <button
+              onClick={() => setShowMealPhoto(true)}
+              className="flex flex-col items-center gap-1.5 px-2 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+                <Camera className="w-4.5 h-4.5 text-violet-600 dark:text-violet-400" />
               </div>
+              <p className="text-[11px] font-medium text-slate-700 dark:text-slate-200 text-center leading-tight">{t('nutrition.mealPhoto')}</p>
             </button>
             <button
               onClick={() => setShowManual(true)}
-              className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              className="flex flex-col items-center gap-1.5 px-2 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
             >
-              <div className="w-9 h-9 rounded-xl bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center">
                 <PenLine className="w-4.5 h-4.5 text-primary-500 dark:text-primary-400" />
               </div>
-              <div className="text-left min-w-0">
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{t('nutrition.manualEntry')}</p>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">{t('nutrition.manualEntryDesc')}</p>
-              </div>
+              <p className="text-[11px] font-medium text-slate-700 dark:text-slate-200 text-center leading-tight">{t('nutrition.manualEntry')}</p>
             </button>
           </div>
 
