@@ -18,24 +18,32 @@ export async function compressMealPhoto(file) {
  * Send meal photo to API for analysis
  */
 export async function analyzeMealPhoto(base64Image, language = 'de') {
-  const response = await fetch('/api/analyze-meal', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ image: base64Image, language }),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
 
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error || 'API request failed');
+  try {
+    const response = await fetch('/api/analyze-meal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: base64Image, language }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || 'API request failed');
+    }
+
+    const data = await response.json();
+
+    if (data.error === 'no_food_detected') {
+      return { error: 'no_food_detected', items: [] };
+    }
+
+    return data;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  const data = await response.json();
-
-  if (data.error === 'no_food_detected') {
-    return { error: 'no_food_detected', items: [] };
-  }
-
-  return data;
 }
 
 /**

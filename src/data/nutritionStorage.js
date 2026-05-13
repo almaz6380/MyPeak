@@ -13,6 +13,26 @@ const GOALS_KEY = 'nutrition_goals';
 export async function getNutritionEntries(userId, date) {
   const cacheKey = ENTRIES_PREFIX + date;
 
+  // localStorage first — instant
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    // Refresh from Supabase in background
+    if (!guestSkip(userId)) {
+      supabase
+        .from('nutrition_entries')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('date', date)
+        .order('created_at', { ascending: true })
+        .then(({ data, error }) => {
+          if (!error && data) localStorage.setItem(cacheKey, JSON.stringify(data));
+        })
+        .catch(() => {});
+    }
+    return JSON.parse(cached);
+  }
+
+  // No cache → must await Supabase
   if (!guestSkip(userId)) {
     const { data, error } = await supabase
       .from('nutrition_entries')
@@ -27,8 +47,7 @@ export async function getNutritionEntries(userId, date) {
     }
   }
 
-  const cached = localStorage.getItem(cacheKey);
-  return cached ? JSON.parse(cached) : [];
+  return [];
 }
 
 export async function saveNutritionEntry(userId, entry) {
@@ -103,9 +122,28 @@ export async function deleteNutritionEntry(userId, entryId, date) {
 // ── Custom Meals ─────────────────────────────────────────────
 
 export async function getCustomMeals(userId) {
+  // localStorage first — instant
   let localData = [];
   try { localData = JSON.parse(localStorage.getItem(CUSTOM_MEALS_KEY) || '[]'); } catch {}
 
+  if (localData.length > 0) {
+    // Refresh from Supabase in background
+    if (!guestSkip(userId)) {
+      supabase
+        .from('custom_meals')
+        .select('*')
+        .eq('user_id', userId)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false })
+        .then(({ data, error }) => {
+          if (!error && data) localStorage.setItem(CUSTOM_MEALS_KEY, JSON.stringify(data));
+        })
+        .catch(() => {});
+    }
+    return localData;
+  }
+
+  // No cache → must await Supabase
   if (!guestSkip(userId)) {
     try {
       const { data, error } = await supabase
@@ -271,9 +309,33 @@ export async function saveNutritionGoals(userId, goals) {
 
 // ── Recent Foods ─────────────────────────────────────────────
 
-export async function getRecentFoods(userId, limit = 10) {
-  let data = null;
+const RECENT_FOODS_KEY = 'recent_foods';
 
+export async function getRecentFoods(userId, limit = 10) {
+  // localStorage first — instant
+  const cached = localStorage.getItem(RECENT_FOODS_KEY);
+  if (cached) {
+    // Refresh in background
+    if (!guestSkip(userId)) {
+      supabase
+        .from('nutrition_entries')
+        .select('food_name, brand, serving_size, serving_unit, calories, protein, carbs, fat, source, source_id')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(50)
+        .then(({ data }) => {
+          if (data) {
+            const unique = _dedupeRecentFoods(data, limit);
+            localStorage.setItem(RECENT_FOODS_KEY, JSON.stringify(unique));
+          }
+        })
+        .catch(() => {});
+    }
+    try { return JSON.parse(cached).slice(0, limit); } catch { return []; }
+  }
+
+  // No cache → await Supabase
+  let data = null;
   if (!guestSkip(userId)) {
     try {
       ({ data } = await supabase
@@ -289,6 +351,12 @@ export async function getRecentFoods(userId, limit = 10) {
 
   if (!data) return [];
 
+  const unique = _dedupeRecentFoods(data, limit);
+  localStorage.setItem(RECENT_FOODS_KEY, JSON.stringify(unique));
+  return unique;
+}
+
+function _dedupeRecentFoods(data, limit) {
   const seen = new Set();
   const unique = [];
   for (const entry of data) {

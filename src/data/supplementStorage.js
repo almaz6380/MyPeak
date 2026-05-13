@@ -9,6 +9,25 @@ const LOGS_PREFIX = 'supplement_logs_';
 // ── Supplements CRUD ────────────────────────────────────────────
 
 export async function getSupplements(userId) {
+  // localStorage first — instant
+  const cached = localStorage.getItem(SUPPLEMENTS_KEY);
+  if (cached) {
+    if (!guestSkip(userId)) {
+      supabase
+        .from('supplements')
+        .select('*')
+        .eq('user_id', userId)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: true })
+        .then(({ data, error }) => {
+          if (!error && data) localStorage.setItem(SUPPLEMENTS_KEY, JSON.stringify(data));
+        })
+        .catch(() => {});
+    }
+    try { return JSON.parse(cached); } catch { return []; }
+  }
+
+  // No cache → must await Supabase
   if (!guestSkip(userId)) {
     try {
       const { data, error } = await supabase
@@ -27,11 +46,7 @@ export async function getSupplements(userId) {
     }
   }
 
-  try {
-    return JSON.parse(localStorage.getItem(SUPPLEMENTS_KEY) || '[]');
-  } catch {
-    return [];
-  }
+  return [];
 }
 
 export async function saveSupplement(userId, supplement) {
@@ -135,6 +150,24 @@ export async function deleteSupplement(userId, supplementId) {
 export async function getSupplementLogs(userId, date) {
   const cacheKey = LOGS_PREFIX + date;
 
+  // localStorage first — instant
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    if (!guestSkip(userId)) {
+      supabase
+        .from('supplement_logs')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('date', date)
+        .then(({ data, error }) => {
+          if (!error && data) localStorage.setItem(cacheKey, JSON.stringify(data));
+        })
+        .catch(() => {});
+    }
+    try { return JSON.parse(cached); } catch { return []; }
+  }
+
+  // No cache → must await Supabase
   if (!guestSkip(userId)) {
     try {
       const { data, error } = await supabase
@@ -152,11 +185,7 @@ export async function getSupplementLogs(userId, date) {
     }
   }
 
-  try {
-    return JSON.parse(localStorage.getItem(cacheKey) || '[]');
-  } catch {
-    return [];
-  }
+  return [];
 }
 
 export async function logSupplementTaken(userId, supplementId, date, timeSlot) {

@@ -279,16 +279,38 @@ export function hasGoldenFrame(level) {
   return level >= 30;
 }
 
+const XP_KEY = 'user_xp';
+
 export async function getXP(userId) {
   if (isGuest(userId)) return { total_xp: 0, level: 1, streak_days: 0 };
 
+  // localStorage first — instant
+  const cached = localStorage.getItem(XP_KEY);
+  if (cached) {
+    // Refresh in background
+    supabase
+      .from('user_xp')
+      .select('*')
+      .eq('user_id', userId)
+      .single()
+      .then(({ data }) => {
+        if (data) localStorage.setItem(XP_KEY, JSON.stringify(data));
+      })
+      .catch(() => {});
+    try { return JSON.parse(cached); } catch {}
+  }
+
+  // No cache → await Supabase
   const { data } = await supabase
     .from('user_xp')
     .select('*')
     .eq('user_id', userId)
     .single();
 
-  if (data) return data;
+  if (data) {
+    localStorage.setItem(XP_KEY, JSON.stringify(data));
+    return data;
+  }
 
   const { data: created } = await supabase
     .from('user_xp')
@@ -296,7 +318,9 @@ export async function getXP(userId) {
     .select()
     .single();
 
-  return created || { total_xp: 0, level: 1, streak_days: 0 };
+  const result = created || { total_xp: 0, level: 1, streak_days: 0 };
+  localStorage.setItem(XP_KEY, JSON.stringify(result));
+  return result;
 }
 
 // Returns { oldLevel, newLevel, xpGained } for level-up detection

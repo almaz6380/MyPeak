@@ -228,7 +228,10 @@ export async function searchOpenFoodFacts(query, language = 'de') {
     const lc = language === 'de' ? 'de' : 'en';
     const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=20&lc=${lc}`;
 
-    const res = await fetch(url);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
     if (!res.ok) return [];
 
     const json = await res.json();

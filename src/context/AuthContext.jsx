@@ -24,20 +24,55 @@ export function isGuest(userId) {
 }
 
 export function AuthProvider({ children }) {
+  // Instant restore from localStorage — no loading spinner for returning users
   const [session, setSession] = useState(null);
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  async function fetchProfile(userId) {
-    // Try to load cached profile first for instant display
-    const cachedProfile = localStorage.getItem('cachedProfile');
-    if (cachedProfile) {
-      const parsed = JSON.parse(cachedProfile);
-      if (parsed?.id === userId) setProfile(parsed);
+  const [user, setUser] = useState(() => {
+    // Guest mode — instant
+    if (localStorage.getItem('guestMode') === 'true') {
+      return { id: GUEST_ID, email: 'guest@local' };
     }
+    // Cached user from previous session — instant
+    try {
+      const cached = localStorage.getItem('cachedUser');
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return null;
+  });
+  const [profile, setProfile] = useState(() => {
+    if (localStorage.getItem('guestMode') === 'true') return GUEST_PROFILE;
+    try {
+      const cached = localStorage.getItem('cachedProfile');
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return null;
+  });
+  // Only show loading if we have NO cached data at all
+  const [loading, setLoading] = useState(() => {
+    if (localStorage.getItem('guestMode') === 'true') return false;
+    if (localStorage.getItem('cachedUser') && localStorage.getItem('cachedProfile')) return false;
+    return true;
+  });
 
-    // Then fetch fresh from Supabase (non-blocking if cache existed)
+  function fetchProfileBackground(userId) {
+    supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setProfile(data);
+          localStorage.setItem('cachedProfile', JSON.stringify(data));
+        }
+      })
+      .catch(() => {});
+
+    // Background tasks
+    loadSettings(userId).catch(() => {});
+    migrateLocalDataToSupabase(userId);
+  }
+
+  async function fetchProfileBlocking(userId) {
     try {
       const { data } = await supabase
         .from('profiles')
@@ -49,39 +84,42 @@ export function AuthProvider({ children }) {
         setProfile(data);
         localStorage.setItem('cachedProfile', JSON.stringify(data));
       }
-    } catch {
-      // Offline or Supabase down — cached profile is fine
-    }
+    } catch {}
 
-    // Background tasks — don't block app startup
     loadSettings(userId).catch(() => {});
     migrateLocalDataToSupabase(userId);
-
-    return;
   }
 
   useEffect(() => {
-    // Check for guest session first (instant)
-    const guestSession = localStorage.getItem('guestMode');
-    if (guestSession === 'true') {
-      setUser({ id: GUEST_ID, email: 'guest@local' });
-      setProfile(GUEST_PROFILE);
-      setLoading(false);
-      return;
-    }
+    // Guest mode already handled in useState initializers
+    if (localStorage.getItem('guestMode') === 'true') return;
 
     // Timeout: if Supabase doesn't respond in 3s, show login
-    const timeout = setTimeout(() => {
-      if (loading) setLoading(false);
-    }, 3000);
+    const timeout = setTimeout(() => setLoading(false), 3000);
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
       clearTimeout(timeout);
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id).finally(() => setLoading(false));
+      setSession(s);
+      const supaUser = s?.user ?? null;
+      setUser(supaUser);
+
+      if (supaUser) {
+        // Cache user for instant restore next time
+        localStorage.setItem('cachedUser', JSON.stringify({ id: supaUser.id, email: supaUser.email }));
+
+        if (profile) {
+          // Already have cached profile — just refresh in background
+          fetchProfileBackground(supaUser.id);
+          setLoading(false);
+        } else {
+          // No cached profile — must wait
+          fetchProfileBlocking(supaUser.id).finally(() => setLoading(false));
+        }
       } else {
+        // Not logged in — clear cached data
+        localStorage.removeItem('cachedUser');
+        localStorage.removeItem('cachedProfile');
+        setProfile(null);
         setLoading(false);
       }
     }).catch(() => {
@@ -92,10 +130,14 @@ export function AuthProvider({ children }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await fetchProfile(session.user.id);
+        const supaUser = session?.user ?? null;
+        setUser(supaUser);
+        if (supaUser) {
+          localStorage.setItem('cachedUser', JSON.stringify({ id: supaUser.id, email: supaUser.email }));
+          fetchProfileBackground(supaUser.id);
         } else {
+          localStorage.removeItem('cachedUser');
+          localStorage.removeItem('cachedProfile');
           setProfile(null);
         }
       }
@@ -127,6 +169,8 @@ export function AuthProvider({ children }) {
     // Clear guest mode
     if (isGuest(user?.id)) {
       localStorage.removeItem('guestMode');
+      localStorage.removeItem('cachedUser');
+      localStorage.removeItem('cachedProfile');
       setUser(null);
       setSession(null);
       setProfile(null);
@@ -135,6 +179,8 @@ export function AuthProvider({ children }) {
 
     const { error } = await supabase.auth.signOut();
     if (!error) {
+      localStorage.removeItem('cachedUser');
+      localStorage.removeItem('cachedProfile');
       setUser(null);
       setSession(null);
       setProfile(null);

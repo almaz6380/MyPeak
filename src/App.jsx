@@ -21,8 +21,15 @@ import OnboardingPage from './pages/onboarding/OnboardingPage';
 export default function App() {
   const { user, profile, loading } = useAuth();
   const { t } = useTranslation();
-  const [showSplash, setShowSplash] = useState(true);
-  const handleSplashFinished = useCallback(() => setShowSplash(false), []);
+  // Skip splash for returning users — show instantly
+  const [showSplash, setShowSplash] = useState(() => {
+    if (localStorage.getItem('splashSeen')) return false;
+    return true;
+  });
+  const handleSplashFinished = useCallback(() => {
+    localStorage.setItem('splashSeen', 'true');
+    setShowSplash(false);
+  }, []);
 
   if (showSplash) {
     return <SplashScreen onFinished={handleSplashFinished} />;

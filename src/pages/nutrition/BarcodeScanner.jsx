@@ -41,13 +41,22 @@ export default function BarcodeScanner({ onScanned, onClose }) {
     setStatus('loading');
     setScannedBarcode(barcode);
 
-    // Check for locally saved product photo
-    const localPhoto = await getProductPhoto(barcode);
+    // Check for locally saved product photo (with timeout)
+    let localPhoto = null;
+    try { localPhoto = await Promise.race([getProductPhoto(barcode), new Promise((_, r) => setTimeout(r, 3000))]); } catch {}
 
     try {
-      // 1. Check community products first (our DB)
-      const community = await lookupCommunityProduct(barcode);
+      // 1. Check community products first (our DB) — with 5s timeout
+      let community = null;
+      try {
+        community = await Promise.race([
+          lookupCommunityProduct(barcode),
+          new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 5000)),
+        ]);
+      } catch {}
+
       if (community) {
+        if (!isMountedRef.current) return;
         setFoundProduct({
           id: `community_${barcode}`,
           nameDE: community.name,
@@ -68,10 +77,14 @@ export default function BarcodeScanner({ onScanned, onClose }) {
         return;
       }
 
-      // 2. Check Open Food Facts
+      // 2. Check Open Food Facts — with 8s timeout
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
       const res = await fetch(
-        `https://world.openfoodfacts.org/api/v2/product/${barcode}.json`
+        `https://world.openfoodfacts.org/api/v2/product/${barcode}.json`,
+        { signal: controller.signal }
       );
+      clearTimeout(timeout);
       const json = await res.json();
       if (!isMountedRef.current) return;
 
@@ -195,7 +208,16 @@ export default function BarcodeScanner({ onScanned, onClose }) {
   useEffect(() => {
     isMountedRef.current = true;
     const timer = setTimeout(startScanner, 100);
-    return () => { isMountedRef.current = false; clearTimeout(timer); stopQuagga(); };
+    return () => {
+      isMountedRef.current = false;
+      clearTimeout(timer);
+      stopQuagga();
+      // Release camera stream to free resources
+      if (camera) camera.releaseCamera();
+      // Clean up any leftover video/canvas elements
+      const container = document.getElementById('scanner-container');
+      if (container) container.querySelectorAll('video, canvas').forEach((el) => el.remove());
+    };
   }, []);
 
   function handleClose() { stopQuagga(); onClose(); }

@@ -22,7 +22,6 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
   const [entries, setEntries] = useState([]);
   const [goals, setGoals] = useState({ calories: 2000, protein: 150, carbs: 250, fat: 70, water_ml: 3000 });
   const [waterTotal, setWaterTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [showGoalEditor, setShowGoalEditor] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showWaterInput, setShowWaterInput] = useState(false);
@@ -41,14 +40,12 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
   }, [user, selectedDate]);
 
   async function loadDateData() {
-    setLoading(true);
     const [entriesData, waterData] = await Promise.all([
       getNutritionEntries(user.id, selectedDate),
       getWaterTotal(user.id, selectedDate),
     ]);
     setEntries(entriesData);
     setWaterTotal(waterData.total);
-    setLoading(false);
   }
 
   function handleAddWater(ml) {

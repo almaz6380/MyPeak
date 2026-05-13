@@ -9,10 +9,31 @@ const CUSTOM_EXERCISES_KEY = 'custom_exercises';
 export async function getWorkouts(userId) {
   // localStorage first — instant
   const cached = localStorage.getItem(WORKOUTS_KEY);
-  const localData = cached ? JSON.parse(cached) : [];
+  const localData = cached ? JSON.parse(cached) : null;
 
+  if (localData) {
+    // Refresh from Supabase in background (don't block)
+    if (!isGuest(userId)) {
+      supabase
+        .from('workouts')
+        .select('*')
+        .eq('user_id', userId)
+        .order('date', { ascending: false })
+        .then(({ data, error }) => {
+          if (!error && data) {
+            const workouts = data.map((row) => ({
+              id: row.id, date: row.date, duration: row.duration, exercises: row.exercises,
+            }));
+            localStorage.setItem(WORKOUTS_KEY, JSON.stringify(workouts));
+          }
+        })
+        .catch(() => {});
+    }
+    return localData;
+  }
+
+  // No cache → must await Supabase
   if (!isGuest(userId)) {
-    // Supabase in background — update cache silently
     try {
       const { data, error } = await supabase
         .from('workouts')
@@ -22,10 +43,7 @@ export async function getWorkouts(userId) {
 
       if (!error && data) {
         const workouts = data.map((row) => ({
-          id: row.id,
-          date: row.date,
-          duration: row.duration,
-          exercises: row.exercises,
+          id: row.id, date: row.date, duration: row.duration, exercises: row.exercises,
         }));
         localStorage.setItem(WORKOUTS_KEY, JSON.stringify(workouts));
         return workouts;
@@ -35,7 +53,7 @@ export async function getWorkouts(userId) {
     }
   }
 
-  return localData;
+  return [];
 }
 
 export async function saveWorkout(userId, workout) {
@@ -113,6 +131,23 @@ export async function deleteWorkout(userId, workoutId) {
 // ── Custom Exercises ──────────────────────────────────────
 
 export async function getCustomExercises(userId) {
+  // localStorage first — instant
+  const cached = localStorage.getItem(CUSTOM_EXERCISES_KEY);
+  if (cached) {
+    if (!isGuest(userId)) {
+      supabase
+        .from('custom_exercises')
+        .select('*')
+        .eq('user_id', userId)
+        .then(({ data, error }) => {
+          if (!error && data) localStorage.setItem(CUSTOM_EXERCISES_KEY, JSON.stringify(data));
+        })
+        .catch(() => {});
+    }
+    try { return JSON.parse(cached); } catch { return []; }
+  }
+
+  // No cache → must await Supabase
   if (!isGuest(userId)) {
     const { data, error } = await supabase
       .from('custom_exercises')
@@ -125,8 +160,7 @@ export async function getCustomExercises(userId) {
     }
   }
 
-  const cached = localStorage.getItem(CUSTOM_EXERCISES_KEY);
-  return cached ? JSON.parse(cached) : [];
+  return [];
 }
 
 export async function saveCustomExercise(userId, exercise) {
@@ -265,9 +299,33 @@ export async function updateCustomPlan(userId, planId, plan) {
 
 export async function getCustomPlans(userId) {
   // localStorage first — instant
-  let localData = [];
-  try { localData = JSON.parse(localStorage.getItem('customPlans') || '[]'); } catch {}
+  let localData = null;
+  try {
+    const cached = localStorage.getItem('customPlans');
+    if (cached) localData = JSON.parse(cached);
+  } catch {}
 
+  if (localData) {
+    // Refresh from Supabase in background
+    if (!isGuest(userId)) {
+      supabase
+        .from('custom_plans')
+        .select('*')
+        .eq('user_id', userId)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false })
+        .then(({ data, error }) => {
+          if (!error && data) {
+            const plans = data.map((row) => ({ id: row.id, name: row.name, days: row.days }));
+            localStorage.setItem('customPlans', JSON.stringify(plans));
+          }
+        })
+        .catch(() => {});
+    }
+    return localData;
+  }
+
+  // No cache → must await Supabase
   if (!isGuest(userId)) {
     try {
       const { data, error } = await supabase
@@ -287,7 +345,7 @@ export async function getCustomPlans(userId) {
     }
   }
 
-  return localData;
+  return [];
 }
 
 export async function saveCustomPlan(userId, plan) {
@@ -474,6 +532,24 @@ const SCHEDULE_KEY = 'weekly_schedules';
 const ACTIVE_SCHEDULE_KEY = 'active_weekly_schedule';
 
 export async function getWeeklySchedules(userId) {
+  // localStorage first — instant
+  const cached = localStorage.getItem(SCHEDULE_KEY);
+  if (cached) {
+    if (!guestSkip(userId)) {
+      supabase
+        .from('weekly_schedules')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .then(({ data, error }) => {
+          if (!error && data) localStorage.setItem(SCHEDULE_KEY, JSON.stringify(data));
+        })
+        .catch(() => {});
+    }
+    try { return JSON.parse(cached); } catch { return []; }
+  }
+
+  // No cache → must await Supabase
   if (!guestSkip(userId)) {
     try {
       const { data, error } = await supabase
@@ -491,11 +567,7 @@ export async function getWeeklySchedules(userId) {
     }
   }
 
-  try {
-    return JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]');
-  } catch {
-    return [];
-  }
+  return [];
 }
 
 export async function getActiveSchedule(userId) {

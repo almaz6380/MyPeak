@@ -6,6 +6,26 @@ function guestSkip(userId) { return isGuest(userId); }
 const WEIGHT_KEY = 'weight_entries';
 
 export async function getWeightEntries(userId, limit = 90) {
+  // localStorage first — instant
+  const cached = localStorage.getItem(WEIGHT_KEY);
+  if (cached) {
+    // Refresh from Supabase in background
+    if (!guestSkip(userId)) {
+      supabase
+        .from('weight_entries')
+        .select('*')
+        .eq('user_id', userId)
+        .order('date', { ascending: true })
+        .limit(limit)
+        .then(({ data, error }) => {
+          if (!error && data) localStorage.setItem(WEIGHT_KEY, JSON.stringify(data));
+        })
+        .catch(() => {});
+    }
+    try { return JSON.parse(cached); } catch { return []; }
+  }
+
+  // No cache → must await Supabase
   if (!guestSkip(userId)) {
     try {
       const { data, error } = await supabase
@@ -24,11 +44,7 @@ export async function getWeightEntries(userId, limit = 90) {
     }
   }
 
-  try {
-    return JSON.parse(localStorage.getItem(WEIGHT_KEY) || '[]');
-  } catch {
-    return [];
-  }
+  return [];
 }
 
 export async function saveWeightEntry(userId, date, weightKg) {

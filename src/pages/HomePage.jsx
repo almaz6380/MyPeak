@@ -65,16 +65,13 @@ export default function HomePage() {
   const [weightRange, setWeightRange] = useState('3m');
   const [weightCustomFrom, setWeightCustomFrom] = useState('');
   const [weightCustomTo, setWeightCustomTo] = useState('');
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     if (user) loadDashboard();
   }, [user, selectedDate]);
 
   async function loadDashboard() {
-    setLoading(true);
     try {
-      const [entries, goalsData, waterData, workouts, xp, supps, suppLogs] = await Promise.all([
+      const [entries, goalsData, waterData, workouts, xp, supps, suppLogs, weights, cycleSettings] = await Promise.all([
         getNutritionEntries(user.id, selectedDate),
         getNutritionGoals(user.id),
         getWaterTotal(user.id, selectedDate),
@@ -82,6 +79,8 @@ export default function HomePage() {
         getXP(user.id),
         getSupplements(user.id),
         getSupplementLogs(user.id, selectedDate),
+        getWeightEntries(user.id),
+        profile?.gender === 'female' ? getCycleSettings(user.id) : Promise.resolve(null),
       ]);
 
       const totals = entries.reduce(
@@ -98,7 +97,6 @@ export default function HomePage() {
       if (goalsData) setGoals(goalsData);
       setWaterTotal(waterData.total);
 
-      // Workouts on selected date
       const count = (workouts || []).filter((w) => w.date === selectedDate).length;
       setDayWorkouts(count);
 
@@ -108,8 +106,7 @@ export default function HomePage() {
       const progress = getSupplementProgress(scheduled, suppLogs || []);
       setSuppProgress(progress);
 
-      // Weight (prepend profile weight as starting point if no entries exist for that date)
-      const weights = await getWeightEntries(user.id);
+      // Weight (prepend profile weight as starting point)
       if (profile?.weight_kg && (weights.length === 0 || weights[0].date > (profile?.updated_at || profile?.created_at || '').split('T')[0])) {
         const profileDate = (profile?.updated_at || profile?.created_at || new Date().toISOString()).split('T')[0];
         const hasProfileDate = weights.some((w) => w.date === profileDate);
@@ -121,20 +118,17 @@ export default function HomePage() {
 
       // Cycle (only for female users)
       if (profile?.gender === 'female') {
-        const cycleSettings = await getCycleSettings(user.id);
         if (cycleSettings && cycleSettings.tracking_enabled !== false) {
-          const phase = getCyclePhase(cycleSettings, selectedDate);
-          setCyclePhase(phase);
+          setCyclePhase(getCyclePhase(cycleSettings, selectedDate));
           setShowCycle(true);
         } else {
           setCyclePhase(null);
-          setShowCycle(true); // Show setup prompt
+          setShowCycle(true);
         }
       }
     } catch (err) {
       console.error('Dashboard load error:', err);
     }
-    setLoading(false);
   }
 
   function changeDate(offset) {
@@ -196,12 +190,7 @@ export default function HomePage() {
         </button>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
-        </div>
-      ) : (
-        <div className="space-y-3">
+      <div className="space-y-3">
           {/* Calories + Macros Card */}
           <button
             onClick={() => navigate('/nutrition')}
@@ -445,7 +434,6 @@ export default function HomePage() {
           </div>
 
         </div>
-      )}
 
       {/* Calendar Modal */}
       {showCalendar && (

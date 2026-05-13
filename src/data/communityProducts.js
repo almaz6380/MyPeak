@@ -4,40 +4,48 @@ import { isGuest } from '../context/AuthContext';
 // ── Community Product Lookup ─────────────────────────────────
 
 export async function lookupCommunityProduct(barcode) {
-  const { data } = await supabase
-    .from('community_products')
-    .select('*')
-    .eq('barcode', barcode)
-    .single();
+  try {
+    const { data } = await supabase
+      .from('community_products')
+      .select('*')
+      .eq('barcode', barcode)
+      .single();
 
-  return data || null;
+    return data || null;
+  } catch {
+    return null;
+  }
 }
 
 export async function addCommunityProduct(userId, product) {
   if (isGuest(userId)) return null;
 
-  const { data, error } = await supabase
-    .from('community_products')
-    .insert({
-      barcode: product.barcode,
-      name: product.name,
-      brand: product.brand || null,
-      calories: product.calories,
-      protein: product.protein,
-      carbs: product.carbs,
-      fat: product.fat,
-      created_by: userId,
-    })
-    .select()
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from('community_products')
+      .insert({
+        barcode: product.barcode,
+        name: product.name,
+        brand: product.brand || null,
+        calories: product.calories,
+        protein: product.protein,
+        carbs: product.carbs,
+        fat: product.fat,
+        created_by: userId,
+      })
+      .select()
+      .single();
 
-  if (error?.code === '23505') {
-    // Already exists — increment confirmations
-    await supabase.rpc('increment_confirmations', { barcode_input: product.barcode });
-    return await lookupCommunityProduct(product.barcode);
+    if (error?.code === '23505') {
+      // Already exists — increment confirmations
+      await supabase.rpc('increment_confirmations', { barcode_input: product.barcode });
+      return await lookupCommunityProduct(product.barcode);
+    }
+
+    return data;
+  } catch {
+    return null;
   }
-
-  return data;
 }
 
 // ── Personal Overrides ───────────────────────────────────────
