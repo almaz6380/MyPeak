@@ -31,7 +31,13 @@ export async function analyzeMealPhoto(base64Image, language = 'de') {
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || 'API request failed');
+      if (response.status === 413) {
+        throw new Error('image_too_large');
+      }
+      if (response.status === 502) {
+        throw new Error('ai_service_unavailable');
+      }
+      throw new Error(err.error || `API request failed (${response.status})`);
     }
 
     const data = await response.json();

@@ -100,6 +100,11 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Fix: Eigene Übungen erstellen funktioniert jetzt auch im Gastmodus und während aktivem Workout (user?.id Fallback + try/catch)
 - [x] ~~BUG: Plan-Detailansicht~~ — GEFIXT. Klick auf Plan öffnet Detailansicht, Übungen hinzufügen/entfernen, Workout startet erst bei Button.
 - [x] Performance: Alle Storage-Funktionen auf localStorage-first (kein Supabase-Blocking mehr, Session-Timeout 3s)
+- [x] Performance: Sofortiger App-Start — Auth + Profil synchron aus localStorage, kein Loading-Spinner für Returning Users
+- [x] Performance: SplashScreen nur beim allerersten Besuch, danach übersprungen
+- [x] Performance: Globales 8s Timeout auf Supabase-Client, AbortController-Timeouts auf Open Food Facts (8s), Gemini API (15s)
+- [x] Fix: BarcodeScanner gibt Kamera beim Schließen frei (CameraContext.releaseCamera), Timeouts auf API-Calls
+- [x] Fix: CommunityProducts mit try/catch abgesichert (kein Scan-Flow-Crash mehr)
 - [ ] **BUG: Mahlzeit-Foto KI** — Fehlermeldung beim Fotografieren einer Mahlzeit zur KI-Kalorien-Erkennung. Muss debuggt werden (API-Key, Endpoint, Bildformat prüfen).
 
 ### Phase 3: Ernährungs-Tracking — FERTIG
@@ -109,6 +114,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Tägliche Kalorien- und Makro-Übersicht mit SVG-Ringen (kcal, Protein, Carbs, Fat)
 - [x] TDEE-Rechner (Mifflin-St Jeor Formel, vorbefüllt mit Profildaten)
 - [x] Makro-Ziele manuell editierbar (nicht nur über TDEE)
+- [x] kcal-Ziel Auto/Manuell-Modus: Auto berechnet kcal aus Makros (P×4+C×4+F×9), Manuell erlaubt freie Eingabe
 - [x] Barcode-Scanner per Kamera (Quagga2 + Open Food Facts API + Community Products + CameraContext)
 - [x] Barcode-Scan: Produktbild von Open Food Facts + Makros als Fullscreen-Ergebnis nach Scan
 - [x] Produktfotos: Eigenes Foto aufnehmen wenn kein Bild in der Datenbank (IndexedDB, komprimiert)
@@ -390,7 +396,7 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 - [x] Eigene Meals erstellen und speichern
 - [x] Tägliche Kalorien- und Makro-Übersicht (SVG-Ringe)
 - [x] TDEE-/Kalorienverbrauch-Rechner (Mifflin-St Jeor)
-- [x] Makro-Ziele manuell editierbar
+- [x] Makro-Ziele manuell editierbar + kcal Auto-Berechnung aus Makros
 - [x] Barcode-Scanner per Kamera (Quagga2 + Open Food Facts)
 - [x] Custom Calendar für Datumsauswahl
 - [x] Zuletzt verwendete Lebensmittel

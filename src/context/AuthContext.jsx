@@ -209,7 +209,7 @@ export function AuthProvider({ children }) {
     }
     const { data: { session: currentSession } } = await supabase.auth.getSession();
     if (currentSession?.user) {
-      await fetchProfile(currentSession.user.id);
+      await fetchProfileBlocking(currentSession.user.id);
     }
   }
 

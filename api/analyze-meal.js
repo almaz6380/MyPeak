@@ -16,6 +16,11 @@ export default async function handler(req, res) {
   // Strip data URL prefix if present
   const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
 
+  // Reject oversized payloads (max ~3MB base64 ≈ ~2.25MB image)
+  if (base64Data.length > 4_000_000) {
+    return res.status(413).json({ error: 'Image too large. Please use a compressed image under 3MB.' });
+  }
+
   const prompt = language === 'de'
     ? `Du bist ein Ernährungsanalyse-Assistent. Analysiere dieses Foto einer Mahlzeit und identifiziere jedes sichtbare Lebensmittel.
 

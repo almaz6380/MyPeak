@@ -21,10 +21,14 @@ export async function getWorkouts(userId) {
         .order('date', { ascending: false })
         .then(({ data, error }) => {
           if (!error && data) {
-            const workouts = data.map((row) => ({
+            const supabaseWorkouts = data.map((row) => ({
               id: row.id, date: row.date, duration: row.duration, exercises: row.exercises,
             }));
-            localStorage.setItem(WORKOUTS_KEY, JSON.stringify(workouts));
+            // Keep local-only workouts (not yet synced) and merge with Supabase data
+            const currentLocal = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
+            const localOnly = currentLocal.filter((w) => String(w.id).startsWith('local_'));
+            const merged = [...localOnly, ...supabaseWorkouts];
+            localStorage.setItem(WORKOUTS_KEY, JSON.stringify(merged));
           }
         })
         .catch(() => {});
@@ -280,7 +284,7 @@ export async function updateCustomPlan(userId, planId, plan) {
     localStorage.setItem('customPlans', JSON.stringify(cached));
   }
 
-  if (!guestSkip(userId) && !planId.startsWith('local_')) {
+  if (!isGuest(userId) && !planId.startsWith('local_')) {
     try {
       await supabase
         .from('custom_plans')
@@ -367,14 +371,22 @@ export async function saveCustomPlan(userId, plan) {
 }
 
 export async function deleteCustomPlan(userId, planId) {
-  await supabase
-    .from('custom_plans')
-    .update({ deleted_at: new Date().toISOString() })
-    .eq('id', planId)
-    .eq('user_id', userId);
-
+  // localStorage first
   const cached = JSON.parse(localStorage.getItem('customPlans') || '[]');
   localStorage.setItem('customPlans', JSON.stringify(cached.filter((p) => p.id !== planId)));
+
+  // Soft-delete in Supabase (skip for guests and local-only plans)
+  if (!isGuest(userId) && !planId.startsWith('local_')) {
+    try {
+      await supabase
+        .from('custom_plans')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', planId)
+        .eq('user_id', userId);
+    } catch (err) {
+      console.error('Failed to delete plan in Supabase:', err);
+    }
+  }
 }
 
 export async function getDeletedCustomPlans(userId) {
@@ -418,6 +430,10 @@ export async function permanentDeleteCustomPlan(userId, planId) {
 // ── Migration: Upload localStorage data on first login ───
 
 export async function migrateLocalDataToSupabase(userId) {
+  // Skip if already migrated for this user
+  const migrationKey = `migrated_${userId}`;
+  if (localStorage.getItem(migrationKey) === 'true') return;
+
   // Migrate workouts
   const localWorkouts = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
   if (localWorkouts.length > 0) {
@@ -456,6 +472,9 @@ export async function migrateLocalDataToSupabase(userId) {
       await supabase.from('custom_plans').insert(rows);
     }
   }
+
+  // Mark migration as done for this user
+  localStorage.setItem(migrationKey, 'true');
 }
 
 // ── Exercise Notes ───────────────────────────────────────────
@@ -535,7 +554,7 @@ export async function getWeeklySchedules(userId) {
   // localStorage first — instant
   const cached = localStorage.getItem(SCHEDULE_KEY);
   if (cached) {
-    if (!guestSkip(userId)) {
+    if (!isGuest(userId)) {
       supabase
         .from('weekly_schedules')
         .select('*')
@@ -550,7 +569,7 @@ export async function getWeeklySchedules(userId) {
   }
 
   // No cache → must await Supabase
-  if (!guestSkip(userId)) {
+  if (!isGuest(userId)) {
     try {
       const { data, error } = await supabase
         .from('weekly_schedules')
@@ -590,7 +609,7 @@ export async function saveWeeklySchedule(userId, schedule) {
   cached.unshift(localEntry);
   localStorage.setItem(SCHEDULE_KEY, JSON.stringify(cached));
 
-  if (!guestSkip(userId)) {
+  if (!isGuest(userId)) {
     try {
       // Deactivate all existing
       await supabase
@@ -623,7 +642,7 @@ export async function deleteWeeklySchedule(userId, scheduleId) {
   const cached = JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]');
   localStorage.setItem(SCHEDULE_KEY, JSON.stringify(cached.filter((s) => s.id !== scheduleId)));
 
-  if (!guestSkip(userId) && !scheduleId.startsWith('local_')) {
+  if (!isGuest(userId) && !scheduleId.startsWith('local_')) {
     try {
       await supabase.from('weekly_schedules').delete().eq('id', scheduleId);
     } catch (err) {
