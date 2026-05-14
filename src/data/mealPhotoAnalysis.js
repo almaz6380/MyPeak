@@ -8,10 +8,26 @@ const OIL_MULTIPLIERS = {
 };
 
 /**
- * Compress a meal photo for API upload (higher quality than exercise photos)
+ * Compress a meal photo for API upload.
+ * Ensures base64 output stays under ~3MB (safe for Vercel's 4.5MB body limit).
+ * Tries higher quality first, then reduces if still too large.
  */
 export async function compressMealPhoto(file) {
-  return compressImage(file, 1024, 0.7);
+  // First attempt: 1024px, quality 0.7
+  let result = await compressImage(file, 1024, 0.7);
+
+  // Check base64 size (each char ≈ 1 byte, data URL prefix ~23 chars)
+  if (result.length > 3_000_000) {
+    // Too large — retry with lower quality
+    result = await compressImage(file, 800, 0.5);
+  }
+
+  if (result.length > 3_000_000) {
+    // Still too large — aggressive compression
+    result = await compressImage(file, 640, 0.3);
+  }
+
+  return result;
 }
 
 /**
@@ -19,7 +35,8 @@ export async function compressMealPhoto(file) {
  */
 export async function analyzeMealPhoto(base64Image, language = 'de') {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
+  // Gemini can take a while — 25s timeout (was 15s, too short for large images)
+  const timeout = setTimeout(() => controller.abort(), 25000);
 
   try {
     const response = await fetch('/api/analyze-meal', {
@@ -47,6 +64,11 @@ export async function analyzeMealPhoto(base64Image, language = 'de') {
     }
 
     return data;
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error('timeout');
+    }
+    throw err;
   } finally {
     clearTimeout(timeout);
   }

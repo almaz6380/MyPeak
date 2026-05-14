@@ -131,10 +131,23 @@ export default function MealPhotoCapture({ onClose, onAddItems, language = 'de' 
             {error && (
               <div className="w-full max-w-sm text-center">
                 <p className="text-red-400 text-sm">
-                  {error === 'no_food' ? t('nutrition.noFoodDetected') : t('nutrition.aiError')}
+                  {error === 'no_food'
+                    ? t('nutrition.noFoodDetected')
+                    : error === 'timeout'
+                      ? (lang === 'de' ? 'Zeitüberschreitung — bitte versuche es erneut.' : 'Request timed out — please try again.')
+                      : error === 'image_too_large'
+                        ? (lang === 'de' ? 'Bild zu groß — bitte ein kleineres Foto verwenden.' : 'Image too large — please use a smaller photo.')
+                        : error === 'ai_service_unavailable'
+                          ? (lang === 'de' ? 'KI-Service nicht erreichbar — bitte später erneut versuchen.' : 'AI service unavailable — please try again later.')
+                          : t('nutrition.aiError')}
                 </p>
                 {error === 'no_food' && (
                   <p className="text-white/40 text-xs mt-1">{t('nutrition.noFoodDetectedDesc')}</p>
+                )}
+                {(error === 'timeout' || error === 'ai_service_unavailable') && (
+                  <button onClick={handleAnalyze} className="mt-2 text-primary-400 text-xs font-medium">
+                    {lang === 'de' ? 'Erneut versuchen' : 'Try again'}
+                  </button>
                 )}
               </div>
             )}
