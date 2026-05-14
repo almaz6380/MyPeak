@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Calendar, Dumbbell, TrendingUp, ChevronDown, ChevronUp, GitCompareArrows, X, ArrowUpRight, ArrowDownRight, Minus, Loader2, Trash2, BarChart3, Pencil, Plus, Check } from 'lucide-react';
 import { getWorkouts, deleteWorkout, updateWorkout } from '../../data/workoutStorage';
 import { useAuth } from '../../context/AuthContext';
-import { getExerciseById } from '../../data/exercises';
+import allExercisesData, { getExerciseById } from '../../data/exercises';
 import MuscleGroupIcon from '../../components/icons/MuscleGroupIcon';
 import useProgressComparison from '../../hooks/useProgressComparison';
 import ExerciseLineGraph from '../../components/progress/ExerciseLineGraph';
@@ -660,8 +660,7 @@ function EditWorkoutModal({ workout, onSave, onClose, t, weightUnit }) {
 
 function AddExerciseToEdit({ onAdd, onClose, t, lang }) {
   const [search, setSearch] = useState('');
-  const allEx = require('../../data/exercises').default;
-  const filtered = allEx
+  const filtered = allExercisesData
     .filter((ex) => (ex.type || 'strength') === 'strength')
     .filter((ex) => !search || t(ex.nameKey).toLowerCase().includes(search.toLowerCase()))
     .slice(0, 20);

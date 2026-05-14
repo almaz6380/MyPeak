@@ -75,10 +75,14 @@ export default function TrainingPage() {
     }
     setScheduledDays(scheduled);
 
-    // Completed days from workout history (date strings)
+    // Completed days from workout history (normalize to YYYY-MM-DD)
     const completed = new Set();
     (workouts || []).forEach((w) => {
-      if (w.date) completed.add(w.date);
+      if (w.date) {
+        // Handle both ISO timestamps and date-only strings
+        const dateStr = w.date.length > 10 ? w.date.split('T')[0] : w.date;
+        completed.add(dateStr);
+      }
     });
     setCompletedDays(completed);
   }

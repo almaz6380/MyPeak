@@ -22,6 +22,33 @@ export function ActiveWorkoutProvider({ children }) {
     return null;
   });
 
+  // Rest timer state
+  const [restTimer, setRestTimer] = useState(null); // { remaining, duration, exIdx, setIdx }
+
+  // Rest timer countdown
+  useEffect(() => {
+    if (!restTimer || restTimer.remaining <= 0) return;
+    const tick = setInterval(() => {
+      setRestTimer((prev) => {
+        if (!prev || prev.remaining <= 1) {
+          // Timer finished — vibrate if available
+          if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+          return null;
+        }
+        return { ...prev, remaining: prev.remaining - 1 };
+      });
+    }, 1000);
+    return () => clearInterval(tick);
+  }, [restTimer?.remaining > 0]);
+
+  const startRestTimer = useCallback((seconds, exIdx = null, setIdx = null) => {
+    setRestTimer({ remaining: seconds, duration: seconds, exIdx, setIdx });
+  }, []);
+
+  const stopRestTimer = useCallback(() => {
+    setRestTimer(null);
+  }, []);
+
   // Persist to localStorage on every change
   useEffect(() => {
     if (workout) {
@@ -154,6 +181,9 @@ export function ActiveWorkoutProvider({ children }) {
     workout,
     isActive,
     elapsed,
+    restTimer,
+    startRestTimer,
+    stopRestTimer,
     startWorkout,
     updateExercises,
     addExercises,

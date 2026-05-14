@@ -29,6 +29,10 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
   const [editingTarget, setEditingTarget] = useState(null);
   const [noteModal, setNoteModal] = useState(null); // { exerciseId, name }
   const [exerciseNotes, setExerciseNotes] = useState({});
+  const [completedSets, setCompletedSets] = useState({}); // { 'exIdx-setIdx': true }
+  const [restDuration, setRestDuration] = useState(() => {
+    return parseInt(localStorage.getItem('restTimerSeconds') || '90');
+  });
   const weightUnit = localStorage.getItem('weightUnit') || 'kg';
 
   // Load all notes on mount
@@ -85,9 +89,12 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
       return;
     }
 
+    // Capture exact duration NOW (not from interval-updated state)
+    const exactDuration = Date.now() - ctx.workout.startTime;
+
     const workout = {
-      date: new Date().toISOString(),
-      duration: elapsed,
+      date: new Date().toISOString().split('T')[0],
+      duration: exactDuration,
       exercises: validExercises.map((ex) => ({
         exerciseId: ex.exerciseId,
         nameKey: ex.nameKey,
@@ -99,8 +106,22 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
     // Save to localStorage + Supabase (fire-and-forget, never blocks)
     saveWorkout(user.id, workout).catch((err) => console.error('Save workout error:', err));
 
-    // PR check in background
-    checkForPRs().then((prs) => setPendingPrs(prs || {})).catch(() => {});
+    // PR check on captured data (not dependent on context state)
+    const capturedExercises = [...validExercises];
+    const checkPRsFromCapture = async () => {
+      const newPrs = {};
+      for (const ex of capturedExercises) {
+        const record = await getPersonalRecord(user.id, ex.exerciseId);
+        const exUnit = ex.unit || weightUnit;
+        for (const set of ex.sets) {
+          const w = parseFloat(set.weight);
+          const wKg = toKg(w, exUnit);
+          if (wKg && wKg > record.maxWeight) newPrs[ex.exerciseId] = true;
+        }
+      }
+      return newPrs;
+    };
+    checkPRsFromCapture().then((prs) => setPendingPrs(prs || {})).catch(() => {});
 
     // Auto-update the source plan if started from a plan
     if (wasFromPlan && sourcePlanId) {
@@ -158,11 +179,64 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
 
   return (
     <div className="p-4 pt-16 pb-24">
+      {/* Rest Timer Banner */}
+      {ctx.restTimer && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-primary-600 dark:bg-primary-700 text-white px-4 py-3 shadow-lg">
+          <div className="flex items-center justify-between max-w-lg mx-auto">
+            <div className="flex items-center gap-3">
+              <div className="text-2xl font-mono font-bold">
+                {Math.floor(ctx.restTimer.remaining / 60)}:{String(ctx.restTimer.remaining % 60).padStart(2, '0')}
+              </div>
+              <span className="text-sm opacity-80">{t('training.restPause') || 'Pause'}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => ctx.startRestTimer(ctx.restTimer.remaining + 30)}
+                className="px-2.5 py-1 rounded-lg bg-white/20 text-xs font-semibold"
+              >
+                +30s
+              </button>
+              <button
+                onClick={() => ctx.stopRestTimer()}
+                className="px-2.5 py-1 rounded-lg bg-white/20 text-xs font-semibold"
+              >
+                {t('training.skip') || 'Skip'}
+              </button>
+            </div>
+          </div>
+          {/* Progress bar */}
+          <div className="mt-2 h-1 bg-white/20 rounded-full overflow-hidden max-w-lg mx-auto">
+            <div
+              className="h-full bg-white rounded-full transition-all duration-1000"
+              style={{ width: `${(ctx.restTimer.remaining / ctx.restTimer.duration) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">{t('training.activeWorkout')}</h1>
         <span className="text-sm font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg">
           {formatTime(elapsed)}
         </span>
+      </div>
+
+      {/* Rest timer duration selector */}
+      <div className="flex items-center gap-2 mb-4 overflow-x-auto scrollbar-hide">
+        <span className="text-xs text-slate-400 whitespace-nowrap">{t('training.restTimer') || 'Pause'}:</span>
+        {[60, 90, 120, 150, 180].map((sec) => (
+          <button
+            key={sec}
+            onClick={() => { setRestDuration(sec); localStorage.setItem('restTimerSeconds', String(sec)); }}
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+              restDuration === sec
+                ? 'bg-primary-500 text-white'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+            }`}
+          >
+            {sec >= 60 ? `${sec / 60}min` : `${sec}s`}
+          </button>
+        ))}
       </div>
 
       {exercises.length === 0 && (
@@ -205,7 +279,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
 
               {lastSession ? (
                 <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">
-                  {t('training.lastTime')}: {lastSession.sets.map((s) => `${s.weight}${lastSession.unit || t(`training.${weightUnit}`)} × ${s.reps}`).join(', ')}
+                  {t('training.lastTime')}: {lastSession.sets.map((s) => `${s.weight}${lastSession.unit || weightUnit} × ${s.reps}`).join(', ')}
                 </p>
               ) : (
                 <p className="text-xs text-green-500 mb-2">{t('training.firstTime')}</p>
@@ -260,7 +334,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
                 </div>
               )}
 
-              <div className="grid grid-cols-[2.5rem_1fr_1fr_2rem] gap-2 items-center text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">
+              <div className="grid grid-cols-[2.5rem_1fr_1fr_2rem_2rem] gap-2 items-center text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">
                 <span className="text-center">{t('training.set')}</span>
                 <span className="text-center">
                   {t('training.weight')}{' '}
@@ -269,6 +343,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
                   </button>
                 </span>
                 <span className="text-center">{t('training.reps')}</span>
+                <span className="text-center">✓</span>
                 <span></span>
               </div>
 
@@ -277,9 +352,11 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
                 const borderColor = setStatus === 'improved' ? 'border-green-400 dark:border-green-600'
                   : setStatus === 'worse' ? 'border-red-400 dark:border-red-600'
                   : 'border-slate-200 dark:border-slate-700';
+                const setKey = `${exIdx}-${setIdx}`;
+                const isCompleted = completedSets[setKey];
 
                 return (
-                  <div key={setIdx} className="grid grid-cols-[2.5rem_1fr_1fr_2rem] gap-2 items-center mb-2">
+                  <div key={setIdx} className={`grid grid-cols-[2.5rem_1fr_1fr_2rem_2rem] gap-2 items-center mb-2 ${isCompleted ? 'opacity-60' : ''}`}>
                     <span className="text-sm text-center text-slate-400 font-semibold">{setIdx + 1}</span>
                     <input
                       type="number"
@@ -297,6 +374,23 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
                       placeholder="0"
                       className={`w-full px-2 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border ${borderColor} text-sm text-center focus:outline-none focus:ring-2 focus:ring-primary-400`}
                     />
+                    <button
+                      onClick={() => {
+                        const newCompleted = { ...completedSets, [setKey]: !isCompleted };
+                        setCompletedSets(newCompleted);
+                        // Auto-start rest timer when marking set as done
+                        if (!isCompleted && set.reps && set.weight) {
+                          ctx.startRestTimer(restDuration, exIdx, setIdx);
+                        }
+                      }}
+                      className={`flex items-center justify-center w-7 h-7 rounded-full border-2 transition-colors ${
+                        isCompleted
+                          ? 'bg-green-500 border-green-500 text-white'
+                          : 'border-slate-300 dark:border-slate-600 text-transparent hover:border-green-400'
+                      }`}
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
                     <button onClick={() => ctx.removeSet(exIdx, setIdx)} className="flex items-center justify-center text-slate-300 hover:text-red-400">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
