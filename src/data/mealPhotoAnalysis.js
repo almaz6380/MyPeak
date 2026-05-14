@@ -51,6 +51,9 @@ export async function analyzeMealPhoto(base64Image, language = 'de') {
       if (response.status === 413) {
         throw new Error('image_too_large');
       }
+      if (response.status === 429) {
+        throw new Error('rate_limit');
+      }
       if (response.status === 502) {
         throw new Error('ai_service_unavailable');
       }

@@ -93,67 +93,83 @@ Return ONLY valid JSON in this exact format, no other text:
   "meal_description_en": "Short description of the meal"
 }`;
 
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const geminiBody = JSON.stringify({
+    contents: [
       {
+        parts: [
+          {
+            inline_data: {
+              mime_type: 'image/jpeg',
+              data: base64Data,
+            },
+          },
+          {
+            text: prompt,
+          },
+        ],
+      },
+    ],
+    generationConfig: {
+      temperature: 0.1,
+      maxOutputTokens: 1024,
+      responseMimeType: 'application/json',
+    },
+  });
+
+  // Retry with exponential backoff for rate limits (429)
+  const MAX_RETRIES = 3;
+  let lastError = null;
+
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+      const response = await fetch(geminiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  inline_data: {
-                    mime_type: 'image/jpeg',
-                    data: base64Data,
-                  },
-                },
-                {
-                  text: prompt,
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.1,
-            maxOutputTokens: 1024,
-            responseMimeType: 'application/json',
-          },
-        }),
+        body: geminiBody,
+      });
+
+      // Rate limited — wait and retry
+      if (response.status === 429) {
+        const waitSeconds = Math.pow(2, attempt + 1); // 2s, 4s, 8s
+        console.log(`Rate limited (429), retrying in ${waitSeconds}s (attempt ${attempt + 1}/${MAX_RETRIES})`);
+        await new Promise((r) => setTimeout(r, waitSeconds * 1000));
+        continue;
       }
-    );
 
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('Gemini API error:', response.status, errorData);
-      return res.status(502).json({ error: 'AI service error' });
-    }
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Gemini API error:', response.status, errorData);
+        return res.status(502).json({ error: 'AI service error', detail: `Status ${response.status}` });
+      }
 
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    if (!text) {
-      return res.status(502).json({ error: 'Empty AI response' });
-    }
+      if (!text) {
+        return res.status(502).json({ error: 'Empty AI response' });
+      }
 
-    // Parse JSON from response
-    let parsed;
-    try {
-      const jsonStr = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
-      parsed = JSON.parse(jsonStr);
-    } catch {
-      console.error('Failed to parse AI response:', text);
-      return res.status(422).json({ error: 'Could not parse AI response' });
-    }
+      // Parse JSON from response
+      let parsed;
+      try {
+        const jsonStr = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+        parsed = JSON.parse(jsonStr);
+      } catch {
+        console.error('Failed to parse AI response:', text);
+        return res.status(422).json({ error: 'Could not parse AI response' });
+      }
 
-    if (parsed.error) {
       return res.status(200).json(parsed);
+    } catch (err) {
+      lastError = err;
+      console.error(`Attempt ${attempt + 1} failed:`, err.message);
+      if (attempt < MAX_RETRIES - 1) {
+        await new Promise((r) => setTimeout(r, Math.pow(2, attempt + 1) * 1000));
+      }
     }
-
-    return res.status(200).json(parsed);
-  } catch (err) {
-    console.error('Analyze meal error:', err);
-    return res.status(500).json({ error: 'Internal server error' });
   }
+
+  console.error('All retries failed:', lastError);
+  return res.status(429).json({ error: 'rate_limit', message: 'AI service is busy. Please wait a moment and try again.' });
 }
