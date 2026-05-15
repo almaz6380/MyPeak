@@ -105,7 +105,10 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Performance: Globales 8s Timeout auf Supabase-Client, AbortController-Timeouts auf Open Food Facts (8s), Gemini API (15s)
 - [x] Fix: BarcodeScanner gibt Kamera beim Schließen frei (CameraContext.releaseCamera), Timeouts auf API-Calls
 - [x] Fix: CommunityProducts mit try/catch abgesichert (kein Scan-Flow-Crash mehr)
-- [ ] **BUG: Mahlzeit-Foto KI** — Fehlermeldung beim Fotografieren einer Mahlzeit zur KI-Kalorien-Erkennung. Muss debuggt werden (API-Key, Endpoint, Bildformat prüfen).
+- [x] ~~BUG: Mahlzeit-Foto KI~~ — GEFIXT. Bildkompression, Timeout-Handling, Gemini 429 Rate-Limit Retry, bessere Fehlermeldungen.
+- [x] Fix: Auth guestSkip + localStorage-Merge bei Login
+- [x] Fix: Rest-Timer Position unter Notch + Set-Completion UX
+- [x] Fix: Training bugs (Rest-Timer, Set-Abhaken, Workout-History)
 
 ### Phase 3: Ernährungs-Tracking — FERTIG
 - [x] Lebensmittel-Suche (150 lokale Lebensmittel + Open Food Facts API)
