@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
@@ -67,6 +67,19 @@ export default function App() {
   );
 }
 
+function NotFound() {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 pt-40 px-6 text-center">
+      <p className="text-5xl font-bold text-primary-400">404</p>
+      <p className="text-slate-500 dark:text-slate-400">{t('common.pageNotFound')}</p>
+      <Link to="/" className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-2xl transition-colors">
+        {t('common.backHome')}
+      </Link>
+    </div>
+  );
+}
+
 function AppShell() {
   const { isGuestMode } = useAuth();
   const { t } = useTranslation();
@@ -90,6 +103,7 @@ function AppShell() {
             <Route path="/library" element={<LibraryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/cycle" element={<CycleDetailPage onBack={() => window.history.back()} />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
       </PullToRefresh>

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mail, Lock, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../lib/supabase';
+import { mapAuthError } from './authErrors';
 
 export default function LoginForm({ onSwitchToRegister, onSwitchToReset }) {
   const { t } = useTranslation();
@@ -9,18 +11,33 @@ export default function LoginForm({ onSwitchToRegister, onSwitchToReset }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [errorCode, setErrorCode] = useState(null);
+  const [resent, setResent] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
+    setErrorCode(null);
+    setResent(false);
     setLoading(true);
 
     const { error } = await signIn(email, password);
     if (error) {
-      setError(t('auth.loginError'));
+      const mapped = mapAuthError(error, t);
+      setError(mapped.text);
+      setErrorCode(mapped.code);
     }
     setLoading(false);
+  }
+
+  async function handleResendConfirmation() {
+    try {
+      await supabase.auth.resend({ type: 'signup', email });
+      setResent(true);
+    } catch {
+      setResent(true); // keine E-Mail-Enumeration: immer Erfolg anzeigen
+    }
   }
 
   return (
@@ -28,6 +45,19 @@ export default function LoginForm({ onSwitchToRegister, onSwitchToReset }) {
       {error && (
         <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm rounded-xl p-3 text-center">
           {error}
+          {errorCode === 'email_not_confirmed' && (
+            resent ? (
+              <p className="mt-2 text-green-600 dark:text-green-400 font-medium">{t('auth.confirmationResent')}</p>
+            ) : (
+              <button
+                type="button"
+                onClick={handleResendConfirmation}
+                className="block w-full mt-2 font-medium underline"
+              >
+                {t('auth.resendConfirmation')}
+              </button>
+            )
+          )}
         </div>
       )}
 

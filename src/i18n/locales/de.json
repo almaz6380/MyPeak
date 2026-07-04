@@ -312,6 +312,8 @@
     "welcome": "Willkommen",
     "save": "Speichern",
     "cancel": "Abbrechen",
+    "pageNotFound": "Diese Seite gibt es nicht.",
+    "backHome": "Zur Startseite",
     "delete": "Löschen",
     "edit": "Bearbeiten",
     "back": "Zurück",

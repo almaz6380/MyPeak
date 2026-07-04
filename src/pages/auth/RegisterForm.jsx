@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mail, Lock, Loader2, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { mapAuthError } from './authErrors';
 
 export default function RegisterForm({ onSwitchToLogin }) {
   const { t } = useTranslation();
@@ -31,15 +32,15 @@ export default function RegisterForm({ onSwitchToLogin }) {
       const { data, error } = await signUp(email, password);
       if (error) {
         console.error('Registration error:', error);
-        setError(`Fehler: ${error.message || JSON.stringify(error)}`);
+        setError(mapAuthError(error, t).text);
       } else if (data?.user?.identities?.length === 0) {
-        setError(t('common.back') === 'Zurück' ? 'Diese E-Mail ist bereits registriert.' : 'This email is already registered.');
+        setError(t('auth.emailAlreadyRegistered'));
       } else {
         setSuccess(true);
       }
     } catch (e) {
       console.error('Registration exception:', e);
-      setError(`Exception: ${e.message || e}`);
+      setError(mapAuthError(e, t).text);
     }
     setLoading(false);
   }

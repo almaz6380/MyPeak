@@ -312,6 +312,8 @@
     "welcome": "Welcome",
     "save": "Save",
     "cancel": "Cancel",
+    "pageNotFound": "This page does not exist.",
+    "backHome": "Back to home",
     "delete": "Delete",
     "edit": "Edit",
     "back": "Back",
