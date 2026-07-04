@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, Check, Dumbbell, User, Users, Loader2, Target, Scale, TrendingDown, Zap, Activity, Flame, Baby, Award, Crown } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
+import { toLocalDateString } from '../../lib/dateUtils';
 
 const TOTAL_STEPS = 8;
 
@@ -209,7 +210,7 @@ function NameBirthdateStep({ data, updateField }) {
             type="date"
             value={data.birthdate}
             onChange={(e) => updateField('birthdate', e.target.value)}
-            max={new Date(new Date().setFullYear(new Date().getFullYear() - 14)).toISOString().split('T')[0]}
+            max={toLocalDateString(new Date(new Date().setFullYear(new Date().getFullYear() - 14)))}
             min="1930-01-01"
             className="w-full px-4 py-4 bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 rounded-2xl text-lg font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />

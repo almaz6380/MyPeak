@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { isGuest } from '../context/AuthContext';
+import { todayLocal, toLocalDateString } from '../lib/dateUtils';
 
 // ── Friend Codes ─────────────────────────────────────────────
 
@@ -348,8 +349,8 @@ export async function updateStreak(userId) {
   if (isGuest(userId)) return null;
 
   const xp = await getXP(userId);
-  const today = new Date().toISOString().split('T')[0];
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+  const today = todayLocal();
+  const yesterday = toLocalDateString(new Date(Date.now() - 86400000));
 
   let newStreak = 1;
   if (xp.last_workout_date === yesterday) {
@@ -406,7 +407,7 @@ export async function getLeaderboardData(userId, friends) {
   // Get this week's workouts for all users
   const weekStart = new Date();
   weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-  const weekStartStr = weekStart.toISOString().split('T')[0];
+  const weekStartStr = toLocalDateString(weekStart);
 
   const { data: workouts } = await supabase
     .from('workouts')

@@ -1,5 +1,6 @@
 import { useRef, useMemo, useState, useCallback } from 'react';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { toLocalDateString } from '../lib/dateUtils';
 
 const DAY_LABELS_DE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 const DAY_LABELS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -19,7 +20,7 @@ const SLOTS = [
 ];
 
 function toDateStr(d) {
-  return d.toISOString().split('T')[0];
+  return toLocalDateString(d);
 }
 
 function addDays(dateStr, days) {

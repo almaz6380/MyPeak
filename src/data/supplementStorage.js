@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { isGuest } from '../context/AuthContext';
+import { parseLocalDate } from '../lib/dateUtils';
 
 function guestSkip(userId) { return isGuest(userId); }
 
@@ -20,7 +21,12 @@ export async function getSupplements(userId) {
         .is('deleted_at', null)
         .order('created_at', { ascending: true })
         .then(({ data, error }) => {
-          if (!error && data) localStorage.setItem(SUPPLEMENTS_KEY, JSON.stringify(data));
+          if (!error && data) {
+            // Noch nicht gesyncte lokale Supplements behalten
+            const currentLocal = JSON.parse(localStorage.getItem(SUPPLEMENTS_KEY) || '[]');
+            const localOnly = currentLocal.filter((s) => String(s.id).startsWith('local_'));
+            localStorage.setItem(SUPPLEMENTS_KEY, JSON.stringify([...data, ...localOnly]));
+          }
         })
         .catch(() => {});
     }
@@ -160,7 +166,12 @@ export async function getSupplementLogs(userId, date) {
         .eq('user_id', userId)
         .eq('date', date)
         .then(({ data, error }) => {
-          if (!error && data) localStorage.setItem(cacheKey, JSON.stringify(data));
+          if (!error && data) {
+            // Noch nicht gesyncte lokale Logs behalten
+            const currentLocal = JSON.parse(localStorage.getItem(cacheKey) || '[]');
+            const localOnly = currentLocal.filter((l) => String(l.id).startsWith('local_'));
+            localStorage.setItem(cacheKey, JSON.stringify([...data, ...localOnly]));
+          }
         })
         .catch(() => {});
     }
@@ -269,7 +280,7 @@ export async function unlogSupplementTaken(userId, supplementId, date, timeSlot)
 const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
 export function getTodayScheduledSupplements(supplements, date) {
-  const dayOfWeek = DAY_KEYS[new Date(date).getDay()];
+  const dayOfWeek = DAY_KEYS[parseLocalDate(date).getDay()];
   return supplements
     .filter((s) => {
       const schedule = s.schedule || {};

@@ -25,6 +25,7 @@ import WeeklyPlanBuilder from './training/WeeklyPlanBuilder';
 import MyPlans from './training/MyPlans';
 import PeakPrograms from './training/PeakPrograms';
 import PlanDetail from './training/PlanDetail';
+import { todayLocal, toLocalDateString } from '../lib/dateUtils';
 
 export default function TrainingPage() {
   const { t } = useTranslation();
@@ -43,7 +44,7 @@ export default function TrainingPage() {
   const [planDetailExercises, setPlanDetailExercises] = useState(null); // persisted exercise list for PlanDetail
 
   // Diamond Calendar state
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(todayLocal());
   const [scheduledDays, setScheduledDays] = useState(new Set());
   const [completedDays, setCompletedDays] = useState(new Set());
   const [showTrainingCalendar, setShowTrainingCalendar] = useState(false);
@@ -69,7 +70,7 @@ export default function TrainingPage() {
         d.setDate(d.getDate() + offset);
         const dayKey = DAY_KEYS[d.getDay()];
         if (schedule.days[dayKey]) {
-          scheduled.add(d.toISOString().split('T')[0]);
+          scheduled.add(toLocalDateString(d));
         }
       }
     }
@@ -1322,7 +1323,7 @@ function TrainingCalendarModal({ selectedDate, lang, onSelect, onClose }) {
     else setViewMonth(viewMonth + 1);
   }
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = todayLocal();
 
   return (
     <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-6" onClick={onClose}>
@@ -1370,7 +1371,7 @@ function TrainingCalendarModal({ selectedDate, lang, onSelect, onClose }) {
 
         <div className="flex gap-2 px-5 pb-5">
           <button
-            onClick={() => onSelect(new Date().toISOString().split('T')[0])}
+            onClick={() => onSelect(todayLocal())}
             className="flex-1 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-semibold"
           >
             {lang === 'de' ? 'Heute' : 'Today'}

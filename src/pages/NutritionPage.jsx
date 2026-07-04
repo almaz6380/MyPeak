@@ -13,6 +13,7 @@ import AddSupplement from './nutrition/AddSupplement';
 import { useAuth } from '../context/AuthContext';
 import { updateNutritionEntry } from '../data/nutritionStorage';
 import { useTranslation } from 'react-i18next';
+import { toLocalDateString } from '../lib/dateUtils';
 
 export default function NutritionPage() {
   const { user } = useAuth();
@@ -54,7 +55,7 @@ export default function NutritionPage() {
       protein: foodData.protein,
       carbs: foodData.carbs,
       fat: foodData.fat,
-    });
+    }, editingEntry.date);
     setEditingEntry(null);
     refresh();
   }
@@ -184,7 +185,7 @@ export default function NutritionPage() {
 }
 
 function formatDate(date) {
-  return date.toISOString().split('T')[0];
+  return toLocalDateString(date);
 }
 
 function calcPer100(value, servingSize) {

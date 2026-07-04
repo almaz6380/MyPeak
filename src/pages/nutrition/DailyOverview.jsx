@@ -5,6 +5,7 @@ import MacroRing from './MacroRing';
 import MyPeakLogo from '../../components/MyPeakLogo';
 import { useAuth } from '../../context/AuthContext';
 import { getNutritionEntries, getNutritionGoals, deleteNutritionEntry, saveNutritionGoals, getWaterTotal, addWater, removeWaterAmount } from '../../data/nutritionStorage';
+import { toLocalDateString } from '../../lib/dateUtils';
 
 const MEAL_SLOTS = ['breakfast', 'lunch', 'dinner', 'snack'];
 
@@ -702,7 +703,7 @@ function r1(val) {
 }
 
 function formatDate(date) {
-  return date.toISOString().split('T')[0];
+  return toLocalDateString(date);
 }
 
 function formatDisplayDate(dateStr, lang) {

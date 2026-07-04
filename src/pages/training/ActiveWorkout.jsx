@@ -11,6 +11,7 @@ import MiniSparkline from '../../components/progress/MiniSparkline';
 import ProgressRing from '../../components/progress/ProgressRing';
 import PostWorkoutSummary from '../../components/progress/PostWorkoutSummary';
 import useProgressComparison, { getExerciseTarget, setExerciseTarget } from '../../hooks/useProgressComparison';
+import { todayLocal } from '../../lib/dateUtils';
 
 export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
   const { t } = useTranslation();
@@ -93,7 +94,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
     const exactDuration = Date.now() - ctx.workout.startTime;
 
     const workout = {
-      date: new Date().toISOString().split('T')[0],
+      date: todayLocal(),
       duration: exactDuration,
       exercises: validExercises.map((ex) => ({
         exerciseId: ex.exerciseId,

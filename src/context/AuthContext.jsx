@@ -1,7 +1,18 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { loadSettings } from '../data/settingsStorage';
-import { migrateLocalDataToSupabase } from '../data/workoutStorage';
+import { syncLocalDataToCloud, registerOnlineSync } from '../data/resync';
+
+// Geräte-Einstellungen, die beim Abmelden erhalten bleiben —
+// alle anderen Keys sind Nutzerdaten und werden entfernt, damit der
+// nächste Login auf diesem Gerät keine fremden Daten sieht.
+const KEEP_ON_SIGNOUT = ['language', 'darkMode', 'splashSeen', 'weightUnit'];
+
+function clearLocalUserData() {
+  for (const key of Object.keys(localStorage)) {
+    if (!KEEP_ON_SIGNOUT.includes(key)) localStorage.removeItem(key);
+  }
+}
 
 const AuthContext = createContext();
 const GUEST_ID = 'guest';
@@ -69,7 +80,7 @@ export function AuthProvider({ children }) {
 
     // Background tasks
     loadSettings(userId).catch(() => {});
-    migrateLocalDataToSupabase(userId);
+    syncLocalDataToCloud(userId);
   }
 
   async function fetchProfileBlocking(userId) {
@@ -87,8 +98,13 @@ export function AuthProvider({ children }) {
     } catch {}
 
     loadSettings(userId).catch(() => {});
-    migrateLocalDataToSupabase(userId);
+    syncLocalDataToCloud(userId);
   }
+
+  useEffect(() => {
+    // Fehlgeschlagene Cloud-Writes erneut versuchen, sobald wieder online
+    registerOnlineSync();
+  }, []);
 
   useEffect(() => {
     // Guest mode already handled in useState initializers
@@ -166,7 +182,8 @@ export function AuthProvider({ children }) {
   }
 
   async function signOut() {
-    // Clear guest mode
+    // Clear guest mode — Gast-Daten BLEIBEN lokal erhalten, damit sie bei
+    // einer anschließenden Registrierung ins neue Konto übernommen werden
     if (isGuest(user?.id)) {
       localStorage.removeItem('guestMode');
       localStorage.removeItem('cachedUser');
@@ -179,8 +196,9 @@ export function AuthProvider({ children }) {
 
     const { error } = await supabase.auth.signOut();
     if (!error) {
-      localStorage.removeItem('cachedUser');
-      localStorage.removeItem('cachedProfile');
+      // Alle Nutzerdaten vom Gerät entfernen (nur Geräte-Einstellungen bleiben),
+      // damit der nächste Login keine Daten des vorherigen Kontos sieht
+      clearLocalUserData();
       setUser(null);
       setSession(null);
       setProfile(null);

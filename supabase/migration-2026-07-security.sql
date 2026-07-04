@@ -104,6 +104,10 @@ $$;
 REVOKE ALL ON FUNCTION public.apply_crowdsource_correction(text) FROM public, anon;
 GRANT EXECUTE ON FUNCTION public.apply_crowdsource_correction(text) TO authenticated;
 
+-- ── 6a. Fehlende Spalten (App schreibt sie bereits, Insert schlug still fehl) ──
+ALTER TABLE nutrition_goals ADD COLUMN IF NOT EXISTS water_ml integer DEFAULT 3000;
+ALTER TABLE nutrition_goals ADD COLUMN IF NOT EXISTS fiber numeric DEFAULT 30;
+
 -- ── 6. FK-Regeln, damit Konto-Löschung nie blockiert ──────────
 ALTER TABLE community_products
   DROP CONSTRAINT IF EXISTS community_products_created_by_fkey,
