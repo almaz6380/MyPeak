@@ -82,37 +82,11 @@ export async function savePersonalOverride(userId, barcode, nutrition) {
 }
 
 async function checkCrowdsource(barcode) {
-  const { data: overrides } = await supabase
-    .from('product_overrides')
-    .select('calories, protein, carbs, fat')
-    .eq('barcode', barcode);
-
-  if (!overrides || overrides.length < 3) return;
-
-  // Calculate average
-  const avg = {
-    calories: Math.round(overrides.reduce((s, o) => s + o.calories, 0) / overrides.length),
-    protein: Math.round(overrides.reduce((s, o) => s + o.protein, 0) / overrides.length * 10) / 10,
-    carbs: Math.round(overrides.reduce((s, o) => s + o.carbs, 0) / overrides.length * 10) / 10,
-    fat: Math.round(overrides.reduce((s, o) => s + o.fat, 0) / overrides.length * 10) / 10,
-  };
-
-  // Check if values are similar (within 15% of each other)
-  const allSimilar = overrides.every((o) => {
-    if (avg.calories === 0) return true;
-    return Math.abs(o.calories - avg.calories) / avg.calories < 0.15;
-  });
-
-  if (allSimilar) {
-    await supabase
-      .from('community_products')
-      .update({
-        calories: avg.calories,
-        protein: avg.protein,
-        carbs: avg.carbs,
-        fat: avg.fat,
-        confirmations: overrides.length,
-      })
-      .eq('barcode', barcode);
+  // Läuft serverseitig (SECURITY DEFINER RPC) — Clients können Community-Daten
+  // nicht mehr direkt überschreiben und fremde Overrides nicht mehr lesen.
+  try {
+    await supabase.rpc('apply_crowdsource_correction', { barcode_input: barcode });
+  } catch (err) {
+    console.error('Crowdsource check failed:', err);
   }
 }

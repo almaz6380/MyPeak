@@ -1,4 +1,5 @@
 import { compressImage } from './exercisePhotos';
+import { supabase } from '../lib/supabase';
 
 // Oil level adjustment multipliers (applied to fat content)
 const OIL_MULTIPLIERS = {
@@ -39,15 +40,25 @@ export async function analyzeMealPhoto(base64Image, language = 'de') {
   const timeout = setTimeout(() => controller.abort(), 25000);
 
   try {
+    // Login-Pflicht: Der Endpoint verlangt ein gültiges Supabase-Token
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    if (!token) {
+      throw new Error('auth_required');
+    }
+
     const response = await fetch('/api/analyze-meal', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ image: base64Image, language }),
       signal: controller.signal,
     });
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
+      if (response.status === 401) {
+        throw new Error('auth_required');
+      }
       if (response.status === 413) {
         throw new Error('image_too_large');
       }
