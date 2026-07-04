@@ -101,6 +101,8 @@ export default function PeptidesPage({ onBack }) {
           </div>
         </div>
 
+        <Disclaimer lang={lang} />
+
         {/* Summary */}
         <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
           {lang === 'de' ? p.summaryDE : p.summaryEN}

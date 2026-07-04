@@ -1,30 +1,47 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dumbbell, Apple, Pill, Droplets, Syringe, ChevronRight, Scale } from 'lucide-react';
+import { Syringe, ChevronRight, Scale, Loader2 } from 'lucide-react';
 import MyPeakLogo from '../components/MyPeakLogo';
-import PeptidesPage from './library/PeptidesPage';
-import DietsPage from './library/DietsPage';
+
+// Lazy: Die E-Book-Texte (Peptide ~480 KB, Diäten ~220 KB) werden erst
+// geladen, wenn die Sektion geöffnet wird — verkleinert das Start-Bundle massiv.
+const PeptidesPage = lazy(() => import('./library/PeptidesPage'));
+const DietsPage = lazy(() => import('./library/DietsPage'));
+
+function SectionLoader() {
+  return (
+    <div className="flex items-center justify-center pt-40">
+      <Loader2 className="w-6 h-6 text-primary-400 animate-spin" />
+    </div>
+  );
+}
 
 export default function LibraryPage() {
   const { t } = useTranslation();
   const [view, setView] = useState('home');
 
   if (view === 'peptides') {
-    return <PeptidesPage onBack={() => setView('home')} />;
+    return (
+      <Suspense fallback={<SectionLoader />}>
+        <PeptidesPage onBack={() => setView('home')} />
+      </Suspense>
+    );
   }
 
   if (view === 'diets') {
-    return <DietsPage onBack={() => setView('home')} />;
+    return (
+      <Suspense fallback={<SectionLoader />}>
+        <DietsPage onBack={() => setView('home')} />
+      </Suspense>
+    );
   }
 
+  // Unfertige Sektionen (training, nutrition, supplements, bloodwork) sind bis
+  // zum Fertigstellen ausgeblendet — halbleere "Bald"-Kacheln wirken unfertig.
   const sections = [
-    { id: 'training', icon: <Dumbbell className="w-6 h-6" />, label: t('library.training'), color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400', ready: false },
-    { id: 'nutrition', icon: <Apple className="w-6 h-6" />, label: t('library.nutrition'), color: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400', ready: false },
     { id: 'diets', icon: <Scale className="w-6 h-6" />, label: t('library.diets'), color: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400', ready: true },
-    { id: 'supplements', icon: <Pill className="w-6 h-6" />, label: t('library.supplements'), color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400', ready: false },
     { id: 'peptides', icon: <Syringe className="w-6 h-6" />, label: t('library.peptides'), color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400', ready: true },
-    { id: 'bloodwork', icon: <Droplets className="w-6 h-6" />, label: t('library.bloodwork'), color: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400', ready: false },
-  ];
+  ].filter((s) => s.ready);
 
   return (
     <div className="p-4 pt-16 pb-24">
