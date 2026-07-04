@@ -1,11 +1,10 @@
 // Rechtstexte für MyPeak (DE + EN).
-// WICHTIG: Alle [PLATZHALTER] vor dem Launch mit echten Daten ersetzen!
 
 export const OPERATOR = {
-  name: '[VOR- UND NACHNAME DES BETREIBERS]',
-  address: '[STRASSE UND HAUSNUMMER]',
-  city: '[PLZ UND ORT], Österreich',
-  email: '[KONTAKT-E-MAIL-ADRESSE]',
+  name: 'Josef Gallab (Einzelunternehmen)',
+  address: 'Oberhofenweg 21b',
+  city: '6380 St. Johann in Tirol, Österreich',
+  email: 'kontakt@wellbooked.at',
 };
 
 const operatorBlockDE = `${OPERATOR.name}\n${OPERATOR.address}\n${OPERATOR.city}\nE-Mail: ${OPERATOR.email}`;
@@ -24,6 +23,10 @@ export const legalDocs = {
         {
           heading: 'Unternehmensgegenstand',
           body: 'Betrieb der Fitness- und Ernährungs-Web-App „MyPeak" (my-peak.vercel.app).',
+        },
+        {
+          heading: 'Gewerbe- und berufsrechtliche Angaben',
+          body: 'Freies Gewerbe: „Dienstleistungen in der automatischen Datenverarbeitung und Informationstechnik"\nGISA-Zahl: 39801937\nMitglied der Wirtschaftskammer Tirol (Bezirksstelle Kitzbühel)\nAufsichtsbehörde/Gewerbebehörde: Bezirkshauptmannschaft Kitzbühel\nAnwendbare Rechtsvorschrift: Gewerbeordnung (GewO), abrufbar unter ris.bka.gv.at\nUmsatzsteuer: Kleinunternehmer gemäß § 6 Abs. 1 Z 27 UStG (keine UID-Nummer)',
         },
         {
           heading: 'Verbraucherstreitbeilegung',
@@ -46,6 +49,10 @@ export const legalDocs = {
         {
           heading: 'Business purpose',
           body: 'Operation of the fitness and nutrition web app "MyPeak" (my-peak.vercel.app).',
+        },
+        {
+          heading: 'Trade and professional information',
+          body: 'Unregulated trade: "Services in automatic data processing and information technology"\nGISA number: 39801937\nMember of the Tyrol Economic Chamber (Kitzbühel district office)\nSupervisory/trade authority: District Authority Kitzbühel\nApplicable law: Austrian Trade Act (GewO), available at ris.bka.gv.at\nVAT: small business pursuant to § 6 (1) 27 UStG (no VAT ID)',
         },
         {
           heading: 'Consumer dispute resolution',
