@@ -17,6 +17,7 @@ import CycleDetailPage from './pages/CycleDetailPage';
 import AuthPage from './pages/auth/AuthPage';
 import UpdatePasswordPage from './pages/auth/UpdatePasswordPage';
 import OnboardingPage from './pages/onboarding/OnboardingPage';
+import LegalPage from './pages/legal/LegalPage';
 
 export default function App() {
   const { user, profile, loading } = useAuth();
@@ -47,6 +48,9 @@ export default function App() {
   return (
     <Routes>
       <Route path="/auth/update-password" element={<UpdatePasswordPage />} />
+      <Route path="/legal/imprint" element={<LegalPage doc="imprint" />} />
+      <Route path="/legal/privacy" element={<LegalPage doc="privacy" />} />
+      <Route path="/legal/terms" element={<LegalPage doc="terms" />} />
       <Route
         path="*"
         element={

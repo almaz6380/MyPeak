@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import MyPeakLogo from '../../components/MyPeakLogo';
 import LoginForm from './LoginForm';
@@ -48,6 +49,15 @@ export default function AuthPage() {
         >
           {t('auth.guestMode')}
         </button>
+
+        {/* Legal links */}
+        <div className="flex items-center justify-center gap-2 mt-6 text-xs text-slate-400 dark:text-slate-500">
+          <Link to="/legal/imprint" className="hover:text-primary-400 transition-colors">{t('legal.imprint')}</Link>
+          <span>·</span>
+          <Link to="/legal/privacy" className="hover:text-primary-400 transition-colors">{t('legal.privacy')}</Link>
+          <span>·</span>
+          <Link to="/legal/terms" className="hover:text-primary-400 transition-colors">{t('legal.terms')}</Link>
+        </div>
       </div>
     </div>
   );

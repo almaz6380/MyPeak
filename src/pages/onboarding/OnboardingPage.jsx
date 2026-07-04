@@ -551,6 +551,14 @@ function TermsStep({ value, onChange }) {
           <p className="font-semibold text-slate-900 dark:text-white">{t('onboarding.privacyHeading')}</p>
           <p>{t('onboarding.privacyText1')}</p>
         </div>
+        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700 flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-slate-400 dark:text-slate-500">{t('legal.fullDocuments')}:</span>
+          <a href="/legal/terms" target="_blank" rel="noopener" className="text-primary-500 dark:text-primary-400 underline">{t('legal.terms')}</a>
+          <span className="text-slate-300 dark:text-slate-600">·</span>
+          <a href="/legal/privacy" target="_blank" rel="noopener" className="text-primary-500 dark:text-primary-400 underline">{t('legal.privacy')}</a>
+          <span className="text-slate-300 dark:text-slate-600">·</span>
+          <a href="/legal/imprint" target="_blank" rel="noopener" className="text-primary-500 dark:text-primary-400 underline">{t('legal.imprint')}</a>
+        </div>
       </div>
 
       <button

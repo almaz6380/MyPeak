@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { saveSetting } from '../data/settingsStorage';
 import MyPeakLogo from '../components/MyPeakLogo';
 import { supabase } from '../lib/supabase';
-import { Moon, Sun, Globe, Weight, LogOut, User, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy } from 'lucide-react';
+import { Moon, Sun, Globe, Weight, LogOut, User, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2 } from 'lucide-react';
 import { getOrCreateFriendCode, getXP, getLevelTitle, calculateLevel, hasGoldenFrame } from '../data/socialStorage';
 
 export default function ProfilePage() {
@@ -22,12 +23,16 @@ export default function ProfilePage() {
   const [copied, setCopied] = useState(false);
   const [xpData, setXpData] = useState({ total_xp: 0, level: 1, streak_days: 0 });
 
-  useState(() => {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+
+  useEffect(() => {
     if (user && !isGuestMode) {
       getOrCreateFriendCode(user.id, profile?.name).then((code) => code && setFriendCode(code));
       getXP(user.id).then(setXpData);
     }
-  }, [user]);
+  }, [user, isGuestMode, profile?.name]);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'de' ? 'en' : 'de';
@@ -45,6 +50,28 @@ export default function ProfilePage() {
 
   const handleSignOut = async () => {
     await signOut();
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('no session');
+      const res = await fetch('/api/delete-account', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('delete failed');
+      // Alle lokalen Daten entfernen, damit nichts vom Konto zurückbleibt
+      localStorage.clear();
+      await supabase.auth.signOut().catch(() => {});
+      window.location.href = '/';
+    } catch {
+      setDeleteError(t('auth.deleteAccountError'));
+      setDeleting(false);
+    }
   };
 
   const openEdit = (field, currentValue) => {
@@ -263,6 +290,16 @@ export default function ProfilePage() {
         />
       </div>
 
+      {/* Legal */}
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden mb-4">
+        <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 px-4 pt-4 pb-2">
+          {t('legal.title')}
+        </h2>
+        <LegalRow to="/legal/imprint" label={t('legal.imprint')} />
+        <LegalRow to="/legal/privacy" label={t('legal.privacy')} />
+        <LegalRow to="/legal/terms" label={t('legal.terms')} last />
+      </div>
+
       {/* Sign Out */}
       <button
         onClick={() => setShowSignOutConfirm(true)}
@@ -271,6 +308,48 @@ export default function ProfilePage() {
         <LogOut className="w-5 h-5" />
         {t('auth.signOut')}
       </button>
+
+      {/* Delete Account */}
+      {!isGuestMode && (
+        <button
+          onClick={() => setShowDeleteConfirm(true)}
+          className="w-full flex items-center justify-center gap-2 py-3.5 mt-3 text-red-500/70 hover:text-red-600 text-sm font-medium rounded-2xl border border-red-200 dark:border-red-900/40 transition-colors"
+        >
+          <Trash2 className="w-4 h-4" />
+          {t('auth.deleteAccount')}
+        </button>
+      )}
+
+      {/* Delete Account Confirmation */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <p className="text-center font-semibold mb-2">{t('auth.deleteAccount')}?</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-4">
+              {t('auth.deleteAccountWarning')}
+            </p>
+            {deleteError && (
+              <p className="text-sm text-red-500 text-center mb-3">{deleteError}</p>
+            )}
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowDeleteConfirm(false); setDeleteError(null); }}
+                disabled={deleting}
+                className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleting}
+                className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-60 text-white font-medium text-sm transition-colors flex items-center justify-center gap-2"
+              >
+                {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : t('auth.deleteAccountConfirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Sign Out Confirmation */}
       {showSignOutConfirm && (
@@ -309,6 +388,21 @@ export default function ProfilePage() {
         />
       )}
     </div>
+  );
+}
+
+function LegalRow({ to, label, last = false }) {
+  return (
+    <Link
+      to={to}
+      className={`w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${last ? '' : 'border-b border-slate-100 dark:border-slate-700'}`}
+    >
+      <div className="flex items-center gap-3 text-slate-700 dark:text-slate-200">
+        <FileText className="w-5 h-5 text-primary-500" />
+        <span className="text-sm font-medium">{label}</span>
+      </div>
+      <ChevronRight className="w-4 h-4 text-slate-400" />
+    </Link>
   );
 }
 
