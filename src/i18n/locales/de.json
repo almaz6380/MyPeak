@@ -856,6 +856,8 @@
     "emailAlreadyRegistered": "Diese E-Mail-Adresse ist bereits registriert. Bitte melde dich an.",
     "weakPassword": "Das Passwort ist zu schwach. Bitte wähle ein längeres Passwort.",
     "samePassword": "Das neue Passwort muss sich vom alten unterscheiden.",
+    "wrongPassword": "Falsches Passwort.",
+    "deleteAccountPasswordPrompt": "Zur Bestätigung Passwort eingeben",
     "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
     "networkError": "Verbindungsfehler. Bitte prüfe deine Internetverbindung.",
     "genericError": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",

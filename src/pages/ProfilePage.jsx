@@ -26,6 +26,7 @@ export default function ProfilePage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(null);
+  const [deletePassword, setDeletePassword] = useState('');
 
   useEffect(() => {
     if (user && !isGuestMode) {
@@ -55,6 +56,16 @@ export default function ProfilePage() {
   const handleDeleteAccount = async () => {
     setDeleting(true);
     setDeleteError(null);
+    // Passwort-Bestätigung: verhindert Löschung durch Dritte am entsperrten Gerät
+    const { error: pwError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: deletePassword,
+    });
+    if (pwError) {
+      setDeleteError(t('auth.wrongPassword'));
+      setDeleting(false);
+      return;
+    }
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
@@ -328,12 +339,20 @@ export default function ProfilePage() {
             <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-4">
               {t('auth.deleteAccountWarning')}
             </p>
+            <input
+              type="password"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+              placeholder={t('auth.deleteAccountPasswordPrompt')}
+              autoComplete="current-password"
+              className="w-full px-4 py-2.5 mb-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+            />
             {deleteError && (
               <p className="text-sm text-red-500 text-center mb-3">{deleteError}</p>
             )}
             <div className="flex gap-3">
               <button
-                onClick={() => { setShowDeleteConfirm(false); setDeleteError(null); }}
+                onClick={() => { setShowDeleteConfirm(false); setDeleteError(null); setDeletePassword(''); }}
                 disabled={deleting}
                 className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
@@ -341,7 +360,7 @@ export default function ProfilePage() {
               </button>
               <button
                 onClick={handleDeleteAccount}
-                disabled={deleting}
+                disabled={deleting || !deletePassword}
                 className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-60 text-white font-medium text-sm transition-colors flex items-center justify-center gap-2"
               >
                 {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : t('auth.deleteAccountConfirm')}
