@@ -28,3 +28,13 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
 }
+
+// Nach einem Deploy können lazy geladene Chunks mit altem Hash 404en —
+// einmaliges Neuladen holt das frische index.html (Schleifen-Schutz via sessionStorage)
+window.addEventListener('vite:preloadError', (event) => {
+  if (!sessionStorage.getItem('chunk-reload')) {
+    sessionStorage.setItem('chunk-reload', '1');
+    event.preventDefault();
+    window.location.reload();
+  }
+});

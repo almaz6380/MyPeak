@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mypeak-v2';
+const CACHE_NAME = 'mypeak-v3';
 const STATIC_ASSETS = ['/', '/manifest.json', '/mypeak-icon-v2.svg', '/mypeak-arrow-v2.svg'];
 
 self.addEventListener('install', (event) => {
@@ -26,7 +26,25 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // App assets: stale-while-revalidate (fast load + background update)
+  // Navigation (index.html): IMMER Netz zuerst. Ein gecachtes index.html
+  // verweist nach einem Deploy auf gelöschte Asset-Hashes → weiße Seite.
+  // Cache dient nur noch als Offline-Fallback.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          return response;
+        })
+        .catch(() =>
+          caches.match(event.request).then((cached) => cached || caches.match('/'))
+        )
+    );
+    return;
+  }
+
+  // Übrige Assets (gehashte Dateien sind unveränderlich): stale-while-revalidate
   event.respondWith(
     caches.open(CACHE_NAME).then(async (cache) => {
       const cached = await cache.match(event.request);
