@@ -57,12 +57,20 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
     onSaved();
   }
 
-  // Open PortionPicker for a recent food so user can choose grams
+  // Open PortionPicker for a recent food so user can choose grams.
+  // Recent entries store macros for the logged serving, but PortionPicker
+  // expects per-100g values — convert back before handing over.
   function selectRecent(food) {
+    const size = Number(food.serving_size) || 100;
+    const factor = 100 / size;
     setSelectedFood({
       ...food,
       nameDE: food.food_name,
       nameEN: food.food_name,
+      calories: Math.round((food.calories || 0) * factor),
+      protein: Math.round((food.protein || 0) * factor * 10) / 10,
+      carbs: Math.round((food.carbs || 0) * factor * 10) / 10,
+      fat: Math.round((food.fat || 0) * factor * 10) / 10,
       servingSize: food.serving_size,
       servingUnit: food.serving_unit || 'g',
     });
