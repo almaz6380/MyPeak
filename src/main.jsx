@@ -29,6 +29,20 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// Fehler-Monitoring: nur aktiv, wenn VITE_SENTRY_DSN gesetzt ist.
+// Dynamischer Import → Sentry landet in einem eigenen Chunk und wird ohne DSN nie geladen.
+if (import.meta.env.VITE_SENTRY_DSN) {
+  import('@sentry/react').then((Sentry) => {
+    Sentry.init({
+      dsn: import.meta.env.VITE_SENTRY_DSN,
+      environment: import.meta.env.MODE,
+      // Nur Fehler, kein Performance-Tracing/Replay — hält das freie Kontingent klein
+      tracesSampleRate: 0,
+      sendDefaultPii: false,
+    });
+  }).catch(() => {});
+}
+
 // Nach einem Deploy können lazy geladene Chunks mit altem Hash 404en —
 // einmaliges Neuladen holt das frische index.html (Schleifen-Schutz via sessionStorage)
 window.addEventListener('vite:preloadError', (event) => {
