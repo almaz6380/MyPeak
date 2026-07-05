@@ -17,6 +17,17 @@ function clearLocalUserData() {
 const AuthContext = createContext();
 const GUEST_ID = 'guest';
 
+// Schutz gegen Konto-Wechsel ohne sauberen Logout: Gehören die lokalen Daten
+// einem ANDEREN echten Konto, werden sie vor Übernahme der neuen Session
+// entfernt — sonst sieht das neue Konto den Cache des alten (und der
+// Cloud-Sync würde dessen local_-Einträge ins falsche Konto hochladen).
+// Gast-Daten bleiben absichtlich erhalten (gewollte Übernahme bei Registrierung).
+function ensureLocalDataOwner(userId) {
+  const owner = localStorage.getItem('localDataOwner');
+  if (owner && owner !== userId && owner !== GUEST_ID) clearLocalUserData();
+  localStorage.setItem('localDataOwner', userId);
+}
+
 const GUEST_PROFILE = {
   id: GUEST_ID,
   name: 'Gast',
@@ -120,6 +131,7 @@ export function AuthProvider({ children }) {
       setUser(supaUser);
 
       if (supaUser) {
+        ensureLocalDataOwner(supaUser.id);
         // Cache user for instant restore next time
         localStorage.setItem('cachedUser', JSON.stringify({ id: supaUser.id, email: supaUser.email }));
 
@@ -149,6 +161,7 @@ export function AuthProvider({ children }) {
         const supaUser = session?.user ?? null;
         setUser(supaUser);
         if (supaUser) {
+          ensureLocalDataOwner(supaUser.id);
           localStorage.setItem('cachedUser', JSON.stringify({ id: supaUser.id, email: supaUser.email }));
           fetchProfileBackground(supaUser.id);
         } else {
@@ -163,6 +176,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   function signInAsGuest() {
+    localStorage.setItem('localDataOwner', GUEST_ID);
     localStorage.setItem('guestMode', 'true');
     setUser({ id: GUEST_ID, email: 'guest@local' });
     setProfile(GUEST_PROFILE);
