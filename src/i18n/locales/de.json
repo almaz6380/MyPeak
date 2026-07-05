@@ -312,6 +312,9 @@
     "welcome": "Willkommen",
     "save": "Speichern",
     "cancel": "Abbrechen",
+    "pageNotFound": "Diese Seite gibt es nicht.",
+    "backHome": "Zur Startseite",
+    "search": "Suchen...",
     "delete": "Löschen",
     "edit": "Bearbeiten",
     "back": "Zurück",
@@ -845,7 +848,27 @@
     "welcomeTitle": "Willkommen bei MyPeak",
     "welcomeSubtitle": "Tracke dein Training. Erreiche deine Ziele.",
     "guestMode": "Als Gast testen",
-    "guestBanner": "Du bist im Gastmodus — registriere dich, um deine Daten dauerhaft zu speichern."
+    "guestBanner": "Du bist im Gastmodus — registriere dich, um deine Daten dauerhaft zu speichern.",
+    "emailNotConfirmed": "Deine E-Mail-Adresse ist noch nicht bestätigt. Bitte prüfe dein Postfach (auch den Spam-Ordner).",
+    "resendConfirmation": "Bestätigungs-E-Mail erneut senden",
+    "confirmationResent": "Bestätigungs-E-Mail wurde erneut gesendet.",
+    "tooManyRequests": "Zu viele Versuche. Bitte warte einen Moment und versuche es erneut.",
+    "emailAlreadyRegistered": "Diese E-Mail-Adresse ist bereits registriert. Bitte melde dich an.",
+    "weakPassword": "Das Passwort ist zu schwach. Bitte wähle ein längeres Passwort.",
+    "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
+    "networkError": "Verbindungsfehler. Bitte prüfe deine Internetverbindung.",
+    "genericError": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "deleteAccount": "Konto löschen",
+    "deleteAccountWarning": "Dein Konto und alle gespeicherten Daten (Trainings, Ernährung, Gewicht, Zyklus, Freunde) werden endgültig gelöscht. Das kann nicht rückgängig gemacht werden.",
+    "deleteAccountConfirm": "Endgültig löschen",
+    "deleteAccountError": "Löschen fehlgeschlagen. Bitte versuche es später erneut."
+  },
+  "legal": {
+    "title": "Rechtliches",
+    "imprint": "Impressum",
+    "privacy": "Datenschutzerklärung",
+    "terms": "Nutzungsbedingungen",
+    "fullDocuments": "Vollständige Dokumente"
   },
   "onboarding": {
     "step": "Schritt {{current}} von {{total}}",

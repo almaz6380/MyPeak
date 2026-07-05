@@ -1,3 +1,4 @@
+import { toLocalDateString } from '../lib/dateUtils';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Dumbbell, Apple, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -8,7 +9,7 @@ import {
   getCyclePhase, getPhaseRecommendations,
 } from '../data/cycleStorage';
 
-function formatDate(d) { return d.toISOString().split('T')[0]; }
+function formatDate(d) { return toLocalDateString(d); }
 
 const MOODS = [
   { key: 'great', emoji: '😁' },

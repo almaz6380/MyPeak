@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
+import { Loader2 } from 'lucide-react';
 import DailyOverview from './nutrition/DailyOverview';
 import AddFoodEntry from './nutrition/AddFoodEntry';
 import TDEECalculator from './nutrition/TDEECalculator';
 import CustomMealsList from './nutrition/CustomMealsList';
 import CustomMealBuilder from './nutrition/CustomMealBuilder';
 import PortionPicker from './nutrition/PortionPicker';
-import Cookbook from './nutrition/Cookbook';
+// Lazy: Rezeptdaten erst laden, wenn das Kochbuch geöffnet wird
+const Cookbook = lazy(() => import('./nutrition/Cookbook'));
 import RecipeDetail from './nutrition/RecipeDetail';
 import SupplementsOverview from './nutrition/SupplementsOverview';
 import SupplementsList from './nutrition/SupplementsList';
@@ -13,6 +15,7 @@ import AddSupplement from './nutrition/AddSupplement';
 import { useAuth } from '../context/AuthContext';
 import { updateNutritionEntry } from '../data/nutritionStorage';
 import { useTranslation } from 'react-i18next';
+import { toLocalDateString } from '../lib/dateUtils';
 
 export default function NutritionPage() {
   const { user } = useAuth();
@@ -54,7 +57,7 @@ export default function NutritionPage() {
       protein: foodData.protein,
       carbs: foodData.carbs,
       fat: foodData.fat,
-    });
+    }, editingEntry.date);
     setEditingEntry(null);
     refresh();
   }
@@ -122,10 +125,12 @@ export default function NutritionPage() {
 
   if (view === 'cookbook') {
     return (
-      <Cookbook
-        onBack={() => setView('home')}
-        onSelectRecipe={(recipe) => { setSelectedRecipe(recipe); setView('recipeDetail'); }}
-      />
+      <Suspense fallback={<div className="flex items-center justify-center pt-40"><Loader2 className="w-6 h-6 text-primary-400 animate-spin" /></div>}>
+        <Cookbook
+          onBack={() => setView('home')}
+          onSelectRecipe={(recipe) => { setSelectedRecipe(recipe); setView('recipeDetail'); }}
+        />
+      </Suspense>
     );
   }
 
@@ -184,7 +189,7 @@ export default function NutritionPage() {
 }
 
 function formatDate(date) {
-  return date.toISOString().split('T')[0];
+  return toLocalDateString(date);
 }
 
 function calcPer100(value, servingSize) {

@@ -10,9 +10,10 @@ import { getXP } from '../data/socialStorage';
 import { getSupplements, getSupplementLogs, getTodayScheduledSupplements, getSupplementProgress } from '../data/supplementStorage';
 import { getCycleSettings, getCyclePhase, getPhaseRecommendations } from '../data/cycleStorage';
 import { getWeightEntries, saveWeightEntry } from '../data/weightStorage';
+import { toLocalDateString } from '../lib/dateUtils';
 
 function formatDate(d) {
-  return d.toISOString().split('T')[0];
+  return toLocalDateString(d);
 }
 
 function getGreeting(t) {
@@ -583,7 +584,7 @@ function WeightChart({ entries, range = '3m', customFrom = '', customTo = '' }) 
       case '1y': cutoff.setFullYear(cutoff.getFullYear() - 1); break;
       default: cutoff.setFullYear(2000); break;
     }
-    fromStr = cutoff.toISOString().split('T')[0];
+    fromStr = toLocalDateString(cutoff);
     toStr = formatDate(now);
   }
 

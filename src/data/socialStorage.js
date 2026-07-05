@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { isGuest } from '../context/AuthContext';
+import { todayLocal, toLocalDateString } from '../lib/dateUtils';
 
 // ── Friend Codes ─────────────────────────────────────────────
 
@@ -82,10 +83,10 @@ export async function getFriendRequests(userId) {
 
   if (error || !data) return [];
 
-  // Fetch sender profiles separately
+  // Fetch sender names separately (friend_profiles view: nur id + name, RLS-sicher)
   const senderIds = data.map((r) => r.sender_id);
   const { data: profiles } = await supabase
-    .from('profiles')
+    .from('friend_profiles')
     .select('id, name')
     .in('id', senderIds);
 
@@ -118,7 +119,7 @@ export async function getFriends(userId) {
   // Get all friend user IDs
   const friendIds = data.map((f) => f.sender_id === userId ? f.receiver_id : f.sender_id);
   const { data: profiles } = await supabase
-    .from('profiles')
+    .from('friend_profiles')
     .select('id, name')
     .in('id', friendIds);
 
@@ -170,10 +171,10 @@ export async function getChallenges(userId) {
 
   if (error || !data || data.length === 0) return [];
 
-  // Fetch all involved user profiles
+  // Fetch all involved user names
   const userIds = [...new Set(data.flatMap((c) => [c.challenger_id, c.opponent_id]))];
   const { data: profiles } = await supabase
-    .from('profiles')
+    .from('friend_profiles')
     .select('id, name')
     .in('id', userIds);
 
@@ -348,8 +349,8 @@ export async function updateStreak(userId) {
   if (isGuest(userId)) return null;
 
   const xp = await getXP(userId);
-  const today = new Date().toISOString().split('T')[0];
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+  const today = todayLocal();
+  const yesterday = toLocalDateString(new Date(Date.now() - 86400000));
 
   let newStreak = 1;
   if (xp.last_workout_date === yesterday) {
@@ -406,7 +407,7 @@ export async function getLeaderboardData(userId, friends) {
   // Get this week's workouts for all users
   const weekStart = new Date();
   weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-  const weekStartStr = weekStart.toISOString().split('T')[0];
+  const weekStartStr = toLocalDateString(weekStart);
 
   const { data: workouts } = await supabase
     .from('workouts')

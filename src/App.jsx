@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
@@ -17,6 +17,7 @@ import CycleDetailPage from './pages/CycleDetailPage';
 import AuthPage from './pages/auth/AuthPage';
 import UpdatePasswordPage from './pages/auth/UpdatePasswordPage';
 import OnboardingPage from './pages/onboarding/OnboardingPage';
+import LegalPage from './pages/legal/LegalPage';
 
 export default function App() {
   const { user, profile, loading } = useAuth();
@@ -47,6 +48,9 @@ export default function App() {
   return (
     <Routes>
       <Route path="/auth/update-password" element={<UpdatePasswordPage />} />
+      <Route path="/legal/imprint" element={<LegalPage doc="imprint" />} />
+      <Route path="/legal/privacy" element={<LegalPage doc="privacy" />} />
+      <Route path="/legal/terms" element={<LegalPage doc="terms" />} />
       <Route
         path="*"
         element={
@@ -60,6 +64,19 @@ export default function App() {
         }
       />
     </Routes>
+  );
+}
+
+function NotFound() {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 pt-40 px-6 text-center">
+      <p className="text-5xl font-bold text-primary-400">404</p>
+      <p className="text-slate-500 dark:text-slate-400">{t('common.pageNotFound')}</p>
+      <Link to="/" className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-2xl transition-colors">
+        {t('common.backHome')}
+      </Link>
+    </div>
   );
 }
 
@@ -86,6 +103,7 @@ function AppShell() {
             <Route path="/library" element={<LibraryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/cycle" element={<CycleDetailPage onBack={() => window.history.back()} />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
       </PullToRefresh>

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, Check, Dumbbell, User, Users, Loader2, Target, Scale, TrendingDown, Zap, Activity, Flame, Baby, Award, Crown } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
+import { toLocalDateString } from '../../lib/dateUtils';
 
 const TOTAL_STEPS = 8;
 
@@ -209,7 +210,7 @@ function NameBirthdateStep({ data, updateField }) {
             type="date"
             value={data.birthdate}
             onChange={(e) => updateField('birthdate', e.target.value)}
-            max={new Date(new Date().setFullYear(new Date().getFullYear() - 14)).toISOString().split('T')[0]}
+            max={toLocalDateString(new Date(new Date().setFullYear(new Date().getFullYear() - 14)))}
             min="1930-01-01"
             className="w-full px-4 py-4 bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 rounded-2xl text-lg font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
@@ -550,6 +551,14 @@ function TermsStep({ value, onChange }) {
           <p>{t('onboarding.termsText1')}</p>
           <p className="font-semibold text-slate-900 dark:text-white">{t('onboarding.privacyHeading')}</p>
           <p>{t('onboarding.privacyText1')}</p>
+        </div>
+        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700 flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-slate-400 dark:text-slate-500">{t('legal.fullDocuments')}:</span>
+          <a href="/legal/terms" target="_blank" rel="noopener" className="text-primary-500 dark:text-primary-400 underline">{t('legal.terms')}</a>
+          <span className="text-slate-300 dark:text-slate-600">·</span>
+          <a href="/legal/privacy" target="_blank" rel="noopener" className="text-primary-500 dark:text-primary-400 underline">{t('legal.privacy')}</a>
+          <span className="text-slate-300 dark:text-slate-600">·</span>
+          <a href="/legal/imprint" target="_blank" rel="noopener" className="text-primary-500 dark:text-primary-400 underline">{t('legal.imprint')}</a>
         </div>
       </div>
 

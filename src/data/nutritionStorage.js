@@ -25,7 +25,12 @@ export async function getNutritionEntries(userId, date) {
         .eq('date', date)
         .order('created_at', { ascending: true })
         .then(({ data, error }) => {
-          if (!error && data) localStorage.setItem(cacheKey, JSON.stringify(data));
+          if (!error && data) {
+            // Noch nicht gesyncte lokale Einträge behalten (kein stiller Verlust)
+            const currentLocal = JSON.parse(localStorage.getItem(cacheKey) || '[]');
+            const localOnly = currentLocal.filter((e) => String(e.id).startsWith('local_'));
+            localStorage.setItem(cacheKey, JSON.stringify([...data, ...localOnly]));
+          }
         })
         .catch(() => {});
     }
@@ -85,7 +90,22 @@ export async function saveNutritionEntry(userId, entry) {
   return { data, error };
 }
 
-export async function updateNutritionEntry(userId, entryId, updates) {
+export async function updateNutritionEntry(userId, entryId, updates, date = null) {
+  // localStorage first — funktioniert auch für Gäste und noch nicht gesyncte Einträge
+  if (date) {
+    const cacheKey = ENTRIES_PREFIX + date;
+    const cached = JSON.parse(localStorage.getItem(cacheKey) || '[]');
+    const idx = cached.findIndex((e) => e.id === entryId);
+    if (idx >= 0) {
+      cached[idx] = { ...cached[idx], ...updates };
+      localStorage.setItem(cacheKey, JSON.stringify(cached));
+    }
+  }
+
+  if (guestSkip(userId) || String(entryId).startsWith('local_')) {
+    return { data: null, error: null };
+  }
+
   const { data, error } = await supabase
     .from('nutrition_entries')
     .update(updates)
@@ -136,7 +156,12 @@ export async function getCustomMeals(userId) {
         .is('deleted_at', null)
         .order('created_at', { ascending: false })
         .then(({ data, error }) => {
-          if (!error && data) localStorage.setItem(CUSTOM_MEALS_KEY, JSON.stringify(data));
+          if (!error && data) {
+            // Noch nicht gesyncte lokale Meals behalten
+            const currentLocal = JSON.parse(localStorage.getItem(CUSTOM_MEALS_KEY) || '[]');
+            const localOnly = currentLocal.filter((m) => String(m.id).startsWith('local_'));
+            localStorage.setItem(CUSTOM_MEALS_KEY, JSON.stringify([...localOnly, ...data]));
+          }
         })
         .catch(() => {});
     }
@@ -237,19 +262,30 @@ export async function logCustomMeal(userId, meal, date, mealSlot) {
     source_id: meal.id,
   }));
 
+  // localStorage first — funktioniert auch für Gäste und offline
+  const cacheKey = ENTRIES_PREFIX + date;
+  const localEntries = entries.map((e, i) => ({ ...e, id: `local_${Date.now()}_${i}` }));
+  const cached = JSON.parse(localStorage.getItem(cacheKey) || '[]');
+  cached.push(...localEntries);
+  localStorage.setItem(cacheKey, JSON.stringify(cached));
+
+  if (guestSkip(userId)) {
+    return { data: localEntries, error: null };
+  }
+
   const { data, error } = await supabase
     .from('nutrition_entries')
     .insert(entries)
     .select();
 
   if (!error && data) {
-    const cacheKey = ENTRIES_PREFIX + date;
-    const cached = JSON.parse(localStorage.getItem(cacheKey) || '[]');
-    cached.push(...data);
-    localStorage.setItem(cacheKey, JSON.stringify(cached));
+    // Lokale Platzhalter durch Cloud-Zeilen ersetzen
+    const localIds = new Set(localEntries.map((e) => e.id));
+    const current = JSON.parse(localStorage.getItem(cacheKey) || '[]');
+    localStorage.setItem(cacheKey, JSON.stringify([...current.filter((e) => !localIds.has(e.id)), ...data]));
   }
 
-  return { data, error };
+  return { data: data || localEntries, error };
 }
 
 // ── Nutrition Goals ──────────────────────────────────────────
@@ -259,8 +295,20 @@ export async function getNutritionGoals(userId) {
   const cached = localStorage.getItem(GOALS_KEY);
   if (cached) {
     const cachedGoals = JSON.parse(cached);
-    // If we have cached goals, return them immediately
-    // Supabase sync happens in background on save, not on load
+    // Hintergrund-Abgleich: neuere Cloud-Ziele (z.B. vom 2. Gerät) übernehmen
+    if (!guestSkip(userId)) {
+      supabase
+        .from('nutrition_goals')
+        .select('*')
+        .eq('user_id', userId)
+        .single()
+        .then(({ data }) => {
+          if (data?.updated_at && (!cachedGoals.updated_at || data.updated_at > cachedGoals.updated_at)) {
+            localStorage.setItem(GOALS_KEY, JSON.stringify(data));
+          }
+        })
+        .catch(() => {});
+    }
     return cachedGoals;
   }
 
@@ -283,7 +331,7 @@ export async function getNutritionGoals(userId) {
 
 export async function saveNutritionGoals(userId, goals) {
   // Save to localStorage FIRST — this is the source of truth
-  const toCache = { ...goals, user_id: userId };
+  const toCache = { ...goals, user_id: userId, updated_at: new Date().toISOString() };
   localStorage.setItem(GOALS_KEY, JSON.stringify(toCache));
 
   if (!guestSkip(userId)) {

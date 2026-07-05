@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Clock, Heart, Minus, Plus, Check, ChefHat, UtensilsCrossed } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { saveNutritionEntry } from '../../data/nutritionStorage';
+import { todayLocal } from '../../lib/dateUtils';
 
 const DIFFICULTY = {
   easy: { de: 'Einfach', en: 'Easy', color: 'text-green-500 bg-green-50 dark:bg-green-900/20' },
@@ -70,7 +71,7 @@ export default function RecipeDetail({ recipe, onBack, onSaved }) {
   }
 
   async function handleEaten(mealSlot) {
-    const today = new Date().toISOString().split('T')[0];
+    const today = todayLocal();
     await saveNutritionEntry(user.id, {
       date: today,
       meal_slot: mealSlot,

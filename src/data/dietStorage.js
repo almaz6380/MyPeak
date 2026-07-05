@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase';
 import { isGuest } from '../context/AuthContext';
 import { saveNutritionGoals, getNutritionGoals } from './nutritionStorage';
+import { todayLocal } from '../lib/dateUtils';
 
 function guestSkip(userId) { return isGuest(userId); }
 
@@ -36,7 +37,7 @@ export async function startDiet(userId, dietId, config = {}) {
   const entry = {
     user_id: userId,
     diet_id: dietId,
-    started_at: new Date().toISOString().split('T')[0],
+    started_at: todayLocal(),
     config,
     updated_at: new Date().toISOString(),
   };

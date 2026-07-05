@@ -16,6 +16,18 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### Launch-Fixes (Juli 2026, Branch launch-fixes) — FERTIG
+- [x] Rechtsseiten Impressum/Datenschutz/AGB (`/legal/*`, `src/pages/legal/`) — PLATZHALTER in legalContent.js (Name/Adresse) noch ausfüllen!
+- [x] Konto-Löschung (api/delete-account.js + Profil) — braucht `SUPABASE_SERVICE_ROLE_KEY` in Vercel
+- [x] RLS-Sicherheitsmigration `supabase/migration-2026-07-security.sql` — muss im Supabase SQL Editor ausgeführt werden!
+- [x] Gemini-Endpoint mit Login-Pflicht (Gäste bekommen Hinweis)
+- [x] Zeitzonen-Fix: lokales Datum überall (src/lib/dateUtils.js)
+- [x] Gast→Konto-Migration komplett neu (src/data/resync.js): alle Datentypen, keine Duplikate, Auto-Retry bei online
+- [x] Logout löscht Nutzerdaten-Keys (Gast-Daten bleiben für Registrierung)
+- [x] ErrorBoundary + 404-Route, verständliche Auth-Fehler + Resend-Bestätigung
+- [x] Inter selbst gehostet (@fontsource, DSGVO), Meta/OG-Tags, robots.txt, .env.example
+- [x] Code-Splitting: Peptide/Diäten/Kochbuch lazy → Hauptbundle 2.031→1.311 KB
+
 ### Phase 1: Fundament — FERTIG
 - [x] Projektstruktur aufgesetzt (React + Vite + Tailwind CSS)
 - [x] Bottom-Navigation (5 Tabs: Training, Ernährung, HOME-FAB, Bibliothek, Profil)

@@ -84,11 +84,13 @@ export async function saveWorkout(userId, workout) {
 
       if (error) console.error('Failed to save workout to Supabase:', error);
 
-      // Update localStorage with Supabase ID if available
+      // Update localStorage with Supabase ID if available (per ID suchen,
+      // nicht Index 0 — parallel gespeicherte Workouts vertauschen sonst IDs)
       if (data) {
         const c = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
-        if (c.length > 0 && c[0].id === localEntry.id) {
-          c[0] = { ...c[0], id: data.id };
+        const idx = c.findIndex((w) => w.id === localEntry.id);
+        if (idx >= 0) {
+          c[idx] = { ...c[idx], id: data.id };
           localStorage.setItem(WORKOUTS_KEY, JSON.stringify(c));
         }
       }
@@ -321,7 +323,10 @@ export async function getCustomPlans(userId) {
         .then(({ data, error }) => {
           if (!error && data) {
             const plans = data.map((row) => ({ id: row.id, name: row.name, days: row.days }));
-            localStorage.setItem('customPlans', JSON.stringify(plans));
+            // Noch nicht gesyncte lokale Pläne behalten
+            const currentLocal = JSON.parse(localStorage.getItem('customPlans') || '[]');
+            const localOnly = currentLocal.filter((p) => String(p.id).startsWith('local_'));
+            localStorage.setItem('customPlans', JSON.stringify([...localOnly, ...plans]));
           }
         })
         .catch(() => {});
@@ -427,55 +432,8 @@ export async function permanentDeleteCustomPlan(userId, planId) {
     .eq('user_id', userId);
 }
 
-// ── Migration: Upload localStorage data on first login ───
-
-export async function migrateLocalDataToSupabase(userId) {
-  // Skip if already migrated for this user
-  const migrationKey = `migrated_${userId}`;
-  if (localStorage.getItem(migrationKey) === 'true') return;
-
-  // Migrate workouts
-  const localWorkouts = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
-  if (localWorkouts.length > 0) {
-    const { data: existing } = await supabase
-      .from('workouts')
-      .select('id')
-      .eq('user_id', userId)
-      .limit(1);
-
-    if (!existing || existing.length === 0) {
-      const rows = localWorkouts.map((w) => ({
-        user_id: userId,
-        date: w.date,
-        duration: w.duration,
-        exercises: w.exercises,
-      }));
-      await supabase.from('workouts').insert(rows);
-    }
-  }
-
-  // Migrate custom plans
-  const localPlans = JSON.parse(localStorage.getItem('customPlans') || '[]');
-  if (localPlans.length > 0) {
-    const { data: existing } = await supabase
-      .from('custom_plans')
-      .select('id')
-      .eq('user_id', userId)
-      .limit(1);
-
-    if (!existing || existing.length === 0) {
-      const rows = localPlans.map((p) => ({
-        user_id: userId,
-        name: p.name,
-        days: p.days,
-      }));
-      await supabase.from('custom_plans').insert(rows);
-    }
-  }
-
-  // Mark migration as done for this user
-  localStorage.setItem(migrationKey, 'true');
-}
+// Migration Gast→Konto + Offline-Retry: siehe src/data/resync.js
+// (ersetzt die frühere migrateLocalDataToSupabase, die Duplikate erzeugte)
 
 // ── Exercise Notes ───────────────────────────────────────────
 
@@ -561,7 +519,12 @@ export async function getWeeklySchedules(userId) {
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .then(({ data, error }) => {
-          if (!error && data) localStorage.setItem(SCHEDULE_KEY, JSON.stringify(data));
+          if (!error && data) {
+            // Noch nicht gesyncte lokale Wochenpläne behalten
+            const currentLocal = JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]');
+            const localOnly = currentLocal.filter((s) => String(s.id).startsWith('local_'));
+            localStorage.setItem(SCHEDULE_KEY, JSON.stringify([...localOnly, ...data]));
+          }
         })
         .catch(() => {});
     }

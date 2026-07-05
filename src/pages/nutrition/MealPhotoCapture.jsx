@@ -139,9 +139,11 @@ export default function MealPhotoCapture({ onClose, onAddItems, language = 'de' 
                         ? (lang === 'de' ? 'Bild zu groß — bitte ein kleineres Foto verwenden.' : 'Image too large — please use a smaller photo.')
                         : error === 'rate_limit'
                           ? (lang === 'de' ? 'Zu viele Anfragen — bitte warte einen Moment und versuche es erneut.' : 'Too many requests — please wait a moment and try again.')
-                          : error === 'ai_service_unavailable'
-                            ? (lang === 'de' ? 'KI-Service nicht erreichbar — bitte später erneut versuchen.' : 'AI service unavailable — please try again later.')
-                            : t('nutrition.aiError')}
+                          : error === 'auth_required'
+                            ? (lang === 'de' ? 'Die Foto-Analyse ist nur mit Konto verfügbar — registriere dich kostenlos.' : 'Photo analysis requires an account — sign up for free.')
+                            : error === 'ai_service_unavailable'
+                              ? (lang === 'de' ? 'KI-Service nicht erreichbar — bitte später erneut versuchen.' : 'AI service unavailable — please try again later.')
+                              : t('nutrition.aiError')}
                 </p>
                 {error === 'no_food' && (
                   <p className="text-white/40 text-xs mt-1">{t('nutrition.noFoodDetectedDesc')}</p>

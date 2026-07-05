@@ -23,7 +23,9 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view their own profile"
   ON profiles FOR SELECT
-  USING (true);  -- Allow reading all profiles (name only exposed via select)
+  USING (id = auth.uid());
+-- Namen von Freunden/Anfragen: nur ueber die View friend_profiles
+-- (siehe migration-2026-07-security.sql)
 
 CREATE POLICY "Users can update their own profile"
   ON profiles FOR UPDATE
@@ -274,7 +276,9 @@ CREATE TABLE user_xp (
 
 ALTER TABLE user_xp ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Anyone can read XP" ON user_xp FOR SELECT USING (true);
+-- Lesbar nur fuer den User selbst + Freunde (is_friend: siehe migration-2026-07-security.sql)
+CREATE POLICY "Users and friends can read XP" ON user_xp FOR SELECT
+  USING (user_id = auth.uid() OR public.is_friend(user_id));
 CREATE POLICY "Users can manage their own XP" ON user_xp FOR ALL
   USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
 
@@ -296,7 +300,8 @@ CREATE TABLE community_products (
 ALTER TABLE community_products ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Anyone can read community products" ON community_products FOR SELECT USING (true);
 CREATE POLICY "Authenticated users can insert" ON community_products FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
-CREATE POLICY "Anyone can update confirmations" ON community_products FOR UPDATE USING (true);
+-- Updates nur ueber SECURITY-DEFINER-Funktionen (increment_confirmations,
+-- apply_crowdsource_correction) — siehe migration-2026-07-security.sql
 
 CREATE INDEX idx_community_products_barcode ON community_products(barcode);
 
@@ -316,7 +321,8 @@ CREATE TABLE product_overrides (
 ALTER TABLE product_overrides ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can manage their own overrides" ON product_overrides FOR ALL
   USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
-CREATE POLICY "Anyone can read overrides for crowdsource" ON product_overrides FOR SELECT USING (true);
+-- Crowdsource-Auswertung laeuft serverseitig (apply_crowdsource_correction),
+-- fremde Overrides sind NICHT lesbar — siehe migration-2026-07-security.sql
 
 CREATE INDEX idx_product_overrides_barcode ON product_overrides(barcode);
 

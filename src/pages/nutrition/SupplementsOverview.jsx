@@ -1,3 +1,4 @@
+import { toLocalDateString } from '../../lib/dateUtils';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Plus, Check, Pill, Settings, Sun, Moon, Dumbbell, Coffee, Sunset } from 'lucide-react';
@@ -22,7 +23,7 @@ const SLOT_ICONS = {
 };
 
 function formatDate(d) {
-  return d.toISOString().split('T')[0];
+  return toLocalDateString(d);
 }
 
 export default function SupplementsOverview({ onBack, onManage, onAdd }) {
