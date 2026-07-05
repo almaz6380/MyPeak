@@ -341,16 +341,19 @@ CREATE POLICY "Users can manage their own exercise notes" ON exercise_notes FOR 
   USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
 
 -- 17. Trigger: Automatisch Profile + Settings + Nutrition Goals + XP bei neuer Registrierung anlegen
+-- WICHTIG: SET search_path = public ist Pflicht — der Auth-Dienst ruft den
+-- Trigger mit search_path=auth auf und findet die Tabellen sonst nicht
+-- ("Database error saving new user" bei jeder Registrierung).
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO profiles (id) VALUES (NEW.id) ON CONFLICT DO NOTHING;
-  INSERT INTO user_settings (user_id) VALUES (NEW.id) ON CONFLICT DO NOTHING;
-  INSERT INTO nutrition_goals (user_id) VALUES (NEW.id) ON CONFLICT DO NOTHING;
-  INSERT INTO user_xp (user_id) VALUES (NEW.id) ON CONFLICT DO NOTHING;
+  INSERT INTO public.profiles (id) VALUES (NEW.id) ON CONFLICT DO NOTHING;
+  INSERT INTO public.user_settings (user_id) VALUES (NEW.id) ON CONFLICT DO NOTHING;
+  INSERT INTO public.nutrition_goals (user_id) VALUES (NEW.id) ON CONFLICT DO NOTHING;
+  INSERT INTO public.user_xp (user_id) VALUES (NEW.id) ON CONFLICT DO NOTHING;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
