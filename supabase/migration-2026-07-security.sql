@@ -75,32 +75,29 @@ REVOKE ALL ON FUNCTION public.increment_confirmations(text) FROM public, anon;
 GRANT EXECUTE ON FUNCTION public.increment_confirmations(text) TO authenticated;
 
 -- Crowdsource-Korrektur: läuft komplett serverseitig mit fester Logik
--- (3+ ähnliche Korrekturen → Durchschnitt übernehmen)
+-- (3+ ähnliche Korrekturen → Durchschnitt übernehmen; eine einzige Anweisung)
 CREATE OR REPLACE FUNCTION public.apply_crowdsource_correction(barcode_input text)
-RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
-DECLARE
-  cnt integer;
-  avg_cal numeric; avg_p numeric; avg_c numeric; avg_f numeric;
-  similar boolean;
-BEGIN
-  SELECT count(*), round(avg(calories)),
-         round(avg(protein)::numeric, 1), round(avg(carbs)::numeric, 1), round(avg(fat)::numeric, 1)
-    INTO cnt, avg_cal, avg_p, avg_c, avg_f
-    FROM product_overrides WHERE barcode = barcode_input;
-
-  IF cnt IS NULL OR cnt < 3 THEN RETURN; END IF;
-
-  SELECT bool_and(avg_cal = 0 OR abs(calories - avg_cal) / avg_cal < 0.15)
-    INTO similar
-    FROM product_overrides WHERE barcode = barcode_input;
-
-  IF similar THEN
-    UPDATE community_products
-      SET calories = avg_cal, protein = avg_p, carbs = avg_c, fat = avg_f, confirmations = cnt
-      WHERE barcode = barcode_input;
-  END IF;
-END;
-$$;
+RETURNS void LANGUAGE sql SECURITY DEFINER SET search_path = public AS $fn$
+  WITH stats AS (
+    SELECT count(*) AS cnt,
+           round(avg(calories)) AS avg_cal,
+           round(avg(protein)::numeric, 1) AS avg_p,
+           round(avg(carbs)::numeric, 1) AS avg_c,
+           round(avg(fat)::numeric, 1) AS avg_f
+    FROM product_overrides WHERE barcode = barcode_input
+  ),
+  sim AS (
+    SELECT bool_and(s.avg_cal = 0 OR abs(o.calories - s.avg_cal) / s.avg_cal < 0.15) AS ok
+    FROM product_overrides o, stats s
+    WHERE o.barcode = barcode_input
+  )
+  UPDATE community_products cp
+  SET calories = s.avg_cal, protein = s.avg_p, carbs = s.avg_c, fat = s.avg_f, confirmations = s.cnt
+  FROM stats s, sim si
+  WHERE cp.barcode = barcode_input
+    AND s.cnt >= 3
+    AND COALESCE(si.ok, false)
+$fn$;
 REVOKE ALL ON FUNCTION public.apply_crowdsource_correction(text) FROM public, anon;
 GRANT EXECUTE ON FUNCTION public.apply_crowdsource_correction(text) TO authenticated;
 
