@@ -66,7 +66,7 @@ export default function ActiveCardio({ activity, onFinish, onDiscard }) {
       </div>
 
       {/* Large timer */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-8 shadow-sm text-center mb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-8 shadow-soft border border-slate-100 dark:border-slate-800/60 text-center mb-4">
         <p className="text-6xl font-bold font-mono text-slate-900 dark:text-white mb-2">
           {formatTime(elapsed)}
         </p>
@@ -87,7 +87,7 @@ export default function ActiveCardio({ activity, onFinish, onDiscard }) {
       </div>
 
       {/* Distance input */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
         <label className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2 block">
           {t('training.distance')} ({t('training.distanceKm')})
         </label>
@@ -102,7 +102,7 @@ export default function ActiveCardio({ activity, onFinish, onDiscard }) {
       </div>
 
       {/* Pace */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-6">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-6">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-slate-500 dark:text-slate-400">{t('training.pace')}</span>
           <span className="text-lg font-bold font-mono">{pace()} {t('training.paceUnit')}</span>

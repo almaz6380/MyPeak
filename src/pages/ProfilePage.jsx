@@ -144,7 +144,7 @@ export default function ProfilePage() {
 
       {/* User header */}
       {profile?.name && (
-        <div className="flex items-center gap-4 mb-6 p-4 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm">
+        <div className="flex items-center gap-4 mb-6 p-4 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60">
           <div className="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center">
             <User className="w-6 h-6 text-primary-500 dark:text-primary-400" />
           </div>
@@ -162,7 +162,7 @@ export default function ProfilePage() {
         const golden = hasGoldenFrame(levelInfo.level);
         const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
         return (
-        <div className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm p-4 mb-4 ${golden ? 'ring-2 ring-primary-400 shadow-primary-400/20 shadow-lg' : ''}`}>
+        <div className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 p-4 mb-4 ${golden ? 'ring-2 ring-primary-400 shadow-primary-400/20 shadow-lg' : ''}`}>
           {/* Level + Title */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -205,7 +205,7 @@ export default function ProfilePage() {
 
       {/* Personal Data */}
       {profile && (
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden mb-4">
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden mb-4">
           <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 px-4 pt-4 pb-2">
             {t('profile.personalData')}
           </h2>
@@ -255,7 +255,7 @@ export default function ProfilePage() {
       )}
 
       {/* App Settings */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden mb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden mb-4">
         <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 px-4 pt-4 pb-2">
           {t('profile.settings')}
         </h2>
@@ -302,7 +302,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Legal */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden mb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden mb-4">
         <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 px-4 pt-4 pb-2">
           {t('legal.title')}
         </h2>
@@ -314,7 +314,7 @@ export default function ProfilePage() {
       {/* Sign Out */}
       <button
         onClick={() => setShowSignOutConfirm(true)}
-        className="w-full flex items-center justify-center gap-2 py-3.5 text-red-500 hover:text-red-600 font-medium rounded-2xl bg-white dark:bg-surface-dark-alt shadow-sm transition-colors"
+        className="w-full flex items-center justify-center gap-2 py-3.5 text-red-500 hover:text-red-600 font-medium rounded-2xl bg-white dark:bg-surface-dark-alt shadow-soft border border-slate-100 dark:border-slate-800/60 transition-colors"
       >
         <LogOut className="w-5 h-5" />
         {t('auth.signOut')}

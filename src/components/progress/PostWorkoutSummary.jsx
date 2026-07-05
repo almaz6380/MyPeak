@@ -102,7 +102,7 @@ export default function PostWorkoutSummary({ exercises, prs = {}, duration, user
       {/* Per-exercise results */}
       <div className="flex flex-col gap-3 mb-6">
         {results.map((r, i) => (
-          <div key={i} className="bg-white dark:bg-surface-dark-alt rounded-xl p-3 shadow-sm">
+          <div key={i} className="bg-white dark:bg-surface-dark-alt rounded-xl p-3 shadow-soft border border-slate-100 dark:border-slate-800/60">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 flex-1 min-w-0">
                 <span className="font-medium text-sm truncate">{t(r.nameKey)}</span>
@@ -153,7 +153,7 @@ export default function PostWorkoutSummary({ exercises, prs = {}, duration, user
 
       {/* Volume */}
       {currentVolume > 0 && (
-        <div className="bg-white dark:bg-surface-dark-alt rounded-xl p-3 shadow-sm mb-6 flex items-center gap-3">
+        <div className="bg-white dark:bg-surface-dark-alt rounded-xl p-3 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-6 flex items-center gap-3">
           <TrendingUp className="w-5 h-5 text-primary-500" />
           <div>
             <p className="text-sm font-medium">{t('training.totalVolumeChange')}</p>

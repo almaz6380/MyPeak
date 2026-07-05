@@ -107,7 +107,7 @@ export default function CycleDetailPage({ onBack }) {
 
       {/* Phase Display */}
       {phaseInfo && (
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-5 shadow-sm mb-4 text-center">
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-5 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4 text-center">
           <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full ${phaseInfo.bgClass}/20 mb-3`}>
             <div className={`w-2.5 h-2.5 rounded-full ${phaseInfo.bgClass}`} />
             <span className={`text-sm font-semibold ${phaseInfo.textClass}`}>
@@ -129,14 +129,14 @@ export default function CycleDetailPage({ onBack }) {
       {/* Recommendations */}
       {recs && (
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
+          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
             <div className="flex items-center gap-2 mb-2">
               <Dumbbell className="w-4 h-4 text-primary-500" />
               <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{t('cycle.trainingRec')}</span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{recs.training}</p>
           </div>
-          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
+          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
             <div className="flex items-center gap-2 mb-2">
               <Apple className="w-4 h-4 text-green-500" />
               <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{t('cycle.nutritionRec')}</span>
@@ -147,7 +147,7 @@ export default function CycleDetailPage({ onBack }) {
       )}
 
       {/* Symptom Diary */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
         <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">{t('cycle.diary')}</h2>
 
         {/* Mood */}

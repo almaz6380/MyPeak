@@ -460,7 +460,7 @@ function FoundProductScreen({ product, lang, onConfirm, onScanAgain, onClose, t 
             <p className="text-[10px] text-slate-500">Protein</p>
           </div>
           <div className="bg-slate-800 rounded-xl px-4 py-3 text-center">
-            <p className="text-lg font-bold text-amber-400">{product.carbs}g</p>
+            <p className="text-lg font-bold text-emerald-400">{product.carbs}g</p>
             <p className="text-[10px] text-slate-500">Carbs</p>
           </div>
           <div className="bg-slate-800 rounded-xl px-4 py-3 text-center">

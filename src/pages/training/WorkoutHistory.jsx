@@ -166,7 +166,7 @@ export default function WorkoutHistory({ onBack }) {
         {/* Exercise comparisons */}
         <div className="flex flex-col gap-3">
           {comparisons.map(({ exId, nameKey, oldBest, newBest, weightDiff, exUnit }) => (
-            <div key={exId} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
+            <div key={exId} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
               <h3 className="font-semibold mb-3">{t(nameKey)}</h3>
               <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-center">
                 {/* Old */}
@@ -220,7 +220,7 @@ export default function WorkoutHistory({ onBack }) {
         </div>
 
         {/* Volume comparison */}
-        <div className="mt-4 bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
+        <div className="mt-4 bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
           <h3 className="font-semibold mb-2">{t('training.totalVolume')}</h3>
           <div className="grid grid-cols-2 gap-3">
             <div className="text-center">
@@ -254,7 +254,7 @@ export default function WorkoutHistory({ onBack }) {
           <h1 className="text-2xl font-bold">{t(graphExercise.nameKey)}</h1>
         </div>
 
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
           <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">
             {t('training.exerciseGraph')} — {t('training.maxWeightLabel')} ({t(`training.${weightUnit}`)})
           </h2>
@@ -264,7 +264,7 @@ export default function WorkoutHistory({ onBack }) {
         {/* Weekly breakdown */}
         <div className="flex flex-col gap-2">
           {weeklyData.slice().reverse().map((w, i) => (
-            <div key={i} className="bg-white dark:bg-surface-dark-alt rounded-xl p-3 shadow-sm flex items-center justify-between">
+            <div key={i} className="bg-white dark:bg-surface-dark-alt rounded-xl p-3 shadow-soft border border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
               <span className="text-sm font-medium">{t('training.calendarWeek', { week: w.week.split('-W')[1] })}</span>
               <div className="flex items-center gap-3 text-sm">
                 <span className="font-semibold">{w.maxWeight} {t(`training.${weightUnit}`)}</span>
@@ -343,7 +343,7 @@ export default function WorkoutHistory({ onBack }) {
               <div
                 key={workout.id}
                 onClick={() => compareMode ? toggleCompareSelect(workout.id) : null}
-                className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm transition-all ${
+                className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${
                   compareMode ? 'cursor-pointer' : ''
                 } ${isSelected ? 'ring-2 ring-primary-400' : ''}`}
               >

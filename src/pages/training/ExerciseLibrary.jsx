@@ -120,7 +120,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
             const count = allExercises.filter((ex) => (ex.type || 'strength') === tt.key).length;
             return (
               <button key={tt.key} onClick={() => setTrainingType(tt.key)}
-                className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow text-left">
+                className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-left">
                 <div className="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center flex-shrink-0">
                   <Icon className="w-6 h-6 text-primary-400" />
                 </div>
@@ -202,7 +202,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
           const displayName = ex._customName || t(ex.nameKey);
           const isCustom = !!ex._isCustom;
           return (
-            <div key={ex.id} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-sm transition-all ${selected.includes(ex.id) ? 'ring-2 ring-primary-400' : ''}`}>
+            <div key={ex.id} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${selected.includes(ex.id) ? 'ring-2 ring-primary-400' : ''}`}>
               <div className="flex items-center justify-between" onClick={() => selectionMode ? toggleSelect(ex.id) : null}>
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div className="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center flex-shrink-0">

@@ -94,7 +94,7 @@ export default function TDEECalculator({ onBack, onSaved }) {
       </div>
 
       {/* Body Stats */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
         <div className="grid grid-cols-2 gap-3">
           {/* Gender */}
           <div>
@@ -155,7 +155,7 @@ export default function TDEECalculator({ onBack, onSaved }) {
       </div>
 
       {/* Activity Level */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
         <label className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-3 block">{t('nutrition.activityMultiplier')}</label>
         <div className="space-y-2">
           {activityOptions.map((opt) => (
@@ -183,7 +183,7 @@ export default function TDEECalculator({ onBack, onSaved }) {
       </div>
 
       {/* Goal */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
         <label className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-3 block">{t('nutrition.goalAdjustment')}</label>
         <div className="space-y-2">
           {goalOptions.map((opt) => (
@@ -214,7 +214,7 @@ export default function TDEECalculator({ onBack, onSaved }) {
       </div>
 
       {/* Results */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
         <div className="flex items-center gap-2 mb-4">
           <Calculator className="w-4 h-4 text-primary-500" />
           <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('nutrition.recommended')}</h3>
@@ -242,9 +242,9 @@ export default function TDEECalculator({ onBack, onSaved }) {
             <p className="text-[10px] text-blue-500 dark:text-blue-400">{t('nutrition.protein')}</p>
             <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{calculations.protein}g</p>
           </div>
-          <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 text-center">
-            <p className="text-[10px] text-amber-500 dark:text-amber-400">{t('nutrition.carbs')}</p>
-            <p className="text-lg font-bold text-amber-600 dark:text-amber-400">{calculations.carbs}g</p>
+          <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-3 text-center">
+            <p className="text-[10px] text-emerald-500 dark:text-emerald-400">{t('nutrition.carbs')}</p>
+            <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{calculations.carbs}g</p>
           </div>
           <div className="bg-rose-50 dark:bg-rose-900/20 rounded-xl p-3 text-center">
             <p className="text-[10px] text-rose-500 dark:text-rose-400">{t('nutrition.fat')}</p>

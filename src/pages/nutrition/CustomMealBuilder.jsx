@@ -113,7 +113,7 @@ export default function CustomMealBuilder({ onBack, onSaved, editMeal = null, la
       </div>
 
       {/* Items List */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm mb-4 overflow-hidden">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4 overflow-hidden">
         {items.length === 0 ? (
           <p className="text-center text-sm text-slate-400 dark:text-slate-500 py-6">
             {t('nutrition.noEntries')}
@@ -161,9 +161,9 @@ export default function CustomMealBuilder({ onBack, onSaved, editMeal = null, la
             <p className="text-sm font-bold text-blue-600 dark:text-blue-400">{Math.round(totals.protein)}g</p>
             <p className="text-[10px] text-blue-500 dark:text-blue-400">{t('nutrition.protein')}</p>
           </div>
-          <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-2.5 text-center">
-            <p className="text-sm font-bold text-amber-600 dark:text-amber-400">{Math.round(totals.carbs)}g</p>
-            <p className="text-[10px] text-amber-500 dark:text-amber-400">{t('nutrition.carbs')}</p>
+          <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-2.5 text-center">
+            <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{Math.round(totals.carbs)}g</p>
+            <p className="text-[10px] text-emerald-500 dark:text-emerald-400">{t('nutrition.carbs')}</p>
           </div>
           <div className="bg-rose-50 dark:bg-rose-900/20 rounded-xl p-2.5 text-center">
             <p className="text-sm font-bold text-rose-600 dark:text-rose-400">{Math.round(totals.fat)}g</p>

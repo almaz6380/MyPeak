@@ -73,7 +73,7 @@ export default function PlanDetail({ plan, dayIndex, exercises: externalExercise
       </div>
 
       {/* Exercise list */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden mb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden mb-4">
         {exerciseList.length === 0 ? (
           <p className="text-center text-sm text-slate-400 py-8">
             {lang === 'de' ? 'Keine Übungen' : 'No exercises'}

@@ -67,7 +67,7 @@ export default function FoodSearch({ onSelectFood, language = 'de' }) {
             <WifiOff className="w-3.5 h-3.5" />
             {t('nutrition.localResults')}
           </h3>
-          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">
             {localResults.slice(0, 10).map((food) => (
               <FoodResultItem
                 key={food.id}
@@ -87,7 +87,7 @@ export default function FoodSearch({ onSelectFood, language = 'de' }) {
             <Wifi className="w-3.5 h-3.5" />
             {t('nutrition.onlineResults')}
           </h3>
-          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">
             {onlineResults.slice(0, 15).map((food) => (
               <FoodResultItem
                 key={food.id}

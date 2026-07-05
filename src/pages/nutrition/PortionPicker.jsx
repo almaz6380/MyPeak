@@ -52,7 +52,7 @@ export default function PortionPicker({ food, onConfirm, onClose, initialServing
       {/* Content */}
       <div>
         {/* Per 100g reference */}
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
           <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">{t('nutrition.per100g')}</p>
           <div className="flex justify-between text-center">
             <div>
@@ -64,7 +64,7 @@ export default function PortionPicker({ food, onConfirm, onClose, initialServing
               <p className="text-[10px] text-slate-400">{t('nutrition.protein')}</p>
             </div>
             <div>
-              <p className="text-sm font-bold text-amber-600 dark:text-amber-400">{food.carbs}g</p>
+              <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{food.carbs}g</p>
               <p className="text-[10px] text-slate-400">{t('nutrition.carbs')}</p>
             </div>
             <div>
@@ -75,7 +75,7 @@ export default function PortionPicker({ food, onConfirm, onClose, initialServing
         </div>
 
         {/* Serving Size Picker */}
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
           <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-3">{t('nutrition.servingSize')}</p>
           <div className="flex items-center justify-center gap-5">
             <button
@@ -109,12 +109,12 @@ export default function PortionPicker({ food, onConfirm, onClose, initialServing
         </div>
 
         {/* Calculated Macros for selected serving */}
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
           <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-3">{t('nutrition.perServing')}</p>
           <div className="grid grid-cols-4 gap-2">
             <MacroCard label="kcal" value={macros.calories} color="bg-primary-50 dark:bg-primary-900/20 text-primary-500 dark:text-primary-400" />
             <MacroCard label={t('nutrition.protein')} value={`${macros.protein}g`} color="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400" />
-            <MacroCard label={t('nutrition.carbs')} value={`${macros.carbs}g`} color="bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400" />
+            <MacroCard label={t('nutrition.carbs')} value={`${macros.carbs}g`} color="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400" />
             <MacroCard label={t('nutrition.fat')} value={`${macros.fat}g`} color="bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400" />
           </div>
         </div>

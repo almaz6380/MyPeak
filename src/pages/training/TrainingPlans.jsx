@@ -242,7 +242,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onViewPlan, onStart
             </div>
             <div className="flex flex-col gap-3 mb-4">
               {newStrengthPlan.days.map((day, i) => (
-                <div key={i} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
+                <div key={i} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
                   <div className="flex items-center gap-2 mb-3">
                     <input type="text" value={day.name} onChange={(e) => updateDayName(i, e.target.value)} placeholder={t('plans.enterDayName')} className="flex-1 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
                     <button onClick={() => removeDay(i)} className="p-2 text-slate-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
@@ -267,7 +267,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onViewPlan, onStart
               <label className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">{selectedArea === 'hiit' ? t('plans.hiitPlanName') : t('plans.circuitName')}</label>
               <input type="text" value={newIntervalPlan.name} onChange={(e) => setNewIntervalPlan((p) => ({ ...p, name: e.target.value }))} placeholder={t('plans.enterPlanName')} className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
             </div>
-            <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+            <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
               <div className="flex flex-col gap-4">
                 <NumberStepper label={t('training.rounds')} value={newIntervalPlan.rounds} min={1} max={20} step={1} onChange={(v) => setNewIntervalPlan((p) => ({ ...p, rounds: v }))} />
                 <NumberStepper label={t('training.workTime')} value={newIntervalPlan.workTime} min={5} max={120} step={5} suffix="s" onChange={(v) => setNewIntervalPlan((p) => ({ ...p, workTime: v }))} />
@@ -291,7 +291,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onViewPlan, onStart
             </div>
             <div className="flex flex-col gap-3 mb-4">
               {newCardioPlan.sessions.map((session, i) => (
-                <div key={i} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
+                <div key={i} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
                   <div className="flex items-center gap-2 mb-3">
                     <input type="text" value={session.name} onChange={(e) => updateSession(i, 'name', e.target.value)} placeholder={t('plans.enterSessionName')} className="flex-1 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
                     <button onClick={() => removeSession(i)} className="p-2 text-slate-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
@@ -419,7 +419,7 @@ function PlanCard({ plan, type, t, onStart, onView, onDelete, isCustom }) {
   if (type === 'strength') {
     const days = Array.isArray(plan.days) ? plan.days : [];
     return (
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
         <div className="flex items-center justify-between mb-1">
           <h3 className="font-semibold text-lg">{isCustom ? plan.name : t(plan.nameKey)}</h3>
           <button onClick={onDelete} className="p-1.5 text-slate-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
@@ -445,7 +445,7 @@ function PlanCard({ plan, type, t, onStart, onView, onDelete, isCustom }) {
     const config = isCustom ? plan.days : plan;
     const exerciseIds = config.exercises || [];
     return (
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
         <div className="flex items-center justify-between mb-1">
           <h3 className="font-semibold text-lg">{isCustom ? plan.name : t(plan.nameKey)}</h3>
           <button onClick={onDelete} className="p-1.5 text-slate-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
@@ -476,7 +476,7 @@ function PlanCard({ plan, type, t, onStart, onView, onDelete, isCustom }) {
   if (type === 'cardio') {
     const sessions = isCustom ? (plan.days?.sessions || []) : (plan.sessions || []);
     return (
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
         <div className="flex items-center justify-between mb-1">
           <h3 className="font-semibold text-lg">{isCustom ? plan.name : t(plan.nameKey)}</h3>
           <button onClick={onDelete} className="p-1.5 text-slate-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
@@ -578,7 +578,7 @@ function ExercisePicker({ initialSelected, onBack, onConfirm, exerciseType = 'st
 
       <div className="flex flex-col gap-2">
         {filtered.map((ex) => (
-          <button key={ex.id} onClick={() => toggleSelect(ex.id)} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-sm transition-all ${selected.includes(ex.id) ? 'ring-2 ring-primary-400' : ''}`}>
+          <button key={ex.id} onClick={() => toggleSelect(ex.id)} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${selected.includes(ex.id) ? 'ring-2 ring-primary-400' : ''}`}>
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate">{t(ex.nameKey)}</p>

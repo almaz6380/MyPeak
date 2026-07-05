@@ -195,7 +195,7 @@ export default function HomePage() {
           {/* Calories + Macros Card */}
           <button
             onClick={() => navigate('/nutrition')}
-            className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm text-left hover:shadow-md transition-shadow"
+            className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
@@ -203,7 +203,7 @@ export default function HomePage() {
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('home.calories')}</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-lg font-bold text-primary-500">{Math.round(nutrition.calories)}</span>
+                <span className="text-lg font-bold text-primary-600 dark:text-primary-400">{Math.round(nutrition.calories)}</span>
                 <span className="text-sm text-slate-400">/ {goals.calories}</span>
                 <ChevronRight className="w-4 h-4 text-slate-300 ml-1" />
               </div>
@@ -218,9 +218,9 @@ export default function HomePage() {
 
             <div className="flex gap-2">
               <MacroPill label="P" value={Math.round(nutrition.protein)} goal={goals.protein} color="bg-blue-500" />
-              <MacroPill label="C" value={Math.round(nutrition.carbs)} goal={goals.carbs} color="bg-amber-500" />
+              <MacroPill label="C" value={Math.round(nutrition.carbs)} goal={goals.carbs} color="bg-emerald-500" />
               <MacroPill label="F" value={Math.round(nutrition.fat)} goal={goals.fat} color="bg-rose-500" />
-              <MacroPill label="B" value={Math.round(nutrition.fiber)} goal={goals.fiber || 30} color="bg-green-500" />
+              <MacroPill label="B" value={Math.round(nutrition.fiber)} goal={goals.fiber || 30} color="bg-violet-500" />
             </div>
           </button>
 
@@ -228,7 +228,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => navigate('/nutrition')}
-              className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm text-left hover:shadow-md transition-shadow"
+              className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
             >
               <div className="flex items-center gap-2 mb-2">
                 <Droplets className="w-4 h-4 text-cyan-500" />
@@ -244,7 +244,7 @@ export default function HomePage() {
 
             <button
               onClick={() => navigate('/nutrition')}
-              className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm text-left hover:shadow-md transition-shadow"
+              className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
             >
               <div className="flex items-center gap-2 mb-2">
                 <Pill className="w-4 h-4 text-purple-500" />
@@ -263,7 +263,7 @@ export default function HomePage() {
           {showCycle && cyclePhase && (
             <button
               onClick={() => navigate('/cycle')}
-              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm text-left hover:shadow-md transition-shadow"
+              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -288,7 +288,7 @@ export default function HomePage() {
           {showCycle && !cyclePhase && (
             <button
               onClick={() => navigate('/cycle')}
-              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm text-left hover:shadow-md transition-shadow border-2 border-dashed border-pink-300 dark:border-pink-700"
+              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft text-left hover:shadow-md transition-shadow border-2 border-dashed border-pink-300 dark:border-pink-700"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-pink-100 dark:bg-pink-900/20 flex items-center justify-center">
@@ -306,7 +306,7 @@ export default function HomePage() {
           {/* Training + Streak Card */}
           <button
             onClick={() => navigate('/training')}
-            className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm text-left hover:shadow-md transition-shadow"
+            className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -331,7 +331,7 @@ export default function HomePage() {
             </div>
           </button>
           {/* Weight Chart Card */}
-          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">
             <button
               onClick={() => { const next = !showWeightChart; setShowWeightChart(next); localStorage.setItem('weight_chart_collapsed', (!next).toString()); }}
               className="w-full p-4 flex items-center justify-between"
@@ -373,7 +373,7 @@ export default function HomePage() {
                     <button
                       onClick={handleAddWeight}
                       disabled={!weightInput || parseFloat(weightInput) < 20}
-                      className="px-4 py-2.5 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white text-sm font-semibold rounded-xl"
+                      className="px-4 py-2.5 bg-gradient-to-b from-primary-400 to-primary-500 hover:to-primary-600 disabled:opacity-50 text-white text-sm font-semibold rounded-xl shadow-md shadow-primary-500/25"
                     >
                       {t('nutrition.add')}
                     </button>
@@ -550,7 +550,7 @@ function CalendarModal({ selectedDate, onSelect, onClose, lang }) {
         <div className="flex gap-2 px-5 pb-5">
           <button
             onClick={() => { onSelect(todayStr); }}
-            className="flex-1 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-semibold"
+            className="flex-1 py-2.5 rounded-xl bg-gradient-to-b from-primary-400 to-primary-500 text-white text-sm font-semibold shadow-md shadow-primary-500/25"
           >
             {lang === 'de' ? 'Heute' : 'Today'}
           </button>

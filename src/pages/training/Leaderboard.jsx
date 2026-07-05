@@ -42,7 +42,7 @@ export default function Leaderboard({ onBack }) {
       </div>
 
       {/* Category Banner */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4 flex items-center gap-3">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4 flex items-center gap-3">
         <div className={`w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center ${info.color}`}>
           <CatIcon className="w-5 h-5" />
         </div>
@@ -66,7 +66,7 @@ export default function Leaderboard({ onBack }) {
               className={`flex items-center gap-3 p-3 rounded-2xl ${
                 entry.isMe
                   ? 'bg-primary-50 dark:bg-primary-900/20 ring-2 ring-primary-400'
-                  : 'bg-white dark:bg-surface-dark-alt shadow-sm'
+                  : 'bg-white dark:bg-surface-dark-alt shadow-soft border border-slate-100 dark:border-slate-800/60'
               }`}
             >
               {/* Rank */}

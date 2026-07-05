@@ -172,7 +172,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
           onClick={() => setActiveTab('search')}
           className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
             activeTab === 'search'
-              ? 'bg-white dark:bg-surface-dark-alt text-slate-900 dark:text-white shadow-sm'
+              ? 'bg-white dark:bg-surface-dark-alt text-slate-900 dark:text-white shadow-soft border border-slate-100 dark:border-slate-800/60'
               : 'text-slate-500 dark:text-slate-400'
           }`}
         >
@@ -182,7 +182,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
           onClick={() => setActiveTab('recent')}
           className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
             activeTab === 'recent'
-              ? 'bg-white dark:bg-surface-dark-alt text-slate-900 dark:text-white shadow-sm'
+              ? 'bg-white dark:bg-surface-dark-alt text-slate-900 dark:text-white shadow-soft border border-slate-100 dark:border-slate-800/60'
               : 'text-slate-500 dark:text-slate-400'
           }`}
         >
@@ -197,7 +197,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
           <div className="grid grid-cols-3 gap-2 mb-4">
             <button
               onClick={() => setShowScanner(true)}
-              className="flex flex-col items-center gap-1.5 px-2 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              className="flex flex-col items-center gap-1.5 px-2 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
             >
               <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                 <ScanBarcode className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400" />
@@ -206,7 +206,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
             </button>
             <button
               onClick={() => setShowMealPhoto(true)}
-              className="flex flex-col items-center gap-1.5 px-2 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              className="flex flex-col items-center gap-1.5 px-2 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
             >
               <div className="w-9 h-9 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
                 <Camera className="w-4.5 h-4.5 text-violet-600 dark:text-violet-400" />
@@ -215,7 +215,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
             </button>
             <button
               onClick={() => setShowManual(true)}
-              className="flex flex-col items-center gap-1.5 px-2 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              className="flex flex-col items-center gap-1.5 px-2 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
             >
               <div className="w-9 h-9 rounded-xl bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center">
                 <PenLine className="w-4.5 h-4.5 text-primary-500 dark:text-primary-400" />
@@ -234,7 +234,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {customMeals.map((meal) => (
                   <button key={meal.id} onClick={() => handleLogCustomMeal(meal)}
-                    className="flex-shrink-0 px-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt shadow-sm border border-slate-100 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-700 transition-colors">
+                    className="flex-shrink-0 px-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt shadow-soft border border-slate-100 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-700 transition-colors">
                     <p className="text-sm font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">{meal.name}</p>
                     <p className="text-xs text-slate-400 dark:text-slate-500">{Math.round(meal.total_calories)} kcal</p>
                   </button>
@@ -256,7 +256,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
               {lang === 'de' ? 'Noch keine Lebensmittel geloggt.' : 'No foods logged yet.'}
             </p>
           ) : (
-            <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">
               {recentFoods.map((food, i) => {
                 const inQueue = isInQueue(food.food_name);
                 return (

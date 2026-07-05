@@ -93,7 +93,7 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
               <button
                 key={program.id}
                 onClick={() => setSelectedProgram(program)}
-                className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm text-left hover:shadow-md transition-shadow"
+                className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${CAT_COLORS[program.category]}`}>
@@ -147,7 +147,7 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-5 shadow-sm text-left hover:shadow-md transition-shadow flex items-center gap-4"
+              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-5 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow flex items-center gap-4"
             >
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${CAT_COLORS[cat.id]}`}>
                 <CatIcon className="w-6 h-6" />

@@ -63,7 +63,7 @@ export default function SupplementsList({ onBack, onAdd, onEdit }) {
       {!loading && supplements.length > 0 && (
         <div className="space-y-2">
           {supplements.map((supp) => (
-            <div key={supp.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm flex items-center gap-3">
+            <div key={supp.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 flex items-center gap-3">
               <div className="text-2xl flex-shrink-0">{FORM_EMOJIS[supp.form] || '💊'}</div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{supp.name}</p>

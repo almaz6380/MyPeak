@@ -1,5 +1,5 @@
-export default function MacroRing({ value = 0, goal = 1, label, unit, color = 'text-primary-500', strokeColor = 'stroke-primary-500', size = 72 }) {
-  const radius = (size - 8) / 2;
+export default function MacroRing({ value = 0, goal = 1, label, unit, strokeColor = 'stroke-primary-500', size = 72 }) {
+  const radius = (size - 10) / 2;
   const circumference = 2 * Math.PI * radius;
   const progress = Math.min(value / (goal || 1), 1);
   const offset = circumference - progress * circumference;
@@ -15,15 +15,15 @@ export default function MacroRing({ value = 0, goal = 1, label, unit, color = 't
             r={radius}
             fill="none"
             stroke="currentColor"
-            strokeWidth={4}
-            className="text-slate-200 dark:text-slate-700"
+            strokeWidth={6}
+            className="text-slate-100 dark:text-slate-800"
           />
           <circle
             cx={size / 2}
             cy={size / 2}
             r={radius}
             fill="none"
-            strokeWidth={4}
+            strokeWidth={6}
             strokeLinecap="round"
             strokeDasharray={circumference}
             strokeDashoffset={offset}
@@ -31,7 +31,7 @@ export default function MacroRing({ value = 0, goal = 1, label, unit, color = 't
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className={`text-sm font-bold ${isOver ? 'text-red-500' : color}`}>
+          <span className={`text-sm font-bold ${isOver ? 'text-red-500' : 'text-slate-900 dark:text-white'}`}>
             {Math.round(value)}
           </span>
         </div>

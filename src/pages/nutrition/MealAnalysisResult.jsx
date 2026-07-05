@@ -84,11 +84,11 @@ export default function MealAnalysisResult({ result, photo, oilLevel, onOilChang
               <p className="text-[10px] text-slate-400">{t('nutrition.protein')}</p>
             </div>
             <div className="text-center">
-              <p className="text-xl font-bold text-orange-500">{Math.round(totals.carbs)}</p>
+              <p className="text-xl font-bold text-emerald-500">{Math.round(totals.carbs)}</p>
               <p className="text-[10px] text-slate-400">{t('nutrition.carbs')}</p>
             </div>
             <div className="text-center">
-              <p className="text-xl font-bold text-yellow-500">{Math.round(totals.fat)}</p>
+              <p className="text-xl font-bold text-rose-500">{Math.round(totals.fat)}</p>
               <p className="text-[10px] text-slate-400">{t('nutrition.fat')}</p>
             </div>
           </div>
@@ -104,7 +104,7 @@ export default function MealAnalysisResult({ result, photo, oilLevel, onOilChang
           </p>
           <div className="space-y-2">
             {adjustedItems.map((item, i) => (
-              <div key={i} className="bg-white dark:bg-surface-dark-alt rounded-xl p-3 shadow-sm">
+              <div key={i} className="bg-white dark:bg-surface-dark-alt rounded-xl p-3 shadow-soft border border-slate-100 dark:border-slate-800/60">
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
@@ -119,8 +119,8 @@ export default function MealAnalysisResult({ result, photo, oilLevel, onOilChang
                 <div className="flex gap-3">
                   <span className="text-xs text-slate-500">{Math.round(item.calories)} kcal</span>
                   <span className="inline-flex px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-900/20 text-[10px] font-semibold text-blue-500">P {Math.round(item.protein)}g</span>
-                  <span className="inline-flex px-1.5 py-0.5 rounded bg-orange-50 dark:bg-orange-900/20 text-[10px] font-semibold text-orange-500">C {Math.round(item.carbs)}g</span>
-                  <span className="inline-flex px-1.5 py-0.5 rounded bg-yellow-50 dark:bg-yellow-900/20 text-[10px] font-semibold text-yellow-500">F {Math.round(item.fat)}g</span>
+                  <span className="inline-flex px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-900/20 text-[10px] font-semibold text-emerald-500">C {Math.round(item.carbs)}g</span>
+                  <span className="inline-flex px-1.5 py-0.5 rounded bg-rose-50 dark:bg-rose-900/20 text-[10px] font-semibold text-rose-500">F {Math.round(item.fat)}g</span>
                 </div>
               </div>
             ))}

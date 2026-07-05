@@ -32,7 +32,7 @@ export default function LegalPage({ doc }) {
 
         <div className="space-y-5">
           {content.sections.map((section) => (
-            <div key={section.heading} className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm p-5">
+            <div key={section.heading} className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 p-5">
               <h2 className="font-semibold text-slate-900 dark:text-white mb-2">{section.heading}</h2>
               <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line leading-relaxed">
                 {section.body}

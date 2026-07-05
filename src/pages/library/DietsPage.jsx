@@ -272,7 +272,7 @@ export default function DietsPage({ onBack }) {
             <button
               key={diet.id}
               onClick={() => setSelectedDiet(diet)}
-              className={`w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm text-left hover:shadow-md transition-shadow ${
+              className={`w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow ${
                 isActive ? 'ring-2 ring-primary-400' : ''
               }`}
             >
@@ -308,7 +308,7 @@ export default function DietsPage({ onBack }) {
 function EbookSection({ title, content, colorClass, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className={`bg-white dark:bg-surface-dark-alt rounded-xl border-l-4 ${colorClass} shadow-sm overflow-hidden`}>
+    <div className={`bg-white dark:bg-surface-dark-alt rounded-xl border-l-4 ${colorClass} shadow-soft overflow-hidden`}>
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between px-4 py-3">
         <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 text-left">{title}</h3>
         {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}

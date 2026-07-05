@@ -55,7 +55,7 @@ export default function LibraryPage() {
           <button
             key={section.id}
             onClick={() => section.ready ? setView(section.id) : null}
-            className={`bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow text-left ${!section.ready ? 'opacity-50' : ''}`}
+            className={`bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-left ${!section.ready ? 'opacity-50' : ''}`}
           >
             <span className={`rounded-xl p-3 ${section.color}`}>{section.icon}</span>
             <span className="font-medium text-lg flex-1">{section.label}</span>

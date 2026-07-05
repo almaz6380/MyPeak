@@ -27,7 +27,7 @@ export default function AuthPage() {
           </p>
         </div>
 
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm p-6">
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 p-6">
           {view === 'login' && (
             <LoginForm
               onSwitchToRegister={() => setView('register')}

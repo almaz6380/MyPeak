@@ -133,17 +133,17 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
       <div className="flex items-center gap-2 mb-4">
         <button
           onClick={() => changeDate(-1)}
-          className="p-2 rounded-xl bg-white dark:bg-surface-dark-alt shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+          className="p-2 rounded-xl bg-white dark:bg-surface-dark-alt shadow-soft border border-slate-100 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
         >
           <ChevronLeft className="w-5 h-5 text-slate-500" />
         </button>
 
         <button
           onClick={() => setShowCalendar(true)}
-          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold text-center shadow-sm transition-colors ${
+          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold text-center transition-colors ${
             isToday
-              ? 'bg-primary-500 text-white'
-              : 'bg-white dark:bg-surface-dark-alt text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
+              ? 'bg-gradient-to-b from-primary-400 to-primary-500 text-white shadow-md shadow-primary-500/25'
+              : 'bg-white dark:bg-surface-dark-alt text-slate-700 dark:text-slate-200 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800'
           }`}
         >
           {formatDisplayDate(selectedDate, lang)}
@@ -151,7 +151,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
 
         <button
           onClick={() => changeDate(1)}
-          className="p-2 rounded-xl bg-white dark:bg-surface-dark-alt shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+          className="p-2 rounded-xl bg-white dark:bg-surface-dark-alt shadow-soft border border-slate-100 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
         >
           <ChevronRight className="w-5 h-5 text-slate-500" />
         </button>
@@ -159,7 +159,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
         {!isToday && (
           <button
             onClick={() => setSelectedDate(formatDate(new Date()))}
-            className="px-3 py-2.5 rounded-xl bg-primary-500 text-white text-xs font-semibold shadow-sm hover:bg-primary-600 transition-colors whitespace-nowrap"
+            className="px-3 py-2.5 rounded-xl bg-gradient-to-b from-primary-400 to-primary-500 text-white text-xs font-semibold shadow-md shadow-primary-500/25 hover:to-primary-600 transition-colors whitespace-nowrap"
           >
             {t('nutrition.today')}
           </button>
@@ -167,7 +167,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
       </div>
 
       {/* Macro Rings */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-5 shadow-sm mb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-5 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-xs font-medium text-slate-400 dark:text-slate-500">{t('nutrition.macros')}</h2>
           <button
@@ -180,16 +180,16 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
         </div>
 
         <div className="flex justify-between">
-          <MacroRing value={totals.calories} goal={goals.calories} label="kcal" color="text-primary-500" strokeColor="stroke-primary-500" size={76} />
-          <MacroRing value={totals.protein} goal={goals.protein} label={t('nutrition.protein')} unit="g" color="text-blue-500" strokeColor="stroke-blue-500" size={76} />
-          <MacroRing value={totals.carbs} goal={goals.carbs} label={t('nutrition.carbs')} unit="g" color="text-amber-500" strokeColor="stroke-amber-500" size={76} />
-          <MacroRing value={totals.fat} goal={goals.fat} label={t('nutrition.fat')} unit="g" color="text-rose-500" strokeColor="stroke-rose-500" size={76} />
+          <MacroRing value={totals.calories} goal={goals.calories} label="kcal" strokeColor="stroke-primary-500" size={76} />
+          <MacroRing value={totals.protein} goal={goals.protein} label={t('nutrition.protein')} unit="g" strokeColor="stroke-blue-500" size={76} />
+          <MacroRing value={totals.carbs} goal={goals.carbs} label={t('nutrition.carbs')} unit="g" strokeColor="stroke-emerald-500" size={76} />
+          <MacroRing value={totals.fat} goal={goals.fat} label={t('nutrition.fat')} unit="g" strokeColor="stroke-rose-400" size={76} />
         </div>
 
         <div className="mt-3 text-center">
           {totals.calories <= goals.calories ? (
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              <span className="font-semibold text-primary-500 dark:text-primary-400">{Math.round(goals.calories - totals.calories)}</span>{' '}
+              <span className="font-semibold text-primary-600 dark:text-primary-400">{Math.round(goals.calories - totals.calories)}</span>{' '}
               kcal {t('nutrition.remaining')}
             </p>
           ) : (
@@ -206,7 +206,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
         const slotCalories = slotEntries.reduce((sum, e) => sum + (e.calories || 0), 0);
 
         return (
-          <div key={slot} className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm mb-3 overflow-hidden">
+          <div key={slot} className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 mb-3 overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700">
               <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t(`nutrition.${slot}`)}</h3>
               {slotEntries.length > 0 && (
@@ -236,7 +236,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
                     <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-900/20 text-[10px] font-semibold text-blue-600 dark:text-blue-400">
                       P {r1(entry.protein)}
                     </span>
-                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-amber-50 dark:bg-amber-900/20 text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-900/20 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                       C {r1(entry.carbs)}
                     </span>
                     <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-rose-50 dark:bg-rose-900/20 text-[10px] font-semibold text-rose-600 dark:text-rose-400">
@@ -265,7 +265,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
       })}
 
       {/* Water Tracker */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Droplets className="w-5 h-5 text-cyan-500" />
@@ -316,7 +316,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
       {/* Supplements Card */}
       <button
         onClick={onOpenSupplements}
-        className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4 flex items-center gap-3 text-left hover:shadow-md transition-shadow"
+        className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4 flex items-center gap-3 text-left hover:shadow-md transition-shadow"
       >
         <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
           <span className="text-lg">💊</span>
@@ -632,8 +632,8 @@ function GoalEditorModal({ goals, onSave, onClose, t }) {
             </div>
 
             <div className="flex items-end gap-2">
-              <div className="flex-1"><GoalField label={`${t('nutrition.carbs')} (g)`} value={carbs} onChange={handleCarbsChange} color="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 focus:ring-amber-500" /></div>
-              <button onClick={() => autoCalcMacro('carbs')} className={`mb-0.5 px-2 py-2.5 rounded-lg text-[10px] font-medium ${autoCalc === 'carbs' ? 'bg-amber-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>Auto</button>
+              <div className="flex-1"><GoalField label={`${t('nutrition.carbs')} (g)`} value={carbs} onChange={handleCarbsChange} color="bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 focus:ring-emerald-500" /></div>
+              <button onClick={() => autoCalcMacro('carbs')} className={`mb-0.5 px-2 py-2.5 rounded-lg text-[10px] font-medium ${autoCalc === 'carbs' ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>Auto</button>
             </div>
 
             <div className="flex items-end gap-2">
@@ -671,7 +671,7 @@ function GoalEditorModal({ goals, onSave, onClose, t }) {
         </div>
 
         <div className="px-6 pt-4 pb-6 shrink-0">
-          <button onClick={handleSave} className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
+          <button onClick={handleSave} className="w-full py-3 bg-gradient-to-b from-primary-400 to-primary-500 hover:to-primary-600 text-white rounded-xl font-semibold shadow-md shadow-primary-500/25 transition-colors flex items-center justify-center gap-2">
             <Check className="w-4 h-4" />
             {t('common.save')}
           </button>

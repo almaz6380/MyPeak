@@ -51,7 +51,7 @@ export default function UpdatePasswordPage() {
           </h1>
         </div>
 
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm p-6">
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 p-6">
           {success ? (
             <div className="text-center space-y-4 py-4">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />

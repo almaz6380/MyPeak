@@ -115,7 +115,7 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
             <button
               key={recipe.id}
               onClick={() => onSelectRecipe(recipe)}
-              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow text-left"
+              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-left"
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1 min-w-0">

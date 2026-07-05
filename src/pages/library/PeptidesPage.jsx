@@ -206,7 +206,7 @@ export default function PeptidesPage({ onBack }) {
             <button
               key={peptide.id}
               onClick={() => setSelectedPeptide(peptide)}
-              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow text-left"
+              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-left"
             >
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${cat?.color}`}>
                 <CatIcon className="w-5 h-5" />
@@ -244,7 +244,7 @@ function QuickCard({ title, text, color }) {
 function EbookSection({ title, content, colorClass, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden border-l-4 ${colorClass}`}>
+    <div className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft overflow-hidden border-l-4 ${colorClass}`}>
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-4 text-left">
         <h3 className="font-semibold text-sm">{title}</h3>
         {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}

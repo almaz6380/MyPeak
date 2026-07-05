@@ -62,7 +62,7 @@ export default function ChallengesList({ onBack, onCreateChallenge, onViewChalle
             <div className="mb-4">
               <h2 className="text-xs font-medium text-slate-400 mb-2">{lang === 'de' ? 'Eingehende Challenges' : 'Incoming Challenges'}</h2>
               {pending.map((c) => (
-                <div key={c.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-2">
+                <div key={c.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-2">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <Swords className="w-4 h-4 text-primary-400" />
@@ -98,7 +98,7 @@ export default function ChallengesList({ onBack, onCreateChallenge, onViewChalle
                 const daysLeft = Math.max(0, Math.ceil((new Date(c.end_date) - new Date()) / 86400000));
 
                 return (
-                  <button key={c.id} onClick={() => onViewChallenge && onViewChallenge(c)} className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-2 text-left">
+                  <button key={c.id} onClick={() => onViewChallenge && onViewChallenge(c)} className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-2 text-left">
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-sm font-semibold">{lang === 'de' ? 'vs.' : 'vs.'} {opponent?.name || 'User'}</p>
                       <div className="flex items-center gap-1 text-xs text-slate-400">
@@ -132,7 +132,7 @@ export default function ChallengesList({ onBack, onCreateChallenge, onViewChalle
                 const opponent = c.challenger_id === user.id ? c.opponent : c.challenger;
 
                 return (
-                  <div key={c.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-3 shadow-sm mb-2 flex items-center gap-3">
+                  <div key={c.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-3 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-2 flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${won ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-slate-100 dark:bg-slate-800'}`}>
                       {won ? <Trophy className="w-4 h-4 text-amber-500" /> : <X className="w-4 h-4 text-slate-400" />}
                     </div>

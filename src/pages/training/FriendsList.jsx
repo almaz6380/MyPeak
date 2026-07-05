@@ -88,7 +88,7 @@ export default function FriendsList({ onBack, onAddFriend }) {
 
       {/* Add Friend */}
       {showAdd && (
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
           <p className="text-sm font-medium mb-2">{lang === 'de' ? 'MyPeak-Code eingeben' : 'Enter MyPeak Code'}</p>
           <div className="flex gap-2">
             <input
@@ -112,7 +112,7 @@ export default function FriendsList({ onBack, onAddFriend }) {
       {requests.length > 0 && (
         <div className="mb-4">
           <h2 className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">{lang === 'de' ? 'Anfragen' : 'Requests'} ({requests.length})</h2>
-          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">
             {requests.map((req) => (
               <div key={req.id} className="flex items-center justify-between px-4 py-3 border-b border-slate-50 dark:border-slate-700/50 last:border-0">
                 <div className="flex items-center gap-3">
@@ -140,7 +140,7 @@ export default function FriendsList({ onBack, onAddFriend }) {
           {lang === 'de' ? 'Noch keine Freunde. Teile deinen MyPeak-Code!' : 'No friends yet. Share your MyPeak code!'}
         </p>
       ) : (
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">
           {friends.map((friend) => (
             <div key={friend.id} className="flex items-center justify-between px-4 py-3 border-b border-slate-50 dark:border-slate-700/50 last:border-0">
               <div className="flex items-center gap-3">

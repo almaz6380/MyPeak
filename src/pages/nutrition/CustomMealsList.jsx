@@ -56,7 +56,7 @@ export default function CustomMealsList({ onBack, onCreateMeal, onEditMeal }) {
       ) : (
         <div className="space-y-3">
           {meals.map((meal) => (
-            <div key={meal.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden">
+            <div key={meal.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">
               {/* Meal Header */}
               <button
                 onClick={() => setExpandedId(expandedId === meal.id ? null : meal.id)}

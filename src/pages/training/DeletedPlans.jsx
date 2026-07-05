@@ -75,7 +75,7 @@ export default function DeletedPlans({ onBack }) {
         <div className="flex flex-col gap-4">
           {/* Deleted custom plans */}
           {deletedCustom.map((plan) => (
-            <div key={plan.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm opacity-70">
+            <div key={plan.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 opacity-70">
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-lg truncate">{plan.name}</h3>
@@ -107,7 +107,7 @@ export default function DeletedPlans({ onBack }) {
 
           {/* Hidden default plans */}
           {hiddenDefaults.map((plan) => (
-            <div key={plan.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm opacity-70">
+            <div key={plan.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 opacity-70">
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-lg truncate">{t(plan.nameKey)}</h3>

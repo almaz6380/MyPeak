@@ -260,7 +260,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
           const increment = exerciseUnit === 'kg' ? '2.5kg' : '5lbs';
 
           return (
-            <div key={`${ex.exerciseId}-${exIdx}`} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
+            <div key={`${ex.exerciseId}-${exIdx}`} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <ProgressRing status={comparison.status} size={24}>

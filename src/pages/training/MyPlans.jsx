@@ -58,7 +58,7 @@ export default function MyPlans({ onBack, onCreate, onEdit, onStartFreeWorkout }
       {/* Free Workout Button */}
       <button
         onClick={onStartFreeWorkout}
-        className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4 flex items-center gap-4 hover:shadow-md transition-shadow"
+        className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4 flex items-center gap-4 hover:shadow-md transition-shadow"
       >
         <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
           <Zap className="w-6 h-6 text-green-500" />
@@ -90,7 +90,7 @@ export default function MyPlans({ onBack, onCreate, onEdit, onStartFreeWorkout }
       ) : (
         <div className="space-y-3">
           {plans.map((plan) => (
-            <div key={plan.id} className={`bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm ${plan.is_active ? 'ring-2 ring-primary-400' : ''}`}>
+            <div key={plan.id} className={`bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 ${plan.is_active ? 'ring-2 ring-primary-400' : ''}`}>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-semibold text-slate-900 dark:text-white">{plan.name}</p>

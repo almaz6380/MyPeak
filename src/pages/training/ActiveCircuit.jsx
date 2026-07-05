@@ -46,7 +46,7 @@ export default function ActiveCircuit({ config, onFinish, onDiscard }) {
     return (
       <div className="p-4 pt-16 pb-24">
         <h1 className="text-2xl font-bold mb-6">{t('training.circuit')}</h1>
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 shadow-sm text-center mb-6">
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 shadow-soft border border-slate-100 dark:border-slate-800/60 text-center mb-6">
           <p className="text-5xl font-bold mb-2">{config.rounds}</p>
           <p className="text-slate-500 dark:text-slate-400">{t('training.rounds')}</p>
           <div className="flex justify-center gap-6 mt-4">
@@ -66,7 +66,7 @@ export default function ActiveCircuit({ config, onFinish, onDiscard }) {
             {config.exercises.map((id, i) => {
               const ex = getExerciseById(id);
               return (
-                <div key={i} className="bg-white dark:bg-surface-dark-alt rounded-xl p-3 shadow-sm flex items-center gap-3">
+                <div key={i} className="bg-white dark:bg-surface-dark-alt rounded-xl p-3 shadow-soft border border-slate-100 dark:border-slate-800/60 flex items-center gap-3">
                   <span className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-center">{i + 1}</span>
                   <p className="font-medium text-sm">{ex ? t(ex.nameKey) : id}</p>
                 </div>
@@ -144,7 +144,7 @@ export default function ActiveCircuit({ config, onFinish, onDiscard }) {
 
       {/* Exercise list progress */}
       {!timer.finished && (
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
           <div className="flex flex-col gap-2">
             {timer.exerciseIds.map((id, i) => {
               const ex = getExerciseById(id);

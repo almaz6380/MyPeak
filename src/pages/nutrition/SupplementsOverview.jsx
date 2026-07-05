@@ -108,7 +108,7 @@ export default function SupplementsOverview({ onBack, onManage, onAdd }) {
 
       {/* Progress */}
       {scheduled.length > 0 && (
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-medium text-slate-600 dark:text-slate-400">{t('supplements.todayProgress')}</p>
             <p className="text-sm font-bold text-primary-500">{progress.taken}/{progress.total}</p>
@@ -166,7 +166,7 @@ export default function SupplementsOverview({ onBack, onManage, onAdd }) {
                 {t(`supplements.slot_${slot}`)}
               </h2>
             </div>
-            <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">
               {items.map((supp, i) => {
                 const logged = isLogged(supp.id, slot);
                 return (

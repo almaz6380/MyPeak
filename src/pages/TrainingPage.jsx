@@ -380,7 +380,7 @@ export default function TrainingPage() {
       <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 mb-4">
         <button
           onClick={() => setView('myPlans')}
-          className="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-white dark:bg-surface-dark-alt text-slate-900 dark:text-white shadow-sm"
+          className="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-white dark:bg-surface-dark-alt text-slate-900 dark:text-white shadow-soft border border-slate-100 dark:border-slate-800/60"
         >
           {lang === 'de' ? 'Meine Pläne' : 'My Plans'}
         </button>
@@ -400,7 +400,7 @@ export default function TrainingPage() {
       {/* History */}
       <button
         onClick={() => setView('history')}
-        className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow mb-6"
+        className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 flex items-center gap-4 hover:shadow-md transition-shadow mb-6"
       >
         <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
           <History className="w-5 h-5 text-slate-500" />
@@ -446,7 +446,7 @@ function QuickAction({ icon, label, onClick, className = '', vertical = false })
   return (
     <button
       onClick={onClick}
-      className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden ${
+      className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow overflow-hidden ${
         vertical
           ? 'flex flex-col items-center justify-center gap-1.5 py-4 px-1 text-center min-h-[88px]'
           : 'flex items-center gap-3 p-4 text-left'
@@ -495,7 +495,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
             <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">{t('plans.customPlans')}</h2>
             <div className="flex flex-col gap-4">
               {customPlans.map((plan) => (
-                <div key={plan.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
+                <div key={plan.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
                   <h3 className="font-semibold text-lg mb-3">{plan.name}</h3>
                   <div className="flex flex-col gap-2">
                     {plan.days.map((day, i) => (
@@ -521,7 +521,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
         {visibleDefaultPlans.length > 0 && (
           <div className="flex flex-col gap-4">
             {visibleDefaultPlans.map((plan) => (
-              <div key={plan.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
+              <div key={plan.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
                 <h3 className="font-semibold text-lg mb-1">{t(plan.nameKey)}</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">{t(plan.descKey)}</p>
                 <div className="flex flex-col gap-2">
@@ -561,7 +561,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
         <div className="flex flex-col gap-4">
           <button
             onClick={() => setStep('plans')}
-            className="bg-white dark:bg-surface-dark-alt rounded-2xl p-5 text-left shadow-sm hover:shadow-md transition-shadow"
+            className="bg-white dark:bg-surface-dark-alt rounded-2xl p-5 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
           >
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center">
@@ -583,7 +583,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
 
           <button
             onClick={onStartEmpty}
-            className="bg-white dark:bg-surface-dark-alt rounded-2xl p-5 text-left shadow-sm hover:shadow-md transition-shadow"
+            className="bg-white dark:bg-surface-dark-alt rounded-2xl p-5 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
           >
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
@@ -616,7 +616,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
             <button
               key={ex.id}
               onClick={() => onStartCardio(ex)}
-              className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 text-left shadow-sm hover:shadow-md transition-shadow"
+              className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
             >
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
@@ -733,7 +733,7 @@ function TrainingTypeCard({ icon, label, desc, color, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 text-left shadow-sm hover:shadow-md transition-shadow flex items-center gap-4"
+      className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow flex items-center gap-4"
     >
       <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${colorClasses[color]}`}>
         {icon}
@@ -838,7 +838,7 @@ function HiitSetup({ onBack, onStart, exercises, t }) {
         ))}
       </div>
 
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <span className="font-medium">{t('training.rounds')}</span>
@@ -873,7 +873,7 @@ function HiitSetup({ onBack, onStart, exercises, t }) {
           <button
             key={ex.id}
             onClick={() => toggleExercise(ex.id)}
-            className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-sm transition-all ${
+            className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${
               selectedExercises.includes(ex.id) ? 'ring-2 ring-amber-500' : ''
             }`}
           >
@@ -995,7 +995,7 @@ function CircuitSetup({ onBack, onStart, exercises: circuitExercises, t }) {
         </div>
       )}
 
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <span className="font-medium">{t('training.rounds')}</span>
@@ -1031,7 +1031,7 @@ function CircuitSetup({ onBack, onStart, exercises: circuitExercises, t }) {
           {selectedExercises.map((id, i) => {
             const ex = getExerciseById(id);
             return (
-              <div key={id} className="flex items-center gap-3 bg-white dark:bg-surface-dark-alt rounded-xl p-3 shadow-sm">
+              <div key={id} className="flex items-center gap-3 bg-white dark:bg-surface-dark-alt rounded-xl p-3 shadow-soft border border-slate-100 dark:border-slate-800/60">
                 <span className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-center">{i + 1}</span>
                 <span className="flex-1 text-sm font-medium">{ex ? t(ex.nameKey) : id}</span>
                 <button onClick={() => setSelectedExercises((prev) => prev.filter((x) => x !== id))} className="p-1 text-slate-400 hover:text-red-500">
@@ -1117,7 +1117,7 @@ function CircuitExercisePicker({ initialSelected, onBack, onConfirm, t }) {
 
       <div className="flex flex-col gap-2">
         {filtered.map((ex) => (
-          <button key={ex.id} onClick={() => toggle(ex.id)} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-sm transition-all ${selected.includes(ex.id) ? 'ring-2 ring-emerald-500' : ''}`}>
+          <button key={ex.id} onClick={() => toggle(ex.id)} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${selected.includes(ex.id) ? 'ring-2 ring-emerald-500' : ''}`}>
             <div className="flex items-center gap-3">
               <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${selected.includes(ex.id) ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300 dark:border-slate-600'}`}>
                 {selected.includes(ex.id) && (
@@ -1224,7 +1224,7 @@ function MartialArtsSetup({ onBack, onStart, t }) {
       </div>
 
       {/* Config */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm mb-4">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <span className="font-medium">{t('training.rounds')}</span>
@@ -1263,7 +1263,7 @@ function MartialArtsSetup({ onBack, onStart, t }) {
       {/* Exercises */}
       <div className="flex flex-col gap-2 mb-6">
         {filteredExercises.map((ex) => (
-          <button key={ex.id} onClick={() => toggleExercise(ex.id)} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-sm transition-all ${selectedExercises.includes(ex.id) ? 'ring-2 ring-violet-500' : ''}`}>
+          <button key={ex.id} onClick={() => toggleExercise(ex.id)} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${selectedExercises.includes(ex.id) ? 'ring-2 ring-violet-500' : ''}`}>
             <div className="flex items-center gap-3">
               <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${selectedExercises.includes(ex.id) ? 'bg-violet-500 border-violet-500' : 'border-slate-300 dark:border-slate-600'}`}>
                 {selectedExercises.includes(ex.id) && (

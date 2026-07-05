@@ -288,7 +288,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, onSelectExercises, 
         {DAY_KEYS.filter((day) => selectedDays.has(day)).map((day) => {
           const config = dayConfigs[day];
           return (
-            <div key={day} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-sm">
+            <div key={day} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Dumbbell className="w-5 h-5 text-primary-500" />
