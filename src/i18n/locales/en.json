@@ -855,6 +855,7 @@
     "tooManyRequests": "Too many attempts. Please wait a moment and try again.",
     "emailAlreadyRegistered": "This email address is already registered. Please sign in.",
     "weakPassword": "The password is too weak. Please choose a longer password.",
+    "samePassword": "The new password must be different from your old password.",
     "invalidEmail": "Please enter a valid email address.",
     "networkError": "Connection error. Please check your internet connection.",
     "genericError": "Something went wrong. Please try again.",

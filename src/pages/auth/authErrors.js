@@ -21,6 +21,9 @@ export function mapAuthError(error, t) {
   if (msg.includes('weak') || (msg.includes('password') && msg.includes('at least'))) {
     return { code: 'weak_password', text: t('auth.weakPassword') };
   }
+  if (msg.includes('different from the old')) {
+    return { code: 'same_password', text: t('auth.samePassword') };
+  }
   if (msg.includes('invalid email') || msg.includes('unable to validate email')) {
     return { code: 'invalid_email', text: t('auth.invalidEmail') };
   }

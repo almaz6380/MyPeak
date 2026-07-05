@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Loader2, CheckCircle, Dumbbell } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { mapAuthError } from './authErrors';
 
 export default function UpdatePasswordPage() {
   const { t } = useTranslation();
@@ -30,7 +31,7 @@ export default function UpdatePasswordPage() {
     setLoading(true);
     const { error } = await updatePassword(password);
     if (error) {
-      setError(error.message);
+      setError(mapAuthError(error, t).text);
     } else {
       setSuccess(true);
       setTimeout(() => navigate('/'), 2000);
