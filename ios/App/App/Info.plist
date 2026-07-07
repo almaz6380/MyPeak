@@ -47,6 +47,8 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSCameraUsageDescription</key>
 	<string>MyPeak nutzt die Kamera, um Barcodes von Lebensmitteln zu scannen und Mahlzeiten zu fotografieren.</string>
 	<key>GADApplicationIdentifier</key>
