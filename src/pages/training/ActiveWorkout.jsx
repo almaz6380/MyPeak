@@ -10,6 +10,7 @@ import MuscleGroupIcon from '../../components/icons/MuscleGroupIcon';
 import MiniSparkline from '../../components/progress/MiniSparkline';
 import ProgressRing from '../../components/progress/ProgressRing';
 import PostWorkoutSummary from '../../components/progress/PostWorkoutSummary';
+import { maybeShowInterstitial } from '../../lib/ads';
 import useProgressComparison, { getExerciseTarget, setExerciseTarget } from '../../hooks/useProgressComparison';
 import { todayLocal } from '../../lib/dateUtils';
 
@@ -145,6 +146,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
       setShowSaveAsPlan(true);
       return;
     }
+    maybeShowInterstitial();
     onFinish(pendingPrs);
   };
 
@@ -155,6 +157,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
       name: planName.trim(),
       days: [{ name: planName.trim(), exercises: exIds }],
     });
+    maybeShowInterstitial();
     onFinish(pendingPrs);
   };
 

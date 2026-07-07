@@ -6,8 +6,9 @@ import { useAuth } from '../context/AuthContext';
 import { saveSetting } from '../data/settingsStorage';
 import MyPeakLogo from '../components/MyPeakLogo';
 import { supabase } from '../lib/supabase';
-import { Moon, Sun, Globe, Weight, LogOut, User, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2 } from 'lucide-react';
+import { Moon, Sun, Globe, Weight, LogOut, User, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2, ShieldCheck } from 'lucide-react';
 import { getOrCreateFriendCode, getXP, getLevelTitle, calculateLevel, hasGoldenFrame } from '../data/socialStorage';
+import { canChangeAdConsent, changeAdConsent } from '../lib/ads';
 
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
@@ -308,7 +309,21 @@ export default function ProfilePage() {
         </h2>
         <LegalRow to="/legal/imprint" label={t('legal.imprint')} />
         <LegalRow to="/legal/privacy" label={t('legal.privacy')} />
-        <LegalRow to="/legal/terms" label={t('legal.terms')} last />
+        <LegalRow to="/legal/terms" label={t('legal.terms')} last={!canChangeAdConsent()} />
+        {canChangeAdConsent() && (
+          <button
+            onClick={() => changeAdConsent()}
+            className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors text-left"
+          >
+            <span className="flex items-center gap-3">
+              <ShieldCheck className="w-5 h-5 text-slate-400" />
+              <span className="text-slate-700 dark:text-slate-200">
+                {i18n.language === 'de' ? 'Werbe-Einwilligung ändern' : 'Change ad consent'}
+              </span>
+            </span>
+            <ChevronRight className="w-5 h-5 text-slate-300" />
+          </button>
+        )}
       </div>
 
       {/* Sign Out */}

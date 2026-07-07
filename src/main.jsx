@@ -7,6 +7,7 @@ import { ThemeProvider } from './context/ThemeContext'
 import { AuthProvider } from './context/AuthContext'
 import ErrorBoundary from './components/ErrorBoundary'
 import App from './App.jsx'
+import { initAds } from './lib/ads'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -21,6 +22,10 @@ createRoot(document.getElementById('root')).render(
     </ErrorBoundary>
   </StrictMode>,
 )
+
+// Werbung (nur nativ) initialisieren — inkl. DSGVO-Einwilligung.
+// Verzögert, damit der App-Start nicht blockiert wird.
+setTimeout(() => { initAds(); }, 1500);
 
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
