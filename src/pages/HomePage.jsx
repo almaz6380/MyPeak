@@ -98,7 +98,9 @@ export default function HomePage() {
       if (goalsData) setGoals(goalsData);
       setWaterTotal(waterData.total);
 
-      const count = (workouts || []).filter((w) => w.date === selectedDate).length;
+      // Cloud liefert timestamptz ("2026-07-06T00:00:00+00:00"), lokal steht "2026-07-06"
+      const workoutDay = (d) => (typeof d === 'string' && !d.includes('T') ? d : toLocalDateString(new Date(d)));
+      const count = (workouts || []).filter((w) => workoutDay(w.date) === selectedDate).length;
       setDayWorkouts(count);
 
       setXpData(xp || { total_xp: 0, level: 1, streak_days: 0 });
