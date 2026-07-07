@@ -16,6 +16,13 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### Store-Launch + Werbung (07.07.2026) — EINGEREICHT
+- **Android:** signiertes `.aab` (versionCode 1 / 1.0) bei Google Play in Prüfung. Upload-Keystore in `android/upload-keystore.jks` + `keystore.properties` (gitignored! Backup in ~/AppSigningKeys/mypeak + OneDrive). Build: `JAVA_HOME=<Android-Studio-jbr> ./gradlew bundleRelease`.
+- **iOS:** IPA bei App Store Connect eingereicht (App-ID 6788461300, Bundle at.gallab.mypeak). Manuelle Distributions-Signierung im pbxproj (Team JU8STVD4SJ, Profil „MyPeak AppStore"). Build: `xcodebuild ... archive` + `-exportArchive` (ExportOptions auf ~/Desktop/mypeak-ios-export/), Upload via `altool` (ASC-Key VGHCB8Z8Q2). Metadaten per ASC-API gesetzt.
+- **Werbung (AdMob, `src/lib/ads.js`):** Interstitials (jede 2. qualifizierende Aktion, ≥90s Abstand) nach Workout-Speichern + Mahlzeit-Hinzufügen, mit DSGVO-Einwilligung (UMP, nativ in @capacitor-community/admob@8). `USE_TEST_ADS`-Flag: `false`=echte Anzeigen (Launch). Echte IDs (Konto pub-8860791993288062): Android App `~3613953701`/Interstitial `/7984478947`, iOS App `~8812263899`/Interstitial `/5028931559`. **NIE eigene Live-Anzeigen anklicken** (Kontosperre). Nur nativ — Web zeigt keine Ads.
+- **Store-Assets:** `store-assets/` (Screenshots iOS+Android, iPad, Feature-Grafik, App-Icon, `store-texte.md`). Review-Demo-Account: appreview@wellbooked.at / MyPeak-Review#2026.
+- **Offen nach Launch:** AdMob-App↔Store verknüpfen; iOS-Update 1.1 (Englisch) liegt auf Branch i18n-en.
+
 ### Launch-Fixes (Juli 2026, Branch launch-fixes) — FERTIG
 - [x] Rechtsseiten Impressum/Datenschutz/AGB (`/legal/*`, `src/pages/legal/`) — PLATZHALTER in legalContent.js (Name/Adresse) noch ausfüllen!
 - [x] Konto-Löschung (api/delete-account.js + Profil) — braucht `SUPABASE_SERVICE_ROLE_KEY` in Vercel
