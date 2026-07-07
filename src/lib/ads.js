@@ -14,7 +14,7 @@ import { Capacitor } from '@capacitor/core';
 //   3. USE_TEST_ADS = false setzen.
 // ===========================================================================
 
-const USE_TEST_ADS = true;
+const USE_TEST_ADS = false;
 
 const TEST = {
   ios: { interstitial: 'ca-app-pub-3940256099942544/4411468910' },
@@ -23,9 +23,10 @@ const TEST = {
 
 // Platzhalter — vor Launch durch echte MyPeak-Anzeigenblöcke ersetzen
 // (Konto pub-8860791993288062).
+// Echte MyPeak-Anzeigenblöcke (Konto pub-8860791993288062).
 const PROD = {
-  ios: { interstitial: 'ca-app-pub-8860791993288062/0000000000' },
-  android: { interstitial: 'ca-app-pub-8860791993288062/0000000000' },
+  ios: { interstitial: 'ca-app-pub-8860791993288062/5028931559' },
+  android: { interstitial: 'ca-app-pub-8860791993288062/7984478947' },
 };
 
 function ids() {

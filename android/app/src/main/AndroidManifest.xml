@@ -28,10 +28,10 @@
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
         </provider>
 
-        <!-- AdMob-App-ID (aktuell Google-Test-ID; vor Launch durch echte MyPeak-ID ersetzen) -->
+        <!-- AdMob-App-ID (echte MyPeak-Android-ID, Konto pub-8860791993288062) -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="ca-app-pub-8860791993288062~3613953701" />
     </application>
 
     <!-- Permissions -->
