@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2, X, Check, Save, Target, StickyNote } from 'lucide-react';
+import { Plus, Trash2, X, Check, Save, Target, StickyNote, PlayCircle } from 'lucide-react';
 import { saveWorkout, getPersonalRecord, saveCustomPlan, updateCustomPlan, getAllExerciseNotes } from '../../data/workoutStorage';
 import ExerciseNoteModal from './ExerciseNoteModal';
 import { useAuth } from '../../context/AuthContext';
 import { useActiveWorkout } from '../../context/ActiveWorkoutContext';
 import { getExerciseById } from '../../data/exercises';
+import { hasDemo } from '../../data/exerciseDemos';
+import { updateStreak } from '../../data/socialStorage';
+import LevelUpAnimation from '../../components/LevelUpAnimation';
+import ExerciseDemoModal from '../../components/ExerciseDemoModal';
 import MuscleGroupIcon from '../../components/icons/MuscleGroupIcon';
 import MiniSparkline from '../../components/progress/MiniSparkline';
 import ProgressRing from '../../components/progress/ProgressRing';
@@ -15,7 +19,7 @@ import useProgressComparison, { getExerciseTarget, setExerciseTarget } from '../
 import { todayLocal } from '../../lib/dateUtils';
 
 export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const ctx = useActiveWorkout();
   const exercises = ctx.workout?.exercises || [];
@@ -26,6 +30,8 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
   const [showSaveAsPlan, setShowSaveAsPlan] = useState(false);
   const [showPostSummary, setShowPostSummary] = useState(false);
   const [savedWorkoutExercises, setSavedWorkoutExercises] = useState(null);
+  const [levelUp, setLevelUp] = useState(null);
+  const [demoModal, setDemoModal] = useState(null); // { exerciseId, name }
   const [planName, setPlanName] = useState('');
   const [pendingPrs, setPendingPrs] = useState({});
   const [editingTarget, setEditingTarget] = useState(null);
@@ -108,6 +114,13 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
     // Save to localStorage + Supabase (fire-and-forget, never blocks)
     saveWorkout(user.id, workout).catch((err) => console.error('Save workout error:', err));
 
+    // XP + Streak vergeben (fire-and-forget); bei Level-Aufstieg Animation zeigen
+    updateStreak(user.id)
+      .then((res) => {
+        if (res && res.newLevel > res.oldLevel) setLevelUp(res.newLevel);
+      })
+      .catch(() => {});
+
     // PR check on captured data (not dependent on context state)
     const capturedExercises = [...validExercises];
     const checkPRsFromCapture = async () => {
@@ -171,13 +184,22 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
   // Post-workout summary
   if (showPostSummary && savedWorkoutExercises) {
     return (
-      <PostWorkoutSummary
-        exercises={savedWorkoutExercises}
-        prs={pendingPrs}
-        duration={elapsed}
-        userId={user?.id}
-        onDismiss={handlePostSummaryDismiss}
-      />
+      <>
+        <PostWorkoutSummary
+          exercises={savedWorkoutExercises}
+          prs={pendingPrs}
+          duration={elapsed}
+          userId={user?.id}
+          onDismiss={handlePostSummaryDismiss}
+        />
+        {levelUp && (
+          <LevelUpAnimation
+            level={levelUp}
+            lang={i18n.language?.startsWith('de') ? 'de' : 'en'}
+            onDismiss={() => setLevelUp(null)}
+          />
+        )}
+      </>
     );
   }
 
@@ -272,6 +294,15 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
                   <h3 className="font-semibold">{t(ex.nameKey)}</h3>
                   <MiniSparkline data={sparkData} />
                 </div>
+                {hasDemo(ex.exerciseId) && (
+                  <button
+                    onClick={() => setDemoModal({ exerciseId: ex.exerciseId, name: t(ex.nameKey) })}
+                    className="p-1.5 text-slate-400 hover:text-primary-500"
+                    aria-label={t('training.demoBadge')}
+                  >
+                    <PlayCircle className="w-4 h-4" />
+                  </button>
+                )}
                 <button onClick={() => setNoteModal({ exerciseId: ex.exerciseId, name: t(ex.nameKey) })}
                   className={`p-1.5 ${exerciseNotes[ex.exerciseId]?.note || exerciseNotes[ex.exerciseId]?.settings?.length ? 'text-primary-400' : 'text-slate-400 hover:text-primary-500'}`}>
                   <StickyNote className="w-4 h-4" />
@@ -473,6 +504,14 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
           onSaved={(note, settings) => {
             setExerciseNotes((prev) => ({ ...prev, [noteModal.exerciseId]: { ...prev[noteModal.exerciseId], note, settings } }));
           }}
+        />
+      )}
+
+      {demoModal && (
+        <ExerciseDemoModal
+          exerciseId={demoModal.exerciseId}
+          title={demoModal.name}
+          onClose={() => setDemoModal(null)}
         />
       )}
     </div>

@@ -5,9 +5,9 @@ import { useAuth } from '../../context/AuthContext';
 import { getFriends, getFriendRequests, respondToFriendRequest, removeFriend, sendFriendRequest, lookupFriendCode } from '../../data/socialStorage';
 
 export default function FriendsList({ onBack, onAddFriend }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, isGuestMode } = useAuth();
-  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
   const [friends, setFriends] = useState([]);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);

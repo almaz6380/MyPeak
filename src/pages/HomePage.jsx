@@ -67,10 +67,15 @@ export default function HomePage() {
   const [weightCustomFrom, setWeightCustomFrom] = useState('');
   const [weightCustomTo, setWeightCustomTo] = useState('');
   useEffect(() => {
-    if (user) loadDashboard();
+    if (!user) return;
+    // Abbruch-Guard: bei schnellem Datumswechsel darf eine ältere Antwort
+    // den State der neueren nicht überschreiben
+    let alive = true;
+    loadDashboard(() => alive);
+    return () => { alive = false; };
   }, [user, selectedDate]);
 
-  async function loadDashboard() {
+  async function loadDashboard(isAlive = () => true) {
     try {
       const [entries, goalsData, waterData, workouts, xp, supps, suppLogs, weights, cycleSettings] = await Promise.all([
         getNutritionEntries(user.id, selectedDate),
@@ -83,6 +88,8 @@ export default function HomePage() {
         getWeightEntries(user.id),
         profile?.gender === 'female' ? getCycleSettings(user.id) : Promise.resolve(null),
       ]);
+
+      if (!isAlive()) return; // veralteter Aufruf — State nicht mehr anfassen
 
       const totals = entries.reduce(
         (acc, e) => ({
@@ -334,9 +341,11 @@ export default function HomePage() {
           </button>
           {/* Weight Chart Card */}
           <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">
-            <button
+            <div
+              role="button"
+              tabIndex={0}
               onClick={() => { const next = !showWeightChart; setShowWeightChart(next); localStorage.setItem('weight_chart_collapsed', (!next).toString()); }}
-              className="w-full p-4 flex items-center justify-between"
+              className="w-full p-4 flex items-center justify-between cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <Scale className="w-5 h-5 text-primary-500" />
@@ -356,7 +365,7 @@ export default function HomePage() {
                 </button>
                 {showWeightChart ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
               </div>
-            </button>
+            </div>
 
             {showWeightChart && (
               <div className="px-4 pb-4">

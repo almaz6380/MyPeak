@@ -23,9 +23,9 @@ const SPLIT_TYPES = [
 ];
 
 export default function WeeklyPlanBuilder({ onBack, onSaved, onSelectExercises, editPlan }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
   const isEditing = !!editPlan;
 
   // Initialize from editPlan if editing

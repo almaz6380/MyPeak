@@ -5,6 +5,8 @@ import exercises, { muscleGroups, getExercisesByType } from '../../data/exercise
 import { getCustomExercises, saveCustomExercise, deleteCustomExercise } from '../../data/workoutStorage';
 import { useAuth } from '../../context/AuthContext';
 import MuscleGroupIcon from '../../components/icons/MuscleGroupIcon';
+import ExerciseDetailSheet from './ExerciseDetailSheet';
+import { hasDemo } from '../../data/exerciseDemos';
 
 const EQUIPMENT_TYPES = [
   { key: 'all', de: 'Alle', en: 'All' },
@@ -35,9 +37,9 @@ const MA_CATEGORIES = [
 ];
 
 export default function ExerciseLibrary({ onBack, onSelect, selectionMode = false }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
 
   const [trainingType, setTrainingType] = useState(null); // null = show type chooser
   const [muscleFilter, setMuscleFilter] = useState('all');
@@ -47,6 +49,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
   const [selected, setSelected] = useState([]);
   const [customExercises, setCustomExercises] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [detailExercise, setDetailExercise] = useState(null);
 
   useEffect(() => {
     getCustomExercises(user?.id || 'guest').then(setCustomExercises);
@@ -203,13 +206,20 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
           const isCustom = !!ex._isCustom;
           return (
             <div key={ex.id} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${selected.includes(ex.id) ? 'ring-2 ring-primary-400' : ''}`}>
-              <div className="flex items-center justify-between" onClick={() => selectionMode ? toggleSelect(ex.id) : null}>
+              <div className="flex items-center justify-between cursor-pointer" onClick={() => selectionMode ? toggleSelect(ex.id) : setDetailExercise(ex)}>
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div className="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center flex-shrink-0">
                     <MuscleGroupIcon group={ex.muscleGroup || ex.type} size={24} className="text-primary-500" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{displayName}</p>
+                    <p className="font-medium truncate">
+                      {displayName}
+                      {hasDemo(ex.id) && (
+                        <span className="ml-2 align-middle inline-block px-1.5 py-0.5 rounded text-[9px] font-bold bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
+                          {t('training.demoBadge')}
+                        </span>
+                      )}
+                    </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       {ex.muscleGroup ? t(`muscleGroups.${ex.muscleGroup}`) : ''}{ex.equipment ? ` · ${t(`equipment.${ex.equipment}`)}` : ''}
                       {isCustom && <span className="ml-1 text-primary-500">· {t('training.customExercise')}</span>}
@@ -242,6 +252,8 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
       </div>
 
       {showCreateModal && <CreateExerciseModal onSave={handleCreateExercise} onClose={() => setShowCreateModal(false)} t={t} />}
+
+      {detailExercise && <ExerciseDetailSheet exercise={detailExercise} onClose={() => setDetailExercise(null)} />}
 
       {selectionMode && selected.length > 0 && (
         <div className="fixed bottom-20 left-0 right-0 px-4 pb-2">

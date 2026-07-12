@@ -6,9 +6,9 @@ import { useAuth } from '../../context/AuthContext';
 import { updateCustomPlan } from '../../data/workoutStorage';
 
 export default function PlanDetail({ plan, dayIndex, exercises: externalExercises, onExercisesChange, onBack, onStartWorkout, onAddExercise }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
 
   const day = plan.days?.[dayIndex];
   if (!day) return null;

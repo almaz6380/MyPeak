@@ -7,11 +7,33 @@ function guestSkip(userId) { return isGuest(userId); }
 const ENTRIES_PREFIX = 'nutrition_entries_';
 const CUSTOM_MEALS_KEY = 'custom_meals';
 const GOALS_KEY = 'nutrition_goals';
+const PENDING_DELETES_KEY = 'nutrition_pending_deletes';
+
+// Offline fehlgeschlagene Cloud-Deletes — sonst „ersteht" der Eintrag beim
+// nächsten Hintergrund-Refresh aus der Cloud wieder auf
+function getPendingDeletes() {
+  try { return JSON.parse(localStorage.getItem(PENDING_DELETES_KEY) || '[]'); } catch { return []; }
+}
+
+function retryPendingDeletes(userId) {
+  const pending = getPendingDeletes();
+  if (pending.length === 0 || guestSkip(userId)) return;
+  supabase
+    .from('nutrition_entries')
+    .delete()
+    .in('id', pending)
+    .eq('user_id', userId)
+    .then(({ error }) => {
+      if (!error) localStorage.removeItem(PENDING_DELETES_KEY);
+    })
+    .catch(() => {});
+}
 
 // ── Nutrition Entries ────────────────────────────────────────
 
 export async function getNutritionEntries(userId, date) {
   const cacheKey = ENTRIES_PREFIX + date;
+  retryPendingDeletes(userId);
 
   // localStorage first — instant
   const cached = localStorage.getItem(cacheKey);
@@ -26,10 +48,13 @@ export async function getNutritionEntries(userId, date) {
         .order('created_at', { ascending: true })
         .then(({ data, error }) => {
           if (!error && data) {
-            // Noch nicht gesyncte lokale Einträge behalten (kein stiller Verlust)
+            // Noch nicht gesyncte lokale Einträge behalten (kein stiller Verlust),
+            // offline gelöschte Einträge NICHT wieder aufnehmen
+            const pendingDeletes = getPendingDeletes();
+            const fresh = data.filter((e) => !pendingDeletes.includes(e.id));
             const currentLocal = JSON.parse(localStorage.getItem(cacheKey) || '[]');
             const localOnly = currentLocal.filter((e) => String(e.id).startsWith('local_'));
-            localStorage.setItem(cacheKey, JSON.stringify([...data, ...localOnly]));
+            localStorage.setItem(cacheKey, JSON.stringify([...fresh, ...localOnly]));
           }
         })
         .catch(() => {});
@@ -128,15 +153,28 @@ export async function updateNutritionEntry(userId, entryId, updates, date = null
 }
 
 export async function deleteNutritionEntry(userId, entryId, date) {
-  await supabase
-    .from('nutrition_entries')
-    .delete()
-    .eq('id', entryId)
-    .eq('user_id', userId);
-
+  // localStorage first — funktioniert auch für Gäste und noch nicht gesyncte Einträge
   const cacheKey = ENTRIES_PREFIX + date;
   const cached = JSON.parse(localStorage.getItem(cacheKey) || '[]');
   localStorage.setItem(cacheKey, JSON.stringify(cached.filter((e) => e.id !== entryId)));
+
+  if (guestSkip(userId) || String(entryId).startsWith('local_')) return;
+
+  try {
+    const { error } = await supabase
+      .from('nutrition_entries')
+      .delete()
+      .eq('id', entryId)
+      .eq('user_id', userId);
+    if (error) throw error;
+    // Gelegenheit nutzen, frühere fehlgeschlagene Deletes nachzuholen
+    retryPendingDeletes(userId);
+  } catch {
+    // Offline/Fehler: Löschung merken und beim nächsten Refresh/Delete nachholen
+    const pending = getPendingDeletes();
+    if (!pending.includes(entryId)) pending.push(entryId);
+    localStorage.setItem(PENDING_DELETES_KEY, JSON.stringify(pending));
+  }
 }
 
 // ── Custom Meals ─────────────────────────────────────────────

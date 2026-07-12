@@ -112,10 +112,12 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
           const isFav = favorites.includes(recipe.id);
 
           return (
-            <button
+            <div
               key={recipe.id}
+              role="button"
+              tabIndex={0}
               onClick={() => onSelectRecipe(recipe)}
-              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-left"
+              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-left cursor-pointer"
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1 min-w-0">
@@ -149,7 +151,7 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
                   P {recipe.nutrition.protein}g
                 </span>
               </div>
-            </button>
+            </div>
           );
         })}
       </div>

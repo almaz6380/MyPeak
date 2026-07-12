@@ -24,9 +24,9 @@ const PAIN_LEVELS = ['none', 'mild', 'moderate', 'severe'];
 const SLEEP_LEVELS = ['great', 'good', 'poor', 'terrible'];
 
 export default function CycleDetailPage({ onBack }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
   const today = formatDate(new Date());
 
   const [settings, setSettings] = useState(null);
@@ -273,7 +273,7 @@ export default function CycleDetailPage({ onBack }) {
 
 // ── Setup / Settings ────────────────────────────────────────────
 function CycleSetup({ onSave, onBack, lang, initial }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [lastStart, setLastStart] = useState(initial?.last_period_start || '');
   const [cycleLength, setCycleLength] = useState(initial?.cycle_length || 28);
   const [periodLength, setPeriodLength] = useState(initial?.period_length || 5);

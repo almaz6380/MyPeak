@@ -17,7 +17,7 @@ function getFoodEmoji(source) {
 }
 
 export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOpenCustomMeals, onOpenCookbook, onOpenSupplements }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
   const [entries, setEntries] = useState([]);
@@ -97,7 +97,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
     setShowGoalEditor(false);
   }
 
-  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
 
   return (
     <div className="p-4 pt-16 pb-24">
@@ -493,7 +493,7 @@ function CalendarModal({ selectedDate, onSelect, onClose, lang, t }) {
 // ── Goal Editor Modal ────────────────────────────────────────
 
 function GoalEditorModal({ goals, onSave, onClose, t }) {
-  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
   const [calories, setCalories] = useState(String(Math.round(goals.calories)));
   const [protein, setProtein] = useState(String(Math.round(goals.protein)));
   const [carbs, setCarbs] = useState(String(Math.round(goals.carbs)));
@@ -575,13 +575,16 @@ function GoalEditorModal({ goals, onSave, onClose, t }) {
   }
 
   function handleSave() {
+    // parseFloat statt parseInt (Dezimalziele), bewusste 0 nicht zu Default überschreiben
+    const parsedFiber = parseFloat(fiber);
+    const parsedWater = parseFloat(waterMl);
     onSave({
-      calories: parseInt(calories) || 0,
-      protein: parseInt(protein) || 0,
-      carbs: parseInt(carbs) || 0,
-      fat: parseInt(fat) || 0,
-      fiber: parseInt(fiber) || 30,
-      water_ml: parseInt(waterMl) || 3000,
+      calories: parseFloat(calories) || 0,
+      protein: parseFloat(protein) || 0,
+      carbs: parseFloat(carbs) || 0,
+      fat: parseFloat(fat) || 0,
+      fiber: Number.isFinite(parsedFiber) ? parsedFiber : 30,
+      water_ml: Number.isFinite(parsedWater) ? parsedWater : 3000,
     });
   }
 

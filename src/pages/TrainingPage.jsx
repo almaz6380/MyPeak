@@ -28,7 +28,7 @@ import PlanDetail from './training/PlanDetail';
 import { todayLocal, toLocalDateString } from '../lib/dateUtils';
 
 export default function TrainingPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, profile } = useAuth();
   const activeWorkout = useActiveWorkout();
   const hasValidWorkout = activeWorkout.isActive && activeWorkout.workout?.exercises?.length > 0;
@@ -48,7 +48,7 @@ export default function TrainingPage() {
   const [scheduledDays, setScheduledDays] = useState(new Set());
   const [completedDays, setCompletedDays] = useState(new Set());
   const [showTrainingCalendar, setShowTrainingCalendar] = useState(false);
-  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
 
   useEffect(() => {
     if (user) loadCalendarData();
@@ -413,11 +413,11 @@ export default function TrainingPage() {
       </button>
 
       {/* Social */}
-      <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">{t('common.back') === 'Zurück' ? 'Social' : 'Social'}</h2>
+      <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Social</h2>
       <div className="grid grid-cols-3 gap-3">
-        <QuickAction icon={<Medal className="w-6 h-6" />} label={t('common.back') === 'Zurück' ? 'Ranking' : 'Ranking'} onClick={() => setView('leaderboard')} vertical />
+        <QuickAction icon={<Medal className="w-6 h-6" />} label="Ranking" onClick={() => setView('leaderboard')} vertical />
         <QuickAction icon={<Swords className="w-6 h-6" />} label="Challenges" onClick={() => setView('challenges')} vertical />
-        <QuickAction icon={<Users className="w-6 h-6" />} label={t('common.back') === 'Zurück' ? 'Freunde' : 'Friends'} onClick={() => setView('friends')} vertical />
+        <QuickAction icon={<Users className="w-6 h-6" />} label={lang === 'de' ? 'Freunde' : 'Friends'} onClick={() => setView('friends')} vertical />
       </div>
 
       {/* Training Calendar Modal */}
@@ -459,7 +459,7 @@ function QuickAction({ icon, label, onClick, className = '', vertical = false })
 }
 
 function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, onStartCardio, onStartHiit, onStartCircuit, onStartMartialArts }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [step, setStep] = useState('type'); // 'type' | 'strengthChoice' | 'plans' | 'cardioChoice' | 'hiitChoice' | 'circuitChoice' | 'martialArtsChoice'
   const [customPlans, setCustomPlans] = useState([]);

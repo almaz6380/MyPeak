@@ -161,7 +161,7 @@ export default function ProfilePage() {
         const levelInfo = calculateLevel(xpData.total_xp || 0);
         const title = getLevelTitle(levelInfo.level);
         const golden = hasGoldenFrame(levelInfo.level);
-        const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+        const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
         return (
         <div className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 p-4 mb-4 ${golden ? 'ring-2 ring-primary-400 shadow-primary-400/20 shadow-lg' : ''}`}>
           {/* Level + Title */}
@@ -186,7 +186,7 @@ export default function ProfilePage() {
           {/* Friend Code */}
           {friendCode && (
             <div>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">{t('common.back') === 'Zurück' ? 'Mein MyPeak-Code' : 'My MyPeak Code'}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">{i18n.language?.startsWith('de') ? 'Mein MyPeak-Code' : 'My MyPeak Code'}</p>
               <div className="flex items-center gap-2">
                 <code className="flex-1 bg-slate-50 dark:bg-slate-800 rounded-xl px-4 py-2.5 text-center font-mono text-sm font-bold tracking-wider text-primary-400">
                   {friendCode}

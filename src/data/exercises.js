@@ -234,6 +234,8 @@ const exercises = [
   { id: 'box-jumps', type: 'hiit', equipment: 'bodyweight', nameKey: 'exercises.boxJumps', descKey: 'exercises.boxJumpsDesc' },
   { id: 'battle-ropes', type: 'hiit', equipment: 'bodyweight', nameKey: 'exercises.battleRopes', descKey: 'exercises.battleRopesDesc' },
   { id: 'kettlebell-swings', type: 'hiit', equipment: 'bodyweight', nameKey: 'exercises.kettlebellSwings', descKey: 'exercises.kettlebellSwingsDesc' },
+  { id: 'jump-lunges', type: 'hiit', equipment: 'bodyweight', nameKey: 'exercises.jumpLunges', descKey: 'exercises.jumpLungesDesc' },
+  { id: 'plank-jacks', type: 'hiit', equipment: 'bodyweight', nameKey: 'exercises.plankJacks', descKey: 'exercises.plankJacksDesc' },
 
   // === CIRCUIT ===
   { id: 'push-ups', type: 'circuit', equipment: 'bodyweight', nameKey: 'exercises.pushUps', descKey: 'exercises.pushUpsDesc' },
@@ -249,18 +251,25 @@ const exercises = [
   { id: 'pad-work', type: 'martial-arts', martialArtsCategory: 'boxing', nameKey: 'exercises.padWork', descKey: 'exercises.padWorkDesc' },
   { id: 'speed-bag', type: 'martial-arts', martialArtsCategory: 'boxing', nameKey: 'exercises.speedBag', descKey: 'exercises.speedBagDesc' },
   { id: 'slip-and-roll', type: 'martial-arts', martialArtsCategory: 'boxing', nameKey: 'exercises.slipAndRoll', descKey: 'exercises.slipAndRollDesc' },
+  { id: 'jab-cross', type: 'martial-arts', martialArtsCategory: 'boxing', nameKey: 'exercises.jabCross', descKey: 'exercises.jabCrossDesc' },
+  { id: 'hooks', type: 'martial-arts', martialArtsCategory: 'boxing', nameKey: 'exercises.hooks', descKey: 'exercises.hooksDesc' },
+  { id: 'uppercuts', type: 'martial-arts', martialArtsCategory: 'boxing', nameKey: 'exercises.uppercuts', descKey: 'exercises.uppercutsDesc' },
+  { id: 'footwork-drills', type: 'martial-arts', martialArtsCategory: 'boxing', nameKey: 'exercises.footworkDrills', descKey: 'exercises.footworkDrillsDesc' },
 
   // Kickboxing
   { id: 'kick-combos', type: 'martial-arts', martialArtsCategory: 'kickboxing', nameKey: 'exercises.kickCombos', descKey: 'exercises.kickCombosDesc' },
   { id: 'roundhouse-kick-drill', type: 'martial-arts', martialArtsCategory: 'kickboxing', nameKey: 'exercises.roundhouseKickDrill', descKey: 'exercises.roundhouseKickDrillDesc' },
   { id: 'thai-clinch', type: 'martial-arts', martialArtsCategory: 'kickboxing', nameKey: 'exercises.thaiClinch', descKey: 'exercises.thaiClinchDesc' },
   { id: 'low-kick-drill', type: 'martial-arts', martialArtsCategory: 'kickboxing', nameKey: 'exercises.lowKickDrill', descKey: 'exercises.lowKickDrillDesc' },
+  { id: 'front-kick', type: 'martial-arts', martialArtsCategory: 'kickboxing', nameKey: 'exercises.frontKick', descKey: 'exercises.frontKickDesc' },
+  { id: 'knee-strikes', type: 'martial-arts', martialArtsCategory: 'kickboxing', nameKey: 'exercises.kneeStrikes', descKey: 'exercises.kneeStrikesDesc' },
 
   // MMA
   { id: 'ground-and-pound', type: 'martial-arts', martialArtsCategory: 'mma', nameKey: 'exercises.groundAndPound', descKey: 'exercises.groundAndPoundDesc' },
   { id: 'takedown-drill', type: 'martial-arts', martialArtsCategory: 'mma', nameKey: 'exercises.takedownDrill', descKey: 'exercises.takedownDrillDesc' },
   { id: 'sprawl-drill', type: 'martial-arts', martialArtsCategory: 'mma', nameKey: 'exercises.sprawlDrill', descKey: 'exercises.sprawlDrillDesc' },
   { id: 'cage-work', type: 'martial-arts', martialArtsCategory: 'mma', nameKey: 'exercises.cageWork', descKey: 'exercises.cageWorkDesc' },
+  { id: 'elbow-strikes', type: 'martial-arts', martialArtsCategory: 'mma', nameKey: 'exercises.elbowStrikes', descKey: 'exercises.elbowStrikesDesc' },
 
   // Karate
 
@@ -300,5 +309,9 @@ export function getExercisesByType(type) {
 }
 
 export function getExerciseById(id) {
-  return exercises.find((e) => e.id === id);
+  const found = exercises.find((e) => e.id === id);
+  if (!found && import.meta.env.DEV) {
+    console.warn(`[exercises] Unbekannte Übungs-ID: "${id}"`);
+  }
+  return found;
 }

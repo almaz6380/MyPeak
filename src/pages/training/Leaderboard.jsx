@@ -5,9 +5,9 @@ import { useAuth } from '../../context/AuthContext';
 import { getFriends, getLeaderboardCategory, getLeaderboardData, getLevelTitle, hasGoldenFrame } from '../../data/socialStorage';
 
 export default function Leaderboard({ onBack }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, isGuestMode } = useAuth();
-  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const category = getLeaderboardCategory();

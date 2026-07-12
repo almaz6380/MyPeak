@@ -342,6 +342,9 @@ export async function addXP(userId, amount) {
       updated_at: new Date().toISOString(),
     });
 
+  // Cache aktualisieren, damit Home/Profil sofort frische Werte zeigen
+  localStorage.setItem(XP_KEY, JSON.stringify({ ...current, total_xp: newXP, level: newLevel }));
+
   return { oldLevel, newLevel, xpGained: amount };
 }
 
@@ -379,6 +382,15 @@ export async function updateStreak(userId) {
       last_workout_date: today,
       updated_at: new Date().toISOString(),
     });
+
+  // Cache aktualisieren, damit Home/Profil sofort frische Werte zeigen
+  localStorage.setItem(XP_KEY, JSON.stringify({
+    ...xp,
+    total_xp: newTotalXP,
+    level: newLevel,
+    streak_days: newStreak,
+    last_workout_date: today,
+  }));
 
   return { oldLevel, newLevel, xpGained: totalXPGain, streak: newStreak };
 }

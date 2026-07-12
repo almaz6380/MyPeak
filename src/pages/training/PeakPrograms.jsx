@@ -21,9 +21,9 @@ const LEVEL_LABELS = {
 };
 
 export default function PeakPrograms({ onBack, onProgramActivated, userGoal, userExperience }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [activating, setActivating] = useState(false);
@@ -284,9 +284,11 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, on
           const isSwapSelected = swapSource === key;
           return (
             <div key={key}>
-              <button
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => handleDayTap(key)}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all ${
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all cursor-pointer ${
                   isSwapSelected
                     ? 'bg-primary-50 dark:bg-primary-900/20 ring-2 ring-primary-400'
                     : day
@@ -313,7 +315,7 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, on
                     <ChevronRight className={`w-4 h-4 transition-transform ${editingDay === key ? 'rotate-90' : ''}`} />
                   </button>
                 )}
-              </button>
+              </div>
 
               {/* Expanded exercises */}
               {editingDay === key && day?.exercises && (

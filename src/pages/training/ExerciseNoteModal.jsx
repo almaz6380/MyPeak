@@ -6,9 +6,9 @@ import { getExercisePhoto, saveExercisePhoto, deleteExercisePhoto, compressImage
 import { useAuth } from '../../context/AuthContext';
 
 export default function ExerciseNoteModal({ exerciseId, exerciseName, initialNote, initialSettings, onClose, onSaved }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
 
   const [note, setNote] = useState(initialNote || '');
   const [settings, setSettings] = useState(initialSettings || []);

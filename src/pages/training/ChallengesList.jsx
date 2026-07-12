@@ -6,9 +6,9 @@ import { getChallenges, respondToChallenge } from '../../data/socialStorage';
 import { getExerciseById } from '../../data/exercises';
 
 export default function ChallengesList({ onBack, onCreateChallenge, onViewChallenge }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, isGuestMode } = useAuth();
-  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
 

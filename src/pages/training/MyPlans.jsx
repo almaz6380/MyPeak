@@ -7,9 +7,9 @@ import { getWeeklySchedules, deleteWeeklySchedule, saveWeeklySchedule } from '..
 const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
 export default function MyPlans({ onBack, onCreate, onEdit, onStartFreeWorkout }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
 

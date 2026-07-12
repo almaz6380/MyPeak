@@ -7,6 +7,7 @@ import { ActiveWorkoutProvider } from './context/ActiveWorkoutContext';
 import { CameraProvider } from './context/CameraContext';
 import SplashScreen from './components/SplashScreen';
 import BottomNav from './components/BottomNav';
+import BackgroundLayer from './components/BackgroundLayer';
 import PullToRefresh from './components/PullToRefresh';
 import HomePage from './pages/HomePage';
 import TrainingPage from './pages/TrainingPage';
@@ -94,6 +95,7 @@ function AppShell() {
           </p>
         </div>
       )}
+      <BackgroundLayer />
       <PullToRefresh>
         <main className="min-h-screen max-w-lg mx-auto pb-20">
           <Routes>

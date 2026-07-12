@@ -157,7 +157,8 @@
     "muscleGroup": "Muscle group",
     "equipment": "Equipment",
     "customExercise": "Custom",
-    "confirmDeleteExercise": "Do you really want to delete this custom exercise?"
+    "confirmDeleteExercise": "Do you really want to delete this custom exercise?",
+    "demoBadge": "Demo"
   },
   "nutrition": {
     "title": "Nutrition",
@@ -257,7 +258,7 @@
     "barcodeNotFoundDesc": "This barcode is not in the database. You can enter the product manually.",
     "scanAgain": "Scan again",
     "cameraError": "Camera error",
-    "cameraPermissionDenied": "Camera access was denied. Please allow access in your browser settings.",
+    "cameraPermissionDenied": "No camera access. Please allow MyPeak to use the camera in your device settings and try again.",
     "noCameraFound": "No camera found. Please make sure your device has a camera.",
     "mealPhoto": "Photo AI",
     "mealPhotoHint": "Take a photo of your meal — AI will estimate calories and macros for you.",
@@ -400,7 +401,6 @@
     "machineChestFlyDesc": "Fly movement on a machine. Guided chest isolation with constant tension throughout the movement.",
     "resistanceBandChestPress": "Resistance Band Chest Press",
     "resistanceBandChestPressDesc": "Chest press with resistance band. Ideal for warm-ups, rehabilitation, or training on the go.",
-
     "deadlift": "Deadlift",
     "deadliftDesc": "Compound barbell exercise from the floor. Trains entire back and legs.",
     "pullUps": "Pull-Ups",
@@ -465,7 +465,6 @@
     "highRowDesc": "Rowing on the high row machine with an elevated pull point. Targets upper back, rear delts, and rhomboids.",
     "mTorture2WayRow": "M Torture 2 Way Row",
     "mTorture2WayRowDesc": "Specialized rowing machine with two movement angles. Trains the back through alternating pull directions for maximum muscle activation.",
-
     "overheadPress": "Overhead Press",
     "overheadPressDesc": "Barbell pressed overhead. Primarily front and lateral delts.",
     "lateralRaise": "Lateral Raise",
@@ -520,7 +519,6 @@
     "machineLateralRaiseDesc": "Lateral raise on a guided machine. Isolates the lateral deltoid without momentum.",
     "dumbbellYRaise": "Y-Raise",
     "dumbbellYRaiseDesc": "Raise dumbbells in a Y-shape on an incline bench. Targets rear delts and upper back.",
-
     "barbellCurl": "Barbell Curl",
     "barbellCurlDesc": "Curls with barbell. Fundamental bicep exercise.",
     "dumbbellCurl": "Dumbbell Curl",
@@ -563,7 +561,6 @@
     "cablePreacherCurlDesc": "Preacher curls on the cable machine. Constant tension throughout the range of motion for maximum bicep isolation.",
     "scottCurlDumbbell": "Scott Curl (Dumbbell)",
     "scottCurlDumbbellDesc": "Dumbbell curls on the Scott bench (preacher bench). Isolates the biceps with fixed upper arms, preventing momentum.",
-
     "tricepPushdown": "Tricep Pushdown",
     "tricepPushdownDesc": "Cable pushed downward. Fundamental tricep exercise.",
     "skullCrushers": "Skull Crushers",
@@ -606,7 +603,6 @@
     "ezBarSkullCrusherDesc": "Skull crushers with the EZ curl bar. Easier on the wrists while intensely training the triceps.",
     "dipMachine": "Dip Machine",
     "dipMachineDesc": "Guided dips on the machine. Trains triceps and chest with adjustable weight, ideal for beginners.",
-
     "squat": "Squat",
     "squatDesc": "Compound barbell exercise. Trains quads, glutes, and core.",
     "legPress": "Leg Press",
@@ -665,7 +661,6 @@
     "lyingLegCurlDesc": "Leg curl machine in lying position. Trains the hamstrings through full range of motion.",
     "singleLegPress": "Single Leg Press",
     "singleLegPressDesc": "Leg press with one leg. Corrects strength imbalances and trains stability.",
-
     "hipThrust": "Hip Thrust",
     "hipThrustDesc": "Hip extension with barbell on bench. Best exercise for glutes.",
     "cableKickback": "Cable Kickback",
@@ -682,7 +677,6 @@
     "machineHipThrustDesc": "Hip thrust on a dedicated machine. Easy setup with strong glute isolation.",
     "donkeyKick": "Donkey Kicks",
     "donkeyKickDesc": "On all fours, kick one leg back and up. Isolates the glutes with bodyweight.",
-
     "crunches": "Crunches",
     "crunchesDesc": "Classic ab exercise. Trains the upper abs.",
     "hangingLegRaise": "Hanging Leg Raise",
@@ -703,7 +697,6 @@
     "woodchopCableDesc": "Diagonal pulling motion on the cable machine from high to low. Trains rotation and lateral core muscles.",
     "deadBug": "Dead Bug",
     "deadBugDesc": "Lying on back, extend opposite arm and leg. Strengthens the core and improves stability.",
-
     "calfRaiseStanding": "Standing Calf Raise",
     "calfRaiseStandingDesc": "Standing on calf raise machine. Trains the gastrocnemius.",
     "calfRaiseSeated": "Seated Calf Raise",
@@ -714,7 +707,6 @@
     "donkeyCalfRaiseDesc": "Calf raises in a bent-over position with weight on the hips. Classic exercise for maximum calf stretch.",
     "singleLegCalfRaise": "Single Leg Calf Raise",
     "singleLegCalfRaiseDesc": "Calf raise on one leg with bodyweight. Corrects strength imbalances and improves balance.",
-
     "wristCurl": "Wrist Curl",
     "wristCurlDesc": "Curl dumbbell with wrists. Trains forearm flexors.",
     "reverseWristCurl": "Reverse Wrist Curl",
@@ -725,7 +717,6 @@
     "platePinchDesc": "Pinch weight plates together with fingertips and hold. Builds extreme grip strength and forearm power.",
     "behindBackWristCurl": "Behind Back Wrist Curl",
     "behindBackWristCurlDesc": "Curl a barbell behind the back with the wrists. Trains forearm flexors through full range of motion.",
-
     "running": "Running",
     "runningDesc": "Run outdoors or on a treadmill. Improves endurance and cardiovascular fitness.",
     "cycling": "Cycling",
@@ -738,7 +729,6 @@
     "swimmingDesc": "Swim in a pool or open water. Low-impact full-body workout.",
     "jumpRope": "Jump Rope",
     "jumpRopeDesc": "Jump rope for endurance, coordination, and fat burning. Improves speed and footwork.",
-
     "burpees": "Burpees",
     "burpeesDesc": "Full-body exercise: push-up, jump, repeat. Extremely effective for conditioning.",
     "mountainClimbers": "Mountain Climbers",
@@ -753,7 +743,6 @@
     "battleRopesDesc": "Swing heavy ropes in wave motions. Intense upper body cardio.",
     "kettlebellSwings": "Kettlebell Swings",
     "kettlebellSwingsDesc": "Swing kettlebell between legs. Trains hips, back, and conditioning.",
-
     "pushUps": "Push-Ups",
     "pushUpsDesc": "Classic push-ups. Trains chest, shoulders, and triceps with bodyweight.",
     "jumpingJacks": "Jumping Jacks",
@@ -764,7 +753,6 @@
     "stepUpsDesc": "Step onto and off a bench or step. Trains legs and balance.",
     "bodyweightSquats": "Bodyweight Squats",
     "bodyweightSquatsDesc": "Squats without weight. Fundamental leg and glute exercise.",
-
     "shadowBoxing": "Shadow Boxing",
     "shadowBoxingDesc": "Boxing combinations in the air without an opponent. Perfect for warmup and technique.",
     "heavyBagRounds": "Heavy Bag Rounds",
@@ -822,7 +810,25 @@
     "wrestlingConditioning": "Wrestling Conditioning",
     "wrestlingConditioningDesc": "Wrestling-specific strength and endurance training. Bridges, sprawls, and crawls.",
     "matReturns": "Mat Returns",
-    "matReturnsDesc": "Techniques for returning the opponent to the mat from standing position."
+    "matReturnsDesc": "Techniques for returning the opponent to the mat from standing position.",
+    "jumpLunges": "Jump Lunges",
+    "jumpLungesDesc": "Explosive lunges switching legs mid-air. Trains legs and conditioning.",
+    "plankJacks": "Plank Jacks",
+    "plankJacksDesc": "In a forearm plank, jump feet apart and together like a jumping jack. Core and conditioning.",
+    "jabCross": "Jab-Cross",
+    "jabCrossDesc": "The classic 1-2 combination: straight lead-hand jab followed by the rear-hand cross.",
+    "hooks": "Hooks",
+    "hooksDesc": "Lateral punches with a bent arm. Power comes from hip rotation.",
+    "uppercuts": "Uppercuts",
+    "uppercutsDesc": "Upward punches driven from the hips. Builds close-range punching power.",
+    "footworkDrills": "Footwork Drills",
+    "footworkDrillsDesc": "Step patterns, direction changes and distance control. The foundation of every striking art.",
+    "frontKick": "Front Kick",
+    "frontKickDesc": "Straight kick to the front with the ball of the foot. Range weapon and push kick.",
+    "kneeStrikes": "Knee Strikes",
+    "kneeStrikesDesc": "Explosive knee strikes from the clinch or at range. Trains hip power and balance.",
+    "elbowStrikes": "Elbow Strikes",
+    "elbowStrikesDesc": "Short, hard elbow techniques at close range. Precision over power."
   },
   "auth": {
     "login": "Log In",

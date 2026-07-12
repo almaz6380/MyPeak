@@ -9,7 +9,7 @@ import useProgressComparison from '../../hooks/useProgressComparison';
 import ExerciseLineGraph from '../../components/progress/ExerciseLineGraph';
 
 export default function WorkoutHistory({ onBack }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -520,7 +520,7 @@ export default function WorkoutHistory({ onBack }) {
 function EditWorkoutModal({ workout, onSave, onClose, t, weightUnit }) {
   const [exercises, setExercises] = useState(workout.exercises || []);
   const [showAddExercise, setShowAddExercise] = useState(false);
-  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
 
   function updateSet(exIdx, setIdx, field, value) {
     setExercises((prev) => prev.map((ex, ei) => {

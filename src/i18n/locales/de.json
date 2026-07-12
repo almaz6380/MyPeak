@@ -157,7 +157,8 @@
     "muscleGroup": "Muskelgruppe",
     "equipment": "Equipment",
     "customExercise": "Eigene",
-    "confirmDeleteExercise": "Möchtest du diese eigene Übung wirklich löschen?"
+    "confirmDeleteExercise": "Möchtest du diese eigene Übung wirklich löschen?",
+    "demoBadge": "Demo"
   },
   "nutrition": {
     "title": "Ernährung",
@@ -257,7 +258,7 @@
     "barcodeNotFoundDesc": "Dieser Barcode ist nicht in der Datenbank. Du kannst das Produkt manuell eingeben.",
     "scanAgain": "Nochmal scannen",
     "cameraError": "Kamera-Fehler",
-    "cameraPermissionDenied": "Kamerazugriff wurde verweigert. Bitte erlaube den Zugriff in deinen Browser-Einstellungen.",
+    "cameraPermissionDenied": "Kein Kamera-Zugriff. Bitte erlaube MyPeak den Kamera-Zugriff in den Geräte-Einstellungen und versuche es erneut.",
     "noCameraFound": "Keine Kamera gefunden. Bitte stelle sicher, dass dein Gerät eine Kamera hat.",
     "mealPhoto": "Foto erkennen",
     "mealPhotoHint": "Fotografiere deine Mahlzeit — die KI schätzt Kalorien und Makros für dich.",
@@ -400,7 +401,6 @@
     "machineChestFlyDesc": "Fliegende Bewegung an der Maschine. Geführte Isolation der Brustmuskulatur mit konstanter Spannung.",
     "resistanceBandChestPress": "Widerstandsband-Brustdrücken",
     "resistanceBandChestPressDesc": "Brustdrücken mit Widerstandsband. Ideal für Aufwärmen, Rehabilitation oder Training unterwegs.",
-
     "deadlift": "Kreuzheben",
     "deadliftDesc": "Grundübung mit der Langhantel vom Boden. Trainiert den gesamten Rücken und die Beine.",
     "pullUps": "Klimmzüge",
@@ -465,7 +465,6 @@
     "highRowDesc": "Rudern an der High-Row-Maschine mit hohem Zugpunkt. Trainiert den oberen Rücken, hintere Schulter und Rhomboiden.",
     "mTorture2WayRow": "M Torture 2 Way Row",
     "mTorture2WayRowDesc": "Spezielle Ruder-Maschine mit zwei Bewegungswinkeln. Trainiert den Rücken durch wechselnde Zugrichtungen für maximale Muskelaktivierung.",
-
     "overheadPress": "Schulterdrücken",
     "overheadPressDesc": "Langhantel über Kopf drücken. Primär vordere und seitliche Schulter.",
     "lateralRaise": "Seitheben",
@@ -520,7 +519,6 @@
     "machineLateralRaiseDesc": "Seitheben an der Maschine mit geführter Bewegung. Isoliert die seitliche Schulter ohne Schwung.",
     "dumbbellYRaise": "Y-Raise",
     "dumbbellYRaiseDesc": "Kurzhanteln in Y-Form nach oben heben auf der Schrägbank. Trainiert die hintere Schulter und den oberen Rücken.",
-
     "barbellCurl": "Langhantelcurls",
     "barbellCurlDesc": "Curls mit der Langhantel. Grundübung für den Bizeps.",
     "dumbbellCurl": "Kurzhantelcurls",
@@ -563,7 +561,6 @@
     "cablePreacherCurlDesc": "Preacher Curls am Kabelzug. Konstante Spannung über den gesamten Bewegungsradius für maximale Bizeps-Isolation.",
     "scottCurlDumbbell": "Scott Curl (Kurzhantel)",
     "scottCurlDumbbellDesc": "Kurzhantel-Curls auf der Scott-Bank (Preacher Bench). Isoliert den Bizeps durch fixierte Oberarme und verhindert Schwung.",
-
     "tricepPushdown": "Trizepsdrücken am Kabel",
     "tricepPushdownDesc": "Kabelzug nach unten drücken. Grundübung für den Trizeps.",
     "skullCrushers": "Skull Crushers",
@@ -606,7 +603,6 @@
     "ezBarSkullCrusherDesc": "Skull Crushers mit der SZ-Stange. Schont die Handgelenke und trainiert den Trizeps intensiv.",
     "dipMachine": "Dip-Maschine",
     "dipMachineDesc": "Geführte Dips an der Maschine. Trainiert Trizeps und Brust mit einstellbarem Gewicht, ideal für Anfänger.",
-
     "squat": "Kniebeugen",
     "squatDesc": "Grundübung mit der Langhantel. Trainiert Oberschenkel, Gesäß und Core.",
     "legPress": "Beinpresse",
@@ -665,7 +661,6 @@
     "lyingLegCurlDesc": "Beinbeuger-Maschine in liegender Position. Trainiert die Hamstrings mit vollem Bewegungsradius.",
     "singleLegPress": "Einbeinige Beinpresse",
     "singleLegPressDesc": "Beinpresse mit einem Bein. Gleicht Kraftunterschiede aus und trainiert Stabilität.",
-
     "hipThrust": "Hip Thrust",
     "hipThrustDesc": "Hüftstrecken mit Langhantel auf der Bank. Beste Übung für den Gluteus.",
     "cableKickback": "Cable Kickback",
@@ -682,7 +677,6 @@
     "machineHipThrustDesc": "Hip Thrust an der speziellen Maschine. Einfaches Setup mit starker Gluteus-Isolation.",
     "donkeyKick": "Donkey Kicks",
     "donkeyKickDesc": "Im Vierfüßlerstand ein Bein nach hinten-oben drücken. Isoliert den Gluteus mit Körpergewicht.",
-
     "crunches": "Crunches",
     "crunchesDesc": "Klassische Bauchübung. Trainiert den oberen Bauch.",
     "hangingLegRaise": "Hängendes Beinheben",
@@ -703,7 +697,6 @@
     "woodchopCableDesc": "Diagonale Zugbewegung am Kabelzug von oben nach unten. Trainiert die Rotation und seitliche Core-Muskulatur.",
     "deadBug": "Dead Bug",
     "deadBugDesc": "Auf dem Rücken liegend gegenüberliegende Arme und Beine strecken. Stärkt den Core und verbessert die Stabilität.",
-
     "calfRaiseStanding": "Wadenheben stehend",
     "calfRaiseStandingDesc": "Stehend an der Maschine. Trainiert den Gastrocnemius.",
     "calfRaiseSeated": "Wadenheben sitzend",
@@ -714,7 +707,6 @@
     "donkeyCalfRaiseDesc": "Wadenheben in vorgebeugter Position mit Gewicht auf der Hüfte. Klassische Übung für maximale Wadendehnung.",
     "singleLegCalfRaise": "Einbeiniges Wadenheben",
     "singleLegCalfRaiseDesc": "Wadenheben auf einem Bein mit Körpergewicht. Gleicht Kraftunterschiede aus und verbessert die Balance.",
-
     "wristCurl": "Handgelenkbeugen",
     "wristCurlDesc": "Kurzhantel mit den Handgelenken beugen. Trainiert die Unterarmbeuger.",
     "reverseWristCurl": "Reverse Handgelenkbeugen",
@@ -725,7 +717,6 @@
     "platePinchDesc": "Hantelscheiben mit den Fingerspitzen zusammendrücken und halten. Baut extreme Griffkraft und Unterarmstärke auf.",
     "behindBackWristCurl": "Wrist Curl hinter dem Rücken",
     "behindBackWristCurlDesc": "Langhantel hinter dem Rücken mit den Handgelenken curlen. Trainiert die Unterarmbeuger mit vollem Bewegungsradius.",
-
     "running": "Laufen",
     "runningDesc": "Laufen im Freien oder auf dem Laufband. Verbessert Ausdauer und Herz-Kreislauf-Fitness.",
     "cycling": "Radfahren",
@@ -738,7 +729,6 @@
     "swimmingDesc": "Schwimmen im Becken oder Freiwasser. Gelenkschonendes Ganzkörpertraining.",
     "jumpRope": "Seilspringen",
     "jumpRopeDesc": "Seilspringen für Ausdauer, Koordination und Fettverbrennung. Verbessert Schnelligkeit und Beinarbeit.",
-
     "burpees": "Burpees",
     "burpeesDesc": "Ganzkörperübung: Liegestütz, Sprung, wiederholen. Extrem effektiv für Kondition.",
     "mountainClimbers": "Mountain Climbers",
@@ -753,7 +743,6 @@
     "battleRopesDesc": "Schwere Seile in Wellenbewegung schwingen. Intensives Oberkörper-Cardio.",
     "kettlebellSwings": "Kettlebell Swings",
     "kettlebellSwingsDesc": "Kettlebell zwischen den Beinen durchschwingen. Trainiert Hüfte, Rücken und Kondition.",
-
     "pushUps": "Liegestütze",
     "pushUpsDesc": "Klassische Liegestütze. Trainiert Brust, Schultern und Trizeps mit Körpergewicht.",
     "jumpingJacks": "Hampelmänner",
@@ -764,7 +753,6 @@
     "stepUpsDesc": "Auf eine Stufe oder Bank steigen und absteigen. Trainiert Beine und Balance.",
     "bodyweightSquats": "Kniebeugen (Körpergewicht)",
     "bodyweightSquatsDesc": "Kniebeugen ohne Gewicht. Grundübung für Beine und Gesäß.",
-
     "shadowBoxing": "Schattenboxen",
     "shadowBoxingDesc": "Boxkombinationen in der Luft ohne Gegner. Perfekt zum Aufwärmen und für Technik.",
     "heavyBagRounds": "Sandsack-Runden",
@@ -822,7 +810,25 @@
     "wrestlingConditioning": "Ringer-Konditionierung",
     "wrestlingConditioningDesc": "Spezifisches Kraft-Ausdauer-Training für Ringer. Brücken, Sprawls und Kriechen.",
     "matReturns": "Mat Returns",
-    "matReturnsDesc": "Techniken zum Zurückbringen des Gegners auf die Matte aus dem Stand."
+    "matReturnsDesc": "Techniken zum Zurückbringen des Gegners auf die Matte aus dem Stand.",
+    "jumpLunges": "Sprung-Ausfallschritte",
+    "jumpLungesDesc": "Explosive Ausfallschritte mit Sprungwechsel in der Luft. Trainiert Beine und Ausdauer.",
+    "plankJacks": "Plank Jacks",
+    "plankJacksDesc": "Im Unterarmstütz die Beine wie beim Hampelmann öffnen und schließen. Core und Ausdauer.",
+    "jabCross": "Jab-Cross",
+    "jabCrossDesc": "Die klassische 1-2-Kombination: gerader Führhand-Schlag gefolgt vom Cross der Schlaghand.",
+    "hooks": "Haken",
+    "hooksDesc": "Seitliche Schläge mit angewinkeltem Arm. Kraft kommt aus der Hüftrotation.",
+    "uppercuts": "Aufwärtshaken",
+    "uppercutsDesc": "Aufwärts gerichtete Schläge aus der Hüfte. Trainiert Schlagkraft aus der Nahdistanz.",
+    "footworkDrills": "Beinarbeit-Drills",
+    "footworkDrillsDesc": "Schrittmuster, Richtungswechsel und Distanzkontrolle. Die Grundlage jeder Kampfsporttechnik.",
+    "frontKick": "Frontkick",
+    "frontKickDesc": "Gerader Tritt nach vorne mit dem Fußballen. Distanzwaffe und Push-Kick.",
+    "kneeStrikes": "Kniestöße",
+    "kneeStrikesDesc": "Explosive Kniestöße aus dem Clinch oder der Distanz. Trainiert Hüftkraft und Balance.",
+    "elbowStrikes": "Ellbogenschläge",
+    "elbowStrikesDesc": "Kurze, harte Ellbogentechniken aus der Nahdistanz. Präzision vor Kraft."
   },
   "auth": {
     "login": "Anmelden",

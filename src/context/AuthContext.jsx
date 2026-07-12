@@ -208,6 +208,14 @@ export function AuthProvider({ children }) {
       return { error: null };
     }
 
+    // Nicht-synchronisierte local_-Einträge vor dem Löschen hochladen (best effort),
+    // sonst gehen offline erstellte Daten beim Logout unwiderruflich verloren
+    try {
+      await syncLocalDataToCloud(user.id);
+    } catch (err) {
+      console.error('Sync before signout failed:', err);
+    }
+
     const { error } = await supabase.auth.signOut();
     if (!error) {
       // Alle Nutzerdaten vom Gerät entfernen (nur Geräte-Einstellungen bleiben),

@@ -8,10 +8,10 @@ import { lookupCommunityProduct, addCommunityProduct } from '../../data/communit
 import { getProductPhoto, saveProductPhoto, compressImage } from '../../data/exercisePhotos';
 
 export default function BarcodeScanner({ onScanned, onClose }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const camera = useCamera();
-  const lang = t('common.back') === 'Zurück' ? 'de' : 'en';
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
   const [status, setStatus] = useState('starting'); // starting | scanning | loading | found | notFound | addProduct | error
   const [errorMsg, setErrorMsg] = useState('');
   const [scannedBarcode, setScannedBarcode] = useState(null);
@@ -129,8 +129,15 @@ export default function BarcodeScanner({ onScanned, onClose }) {
     // Pre-request camera via context (reuses existing permission)
     try {
       if (camera) await camera.requestCamera();
-    } catch {
-      // Will be caught by Quagga below
+    } catch (err) {
+      // Berechtigung verweigert / keine Kamera → spezifischer Hinweis statt generischem Fehler
+      if (err?.name === 'NotAllowedError' || err?.name === 'SecurityError' || err?.name === 'NotFoundError') {
+        if (!isMountedRef.current) return;
+        setStatus('error');
+        setErrorMsg(t(err.name === 'NotFoundError' ? 'nutrition.noCameraFound' : 'nutrition.cameraPermissionDenied'));
+        return;
+      }
+      // Andere Fehler: Quagga versucht es unten selbst
     }
 
     Quagga.init(

@@ -16,6 +16,16 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### App-Review-Status (12.07.2026)
+- **iOS 1.0 ABGELEHNT** (09.07.2026): Guideline 4.3(a) „Design – Spam" (ähnliches Binary/Konzept wie andere Entwickler — vermutlich Capacitor-Gerüst-Ähnlichkeit mit den anderen Apps des Kontos). **Antwort an App Review gesendet (12.07.2026)** — warten auf Rückmeldung; falls erfolglos → App Review Board Appeal. KEIN Code-Problem.
+- Android: weiterhin in Google-Prüfung.
+
+### Verbesserungs-Runde (12.07.2026, Branch improvements-juli)
+- **Bug-Fixes:** XP/Streak-System verdrahtet (Workout-Ende vergibt jetzt XP + Streak via `updateStreak`, Level-Up-Animation eingebunden — war vorher komplett tot); verschachtelte Buttons auf HomePage/Cookbook/PeakPrograms; Logout synct lokale Daten vor dem Löschen; `deleteNutritionEntry` mit Guest-Guard + Pending-Delete-Nachholliste; Ziel 0 wird nicht mehr zu Default überschrieben (parseFloat); Dashboard-Race-Guard; Scanner unterscheidet Berechtigung-verweigert/keine-Kamera; Sprach-Erkennung überall auf `i18n.language` umgestellt (statt `t('common.back')==='Zurück'`).
+- **peakPrograms.js bereinigt:** 28 kaputte Übungs-IDs auf echte exercises.js-IDs gemappt, 9 neue Übungen ergänzt (jump-lunges, plank-jacks, jab-cross, hooks, uppercuts, footwork-drills, front-kick, knee-strikes, elbow-strikes); `getExerciseById` warnt im Dev-Mode bei unbekannter ID. Achtung: bereits gespeicherte weekly_schedules behalten alte ID-Kopien.
+- **Hintergrundmotive:** dezente SVG-Line-Art pro Tab (`src/components/BackgroundLayer.jsx` + `backgrounds/motifs.jsx`), gemountet in AppShell VOR PullToRefresh (dessen Transform würde position:fixed brechen). Berg/Hantel/Teller/Buch/Silhouette, Opacity ~5%, Maske läuft nach unten aus.
+- **Übungs-Demos:** 179 Übungen mit Foto-Demos aus free-exercise-db (Public Domain, github.com/yuhonas/free-exercise-db). Mapping in `src/data/exerciseDemos.js` (kuratiert!), Bilder in `public/exercise-demos/<dbId>/{0,1}.jpg` (480px, 8,6 MB, offline). `ExerciseDemoImage` = Crossfade Start-/Endposition; Einstiege: Tap in Übungsbibliothek → `ExerciseDetailSheet` (+ „Demo"-Badge), PlayCircle-Button im ActiveWorkout → `ExerciseDemoModal`. Übungen ohne Mapping zeigen kein Badge (Fallback). Ein 3D-Ansatz (three.js) wurde erprobt und VERWORFEN — nicht wieder einführen.
+
 ### Store-Launch + Werbung (07.07.2026) — EINGEREICHT
 - **Android:** signiertes `.aab` (versionCode 1 / 1.0) bei Google Play in Prüfung. Upload-Keystore in `android/upload-keystore.jks` + `keystore.properties` (gitignored! Backup in ~/AppSigningKeys/mypeak + OneDrive). Build: `JAVA_HOME=<Android-Studio-jbr> ./gradlew bundleRelease`.
 - **iOS:** IPA bei App Store Connect eingereicht (App-ID 6788461300, Bundle at.gallab.mypeak). Manuelle Distributions-Signierung im pbxproj (Team JU8STVD4SJ, Profil „MyPeak AppStore"). Build: `xcodebuild ... archive` + `-exportArchive` (ExportOptions auf ~/Desktop/mypeak-ios-export/), Upload via `altool` (ASC-Key VGHCB8Z8Q2). Metadaten per ASC-API gesetzt.
@@ -94,7 +104,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - [x] Freunde-System: MyPeak-Code (MP-NAME-XXXX), per Code hinzufügen, Anfragen annehmen/ablehnen
 - [x] Leaderboard: Wöchentlich rotierende Kategorie (Volumen/Streak/Trainings), nur Freunde
 - [x] Challenges: Freund herausfordern, Volumen oder Runden, Zeitraum wählbar, Live-Score
-- [x] XP-System: Workout +10 XP, Challenge gewinnen +50 XP, 7-Tage-Streak +25 XP, Level-Anzeige im Profil
+- [x] XP-System: Workout +50 XP, Challenge gewinnen +150 XP, Streak-Boni 7/14/30 Tage (+100/200/500 XP), Level-Anzeige im Profil; vergeben beim Workout-Beenden (updateStreak in ActiveWorkout), Level-Up-Animation eingebunden
 - [x] Social-Karten auf Training-Startseite (Ranking, Challenges, Freunde)
 - [x] Level-System: Titel (Rookie/Warrior/Champion/Legend/GOAT), progressive XP, Level-Up Animation
 - [x] Übungsbibliothek erweitert: 117 Kraftübungen (Brust, Rücken, Schultern, Bizeps, Trizeps, Beine, Glutes, Abs, Calves, Forearms), hierarchische Navigation (Bereich→Filter)
