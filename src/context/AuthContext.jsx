@@ -6,7 +6,7 @@ import { syncLocalDataToCloud, registerOnlineSync } from '../data/resync';
 // Geräte-Einstellungen, die beim Abmelden erhalten bleiben —
 // alle anderen Keys sind Nutzerdaten und werden entfernt, damit der
 // nächste Login auf diesem Gerät keine fremden Daten sieht.
-const KEEP_ON_SIGNOUT = ['language', 'darkMode', 'splashSeen', 'weightUnit'];
+const KEEP_ON_SIGNOUT = ['language', 'darkMode', 'themeChosen', 'splashSeen', 'weightUnit'];
 
 function clearLocalUserData() {
   for (const key of Object.keys(localStorage)) {

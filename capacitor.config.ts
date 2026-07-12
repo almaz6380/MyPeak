@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appId: 'at.gallab.mypeak',
   appName: 'MyPeak',
   webDir: 'dist',
-  backgroundColor: '#0a0a0a',
+  backgroundColor: '#f6f4f0',
 };
 
 export default config;
