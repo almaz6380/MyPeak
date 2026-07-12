@@ -1110,5 +1110,13 @@
     "cravings": "Heißhunger",
     "notes": "Notizen",
     "notesPlaceholder": "Wie fühlst du dich heute?"
+  },
+  "heatmap": {
+    "title": "Muskel-Fokus diese Woche",
+    "sets": "Sätze",
+    "setsPerWeek": "Sätze/Woche",
+    "front": "Vorne",
+    "back": "Hinten",
+    "empty": "Noch keine Kraftsätze diese Woche — starte ein Workout, um deine Muskel-Heatmap zu füllen."
   }
 }

@@ -1110,5 +1110,13 @@
     "cravings": "Cravings",
     "notes": "Notes",
     "notesPlaceholder": "How are you feeling today?"
+  },
+  "heatmap": {
+    "title": "Muscle focus this week",
+    "sets": "sets",
+    "setsPerWeek": "sets/week",
+    "front": "Front",
+    "back": "Back",
+    "empty": "No strength sets this week yet — start a workout to fill your muscle heatmap."
   }
 }

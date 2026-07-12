@@ -12,7 +12,7 @@ function getISOWeek(date) {
   return 1 + Math.round(((d - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
 }
 
-function getWeekYear(date) {
+export function getWeekYear(date) {
   const d = new Date(date);
   return `${d.getFullYear()}-W${String(getISOWeek(d)).padStart(2, '0')}`;
 }

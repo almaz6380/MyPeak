@@ -19,6 +19,7 @@ import { useAuth } from '../context/AuthContext';
 import { useActiveWorkout } from '../context/ActiveWorkoutContext';
 import MuscleGroupIcon from '../components/icons/MuscleGroupIcon';
 import WeeklySummaryBanner from '../components/progress/WeeklySummaryBanner';
+import MuscleHeatmapCard from '../components/progress/MuscleHeatmapCard';
 import MyPeakLogo from '../components/MyPeakLogo';
 import DiamondCalendar from '../components/DiamondCalendar';
 import WeeklyPlanBuilder from './training/WeeklyPlanBuilder';
@@ -356,6 +357,8 @@ export default function TrainingPage() {
       )}
 
       <WeeklySummaryBanner userId={user?.id} />
+
+      <MuscleHeatmapCard userId={user?.id} />
 
       {/* Resume active workout banner */}
       {hasValidWorkout && (
