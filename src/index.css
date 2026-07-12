@@ -176,6 +176,18 @@
   animation: draw-arrow 0.3s ease-out 0.5s forwards;
 }
 
+/* Übungs-Demo: weiches Hin- und Herblenden zwischen Start- und Endposition
+   (halten → überblenden → halten → zurück) — wirkt wie eine Bewegung */
+@keyframes demo-crossfade {
+  0%, 32% { opacity: 0; }
+  46%, 82% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+
+.animate-demo-crossfade {
+  animation: demo-crossfade 3s ease-in-out infinite;
+}
+
 /* Quagga scanner container */
 #scanner-container > video {
   width: 100% !important;
