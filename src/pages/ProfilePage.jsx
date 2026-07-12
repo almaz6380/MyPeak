@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { saveSetting } from '../data/settingsStorage';
 import MyPeakLogo from '../components/MyPeakLogo';
 import { supabase } from '../lib/supabase';
-import { Moon, Sun, Globe, Weight, LogOut, User, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2, ShieldCheck } from 'lucide-react';
+import { Moon, Sun, Globe, Weight, LogOut, User, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2, ShieldCheck, Camera as CameraIcon } from 'lucide-react';
 import { getOrCreateFriendCode, getXP, getLevelTitle, calculateLevel, hasGoldenFrame } from '../data/socialStorage';
 import AchievementGallery from '../components/progress/AchievementGallery';
 import { canChangeAdConsent, changeAdConsent } from '../lib/ads';
@@ -207,6 +207,23 @@ export default function ProfilePage() {
 
       {/* Erfolge & Abzeichen */}
       <AchievementGallery userId={user?.id} />
+
+      {/* Mein Fortschritt (Fotos) */}
+      <Link
+        to="/progress"
+        className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 p-4 mb-4 flex items-center justify-between"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+            <CameraIcon className="w-5 h-5 text-primary-500" />
+          </div>
+          <div className="text-left">
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('progressPhotos.title')}</p>
+            <p className="text-[11px] text-slate-400">{t('progressPhotos.subtitle')}</p>
+          </div>
+        </div>
+        <ChevronRight className="w-5 h-5 text-slate-300" />
+      </Link>
 
       {/* Personal Data */}
       {profile && (

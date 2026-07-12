@@ -1216,5 +1216,16 @@
         "desc": "Trained all 10 muscle groups in one week"
       }
     }
+  },
+  "progressPhotos": {
+    "title": "My Progress",
+    "subtitle": "Progress photos & before-after comparison",
+    "privacy": "Your photos stay on this device only and are never uploaded.",
+    "takePhoto": "Take progress photo",
+    "empty": "No photos yet — take your first progress photo and track your transformation over time.",
+    "selectHint": "Tap two photos to compare them.",
+    "compare": "Before / After",
+    "days": "days",
+    "deleteConfirm": "Delete this photo permanently?"
   }
 }

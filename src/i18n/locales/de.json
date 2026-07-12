@@ -1216,5 +1216,16 @@
         "desc": "Alle 10 Muskelgruppen in einer Woche trainiert"
       }
     }
+  },
+  "progressPhotos": {
+    "title": "Mein Fortschritt",
+    "subtitle": "Fortschritts-Fotos & Vorher-Nachher-Vergleich",
+    "privacy": "Deine Fotos bleiben ausschließlich auf diesem Gerät und werden nie hochgeladen.",
+    "takePhoto": "Fortschritts-Foto aufnehmen",
+    "empty": "Noch keine Fotos — nimm dein erstes Fortschritts-Foto auf und verfolge deine Veränderung über die Zeit.",
+    "selectHint": "Tippe zwei Fotos an, um sie zu vergleichen.",
+    "compare": "Vorher / Nachher",
+    "days": "Tage",
+    "deleteConfirm": "Dieses Foto endgültig löschen?"
   }
 }
