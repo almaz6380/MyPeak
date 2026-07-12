@@ -7,6 +7,7 @@ import BarcodeScanner from './BarcodeScanner';
 import MealPhotoCapture from './MealPhotoCapture';
 import { useAuth } from '../../context/AuthContext';
 import { saveNutritionEntry, getRecentFoods, getCustomMeals, logCustomMeal } from '../../data/nutritionStorage';
+import { checkAchievements } from '../../data/achievements';
 import { getCategoryEmoji } from '../../data/foodDatabase';
 import { maybeShowInterstitial } from '../../lib/ads';
 
@@ -55,6 +56,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
       });
     }
     setSaving(false);
+    checkAchievements(user.id, { type: 'nutrition' }).catch(() => {});
     maybeShowInterstitial();
     onSaved();
   }

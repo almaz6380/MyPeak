@@ -1118,5 +1118,103 @@
     "front": "Vorne",
     "back": "Hinten",
     "empty": "Noch keine Kraftsätze diese Woche — starte ein Workout, um deine Muskel-Heatmap zu füllen."
+  },
+  "achievements": {
+    "title": "Erfolge",
+    "unlocked": "Erfolg freigeschaltet",
+    "badges": {
+      "workouts_1": {
+        "name": "Erster Schritt",
+        "desc": "Erstes Workout abgeschlossen"
+      },
+      "workouts_10": {
+        "name": "Dranbleiber",
+        "desc": "10 Workouts abgeschlossen"
+      },
+      "workouts_50": {
+        "name": "Eisenfreund",
+        "desc": "50 Workouts abgeschlossen"
+      },
+      "workouts_100": {
+        "name": "Centurion",
+        "desc": "100 Workouts abgeschlossen"
+      },
+      "streak_7": {
+        "name": "Woche in Flammen",
+        "desc": "7-Tage-Streak erreicht"
+      },
+      "streak_30": {
+        "name": "Unaufhaltsam",
+        "desc": "30-Tage-Streak erreicht"
+      },
+      "streak_100": {
+        "name": "Legende",
+        "desc": "100-Tage-Streak erreicht"
+      },
+      "prs_1": {
+        "name": "Neue Bestmarke",
+        "desc": "Ersten persönlichen Rekord aufgestellt"
+      },
+      "prs_10": {
+        "name": "Rekordjäger",
+        "desc": "10 persönliche Rekorde"
+      },
+      "prs_25": {
+        "name": "Grenzensprenger",
+        "desc": "25 persönliche Rekorde"
+      },
+      "weekvol_5000": {
+        "name": "5 Tonnen",
+        "desc": "5.000 kg Volumen in einer Woche"
+      },
+      "weekvol_10000": {
+        "name": "10 Tonnen",
+        "desc": "10.000 kg Volumen in einer Woche"
+      },
+      "weekvol_20000": {
+        "name": "20 Tonnen",
+        "desc": "20.000 kg Volumen in einer Woche"
+      },
+      "totalvol_100000": {
+        "name": "Elefant",
+        "desc": "100 Tonnen Gesamtvolumen bewegt"
+      },
+      "totalvol_500000": {
+        "name": "T-Rex",
+        "desc": "500 Tonnen Gesamtvolumen bewegt"
+      },
+      "nutrition_7": {
+        "name": "Bewusst essen",
+        "desc": "An 7 Tagen Ernährung geloggt"
+      },
+      "nutrition_30": {
+        "name": "Ernährungs-Profi",
+        "desc": "An 30 Tagen Ernährung geloggt"
+      },
+      "nutrition_100": {
+        "name": "Meisterkoch",
+        "desc": "An 100 Tagen Ernährung geloggt"
+      },
+      "weight_10": {
+        "name": "Auf Kurs",
+        "desc": "10 Gewichtseinträge erfasst"
+      },
+      "early_bird": {
+        "name": "Frühaufsteher",
+        "desc": "Workout vor 7 Uhr abgeschlossen"
+      },
+      "night_owl": {
+        "name": "Nachteule",
+        "desc": "Workout nach 21 Uhr abgeschlossen"
+      },
+      "marathon": {
+        "name": "Marathon-Session",
+        "desc": "Workout länger als 90 Minuten"
+      },
+      "allrounder": {
+        "name": "Allrounder",
+        "desc": "Alle 10 Muskelgruppen in einer Woche trainiert"
+      }
+    }
   }
 }

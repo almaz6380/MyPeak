@@ -7,8 +7,10 @@ import { useAuth } from '../../context/AuthContext';
 import { useActiveWorkout } from '../../context/ActiveWorkoutContext';
 import { getExerciseById } from '../../data/exercises';
 import { hasDemo } from '../../data/exerciseDemos';
-import { updateStreak } from '../../data/socialStorage';
+import { updateStreak, addXP, XP_VALUES } from '../../data/socialStorage';
+import { checkAchievements } from '../../data/achievements';
 import LevelUpAnimation from '../../components/LevelUpAnimation';
+import AchievementToast from '../../components/AchievementToast';
 import ExerciseDemoModal from '../../components/ExerciseDemoModal';
 import MuscleGroupIcon from '../../components/icons/MuscleGroupIcon';
 import MiniSparkline from '../../components/progress/MiniSparkline';
@@ -31,6 +33,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
   const [showPostSummary, setShowPostSummary] = useState(false);
   const [savedWorkoutExercises, setSavedWorkoutExercises] = useState(null);
   const [levelUp, setLevelUp] = useState(null);
+  const [unlockQueue, setUnlockQueue] = useState([]);
   const [demoModal, setDemoModal] = useState(null); // { exerciseId, name }
   const [planName, setPlanName] = useState('');
   const [pendingPrs, setPendingPrs] = useState({});
@@ -115,11 +118,12 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
     saveWorkout(user.id, workout).catch((err) => console.error('Save workout error:', err));
 
     // XP + Streak vergeben (fire-and-forget); bei Level-Aufstieg Animation zeigen
-    updateStreak(user.id)
+    const streakPromise = updateStreak(user.id)
       .then((res) => {
         if (res && res.newLevel > res.oldLevel) setLevelUp(res.newLevel);
+        return res;
       })
-      .catch(() => {});
+      .catch(() => null);
 
     // PR check on captured data (not dependent on context state)
     const capturedExercises = [...validExercises];
@@ -136,7 +140,26 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
       }
       return newPrs;
     };
-    checkPRsFromCapture().then((prs) => setPendingPrs(prs || {})).catch(() => {});
+    checkPRsFromCapture()
+      .then(async (prs) => {
+        setPendingPrs(prs || {});
+        const prCount = Object.keys(prs || {}).length;
+        // NEW_PR-XP vergeben (war definiert, wurde aber nie ausgezahlt)
+        if (prCount > 0) addXP(user.id, prCount * XP_VALUES.NEW_PR).catch(() => {});
+        // Achievements prüfen (nach Streak-Ergebnis, damit bestStreak stimmt)
+        const streakRes = await streakPromise;
+        const newly = await checkAchievements(user.id, {
+          type: 'workout',
+          workout,
+          prCount,
+          streak: streakRes?.streak,
+        });
+        if (newly.length > 0) {
+          setUnlockQueue((q) => [...q, ...newly]);
+          addXP(user.id, newly.length * 50).catch(() => {});
+        }
+      })
+      .catch(() => {});
 
     // Auto-update the source plan if started from a plan
     if (wasFromPlan && sourcePlanId) {
@@ -197,6 +220,13 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
             level={levelUp}
             lang={i18n.language?.startsWith('de') ? 'de' : 'en'}
             onDismiss={() => setLevelUp(null)}
+          />
+        )}
+        {/* Unlock-Toasts sequenziell, Level-Up hat Vorrang */}
+        {!levelUp && unlockQueue.length > 0 && (
+          <AchievementToast
+            achievement={unlockQueue[0]}
+            onDismiss={() => setUnlockQueue((q) => q.slice(1))}
           />
         )}
       </>

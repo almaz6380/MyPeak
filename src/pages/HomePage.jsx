@@ -10,6 +10,7 @@ import { getXP } from '../data/socialStorage';
 import { getSupplements, getSupplementLogs, getTodayScheduledSupplements, getSupplementProgress } from '../data/supplementStorage';
 import { getCycleSettings, getCyclePhase, getPhaseRecommendations } from '../data/cycleStorage';
 import { getWeightEntries, saveWeightEntry } from '../data/weightStorage';
+import { checkAchievements } from '../data/achievements';
 import { toLocalDateString } from '../lib/dateUtils';
 
 function formatDate(d) {
@@ -155,6 +156,7 @@ export default function HomePage() {
     setWeightEntries(updated);
     setWeightInput('');
     setShowWeightInput(false);
+    checkAchievements(user.id, { type: 'weight' }).catch(() => {});
   }
 
   const calPercent = goals.calories > 0 ? Math.min(100, Math.round((nutrition.calories / goals.calories) * 100)) : 0;

@@ -8,6 +8,7 @@ import MyPeakLogo from '../components/MyPeakLogo';
 import { supabase } from '../lib/supabase';
 import { Moon, Sun, Globe, Weight, LogOut, User, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2, ShieldCheck } from 'lucide-react';
 import { getOrCreateFriendCode, getXP, getLevelTitle, calculateLevel, hasGoldenFrame } from '../data/socialStorage';
+import AchievementGallery from '../components/progress/AchievementGallery';
 import { canChangeAdConsent, changeAdConsent } from '../lib/ads';
 
 export default function ProfilePage() {
@@ -203,6 +204,9 @@ export default function ProfilePage() {
         </div>
         );
       })()}
+
+      {/* Erfolge & Abzeichen */}
+      <AchievementGallery userId={user?.id} />
 
       {/* Personal Data */}
       {profile && (
