@@ -242,7 +242,13 @@ export default function HomePage() {
               onClick={() => navigate('/nutrition')}
               className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
             >
-              <CardMotif icon={Droplets} className="text-cyan-500" />
+              {/* Freigestellter Foto-Tropfen (Gemini-generiert, Wasserzeichen weggeschnitten) */}
+              <img
+                src="/bg-photos/droplet.png"
+                alt=""
+                aria-hidden="true"
+                className="absolute -right-1 top-1/2 -translate-y-1/2 w-16 h-16 object-contain pointer-events-none opacity-90 dark:opacity-80"
+              />
               <div className="flex items-center gap-2 mb-2">
                 <Droplets className="w-4 h-4 text-cyan-500" />
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{t('home.water')}</span>
