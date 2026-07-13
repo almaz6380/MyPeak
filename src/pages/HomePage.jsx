@@ -242,21 +242,20 @@ export default function HomePage() {
               onClick={() => navigate('/nutrition')}
               className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
             >
-              {/* Freigestellter Foto-Tropfen (Gemini-generiert, Wasserzeichen weggeschnitten) */}
-              <img
-                src="/bg-photos/droplet.png"
-                alt=""
+              {/* Foto-Hintergrund über die ganze Karte (Gemini-Bild, zugeschnitten) */}
+              <div
                 aria-hidden="true"
-                className="absolute -right-1 top-1/2 -translate-y-1/2 w-16 h-16 object-contain pointer-events-none opacity-90 dark:opacity-80"
+                className="absolute inset-0 bg-cover bg-center pointer-events-none opacity-[0.16] dark:opacity-[0.22]"
+                style={{ backgroundImage: 'url(/bg-photos/water-card.jpg)' }}
               />
-              <div className="flex items-center gap-2 mb-2">
+              <div className="relative flex items-center gap-2 mb-2">
                 <Droplets className="w-4 h-4 text-cyan-500" />
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{t('home.water')}</span>
               </div>
-              <p className="text-lg font-bold text-slate-900 dark:text-white">
+              <p className="relative text-lg font-bold text-slate-900 dark:text-white">
                 {(waterTotal / 1000).toFixed(1)}<span className="text-sm font-normal text-slate-400">L</span>
               </p>
-              <div className="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
+              <div className="relative h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
                 <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${waterPercent}%` }} />
               </div>
             </button>
