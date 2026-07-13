@@ -243,11 +243,12 @@ export default function HomePage() {
               className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
             >
               {/* Foto-Hintergrund über die ganze Karte (Gemini-Bild, zugeschnitten);
-                  Tropfen mittiger + tiefer gesetzt, damit die Spitze nicht mehr unter "Wasser" liegt */}
+                  leicht hineingezoomt (background-size), damit der Tropfen nach rechts wandern kann –
+                  reines backgroundPosition-X greift nicht, weil das Bild die Kartenbreite exakt füllt */}
               <div
                 aria-hidden="true"
-                className="absolute inset-0 bg-cover pointer-events-none opacity-[0.16] dark:opacity-[0.22]"
-                style={{ backgroundImage: 'url(/bg-photos/water-card.jpg)', backgroundPosition: '94% 18%' }}
+                className="absolute inset-0 pointer-events-none opacity-[0.16] dark:opacity-[0.22]"
+                style={{ backgroundImage: 'url(/bg-photos/water-card.jpg)', backgroundSize: '175% auto', backgroundPosition: '0% 39%' }}
               />
               <div className="relative flex items-center gap-2 mb-2">
                 <Droplets className="w-4 h-4 text-cyan-500" />
