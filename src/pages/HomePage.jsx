@@ -248,7 +248,7 @@ export default function HomePage() {
               <div
                 aria-hidden="true"
                 className="absolute inset-0 pointer-events-none opacity-[0.16] dark:opacity-[0.22]"
-                style={{ backgroundImage: 'url(/bg-photos/water-card.jpg)', backgroundSize: '175% auto', backgroundPosition: '0% 39%' }}
+                style={{ backgroundImage: 'url(/bg-photos/water-card.jpg)', backgroundSize: '160% auto', backgroundPosition: '0% 46%' }}
               />
               <div className="relative flex items-center gap-2 mb-2">
                 <Droplets className="w-4 h-4 text-cyan-500" />
