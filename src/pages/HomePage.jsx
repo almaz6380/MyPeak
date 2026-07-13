@@ -206,8 +206,9 @@ export default function HomePage() {
           {/* Calories + Macros Card */}
           <button
             onClick={() => navigate('/nutrition')}
-            className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
+            className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
           >
+            <CardMotif icon={Flame} className="text-primary-500" />
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Flame className="w-5 h-5 text-primary-500" />
@@ -239,8 +240,9 @@ export default function HomePage() {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => navigate('/nutrition')}
-              className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
+              className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
             >
+              <CardMotif icon={Droplets} className="text-cyan-500" />
               <div className="flex items-center gap-2 mb-2">
                 <Droplets className="w-4 h-4 text-cyan-500" />
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{t('home.water')}</span>
@@ -255,8 +257,9 @@ export default function HomePage() {
 
             <button
               onClick={() => navigate('/nutrition')}
-              className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
+              className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
             >
+              <CardMotif icon={Pill} className="text-purple-500" />
               <div className="flex items-center gap-2 mb-2">
                 <Pill className="w-4 h-4 text-purple-500" />
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{t('home.supplements')}</span>
@@ -317,8 +320,9 @@ export default function HomePage() {
           {/* Training + Streak Card */}
           <button
             onClick={() => navigate('/training')}
-            className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
+            className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
           >
+            <CardMotif icon={Dumbbell} className="text-primary-500 -rotate-12" />
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Dumbbell className="w-5 h-5 text-primary-500" />
@@ -342,7 +346,8 @@ export default function HomePage() {
             </div>
           </button>
           {/* Weight Chart Card */}
-          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">
+          <div className="relative bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">
+            <CardMotif icon={Scale} className="text-primary-500" />
             <div
               role="button"
               tabIndex={0}
@@ -459,6 +464,16 @@ export default function HomePage() {
         />
       )}
     </div>
+  );
+}
+
+// Großes, dezentes Symbol in der Kartenecke (rein dekorativ)
+function CardMotif({ icon: Icon, className = '' }) {
+  return (
+    <Icon
+      aria-hidden="true"
+      className={`absolute -right-3 -bottom-4 w-20 h-20 opacity-[0.06] dark:opacity-[0.08] pointer-events-none rotate-12 ${className}`}
+    />
   );
 }
 
