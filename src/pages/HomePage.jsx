@@ -208,8 +208,13 @@ export default function HomePage() {
             onClick={() => navigate('/nutrition')}
             className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
           >
-            <CardMotif icon={Flame} className="text-primary-500" />
-            <div className="flex items-center justify-between mb-3">
+            {/* Foto-Hintergrund (Gemini-Bild, Wasserzeichen entfernt), Flamme rechts platziert */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 pointer-events-none opacity-[0.16] dark:opacity-[0.22]"
+              style={{ backgroundImage: 'url(/bg-photos/calories-card.jpg)', backgroundSize: '150% auto', backgroundPosition: '0% 42%' }}
+            />
+            <div className="relative flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Flame className="w-5 h-5 text-primary-500" />
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('home.calories')}</span>
@@ -221,14 +226,14 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-4">
+            <div className="relative h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-4">
               <div
                 className="h-full bg-primary-500 rounded-full transition-all duration-500"
                 style={{ width: `${calPercent}%` }}
               />
             </div>
 
-            <div className="flex gap-2">
+            <div className="relative flex gap-2">
               <MacroPill label="P" value={Math.round(nutrition.protein)} goal={goals.protein} color="bg-blue-500" />
               <MacroPill label="C" value={Math.round(nutrition.carbs)} goal={goals.carbs} color="bg-emerald-500" />
               <MacroPill label="F" value={Math.round(nutrition.fat)} goal={goals.fat} color="bg-rose-500" />
