@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dumbbell, Plus, History, ClipboardList, Trophy, ArrowLeft, ChevronRight, Heart, Zap, RefreshCw, X, Search, Play, Users, Swords, Medal } from 'lucide-react';
+import { Dumbbell, Plus, History, ClipboardList, Trophy, ArrowLeft, ChevronRight, Heart, Zap, RefreshCw, X, Search, Play, Users, Swords, Medal, Moon } from 'lucide-react';
 import ExerciseLibrary from './training/ExerciseLibrary';
 import ActiveWorkout from './training/ActiveWorkout';
 import ActiveCardio from './training/ActiveCardio';
+import ActiveStructuredCardio from './training/ActiveStructuredCardio';
 import ActiveHiit from './training/ActiveHiit';
 import ActiveCircuit from './training/ActiveCircuit';
 import ActiveMartialArts from './training/ActiveMartialArts';
@@ -13,7 +14,8 @@ import FriendsList from './training/FriendsList';
 import Leaderboard from './training/Leaderboard';
 import ChallengesList from './training/ChallengesList';
 import exercises, { getExerciseById, getExercisesByType } from '../data/exercises';
-import { getCustomPlans, getCustomPlansByType, saveCustomPlan, getActiveSchedule, getScheduledDaysForMonth, getWorkouts } from '../data/workoutStorage';
+import { getCustomPlans, getCustomPlansByType, saveCustomPlan, getActiveSchedule, getScheduledDaysForMonth, getWorkouts, deactivateAllSchedules } from '../data/workoutStorage';
+import { resolveScheduledDay } from '../data/programResolver';
 import { getHiddenDefaultPlans, getPermanentDeletedDefaultPlans } from '../data/settingsStorage';
 import { useAuth } from '../context/AuthContext';
 import { useActiveWorkout } from '../context/ActiveWorkoutContext';
@@ -21,11 +23,14 @@ import MuscleGroupIcon from '../components/icons/MuscleGroupIcon';
 import WeeklySummaryBanner from '../components/progress/WeeklySummaryBanner';
 import MuscleHeatmapCard from '../components/progress/MuscleHeatmapCard';
 import MyPeakLogo from '../components/MyPeakLogo';
+import Toast from '../components/Toast';
 import DiamondCalendar from '../components/DiamondCalendar';
 import WeeklyPlanBuilder from './training/WeeklyPlanBuilder';
 import MyPlans from './training/MyPlans';
-import PeakPrograms from './training/PeakPrograms';
 import PlanDetail from './training/PlanDetail';
+
+// Lazy: hält die (großen) Programmdaten aus dem Hauptbundle
+const PeakPrograms = lazy(() => import('./training/PeakPrograms'));
 import { todayLocal, toLocalDateString } from '../lib/dateUtils';
 
 export default function TrainingPage() {
@@ -35,7 +40,12 @@ export default function TrainingPage() {
   const hasValidWorkout = activeWorkout.isActive && activeWorkout.workout?.exercises?.length > 0;
   const [view, setView] = useState(hasValidWorkout ? 'activeWorkout' : 'home');
   const [prNotification, setPrNotification] = useState(null);
+  const [toast, setToast] = useState(null); // { variant, message }
   const [cardioActivity, setCardioActivity] = useState(null);
+  const [structuredSession, setStructuredSession] = useState(null);
+  const [todaySession, setTodaySession] = useState(null);
+  const [activeSchedule, setActiveSchedule] = useState(null);
+  const [confirmEndProgram, setConfirmEndProgram] = useState(false);
   const [hiitConfig, setHiitConfig] = useState(null);
   const [circuitConfig, setCircuitConfig] = useState(null);
   const [martialArtsConfig, setMartialArtsConfig] = useState(null);
@@ -76,6 +86,16 @@ export default function TrainingPage() {
       }
     }
     setScheduledDays(scheduled);
+    setActiveSchedule(schedule || null);
+
+    // Heutige Session aus dem aktiven Plan auflösen (inkl. Wochen-Progression)
+    try {
+      const todayKey = DAY_KEYS[new Date().getDay()];
+      const resolved = await resolveScheduledDay(schedule, todayKey);
+      setTodaySession(resolved);
+    } catch (e) {
+      setTodaySession(null);
+    }
 
     // Completed days from workout history (normalize to YYYY-MM-DD)
     const completed = new Set();
@@ -173,6 +193,45 @@ export default function TrainingPage() {
     setView('home');
   };
 
+  // „Heute"-Session aus dem aktiven Wochenplan starten — Dispatch nach Tages-Typ
+  const startTodaySession = () => {
+    const day = todaySession;
+    if (!day) return;
+    if (day.type === 'strength' && Array.isArray(day.exercises) && day.exercises.length > 0) {
+      handleStartPlan(day.exercises, null, day.label || null);
+    } else if (day.type === 'cardio' && Array.isArray(day.segments) && day.segments.length > 0) {
+      setStructuredSession(day);
+      setView('activeStructuredCardio');
+    } else if (day.type === 'cardio' && day.exerciseId) {
+      const ex = getExerciseById(day.exerciseId);
+      if (ex) handleStartCardio(ex);
+    } else if (day.type === 'hiit' && day.rounds) {
+      handleStartHiit({ rounds: day.rounds, workTime: day.workTime, restTime: day.restTime, exercises: day.exercises || [] });
+    } else if (day.type === 'martial_arts' && day.rounds) {
+      handleStartMartialArts({ rounds: day.rounds, workTime: day.workTime, restTime: day.restTime, exercises: day.exercises || [] });
+    }
+  };
+
+  // Aktives Programm/Plan beenden = deaktivieren (bleibt in „Meine Pläne")
+  const endActiveProgram = async () => {
+    setConfirmEndProgram(false);
+    await deactivateAllSchedules(user?.id || 'guest');
+    await loadCalendarData();
+    setToast({
+      variant: 'success',
+      message: lang === 'de'
+        ? 'Programm beendet — du findest es weiter unter „Meine Pläne".'
+        : 'Program ended — you can find it under "My Plans".',
+    });
+  };
+
+  // Kann die Heute-Session direkt gestartet werden? (Custom-'split'-Tage z. B. nicht)
+  const todayStartable = !!todaySession && (
+    (todaySession.type === 'strength' && todaySession.exercises?.length > 0)
+    || (todaySession.type === 'cardio' && (todaySession.segments?.length > 0 || todaySession.exerciseId))
+    || ((todaySession.type === 'hiit' || todaySession.type === 'martial_arts') && todaySession.rounds)
+  );
+
   if (view === 'startChoice') {
     return (
       <WorkoutStartChooser
@@ -219,6 +278,16 @@ export default function TrainingPage() {
         activity={cardioActivity}
         onFinish={handleFinishCardioHiitCircuit}
         onDiscard={() => { setCardioActivity(null); setView('home'); }}
+      />
+    );
+  }
+
+  if (view === 'activeStructuredCardio' && structuredSession) {
+    return (
+      <ActiveStructuredCardio
+        session={structuredSession}
+        onFinish={() => { setStructuredSession(null); loadCalendarData(); setView('home'); }}
+        onDiscard={() => { setStructuredSession(null); setView('home'); }}
       />
     );
   }
@@ -320,7 +389,25 @@ export default function TrainingPage() {
 
   if (view === 'peakPrograms') {
     try {
-      return <PeakPrograms onBack={() => setView('home')} onProgramActivated={() => { loadCalendarData(); setView('home'); }} userGoal={profile?.goal || ''} userExperience={profile?.experience || ''} />;
+      return (
+        <Suspense fallback={<div className="p-4 pt-24 text-center text-slate-400 text-sm">…</div>}>
+        <PeakPrograms
+          onBack={() => setView('home')}
+          onProgramActivated={(name) => {
+            loadCalendarData();
+            setView('home');
+            setToast({
+              variant: 'success',
+              message: lang === 'de'
+                ? `„${name}" aktiviert — deine Trainingstage sind jetzt blau im Kalender markiert.`
+                : `"${name}" activated — your training days are now marked blue in the calendar.`,
+            });
+          }}
+          userGoal={profile?.goal || ''}
+          userExperience={profile?.experience || ''}
+        />
+        </Suspense>
+      );
     } catch (err) {
       console.error('PeakPrograms error:', err);
       return (
@@ -334,6 +421,9 @@ export default function TrainingPage() {
 
   return (
     <div className="p-4 pt-16 pb-24">
+      {toast && (
+        <Toast variant={toast.variant} message={toast.message} onDismiss={() => setToast(null)} />
+      )}
       <div className="flex flex-col items-center pt-6 mb-4">
         <MyPeakLogo size={32} />
         <h1 className="text-2xl font-bold mt-2">{t('training.title')}</h1>
@@ -348,6 +438,41 @@ export default function TrainingPage() {
         lang={lang}
         onOpenCalendar={() => setShowTrainingCalendar(true)}
       />
+
+      {/* Aktives Programm: heutige Session (oder Ruhetag) + Beenden */}
+      {activeSchedule && (
+        <div className="mb-4">
+          <button
+            onClick={todayStartable ? startTodaySession : undefined}
+            className={`w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-primary-200 dark:border-primary-800/60 flex items-center gap-3 text-left ${todayStartable ? 'hover:shadow-md transition-shadow' : 'cursor-default'}`}
+          >
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${todaySession ? 'bg-primary-50 dark:bg-primary-900/30' : 'bg-slate-100 dark:bg-slate-800'}`}>
+              {todaySession
+                ? <Play className="w-5 h-5 text-primary-500" />
+                : <Moon className="w-5 h-5 text-slate-400" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                {lang === 'de' ? 'Heute' : 'Today'}: {todaySession ? (todaySession.label || todaySession.type) : (lang === 'de' ? 'Ruhetag' : 'Rest day')}
+              </p>
+              <p className="text-xs text-slate-400 truncate">
+                {todaySession?.week && todaySession?.durationWeeks
+                  ? `${activeSchedule.name} · ${lang === 'de' ? 'Woche' : 'Week'} ${todaySession.week}/${todaySession.durationWeeks}`
+                  : activeSchedule.name}
+              </p>
+            </div>
+            {todayStartable && <ChevronRight className="w-5 h-5 text-slate-300 flex-shrink-0" />}
+          </button>
+          <div className="text-center mt-1.5">
+            <button
+              onClick={() => setConfirmEndProgram(true)}
+              className="text-xs text-slate-400 hover:text-red-500 font-medium transition-colors"
+            >
+              {lang === 'de' ? 'Programm beenden' : 'End program'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {prNotification && (
         <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 mb-4 flex items-center gap-3 animate-pulse">
@@ -434,6 +559,30 @@ export default function TrainingPage() {
           }}
           onClose={() => setShowTrainingCalendar(false)}
         />
+      )}
+
+      {/* Programm-beenden-Bestätigung */}
+      {confirmEndProgram && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <p className="text-center font-semibold mb-1">
+              {lang === 'de' ? 'Programm beenden?' : 'End program?'}
+            </p>
+            <p className="text-center text-sm text-slate-500 dark:text-slate-400 mb-4">
+              {lang === 'de'
+                ? 'Es wird nicht gelöscht — du findest es weiter unter „Meine Pläne" und kannst es jederzeit wieder starten.'
+                : 'It will not be deleted — you can find it under "My Plans" and restart it anytime.'}
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmEndProgram(false)} className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm">
+                {t('common.cancel')}
+              </button>
+              <button onClick={endActiveProgram} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-medium text-sm">
+                {lang === 'de' ? 'Beenden' : 'End'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

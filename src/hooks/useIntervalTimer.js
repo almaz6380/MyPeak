@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import useTimerEffects from './timerEffects';
 
 /**
  * Shared interval timer hook for HIIT, Circuit, and Martial Arts workouts.
@@ -30,80 +31,21 @@ export default function useIntervalTimer({ totalRounds, workTime, restTime, exer
   const [finished, setFinished] = useState(false);
   const [startTime, setStartTime] = useState(null);
 
-  const audioCtxRef = useRef(null);
-  const wakeLockRef = useRef(null);
+  const {
+    playWorkBeep, playRestBeep, playFinishBeep, playCountdownBeep,
+    vibrate, requestWakeLock, initAudio,
+  } = useTimerEffects();
 
   const currentExerciseId = exerciseIds[currentExIdx % exerciseIds.length];
-
-  // ── Audio beep via Web Audio API ──
-  const playBeep = useCallback((frequency = 880, duration = 0.15, count = 1) => {
-    try {
-      if (!audioCtxRef.current) {
-        audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      const ctx = audioCtxRef.current;
-      if (ctx.state === 'suspended') ctx.resume();
-
-      for (let i = 0; i < count; i++) {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = frequency;
-        osc.type = 'sine';
-        gain.gain.value = 0.3;
-
-        const offset = i * (duration + 0.08);
-        osc.start(ctx.currentTime + offset);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + duration);
-        osc.stop(ctx.currentTime + offset + duration + 0.01);
-      }
-    } catch (e) {
-      // Audio not available — silent fallback
-    }
-  }, []);
-
-  const playWorkBeep = useCallback(() => playBeep(880, 0.12, 2), [playBeep]);
-  const playRestBeep = useCallback(() => playBeep(440, 0.2, 1), [playBeep]);
-  const playFinishBeep = useCallback(() => playBeep(1200, 0.15, 3), [playBeep]);
-
-  // ── Countdown beep at 3, 2, 1 ──
-  const playCountdownBeep = useCallback(() => playBeep(660, 0.08, 1), [playBeep]);
-
-  // ── Vibration ──
-  const vibrate = useCallback((pattern = 200) => {
-    if (navigator.vibrate) navigator.vibrate(pattern);
-  }, []);
-
-  // ── Wake Lock ──
-  const requestWakeLock = useCallback(async () => {
-    try {
-      if ('wakeLock' in navigator) {
-        wakeLockRef.current = await navigator.wakeLock.request('screen');
-      }
-    } catch (e) {
-      // Wake Lock not available
-    }
-  }, []);
-
-  const releaseWakeLock = useCallback(() => {
-    if (wakeLockRef.current) {
-      wakeLockRef.current.release();
-      wakeLockRef.current = null;
-    }
-  }, []);
 
   // ── Start ──
   const start = useCallback(() => {
     setStarted(true);
     setStartTime(Date.now());
     requestWakeLock();
-
     // Initialize AudioContext on user gesture
-    if (!audioCtxRef.current) {
-      audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
-    }
-  }, [requestWakeLock]);
+    initAudio();
+  }, [requestWakeLock, initAudio]);
 
   // ── Pause / Resume ──
   const togglePause = useCallback(() => {
@@ -174,15 +116,7 @@ export default function useIntervalTimer({ totalRounds, workTime, restTime, exer
     return () => clearInterval(timer);
   }, [started, paused, finished, phase, currentRound, currentExIdx, totalRounds, workTime, restTime, exerciseIds.length, mode, playWorkBeep, playRestBeep, playFinishBeep, playCountdownBeep, vibrate]);
 
-  // ── Cleanup ──
-  useEffect(() => {
-    return () => {
-      releaseWakeLock();
-      if (audioCtxRef.current) {
-        audioCtxRef.current.close().catch(() => {});
-      }
-    };
-  }, [releaseWakeLock]);
+  // Cleanup (WakeLock + AudioContext) übernimmt useTimerEffects.
 
   // ── Progress (0 to 1) ──
   const progress = phase === 'work' ? timeLeft / workTime : timeLeft / restTime;

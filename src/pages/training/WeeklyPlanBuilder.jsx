@@ -33,7 +33,8 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, onSelectExercises, 
   const [planName, setPlanName] = useState(editPlan?.name || '');
   const [sessionsPerWeek, setSessionsPerWeek] = useState(() => {
     if (editPlan?.sessions_per_week) return editPlan.sessions_per_week;
-    if (editPlan?.days) return Object.values(editPlan.days).filter(Boolean).length;
+    // Über DAY_KEYS zählen — days kann einen _meta-Key tragen (Peak-Programme)
+    if (editPlan?.days) return DAY_KEYS.filter((k) => editPlan.days[k]).length;
     return 4;
   });
   const [selectedDays, setSelectedDays] = useState(() => {
@@ -98,7 +99,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, onSelectExercises, 
 
     await saveWeeklySchedule(user.id, {
       name: planName.trim(),
-      sessions_per_week: Object.values(days).filter(Boolean).length,
+      sessions_per_week: DAY_KEYS.filter((k) => days[k]).length,
       days,
     });
 
