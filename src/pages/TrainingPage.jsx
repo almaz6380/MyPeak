@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dumbbell, Plus, History, ClipboardList, Trophy, ArrowLeft, ChevronRight, Heart, Zap, RefreshCw, X, Search, Play, Users, Swords, Medal } from 'lucide-react';
 import ExerciseLibrary from './training/ExerciseLibrary';
@@ -27,8 +27,10 @@ import Toast from '../components/Toast';
 import DiamondCalendar from '../components/DiamondCalendar';
 import WeeklyPlanBuilder from './training/WeeklyPlanBuilder';
 import MyPlans from './training/MyPlans';
-import PeakPrograms from './training/PeakPrograms';
 import PlanDetail from './training/PlanDetail';
+
+// Lazy: hält die (großen) Programmdaten aus dem Hauptbundle
+const PeakPrograms = lazy(() => import('./training/PeakPrograms'));
 import { todayLocal, toLocalDateString } from '../lib/dateUtils';
 
 export default function TrainingPage() {
@@ -372,6 +374,7 @@ export default function TrainingPage() {
   if (view === 'peakPrograms') {
     try {
       return (
+        <Suspense fallback={<div className="p-4 pt-24 text-center text-slate-400 text-sm">…</div>}>
         <PeakPrograms
           onBack={() => setView('home')}
           onProgramActivated={(name) => {
@@ -387,6 +390,7 @@ export default function TrainingPage() {
           userGoal={profile?.goal || ''}
           userExperience={profile?.experience || ''}
         />
+        </Suspense>
       );
     } catch (err) {
       console.error('PeakPrograms error:', err);

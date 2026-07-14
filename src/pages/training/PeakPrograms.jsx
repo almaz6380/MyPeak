@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ChevronRight, Dumbbell, Heart, Zap, Swords, Star, Clock, Calendar, Play, Check, X } from 'lucide-react';
+import { ArrowLeft, ChevronRight, ChevronDown, Dumbbell, Heart, Zap, Swords, Star, Clock, Calendar, Play, X, FlaskConical, TrendingUp } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { saveWeeklySchedule } from '../../data/workoutStorage';
+import { getExerciseById } from '../../data/exercises';
+import { describeSegments } from './ActiveStructuredCardio';
 import Toast from '../../components/Toast';
 
 import { peakPrograms, peakCategories } from '../../data/peakPrograms';
@@ -195,6 +197,7 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
 
 // ── Program Detail with editable days + exercises ──
 function ProgramDetail({ program, lang, userGoal, userExperience, activating, onBack, onActivate }) {
+  const { t } = useTranslation();
   const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
   const DAY_NAMES_SHORT = lang === 'de' ? ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const DAY_NAMES = lang === 'de'
@@ -208,11 +211,30 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, on
   const [customDays, setCustomDays] = useState(() => JSON.parse(JSON.stringify(program.days)));
   const [editingDay, setEditingDay] = useState(null); // key of the day being edited
   const [swapSource, setSwapSource] = useState(null); // for swapping days
+  const [showWhy, setShowWhy] = useState(false);
+  const [previewWeek, setPreviewWeek] = useState(1);
 
-  // Get training sessions (non-null days) in order
-  const trainingSessions = DAY_KEYS
-    .map((key) => ({ key, data: program.days[key] }))
-    .filter((d) => d.data !== null);
+  const hasWeeks = Array.isArray(program.weeks) && program.weeks.some((w) => w && Object.keys(w).length > 0);
+
+  // Tag für die Anzeige: Basiswoche (customDays), in der Vorschau überlagert
+  // mit dem Wochen-Override des Programms
+  function displayDay(key) {
+    const day = customDays[key];
+    if (!day) return null;
+    if (previewWeek > 1 && day.sessionId) {
+      const override = program.weeks?.[previewWeek - 1]?.[day.sessionId];
+      if (override) return { ...day, ...override };
+    }
+    return day;
+  }
+
+  const exName = (idOrObj) => {
+    const id = typeof idOrObj === 'string' ? idOrObj : idOrObj.id;
+    const ex = getExerciseById(id);
+    return ex ? t(ex.nameKey) : id;
+  };
+
+  const fmtSec = (s) => (s >= 60 ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} min` : `${s} s`);
 
   function swapDays(dayA, dayB) {
     setCustomDays((prev) => {
@@ -273,6 +295,41 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, on
         {lang === 'de' ? program.descDE : program.descEN}
       </p>
 
+      {/* Warum dieser Plan? — Wirkweise + Studienlage (eingeklappt) */}
+      {(program.whyDE || program.studies?.length > 0) && (
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4 overflow-hidden">
+          <button onClick={() => setShowWhy(!showWhy)} className="w-full flex items-center justify-between p-4">
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+              <FlaskConical className="w-4 h-4 text-primary-500" />
+              {lang === 'de' ? 'Warum dieser Plan?' : 'Why this plan?'}
+            </span>
+            <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${showWhy ? 'rotate-180' : ''}`} />
+          </button>
+          {showWhy && (
+            <div className="px-4 pb-4">
+              {program.whyDE && (
+                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
+                  {lang === 'de' ? program.whyDE : program.whyEN}
+                </p>
+              )}
+              {program.studies?.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold tracking-widest uppercase text-slate-400">
+                    {lang === 'de' ? 'Studienlage' : 'Evidence'}
+                  </p>
+                  {program.studies.map((s, i) => (
+                    <p key={i} className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                      <span className="font-semibold text-slate-600 dark:text-slate-300">{s.name} ({s.year}):</span>{' '}
+                      {lang === 'de' ? s.findingDE : s.findingEN}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Stats */}
       <div className="flex gap-3 mb-4">
         <div className="flex-1 bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-center">
@@ -286,6 +343,16 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, on
           <p className="text-[10px] text-slate-400">{lang === 'de' ? 'pro Woche' : 'per week'}</p>
         </div>
       </div>
+
+      {/* Progressions-Regel */}
+      {program.progressionDE && (
+        <div className="bg-white dark:bg-surface-dark-alt rounded-xl p-3 mb-4 flex gap-2 border border-slate-100 dark:border-slate-800/60">
+          <TrendingUp className="w-4 h-4 text-primary-500 flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            {lang === 'de' ? program.progressionDE : program.progressionEN}
+          </p>
+        </div>
+      )}
 
       {/* Day arrangement hint */}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 mb-4">
@@ -306,9 +373,37 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, on
         </button>
       </div>
 
+      {/* Wochen-Chips: Progression vor dem Start ansehen */}
+      {hasWeeks && (
+        <div className="mb-3">
+          <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+            {Array.from({ length: program.duration_weeks }, (_, w) => w + 1).map((w) => (
+              <button
+                key={w}
+                onClick={() => setPreviewWeek(w)}
+                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                  previewWeek === w
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-white dark:bg-surface-dark-alt text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                }`}
+              >
+                W{w}
+              </button>
+            ))}
+          </div>
+          {previewWeek > 1 && (
+            <p className="text-[10px] text-slate-400 mt-1">
+              {lang === 'de'
+                ? `Vorschau Woche ${previewWeek} — der Plan steigert sich automatisch mit`
+                : `Preview week ${previewWeek} — the plan progresses automatically`}
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="space-y-2 mb-6">
         {DAY_KEYS.map((key, i) => {
-          const day = customDays[key];
+          const day = displayDay(key);
           const isSwapSelected = swapSource === key;
           return (
             <div key={key}>
@@ -329,8 +424,19 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, on
                   <div className="flex-1 text-left">
                     <p className="text-sm font-medium text-slate-900 dark:text-white">{day.label || day.type || ''}</p>
                     {day.exercises && <p className="text-[10px] text-slate-400">{day.exercises.length} {lang === 'de' ? 'Übungen' : 'exercises'}</p>}
-                    {day.targetDuration && <p className="text-[10px] text-slate-400">{Math.round(day.targetDuration / 60)} min</p>}
-                    {day.rounds && <p className="text-[10px] text-slate-400">{day.rounds} {lang === 'de' ? 'Runden' : 'rounds'}</p>}
+                    {day.segments ? (
+                      <p className="text-[10px] text-slate-400">{describeSegments(day.segments, lang)}</p>
+                    ) : (
+                      day.targetDuration && <p className="text-[10px] text-slate-400">{Math.round(day.targetDuration / 60)} min</p>
+                    )}
+                    {day.rounds && (
+                      <p className="text-[10px] text-slate-400">
+                        {day.rounds} {lang === 'de' ? 'Runden' : 'rounds'} · {fmtSec(day.workTime)} / {fmtSec(day.restTime)} {lang === 'de' ? 'Pause' : 'rest'}
+                      </p>
+                    )}
+                    {(lang === 'de' ? day.focusDE : day.focusEN) && (
+                      <p className="text-[10px] text-primary-500 font-medium">{lang === 'de' ? day.focusDE : day.focusEN}</p>
+                    )}
                   </div>
                 ) : (
                   <p className="text-sm text-slate-400 italic flex-1 text-left">{lang === 'de' ? 'Ruhetag' : 'Rest day'}</p>
@@ -351,7 +457,7 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, on
                   {day.exercises.map((ex, exIdx) => (
                     <div key={exIdx} className="flex items-center justify-between px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg">
                       <span className="text-xs text-slate-600 dark:text-slate-400">
-                        {ex.id || ex} {ex.sets && `· ${ex.sets}×${ex.reps}`}
+                        {exName(ex)} {ex.sets && `· ${ex.sets}×${ex.reps}`}
                       </span>
                       <button
                         onClick={() => removeExercise(key, exIdx)}
