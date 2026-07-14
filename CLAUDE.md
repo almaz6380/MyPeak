@@ -16,6 +16,16 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### Home-Foto-Icons + Peak-Programme-Überarbeitung (14.07.2026) — LIVE (mobile Session)
+- **Home-Karten-Icons:** 5 freigestellte Foto-Motive (Gemini-generiert, Wasserzeichen/Hintergrund entfernt, transparente PNGs in `public/bg-photos/{flame,drop,supplement,training,weight}-icon.png`) ersetzen die Lucide-Label-Icons auf HomePage — je Karte klein am Label **und** groß+schwach als Eck-Wasserzeichen. `CardMotif` (flaches Lucide-Symbol) → **`CardPhotoMotif`** (Foto). Freistellen erfolgte per Pillow/NumPy (Flood-Fill vom Rand für metallische Motive wie Hantel/Waage, sonst Sättigungs-Keying). Betrifft `src/pages/HomePage.jsx`. (Alte `water-card.jpg`/`calories-card.png` entfernt.)
+- **Peak-Programme „Starten" gefixt:** Der Button funktionierte, gab aber KEIN Feedback (routete stumm auf Home zurück). Neu: generischer **`src/components/Toast.jsx`** (Erfolg/Fehler, Vorbild AchievementToast), `user?.id`-Gast-Guard + `.catch` in `PeakPrograms.jsx`, Erfolgs-Toast auf TrainingPage.
+- **Peak-Programme Datenmodell v2** (`src/data/peakPrograms.js`): Cardio-Tage haben jetzt **`segments`** (`warmup`/`interval`/`steady`/`cooldown` mit Zeiten/RPE) statt nur `targetDuration`; Wochen-Progression via **`weeks[]`** (Sparse-Overrides pro `sessionId`, Basiswoche = `days`); Metadaten `whyDE/EN`, `studies[]`, `progressionDE/EN`, `intensity{rpe,hrZone}`. **Dev-Validator** prüft beim Import alle Übungs-IDs, Segment-Summen und weeks-Konsistenz.
+- **Wochen-Auflösung zur Lesezeit:** NEU **`src/data/programResolver.js`** (`resolveScheduledDay`/`getCurrentWeek`). Aktivierung schreibt `days._meta = {programId, startedAt, durationWeeks}` ins JSONB — **keine Migration** (alle Konsumenten indizieren `days` über DAY_KEYS). **Achtung:** vor dem 14.07. gespeicherte `weekly_schedules` haben kein `_meta` → laufen als statischer Plan ohne Wochen-Progression (Passthrough, kein Bruch).
+- **Strukturierter Cardio-Runner:** NEU **`ActiveStructuredCardio.jsx`** + **`src/hooks/useSegmentTimer.js`**; Beep/Vibration/WakeLock aus `useIntervalTimer` in **`src/hooks/timerEffects.js`** extrahiert (geteilt). Speichert im ActiveCardio-Record-Shape (History/Streak/Achievements unberührt). **„Heute"-Karte** auf TrainingPage (unter dem Kalender) löst die heutige Session auf (inkl. „Woche n/m") und startet sie typgerecht (strength/hiit/martial/cardio).
+- **Programm-Verwaltung:** **„Programm beenden"** (nicht-destruktiv, `deactivateAllSchedules` in workoutStorage — Plan bleibt in „Meine Pläne"); **Ersetzen-Bestätigung** beim Start, wenn schon ein Programm aktiv ist (kein stilles Überschreiben). „Heute"-Karte zeigt auch Ruhetage.
+- **21 Programme evidenzbasiert neu** (DE+EN, je „Warum dieser Plan?" + Studien + Progressions-Regel): Cardio komplett neu (Couch-to-5K 9 Wo, Norwegisches 4×4, 10-20-30, Zone-2, 10K mit Taper), HIIT mit Runden-Progression (Tabata, Gibala 60/75, 30/30, 40/15, EMOM), Kraft + Kampfsport angereichert. Zone-2 „Dauerbelastung" → „Lockeres Tempo" + Sprechtempo-Hinweis, Aktivität (Laufen/Radfahren) sichtbar.
+- **Bundle:** `PeakPrograms` jetzt lazy geladen (Cookbook-Muster) → Programmdaten (~60 KB) raus aus dem Hauptbundle. `WeeklyPlanBuilder` zählt Trainingstage über DAY_KEYS (ignoriert `_meta`).
+
 ### App-Review-Status (12.07.2026)
 - **iOS 1.0 ABGELEHNT** (09.07.2026): Guideline 4.3(a) „Design – Spam" (ähnliches Binary/Konzept wie andere Entwickler — vermutlich Capacitor-Gerüst-Ähnlichkeit mit den anderen Apps des Kontos). **Antwort an App Review gesendet (12.07.2026)** — warten auf Rückmeldung; falls erfolglos → App Review Board Appeal. KEIN Code-Problem.
 - Android: weiterhin in Google-Prüfung.
@@ -265,6 +275,7 @@ src/
 │   │   └── OnboardingPage.jsx    # 7-Schritte-Onboarding
 │   └── training/
 │       ├── ActiveWorkout.jsx     # Aktives Workout (Sets loggen, Timer, Beenden/Verwerfen)
+│       ├── ActiveStructuredCardio.jsx # Strukturierte Cardio-Session (Segment-Timer: Warmup/Intervall/Cooldown)
 │       ├── ExerciseLibrary.jsx   # Übungsbibliothek mit Filter + Suche
 │       ├── TrainingPlans.jsx     # Vorgefertigte + eigene Pläne
 │       ├── WorkoutHistory.jsx    # Verlauf mit Details + Vergleich + Edit-Modal
@@ -308,8 +319,13 @@ src/
 │   ├── weightStorage.js          # Gewichtsverlauf CRUD
 │   ├── dietsData.js              # 8 Diätformen × 7 Kapitel (DE+EN, mit Studien)
 │   ├── dietStorage.js            # Active Diet CRUD + Ziel-Berechnung + Phasen-Tracking
-│   ├── peakPrograms.js           # 21 vorgefertigte Peak-Programme (4 Kategorien)
+│   ├── peakPrograms.js           # 21 evidenzbasierte Peak-Programme (v2: Cardio-Segmente + weeks-Progression + Studien)
+│   ├── programResolver.js        # Löst Wochen-Progression aktiver Programme zur Lesezeit auf (_meta im schedule)
 │   └── recipesData.js            # 25 Rezepte mit Nährwerten (DE + EN)
+├── hooks/
+│   ├── useIntervalTimer.js       # HIIT/Circuit/Kampfsport-Timer (Runden/Arbeit/Pause)
+│   ├── useSegmentTimer.js        # Cardio-Segment-Timer (Warmup/Intervall/Steady/Cooldown)
+│   └── timerEffects.js           # Geteilt: Beeps (WebAudio) + Vibration + WakeLock
 ├── lib/
 │   └── supabase.js               # Supabase Client (URL + Anon Key aus .env)
 ├── i18n/
@@ -321,6 +337,7 @@ src/
 │   ├── ThemeContext.jsx          # Dark/Light Mode
 │   └── ActiveWorkoutContext.jsx  # Aktives Workout State + localStorage Persistence
 ├── components/
+│   ├── Toast.jsx                # Generischer Erfolgs-/Fehler-Toast (fixed bottom, Auto-Dismiss)
 │   └── OilLevelPicker.jsx       # Öl-Level-Auswahl (wenig/normal/viel) für Foto-KI
 └── supabase/
     └── schema.sql                # Komplettes DB-Schema (Tabellen, RLS, Trigger)
