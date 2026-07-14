@@ -23,7 +23,7 @@ const LEVEL_LABELS = {
   advanced: { de: 'Profi', en: 'Advanced', color: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' },
 };
 
-export default function PeakPrograms({ onBack, onProgramActivated, userGoal, userExperience }) {
+export default function PeakPrograms({ onBack, onProgramActivated, userGoal, userExperience, activeScheduleName }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
@@ -59,6 +59,7 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
         userGoal={userGoal}
         userExperience={userExperience}
         activating={activating}
+        activeScheduleName={activeScheduleName}
         onBack={() => setSelectedProgram(null)}
         onActivate={(customDays) => {
           const p = selectedProgram;
@@ -196,8 +197,9 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
 }
 
 // ── Program Detail with editable days + exercises ──
-function ProgramDetail({ program, lang, userGoal, userExperience, activating, onBack, onActivate }) {
+function ProgramDetail({ program, lang, userGoal, userExperience, activating, activeScheduleName, onBack, onActivate }) {
   const { t } = useTranslation();
+  const [confirmReplace, setConfirmReplace] = useState(false);
   const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
   const DAY_NAMES_SHORT = lang === 'de' ? ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const DAY_NAMES = lang === 'de'
@@ -477,9 +479,18 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, on
         })}
       </div>
 
+      {/* Hinweis: ein aktives Programm ist bereits vorhanden */}
+      {activeScheduleName && !activating && (
+        <p className="text-[11px] text-slate-400 text-center mb-2 px-2">
+          {lang === 'de'
+            ? `Aktiv: „${activeScheduleName}". Starten ersetzt es (bleibt in „Meine Pläne").`
+            : `Active: "${activeScheduleName}". Starting replaces it (stays in "My Plans").`}
+        </p>
+      )}
+
       {/* Activate Button */}
       <button
-        onClick={() => onActivate(customDays)}
+        onClick={() => (activeScheduleName ? setConfirmReplace(true) : onActivate(customDays))}
         disabled={activating}
         className="w-full py-4 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold rounded-2xl flex items-center justify-center gap-2"
       >
@@ -490,6 +501,30 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, on
           </>
         )}
       </button>
+
+      {/* Ersetzen-Bestätigung */}
+      {confirmReplace && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <p className="text-center font-semibold mb-1">
+              {lang === 'de' ? 'Aktives Programm ersetzen?' : 'Replace active program?'}
+            </p>
+            <p className="text-center text-sm text-slate-500 dark:text-slate-400 mb-4">
+              {lang === 'de'
+                ? `Du hast gerade „${activeScheduleName}" aktiv. „${lang === 'de' ? program.nameDE : program.nameEN}" zu starten ersetzt es — „${activeScheduleName}" bleibt aber in „Meine Pläne" gespeichert.`
+                : `You currently have "${activeScheduleName}" active. Starting "${lang === 'de' ? program.nameDE : program.nameEN}" replaces it — "${activeScheduleName}" stays saved in "My Plans".`}
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmReplace(false)} className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm">
+                {t('common.cancel')}
+              </button>
+              <button onClick={() => { setConfirmReplace(false); onActivate(customDays); }} className="flex-1 py-2.5 rounded-xl bg-primary-500 text-white font-medium text-sm">
+                {lang === 'de' ? 'Ersetzen' : 'Replace'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
