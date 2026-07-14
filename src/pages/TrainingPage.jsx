@@ -405,6 +405,7 @@ export default function TrainingPage() {
           }}
           userGoal={profile?.goal || ''}
           userExperience={profile?.experience || ''}
+          activeScheduleName={activeSchedule?.name || null}
         />
         </Suspense>
       );
