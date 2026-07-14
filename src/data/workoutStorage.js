@@ -601,6 +601,24 @@ export async function saveWeeklySchedule(userId, schedule) {
   return { data: localEntry, error: null };
 }
 
+// Programm/Plan „beenden": deaktivieren (nicht löschen) — der Plan bleibt in
+// „Meine Pläne" erhalten und kann später wieder aktiviert werden.
+export async function deactivateAllSchedules(userId) {
+  const cached = JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]').map((s) => ({ ...s, is_active: false }));
+  localStorage.setItem(SCHEDULE_KEY, JSON.stringify(cached));
+
+  if (!isGuest(userId)) {
+    try {
+      await supabase
+        .from('weekly_schedules')
+        .update({ is_active: false })
+        .eq('user_id', userId);
+    } catch (err) {
+      console.error('Failed to deactivate weekly schedules:', err);
+    }
+  }
+}
+
 export async function deleteWeeklySchedule(userId, scheduleId) {
   const cached = JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]');
   localStorage.setItem(SCHEDULE_KEY, JSON.stringify(cached.filter((s) => s.id !== scheduleId)));

@@ -10,7 +10,7 @@ import useSegmentTimer from '../../hooks/useSegmentTimer';
 const KIND_INFO = {
   warmup:   { de: 'Aufwärmen',      en: 'Warm-up',   text: 'text-blue-600 dark:text-blue-400',   bg: 'bg-blue-50 dark:bg-blue-900/20',   ring: 'text-blue-500' },
   work:     { de: 'Belastung',      en: 'Work',      text: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-900/20', ring: 'text-green-500' },
-  steady:   { de: 'Dauerbelastung', en: 'Steady',    text: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-900/20', ring: 'text-green-500' },
+  steady:   { de: 'Lockeres Tempo',  en: 'Easy pace', text: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-900/20', ring: 'text-green-500' },
   rest:     { de: 'Erholung',       en: 'Recovery',  text: 'text-red-600 dark:text-red-400',     bg: 'bg-red-50 dark:bg-red-900/20',     ring: 'text-red-500' },
   cooldown: { de: 'Auslaufen',      en: 'Cool-down', text: 'text-slate-500 dark:text-slate-400', bg: 'bg-slate-100 dark:bg-slate-800',   ring: 'text-slate-400' },
 };
@@ -82,19 +82,28 @@ export default function ActiveStructuredCardio({ session, onFinish, onDiscard })
     return (
       <div className="p-4 pt-16 pb-24">
         <h1 className="text-2xl font-bold mb-1">{title}</h1>
-        {session.week && session.durationWeeks && (
-          <p className="text-sm text-primary-500 font-medium mb-4">
-            {lang === 'de' ? 'Woche' : 'Week'} {session.week}/{session.durationWeeks}
-          </p>
-        )}
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">
+          {exercise ? t(exercise.nameKey) : (lang === 'de' ? 'Cardio' : 'Cardio')}
+          {session.week && session.durationWeeks
+            ? ` · ${lang === 'de' ? 'Woche' : 'Week'} ${session.week}/${session.durationWeeks}`
+            : ''}
+        </p>
 
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 shadow-soft border border-slate-100 dark:border-slate-800/60 text-center mb-4 mt-2">
+        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 shadow-soft border border-slate-100 dark:border-slate-800/60 text-center mb-4 mt-3">
           <p className="text-5xl font-bold mb-1">{Math.round(timer.totalDuration / 60)}</p>
           <p className="text-slate-500 dark:text-slate-400">{lang === 'de' ? 'Minuten gesamt' : 'total minutes'}</p>
           {session.intensity?.rpe && (
             <p className="text-xs text-slate-400 mt-2">
               {lang === 'de' ? 'Anstrengung bis' : 'Effort up to'} RPE {session.intensity.rpe}/10
               {session.intensity.hrZone ? ` · ${lang === 'de' ? 'Pulszone' : 'HR zone'} ${session.intensity.hrZone}` : ''}
+            </p>
+          )}
+          {/* Klartext für lockere Einheiten (Zone 2) */}
+          {(session.intensity?.hrZone <= 2 || session.intensity?.rpe <= 4) && (
+            <p className="text-xs text-green-600 dark:text-green-400 mt-2 leading-relaxed">
+              {lang === 'de'
+                ? 'Lockeres Tempo — du solltest dich dabei noch unterhalten können.'
+                : 'Easy pace — you should still be able to hold a conversation.'}
             </p>
           )}
         </div>

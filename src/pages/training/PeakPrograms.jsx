@@ -424,6 +424,9 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, on
                   <div className="flex-1 text-left">
                     <p className="text-sm font-medium text-slate-900 dark:text-white">{day.label || day.type || ''}</p>
                     {day.exercises && <p className="text-[10px] text-slate-400">{day.exercises.length} {lang === 'de' ? 'Übungen' : 'exercises'}</p>}
+                    {day.type === 'cardio' && day.exerciseId && (
+                      <p className="text-[10px] font-medium text-red-500">{exName(day.exerciseId)}</p>
+                    )}
                     {day.segments ? (
                       <p className="text-[10px] text-slate-400">{describeSegments(day.segments, lang)}</p>
                     ) : (

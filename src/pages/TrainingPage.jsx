@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dumbbell, Plus, History, ClipboardList, Trophy, ArrowLeft, ChevronRight, Heart, Zap, RefreshCw, X, Search, Play, Users, Swords, Medal } from 'lucide-react';
+import { Dumbbell, Plus, History, ClipboardList, Trophy, ArrowLeft, ChevronRight, Heart, Zap, RefreshCw, X, Search, Play, Users, Swords, Medal, Moon } from 'lucide-react';
 import ExerciseLibrary from './training/ExerciseLibrary';
 import ActiveWorkout from './training/ActiveWorkout';
 import ActiveCardio from './training/ActiveCardio';
@@ -14,7 +14,7 @@ import FriendsList from './training/FriendsList';
 import Leaderboard from './training/Leaderboard';
 import ChallengesList from './training/ChallengesList';
 import exercises, { getExerciseById, getExercisesByType } from '../data/exercises';
-import { getCustomPlans, getCustomPlansByType, saveCustomPlan, getActiveSchedule, getScheduledDaysForMonth, getWorkouts } from '../data/workoutStorage';
+import { getCustomPlans, getCustomPlansByType, saveCustomPlan, getActiveSchedule, getScheduledDaysForMonth, getWorkouts, deactivateAllSchedules } from '../data/workoutStorage';
 import { resolveScheduledDay } from '../data/programResolver';
 import { getHiddenDefaultPlans, getPermanentDeletedDefaultPlans } from '../data/settingsStorage';
 import { useAuth } from '../context/AuthContext';
@@ -44,6 +44,8 @@ export default function TrainingPage() {
   const [cardioActivity, setCardioActivity] = useState(null);
   const [structuredSession, setStructuredSession] = useState(null);
   const [todaySession, setTodaySession] = useState(null);
+  const [activeSchedule, setActiveSchedule] = useState(null);
+  const [confirmEndProgram, setConfirmEndProgram] = useState(false);
   const [hiitConfig, setHiitConfig] = useState(null);
   const [circuitConfig, setCircuitConfig] = useState(null);
   const [martialArtsConfig, setMartialArtsConfig] = useState(null);
@@ -84,6 +86,7 @@ export default function TrainingPage() {
       }
     }
     setScheduledDays(scheduled);
+    setActiveSchedule(schedule || null);
 
     // Heutige Session aus dem aktiven Plan auflösen (inkl. Wochen-Progression)
     try {
@@ -207,6 +210,19 @@ export default function TrainingPage() {
     } else if (day.type === 'martial_arts' && day.rounds) {
       handleStartMartialArts({ rounds: day.rounds, workTime: day.workTime, restTime: day.restTime, exercises: day.exercises || [] });
     }
+  };
+
+  // Aktives Programm/Plan beenden = deaktivieren (bleibt in „Meine Pläne")
+  const endActiveProgram = async () => {
+    setConfirmEndProgram(false);
+    await deactivateAllSchedules(user?.id || 'guest');
+    await loadCalendarData();
+    setToast({
+      variant: 'success',
+      message: lang === 'de'
+        ? 'Programm beendet — du findest es weiter unter „Meine Pläne".'
+        : 'Program ended — you can find it under "My Plans".',
+    });
   };
 
   // Kann die Heute-Session direkt gestartet werden? (Custom-'split'-Tage z. B. nicht)
@@ -423,27 +439,39 @@ export default function TrainingPage() {
         onOpenCalendar={() => setShowTrainingCalendar(true)}
       />
 
-      {/* Heutige Session aus dem aktiven Wochenplan */}
-      {todaySession && (
-        <button
-          onClick={todayStartable ? startTodaySession : undefined}
-          className={`w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-primary-200 dark:border-primary-800/60 flex items-center gap-3 mb-4 text-left ${todayStartable ? 'hover:shadow-md transition-shadow' : 'cursor-default'}`}
-        >
-          <div className="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0">
-            <Play className="w-5 h-5 text-primary-500" />
+      {/* Aktives Programm: heutige Session (oder Ruhetag) + Beenden */}
+      {activeSchedule && (
+        <div className="mb-4">
+          <button
+            onClick={todayStartable ? startTodaySession : undefined}
+            className={`w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-primary-200 dark:border-primary-800/60 flex items-center gap-3 text-left ${todayStartable ? 'hover:shadow-md transition-shadow' : 'cursor-default'}`}
+          >
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${todaySession ? 'bg-primary-50 dark:bg-primary-900/30' : 'bg-slate-100 dark:bg-slate-800'}`}>
+              {todaySession
+                ? <Play className="w-5 h-5 text-primary-500" />
+                : <Moon className="w-5 h-5 text-slate-400" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                {lang === 'de' ? 'Heute' : 'Today'}: {todaySession ? (todaySession.label || todaySession.type) : (lang === 'de' ? 'Ruhetag' : 'Rest day')}
+              </p>
+              <p className="text-xs text-slate-400 truncate">
+                {todaySession?.week && todaySession?.durationWeeks
+                  ? `${activeSchedule.name} · ${lang === 'de' ? 'Woche' : 'Week'} ${todaySession.week}/${todaySession.durationWeeks}`
+                  : activeSchedule.name}
+              </p>
+            </div>
+            {todayStartable && <ChevronRight className="w-5 h-5 text-slate-300 flex-shrink-0" />}
+          </button>
+          <div className="text-center mt-1.5">
+            <button
+              onClick={() => setConfirmEndProgram(true)}
+              className="text-xs text-slate-400 hover:text-red-500 font-medium transition-colors"
+            >
+              {lang === 'de' ? 'Programm beenden' : 'End program'}
+            </button>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-              {lang === 'de' ? 'Heute' : 'Today'}: {todaySession.label || todaySession.type}
-            </p>
-            <p className="text-xs text-slate-400">
-              {todaySession.week && todaySession.durationWeeks
-                ? `${lang === 'de' ? 'Woche' : 'Week'} ${todaySession.week}/${todaySession.durationWeeks}`
-                : (lang === 'de' ? 'Aus deinem Wochenplan' : 'From your weekly plan')}
-            </p>
-          </div>
-          {todayStartable && <ChevronRight className="w-5 h-5 text-slate-300 flex-shrink-0" />}
-        </button>
+        </div>
       )}
 
       {prNotification && (
@@ -531,6 +559,30 @@ export default function TrainingPage() {
           }}
           onClose={() => setShowTrainingCalendar(false)}
         />
+      )}
+
+      {/* Programm-beenden-Bestätigung */}
+      {confirmEndProgram && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <p className="text-center font-semibold mb-1">
+              {lang === 'de' ? 'Programm beenden?' : 'End program?'}
+            </p>
+            <p className="text-center text-sm text-slate-500 dark:text-slate-400 mb-4">
+              {lang === 'de'
+                ? 'Es wird nicht gelöscht — du findest es weiter unter „Meine Pläne" und kannst es jederzeit wieder starten.'
+                : 'It will not be deleted — you can find it under "My Plans" and restart it anytime.'}
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmEndProgram(false)} className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm">
+                {t('common.cancel')}
+              </button>
+              <button onClick={endActiveProgram} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-medium text-sm">
+                {lang === 'de' ? 'Beenden' : 'End'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
