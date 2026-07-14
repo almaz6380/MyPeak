@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Plus, Trash2, Settings, UtensilsCrossed, Pencil, X, Check, Droplets, GlassWater, BookOpen } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2, Settings, UtensilsCrossed, Pencil, X, Check, Droplets, GlassWater, BookOpen, Flame, Pill } from 'lucide-react';
+import CardMotif from '../../components/CardMotif';
 import MacroRing from './MacroRing';
 import MyPeakLogo from '../../components/MyPeakLogo';
 import { useAuth } from '../../context/AuthContext';
@@ -167,8 +168,9 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
       </div>
 
       {/* Macro Rings */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-5 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
-        <div className="flex items-center justify-between mb-3">
+      <div className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-5 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
+        <CardMotif icon={Flame} className="text-primary-500" />
+        <div className="relative flex items-center justify-between mb-3">
           <h2 className="text-xs font-medium text-slate-400 dark:text-slate-500">{t('nutrition.macros')}</h2>
           <button
             onClick={() => setShowGoalEditor(true)}
@@ -265,8 +267,9 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
       })}
 
       {/* Water Tracker */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
-        <div className="flex items-center justify-between mb-3">
+      <div className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
+        <CardMotif icon={Droplets} className="text-cyan-500" />
+        <div className="relative flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Droplets className="w-5 h-5 text-cyan-500" />
             <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('nutrition.water')}</h2>
@@ -316,10 +319,11 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
       {/* Supplements Card */}
       <button
         onClick={onOpenSupplements}
-        className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4 flex items-center gap-3 text-left hover:shadow-md transition-shadow"
+        className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4 flex items-center gap-3 text-left hover:shadow-md transition-shadow"
       >
+        <CardMotif icon={Pill} className="text-purple-500" />
         <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
-          <span className="text-lg">💊</span>
+          <Pill className="w-5 h-5 text-purple-500" />
         </div>
         <div className="flex-1">
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('supplements.title')}</p>

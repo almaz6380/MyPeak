@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { PullToRefreshContext } from './PullToRefresh';
+import { PullToRefreshContext } from './pullToRefreshContext';
 
 export default function MyPeakLogo({ size = 36, className = '' }) {
   const ptr = useContext(PullToRefreshContext);

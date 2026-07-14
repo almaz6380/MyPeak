@@ -25,6 +25,7 @@ import MuscleHeatmapCard from '../components/progress/MuscleHeatmapCard';
 import MyPeakLogo from '../components/MyPeakLogo';
 import Toast from '../components/Toast';
 import DiamondCalendar from '../components/DiamondCalendar';
+import CardMotif from '../components/CardMotif';
 import WeeklyPlanBuilder from './training/WeeklyPlanBuilder';
 import MyPlans from './training/MyPlans';
 import PlanDetail from './training/PlanDetail';
@@ -529,8 +530,9 @@ export default function TrainingPage() {
       {/* History */}
       <button
         onClick={() => setView('history')}
-        className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 flex items-center gap-4 hover:shadow-md transition-shadow mb-6"
+        className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 flex items-center gap-4 hover:shadow-md transition-shadow mb-6"
       >
+        <CardMotif icon={History} className="text-slate-500" />
         <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
           <History className="w-5 h-5 text-slate-500" />
         </div>
@@ -714,8 +716,9 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
         <div className="flex flex-col gap-4">
           <button
             onClick={() => setStep('plans')}
-            className="bg-white dark:bg-surface-dark-alt rounded-2xl p-5 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
+            className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-5 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
           >
+            <CardMotif icon={ClipboardList} className="text-primary-500" />
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center">
                 <ClipboardList className="w-6 h-6 text-primary-500" />
@@ -736,8 +739,9 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
 
           <button
             onClick={onStartEmpty}
-            className="bg-white dark:bg-surface-dark-alt rounded-2xl p-5 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
+            className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-5 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
           >
+            <CardMotif icon={Plus} className="text-green-500" />
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
                 <Plus className="w-6 h-6 text-green-500" />
@@ -836,6 +840,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
       <div className="flex flex-col gap-3">
         <TrainingTypeCard
           icon={<Dumbbell className="w-6 h-6" />}
+          motif={Dumbbell}
           label={t('training.strength')}
           desc={t('training.strengthDesc')}
           color="primary"
@@ -843,6 +848,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
         />
         <TrainingTypeCard
           icon={<Heart className="w-6 h-6" />}
+          motif={Heart}
           label={t('training.cardio')}
           desc={t('training.cardioDesc')}
           color="red"
@@ -850,6 +856,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
         />
         <TrainingTypeCard
           icon={<Zap className="w-6 h-6" />}
+          motif={Zap}
           label={t('training.hiit')}
           desc={t('training.hiitDesc')}
           color="amber"
@@ -857,6 +864,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
         />
         <TrainingTypeCard
           icon={<RefreshCw className="w-6 h-6" />}
+          motif={RefreshCw}
           label={t('training.circuit')}
           desc={t('training.circuitDesc')}
           color="emerald"
@@ -864,6 +872,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
         />
         <TrainingTypeCard
           icon={<BoxingGlovesIcon className="w-6 h-6" />}
+          motif={BoxingGlovesIcon}
           label={t('training.martialArts')}
           desc={t('training.martialArtsDesc')}
           color="violet"
@@ -874,7 +883,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
   );
 }
 
-function TrainingTypeCard({ icon, label, desc, color, onClick }) {
+function TrainingTypeCard({ icon, motif, label, desc, color, onClick }) {
   const colorClasses = {
     primary: 'bg-primary-50 dark:bg-primary-900/20 text-primary-500',
     red: 'bg-red-50 dark:bg-red-900/20 text-red-500',
@@ -882,12 +891,20 @@ function TrainingTypeCard({ icon, label, desc, color, onClick }) {
     emerald: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500',
     violet: 'bg-violet-50 dark:bg-violet-900/20 text-violet-500',
   };
+  const motifColors = {
+    primary: 'text-primary-500',
+    red: 'text-red-500',
+    amber: 'text-amber-500',
+    emerald: 'text-emerald-500',
+    violet: 'text-violet-500',
+  };
 
   return (
     <button
       onClick={onClick}
-      className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow flex items-center gap-4"
+      className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow flex items-center gap-4"
     >
+      {motif && <CardMotif icon={motif} className={motifColors[color]} />}
       <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${colorClasses[color]}`}>
         {icon}
       </div>

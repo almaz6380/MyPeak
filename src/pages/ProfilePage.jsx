@@ -5,6 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { saveSetting } from '../data/settingsStorage';
 import MyPeakLogo from '../components/MyPeakLogo';
+import CardMotif from '../components/CardMotif';
 import { supabase } from '../lib/supabase';
 import { Moon, Sun, Globe, Weight, LogOut, User, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2, ShieldCheck, Camera as CameraIcon } from 'lucide-react';
 import { getOrCreateFriendCode, getXP, getLevelTitle, calculateLevel, hasGoldenFrame } from '../data/socialStorage';
@@ -146,7 +147,8 @@ export default function ProfilePage() {
 
       {/* User header */}
       {profile?.name && (
-        <div className="flex items-center gap-4 mb-6 p-4 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60">
+        <div className="relative overflow-hidden flex items-center gap-4 mb-6 p-4 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60">
+          <CardMotif icon={User} className="text-primary-500" />
           <div className="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center">
             <User className="w-6 h-6 text-primary-500 dark:text-primary-400" />
           </div>
@@ -211,8 +213,9 @@ export default function ProfilePage() {
       {/* Mein Fortschritt (Fotos) */}
       <Link
         to="/progress"
-        className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 p-4 mb-4 flex items-center justify-between"
+        className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 p-4 mb-4 flex items-center justify-between"
       >
+        <CardMotif icon={CameraIcon} className="text-primary-500" />
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
             <CameraIcon className="w-5 h-5 text-primary-500" />

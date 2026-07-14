@@ -44,10 +44,20 @@
 }
 
 @layer base {
+  /* Auch die Wurzel einfärben: sonst blitzt beim Überziehen (Overscroll) und
+     beim App-Start kurz das weiße Standard-Canvas der WebView durch. */
+  html {
+    background-color: var(--color-surface-alt);
+  }
+  html.dark {
+    background-color: var(--color-surface-dark);
+  }
+
   body {
     @apply bg-surface-alt text-slate-900 font-sans antialiased;
     @apply dark:bg-surface-dark dark:text-slate-100;
     -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: contain;
   }
 
   /* Prevent iOS auto-zoom on input focus (requires >= 16px) */

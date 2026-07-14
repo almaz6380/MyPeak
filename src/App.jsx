@@ -9,6 +9,7 @@ import SplashScreen from './components/SplashScreen';
 import BottomNav from './components/BottomNav';
 import BackgroundLayer from './components/BackgroundLayer';
 import PullToRefresh from './components/PullToRefresh';
+import { useRefreshKey } from './components/pullToRefreshContext';
 import HomePage from './pages/HomePage';
 import TrainingPage from './pages/TrainingPage';
 import NutritionPage from './pages/NutritionPage';
@@ -82,8 +83,27 @@ function NotFound() {
   );
 }
 
+// Der Refresh-Key hängt am Routen-Baum: Pull-to-Refresh erhöht ihn, die
+// aktuelle Seite montiert neu und lädt ihre Daten — ohne WebView-Reload.
+function AppRoutes() {
+  const refreshKey = useRefreshKey();
+
+  return (
+    <Routes key={refreshKey}>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/training" element={<TrainingPage />} />
+      <Route path="/nutrition" element={<NutritionPage />} />
+      <Route path="/library" element={<LibraryPage />} />
+      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/cycle" element={<CycleDetailPage onBack={() => window.history.back()} />} />
+      <Route path="/progress" element={<ProgressPhotosPage />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
+
 function AppShell() {
-  const { isGuestMode } = useAuth();
+  const { isGuestMode, refreshProfile } = useAuth();
   const { t } = useTranslation();
 
   return (
@@ -97,18 +117,9 @@ function AppShell() {
         </div>
       )}
       <BackgroundLayer />
-      <PullToRefresh>
+      <PullToRefresh onRefresh={refreshProfile}>
         <main className="min-h-screen max-w-lg mx-auto pb-20">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/training" element={<TrainingPage />} />
-            <Route path="/nutrition" element={<NutritionPage />} />
-            <Route path="/library" element={<LibraryPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/cycle" element={<CycleDetailPage onBack={() => window.history.back()} />} />
-            <Route path="/progress" element={<ProgressPhotosPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AppRoutes />
         </main>
       </PullToRefresh>
       <BottomNav />

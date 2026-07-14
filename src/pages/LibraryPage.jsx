@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Syringe, ChevronRight, Scale, Loader2 } from 'lucide-react';
 import MyPeakLogo from '../components/MyPeakLogo';
+import CardMotif from '../components/CardMotif';
 
 // Lazy: Die E-Book-Texte (Peptide ~480 KB, Diäten ~220 KB) werden erst
 // geladen, wenn die Sektion geöffnet wird — verkleinert das Start-Bundle massiv.
@@ -39,8 +40,8 @@ export default function LibraryPage() {
   // Unfertige Sektionen (training, nutrition, supplements, bloodwork) sind bis
   // zum Fertigstellen ausgeblendet — halbleere "Bald"-Kacheln wirken unfertig.
   const sections = [
-    { id: 'diets', icon: <Scale className="w-6 h-6" />, label: t('library.diets'), color: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400', ready: true },
-    { id: 'peptides', icon: <Syringe className="w-6 h-6" />, label: t('library.peptides'), color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400', ready: true },
+    { id: 'diets', icon: <Scale className="w-6 h-6" />, motif: Scale, motifColor: 'text-orange-500', label: t('library.diets'), color: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400', ready: true },
+    { id: 'peptides', icon: <Syringe className="w-6 h-6" />, motif: Syringe, motifColor: 'text-amber-500', label: t('library.peptides'), color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400', ready: true },
   ].filter((s) => s.ready);
 
   return (
@@ -55,8 +56,9 @@ export default function LibraryPage() {
           <button
             key={section.id}
             onClick={() => section.ready ? setView(section.id) : null}
-            className={`bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-left ${!section.ready ? 'opacity-50' : ''}`}
+            className={`relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-left ${!section.ready ? 'opacity-50' : ''}`}
           >
+            <CardMotif icon={section.motif} className={section.motifColor} />
             <span className={`rounded-xl p-3 ${section.color}`}>{section.icon}</span>
             <span className="font-medium text-lg flex-1">{section.label}</span>
             {section.ready && <ChevronRight className="w-5 h-5 text-slate-300 dark:text-slate-600" />}

@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState, useCallback } from 'react';
+import { useRef, useMemo, useState, useCallback, useEffect } from 'react';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toLocalDateString } from '../lib/dateUtils';
 
@@ -7,17 +7,41 @@ const DAY_LABELS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTH_NAMES_DE = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 const MONTH_NAMES_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-const SLOTS = [
-  { size: 18, offsetY: 20, opacity: 0.2, fs: 7 },
-  { size: 22, offsetY: 17, opacity: 0.3, fs: 8 },
-  { size: 28, offsetY: 13, opacity: 0.5, fs: 9 },
-  { size: 36, offsetY: 7, opacity: 0.75, fs: 11 },
-  { size: 48, offsetY: 0, opacity: 1, fs: 16 },
-  { size: 36, offsetY: 7, opacity: 0.75, fs: 11 },
-  { size: 28, offsetY: 13, opacity: 0.5, fs: 9 },
-  { size: 22, offsetY: 17, opacity: 0.3, fs: 8 },
-  { size: 18, offsetY: 20, opacity: 0.2, fs: 7 },
-];
+// Kreisgröße/Deckkraft nach Abstand zur Mitte (0..4). Zwischenwerte werden
+// interpoliert — dadurch fließt der Bogen beim Wischen, statt zu springen.
+const SIZES = [48, 36, 28, 22, 18];
+const OPACITIES = [1, 0.75, 0.5, 0.3, 0.2];
+const BASE = SIZES[0];
+const GAP = 6;
+const RANGE = 6;      // gerenderte Tage links/rechts der Mitte
+const VISIBLE = 4.6;  // ab diesem Abstand ausgeblendet
+const MAX_JUMP = 3;   // ein Wisch überspringt höchstens 3 Tage
+const ROW_HEIGHT = 72;
+
+// Wert einer Stützstellen-Kurve bei beliebigem (auch gebrochenem) Abstand.
+function curve(points, dist) {
+  const a = Math.min(Math.abs(dist), points.length - 1);
+  const i = Math.floor(a);
+  const next = Math.min(i + 1, points.length - 1);
+  return points[i] + (points[next] - points[i]) * (a - i);
+}
+
+const sizeAt = (dist) => curve(SIZES, dist);
+
+// x-Position je ganzem Tagesabstand: halbe Breite + Lücke + halbe Breite.
+const X_STEPS = [0];
+for (let k = 1; k <= RANGE; k++) {
+  X_STEPS[k] = X_STEPS[k - 1] + sizeAt(k - 1) / 2 + GAP + sizeAt(k) / 2;
+}
+const DAY_WIDTH = X_STEPS[1]; // Pixel pro Tag beim Wischen
+
+function xAt(dist) {
+  const a = Math.min(Math.abs(dist), RANGE);
+  const i = Math.floor(a);
+  const next = Math.min(i + 1, RANGE);
+  const v = X_STEPS[i] + (X_STEPS[next] - X_STEPS[i]) * (a - i);
+  return dist < 0 ? -v : v;
+}
 
 function toDateStr(d) {
   return toLocalDateString(d);
@@ -30,11 +54,18 @@ function addDays(dateStr, days) {
 }
 
 export default function DiamondCalendar({ selectedDate, onSelectDate, scheduledDays, completedDays, lang = 'de', onOpenCalendar }) {
-  const startXRef = useRef(0);
-  const selectedRef = useRef(selectedDate);
-  selectedRef.current = selectedDate;
-  const [pulse, setPulse] = useState(false);
-  const pulseTimer = useRef(null);
+  // shift = um wie viele Tage die Reihe gerade aus der Ruhelage verschoben ist
+  // (gebrochen während des Wischens, 0 in Ruhe).
+  const [shift, setShift] = useState(0);
+  const [animate, setAnimate] = useState(false);
+  const touch = useRef({ x: 0, y: 0, axis: null });
+  const rafRef = useRef(null);
+  const animTimer = useRef(null);
+
+  useEffect(() => () => {
+    cancelAnimationFrame(rafRef.current);
+    clearTimeout(animTimer.current);
+  }, []);
 
   const sel = new Date(selectedDate + 'T12:00:00');
   const dayLabels = lang === 'de' ? DAY_LABELS_DE : DAY_LABELS_EN;
@@ -42,43 +73,64 @@ export default function DiamondCalendar({ selectedDate, onSelectDate, scheduledD
   const monthName = monthNames[sel.getMonth()];
   const dayName = dayLabels[sel.getDay()];
 
-  const triggerPulse = useCallback(() => {
-    setPulse(true);
-    clearTimeout(pulseTimer.current);
-    pulseTimer.current = setTimeout(() => setPulse(false), 120);
-    try { navigator.vibrate?.(12); } catch {}
-  }, []);
+  // Datum übernehmen und den Rest-Versatz weich auf 0 auslaufen lassen.
+  const settle = useCallback((days, restShift) => {
+    if (days !== 0) {
+      onSelectDate(addDays(selectedDate, days));
+      try { navigator.vibrate?.(12); } catch { /* nicht unterstützt */ }
+    }
+    setAnimate(false);
+    setShift(restShift);
+    cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      setAnimate(true);
+      setShift(0);
+      clearTimeout(animTimer.current);
+      animTimer.current = setTimeout(() => setAnimate(false), 280);
+    });
+  }, [onSelectDate, selectedDate]);
 
-  function go(dir) {
-    const next = addDays(selectedRef.current, dir);
-    triggerPulse();
-    onSelectDate(next);
-  }
+  // Pfeile und Tap auf einen Nachbarkreis: gleiten statt springen.
+  const go = useCallback((days) => settle(days, -days), [settle]);
 
   function onTouchStart(e) {
-    startXRef.current = e.touches[0].clientX;
+    touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, axis: null };
   }
 
   function onTouchMove(e) {
-    e.preventDefault();
-    const dx = startXRef.current - e.touches[0].clientX;
-    if (Math.abs(dx) >= 28) {
-      go(dx > 0 ? 1 : -1);
-      startXRef.current = e.touches[0].clientX;
+    const dx = e.touches[0].clientX - touch.current.x;
+    const dy = e.touches[0].clientY - touch.current.y;
+
+    // Achse einmal festlegen: vertikal bleibt Scrollen bzw. Pull-to-Refresh.
+    if (!touch.current.axis) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      touch.current.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
     }
+    if (touch.current.axis !== 'x') return;
+
+    e.preventDefault();
+    setAnimate(false);
+    // Jenseits von MAX_JUMP zäher werden lassen (gummiartiger Widerstand).
+    const raw = -dx / DAY_WIDTH;
+    const clamped = Math.max(-MAX_JUMP, Math.min(MAX_JUMP, raw));
+    setShift(clamped + (raw - clamped) * 0.2);
   }
 
-  // Build 9 slots: selected ± 4 days (crosses month boundaries automatically)
+  function onTouchEnd() {
+    if (touch.current.axis !== 'x') return;
+    touch.current.axis = null;
+    const target = Math.max(-MAX_JUMP, Math.min(MAX_JUMP, Math.round(shift)));
+    settle(target, shift - target);
+  }
+
+  // Kreise für selected ± RANGE (Monatsgrenzen laufen automatisch mit).
   const slots = useMemo(() => {
-    return SLOTS.map((slotStyle, i) => {
-      const dateStr = addDays(selectedDate, i - 4);
-      const d = new Date(dateStr + 'T12:00:00');
-      return {
-        dateStr,
-        day: d.getDate(),
-        ...slotStyle,
-      };
-    });
+    const list = [];
+    for (let offset = -RANGE; offset <= RANGE; offset++) {
+      const dateStr = addDays(selectedDate, offset);
+      list.push({ offset, dateStr, day: new Date(dateStr + 'T12:00:00').getDate() });
+    }
+    return list;
   }, [selectedDate]);
 
   function getColor(dateStr) {
@@ -109,32 +161,51 @@ export default function DiamondCalendar({ selectedDate, onSelectDate, scheduledD
       <div
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
-        className="flex items-end justify-center select-none"
-        style={{ height: 72, touchAction: 'none' }}
+        onTouchEnd={onTouchEnd}
+        onTouchCancel={onTouchEnd}
+        className="relative overflow-hidden select-none"
+        style={{ height: ROW_HEIGHT, touchAction: 'pan-y' }}
       >
-        {slots.map((slot, i) => (
-          <div
-            key={i}
-            onClick={() => slot.dateStr !== selectedDate && (triggerPulse(), onSelectDate(slot.dateStr))}
-            className="flex-shrink-0 flex items-center justify-center"
-            style={{ height: 72, paddingTop: slot.offsetY, opacity: slot.opacity, marginRight: i < 8 ? 6 : 0 }}
-          >
-            <div
-              className={`${getColor(slot.dateStr)} flex items-center justify-center ${i === 4 ? 'shadow-lg shadow-primary-500/20' : ''}`}
+        {slots.map((slot) => {
+          // Abstand zur Mitte — während des Wischens gebrochen, also fließend.
+          const dist = slot.offset - shift;
+          const scale = sizeAt(dist) / BASE;
+          const y = ((BASE - sizeAt(dist)) / 2) * 1.35; // kleine Kreise sinken ab → Bogen
+          const isCenter = Math.abs(dist) < 0.5;
+          const transition = animate
+            ? 'transform 280ms cubic-bezier(0.22, 1, 0.36, 1), opacity 280ms ease-out'
+            : 'none';
+
+          return (
+            <button
+              key={slot.dateStr}
+              type="button"
+              onClick={() => {
+                const days = Math.round(slot.offset - shift);
+                if (days !== 0) go(days);
+              }}
+              className="absolute top-0 left-1/2 flex items-center justify-center"
               style={{
-                width: slot.size,
-                height: slot.size,
-                transform: i === 4 && pulse ? 'scale(1.2)' : 'none',
-                borderRadius: '50%',
-                transition: i === 4 ? 'transform 0.1s ease-out' : 'none',
+                width: BASE,
+                height: BASE,
+                marginLeft: -BASE / 2,
+                marginTop: (ROW_HEIGHT - BASE) / 2,
+                opacity: Math.abs(dist) > VISIBLE ? 0 : curve(OPACITIES, dist),
+                transform: `translate3d(${xAt(dist)}px, ${y}px, 0) scale(${scale})`,
+                transition,
+                willChange: 'transform, opacity',
               }}
             >
-              <span className="font-bold text-white" style={{ fontSize: slot.fs }}>
-                {slot.day}
-              </span>
-            </div>
-          </div>
-        ))}
+              <div
+                className={`${getColor(slot.dateStr)} w-full h-full rounded-full flex items-center justify-center ${isCenter ? 'shadow-lg shadow-primary-500/20' : ''}`}
+              >
+                <span className="font-bold text-white" style={{ fontSize: 16 }}>
+                  {slot.day}
+                </span>
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       {/* Selected day label */}
