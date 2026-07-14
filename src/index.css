@@ -44,8 +44,10 @@
 }
 
 @layer base {
-  /* Auch die Wurzel einfärben: sonst blitzt beim Überziehen (Overscroll) und
-     beim App-Start kurz das weiße Standard-Canvas der WebView durch. */
+  /* Die Grundfarbe sitzt auf html, nicht auf body: sonst blitzt beim Überziehen
+     (Overscroll) und beim App-Start kurz das weiße Canvas der WebView durch.
+     body MUSS dafür transparent bleiben — ein eigener body-Hintergrund würde den
+     BackgroundLayer (fixed, -z-10) verdecken, der hinter dem Content liegt. */
   html {
     background-color: var(--color-surface-alt);
   }
@@ -54,8 +56,8 @@
   }
 
   body {
-    @apply bg-surface-alt text-slate-900 font-sans antialiased;
-    @apply dark:bg-surface-dark dark:text-slate-100;
+    @apply bg-transparent text-slate-900 font-sans antialiased;
+    @apply dark:text-slate-100;
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior-y: contain;
   }
