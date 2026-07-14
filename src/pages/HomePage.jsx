@@ -208,11 +208,11 @@ export default function HomePage() {
             onClick={() => navigate('/nutrition')}
             className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
           >
-            {/* Freigestellte Flamme (transparentes PNG), oben rechts – Karte bleibt weiß */}
+            {/* Freigestellte Flamme (transparentes PNG), schwebt links neben der Zahl in der Kopfzeile */}
             <div
               aria-hidden="true"
               className="absolute inset-0 pointer-events-none opacity-[0.42] dark:opacity-[0.5]"
-              style={{ backgroundImage: 'url(/bg-photos/calories-card.png)', backgroundSize: 'auto 110%', backgroundPosition: '88% 22%', backgroundRepeat: 'no-repeat' }}
+              style={{ backgroundImage: 'url(/bg-photos/calories-card.png)', backgroundSize: 'auto 55%', backgroundPosition: '64% 0%', backgroundRepeat: 'no-repeat' }}
             />
             <div className="relative flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
