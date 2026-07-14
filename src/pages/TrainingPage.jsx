@@ -4,6 +4,7 @@ import { Dumbbell, Plus, History, ClipboardList, Trophy, ArrowLeft, ChevronRight
 import ExerciseLibrary from './training/ExerciseLibrary';
 import ActiveWorkout from './training/ActiveWorkout';
 import ActiveCardio from './training/ActiveCardio';
+import ActiveStructuredCardio from './training/ActiveStructuredCardio';
 import ActiveHiit from './training/ActiveHiit';
 import ActiveCircuit from './training/ActiveCircuit';
 import ActiveMartialArts from './training/ActiveMartialArts';
@@ -14,6 +15,7 @@ import Leaderboard from './training/Leaderboard';
 import ChallengesList from './training/ChallengesList';
 import exercises, { getExerciseById, getExercisesByType } from '../data/exercises';
 import { getCustomPlans, getCustomPlansByType, saveCustomPlan, getActiveSchedule, getScheduledDaysForMonth, getWorkouts } from '../data/workoutStorage';
+import { resolveScheduledDay } from '../data/programResolver';
 import { getHiddenDefaultPlans, getPermanentDeletedDefaultPlans } from '../data/settingsStorage';
 import { useAuth } from '../context/AuthContext';
 import { useActiveWorkout } from '../context/ActiveWorkoutContext';
@@ -38,6 +40,8 @@ export default function TrainingPage() {
   const [prNotification, setPrNotification] = useState(null);
   const [toast, setToast] = useState(null); // { variant, message }
   const [cardioActivity, setCardioActivity] = useState(null);
+  const [structuredSession, setStructuredSession] = useState(null);
+  const [todaySession, setTodaySession] = useState(null);
   const [hiitConfig, setHiitConfig] = useState(null);
   const [circuitConfig, setCircuitConfig] = useState(null);
   const [martialArtsConfig, setMartialArtsConfig] = useState(null);
@@ -78,6 +82,15 @@ export default function TrainingPage() {
       }
     }
     setScheduledDays(scheduled);
+
+    // Heutige Session aus dem aktiven Plan auflösen (inkl. Wochen-Progression)
+    try {
+      const todayKey = DAY_KEYS[new Date().getDay()];
+      const resolved = await resolveScheduledDay(schedule, todayKey);
+      setTodaySession(resolved);
+    } catch (e) {
+      setTodaySession(null);
+    }
 
     // Completed days from workout history (normalize to YYYY-MM-DD)
     const completed = new Set();
@@ -175,6 +188,32 @@ export default function TrainingPage() {
     setView('home');
   };
 
+  // „Heute"-Session aus dem aktiven Wochenplan starten — Dispatch nach Tages-Typ
+  const startTodaySession = () => {
+    const day = todaySession;
+    if (!day) return;
+    if (day.type === 'strength' && Array.isArray(day.exercises) && day.exercises.length > 0) {
+      handleStartPlan(day.exercises, null, day.label || null);
+    } else if (day.type === 'cardio' && Array.isArray(day.segments) && day.segments.length > 0) {
+      setStructuredSession(day);
+      setView('activeStructuredCardio');
+    } else if (day.type === 'cardio' && day.exerciseId) {
+      const ex = getExerciseById(day.exerciseId);
+      if (ex) handleStartCardio(ex);
+    } else if (day.type === 'hiit' && day.rounds) {
+      handleStartHiit({ rounds: day.rounds, workTime: day.workTime, restTime: day.restTime, exercises: day.exercises || [] });
+    } else if (day.type === 'martial_arts' && day.rounds) {
+      handleStartMartialArts({ rounds: day.rounds, workTime: day.workTime, restTime: day.restTime, exercises: day.exercises || [] });
+    }
+  };
+
+  // Kann die Heute-Session direkt gestartet werden? (Custom-'split'-Tage z. B. nicht)
+  const todayStartable = !!todaySession && (
+    (todaySession.type === 'strength' && todaySession.exercises?.length > 0)
+    || (todaySession.type === 'cardio' && (todaySession.segments?.length > 0 || todaySession.exerciseId))
+    || ((todaySession.type === 'hiit' || todaySession.type === 'martial_arts') && todaySession.rounds)
+  );
+
   if (view === 'startChoice') {
     return (
       <WorkoutStartChooser
@@ -221,6 +260,16 @@ export default function TrainingPage() {
         activity={cardioActivity}
         onFinish={handleFinishCardioHiitCircuit}
         onDiscard={() => { setCardioActivity(null); setView('home'); }}
+      />
+    );
+  }
+
+  if (view === 'activeStructuredCardio' && structuredSession) {
+    return (
+      <ActiveStructuredCardio
+        session={structuredSession}
+        onFinish={() => { setStructuredSession(null); loadCalendarData(); setView('home'); }}
+        onDiscard={() => { setStructuredSession(null); setView('home'); }}
       />
     );
   }
@@ -369,6 +418,29 @@ export default function TrainingPage() {
         lang={lang}
         onOpenCalendar={() => setShowTrainingCalendar(true)}
       />
+
+      {/* Heutige Session aus dem aktiven Wochenplan */}
+      {todaySession && (
+        <button
+          onClick={todayStartable ? startTodaySession : undefined}
+          className={`w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-primary-200 dark:border-primary-800/60 flex items-center gap-3 mb-4 text-left ${todayStartable ? 'hover:shadow-md transition-shadow' : 'cursor-default'}`}
+        >
+          <div className="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0">
+            <Play className="w-5 h-5 text-primary-500" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+              {lang === 'de' ? 'Heute' : 'Today'}: {todaySession.label || todaySession.type}
+            </p>
+            <p className="text-xs text-slate-400">
+              {todaySession.week && todaySession.durationWeeks
+                ? `${lang === 'de' ? 'Woche' : 'Week'} ${todaySession.week}/${todaySession.durationWeeks}`
+                : (lang === 'de' ? 'Aus deinem Wochenplan' : 'From your weekly plan')}
+            </p>
+          </div>
+          {todayStartable && <ChevronRight className="w-5 h-5 text-slate-300 flex-shrink-0" />}
+        </button>
+      )}
 
       {prNotification && (
         <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 mb-4 flex items-center gap-3 animate-pulse">
