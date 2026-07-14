@@ -208,11 +208,11 @@ export default function HomePage() {
             onClick={() => navigate('/nutrition')}
             className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
           >
-            {/* Foto-Hintergrund (Gemini-Bild, Wasserzeichen entfernt), Flamme rechts platziert */}
+            {/* Freigestellte Flamme (transparentes PNG), oben rechts – Karte bleibt weiß */}
             <div
               aria-hidden="true"
-              className="absolute inset-0 pointer-events-none opacity-[0.16] dark:opacity-[0.22]"
-              style={{ backgroundImage: 'url(/bg-photos/calories-card.jpg)', backgroundSize: '150% auto', backgroundPosition: '0% 42%' }}
+              className="absolute inset-0 pointer-events-none opacity-[0.42] dark:opacity-[0.5]"
+              style={{ backgroundImage: 'url(/bg-photos/calories-card.png)', backgroundSize: 'auto 110%', backgroundPosition: '88% 22%', backgroundRepeat: 'no-repeat' }}
             />
             <div className="relative flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
