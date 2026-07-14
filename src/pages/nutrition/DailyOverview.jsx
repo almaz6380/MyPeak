@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Plus, Trash2, Settings, UtensilsCrossed, Pencil, X, Check, Droplets, GlassWater, BookOpen, Flame, Pill } from 'lucide-react';
-import CardMotif from '../../components/CardMotif';
+import { ChevronLeft, ChevronRight, Plus, Trash2, Settings, UtensilsCrossed, Pencil, X, Check, GlassWater, BookOpen } from 'lucide-react';
+import CardPhotoMotif from '../../components/CardPhotoMotif';
 import MacroRing from './MacroRing';
 import MyPeakLogo from '../../components/MyPeakLogo';
 import { useAuth } from '../../context/AuthContext';
@@ -169,7 +169,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
 
       {/* Macro Rings */}
       <div className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-5 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
-        <CardMotif icon={Flame} className="text-primary-500" />
+        <CardPhotoMotif src="/bg-photos/flame-icon.png" />
         <div className="relative flex items-center justify-between mb-3">
           <h2 className="text-xs font-medium text-slate-400 dark:text-slate-500">{t('nutrition.macros')}</h2>
           <button
@@ -268,10 +268,10 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
 
       {/* Water Tracker */}
       <div className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
-        <CardMotif icon={Droplets} className="text-cyan-500" />
+        <CardPhotoMotif src="/bg-photos/drop-icon.png" />
         <div className="relative flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Droplets className="w-5 h-5 text-cyan-500" />
+            <img src="/bg-photos/drop-icon.png" alt="" aria-hidden="true" className="h-5 w-auto object-contain -my-0.5" />
             <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('nutrition.water')}</h2>
           </div>
           <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -321,9 +321,9 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
         onClick={onOpenSupplements}
         className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4 flex items-center gap-3 text-left hover:shadow-md transition-shadow"
       >
-        <CardMotif icon={Pill} className="text-purple-500" />
+        <CardPhotoMotif src="/bg-photos/supplement-icon.png" />
         <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
-          <Pill className="w-5 h-5 text-purple-500" />
+          <img src="/bg-photos/supplement-icon.png" alt="" aria-hidden="true" className="h-6 w-auto object-contain" />
         </div>
         <div className="flex-1">
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('supplements.title')}</p>

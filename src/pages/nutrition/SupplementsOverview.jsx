@@ -2,7 +2,7 @@ import { toLocalDateString } from '../../lib/dateUtils';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Plus, Check, Pill, Settings, Sun, Moon, Dumbbell, Coffee, Sunset } from 'lucide-react';
-import CardMotif from '../../components/CardMotif';
+import CardPhotoMotif from '../../components/CardPhotoMotif';
 import { useAuth } from '../../context/AuthContext';
 import {
   getSupplements,
@@ -110,7 +110,7 @@ export default function SupplementsOverview({ onBack, onManage, onAdd }) {
       {/* Progress */}
       {scheduled.length > 0 && (
         <div className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
-          <CardMotif icon={Pill} className="text-purple-500" />
+          <CardPhotoMotif src="/bg-photos/supplement-icon.png" />
           <div className="relative flex items-center justify-between mb-2">
             <p className="text-sm font-medium text-slate-600 dark:text-slate-400">{t('supplements.todayProgress')}</p>
             <p className="text-sm font-bold text-primary-500">{progress.taken}/{progress.total}</p>

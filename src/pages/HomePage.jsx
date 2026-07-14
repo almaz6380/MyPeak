@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Flame, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, User, Calendar, Plus } from 'lucide-react';
 import MyPeakLogo from '../components/MyPeakLogo';
+import CardPhotoMotif from '../components/CardPhotoMotif';
 import { useAuth } from '../context/AuthContext';
 import { getNutritionEntries, getNutritionGoals, getWaterTotal } from '../data/nutritionStorage';
 import { getWorkouts } from '../data/workoutStorage';
@@ -464,18 +465,6 @@ export default function HomePage() {
         />
       )}
     </div>
-  );
-}
-
-// Großes, dezentes Foto-Motiv in der Kartenecke (rein dekorativ, wie ein Wasserzeichen)
-function CardPhotoMotif({ src, className = '' }) {
-  return (
-    <img
-      src={src}
-      alt=""
-      aria-hidden="true"
-      className={`absolute -right-3 -bottom-4 w-24 h-24 object-contain opacity-[0.08] dark:opacity-[0.12] pointer-events-none ${className}`}
-    />
   );
 }
 
