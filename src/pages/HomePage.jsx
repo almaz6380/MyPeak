@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Droplets, Dumbbell, Flame, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Pill, User, Calendar, Plus, Scale } from 'lucide-react';
+import { Flame, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, User, Calendar, Plus } from 'lucide-react';
 import MyPeakLogo from '../components/MyPeakLogo';
 import { useAuth } from '../context/AuthContext';
 import { getNutritionEntries, getNutritionGoals, getWaterTotal } from '../data/nutritionStorage';
@@ -208,10 +208,10 @@ export default function HomePage() {
             onClick={() => navigate('/nutrition')}
             className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
           >
-            <CardMotif icon={Flame} className="text-primary-500" />
-            <div className="flex items-center justify-between mb-3">
+            <CardPhotoMotif src="/bg-photos/flame-icon.png" />
+            <div className="relative flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Flame className="w-5 h-5 text-primary-500" />
+                <img src="/bg-photos/flame-icon.png" alt="" aria-hidden="true" className="h-6 w-auto object-contain -my-1" />
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('home.calories')}</span>
               </div>
               <div className="flex items-center gap-1">
@@ -221,14 +221,14 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-4">
+            <div className="relative h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-4">
               <div
                 className="h-full bg-primary-500 rounded-full transition-all duration-500"
                 style={{ width: `${calPercent}%` }}
               />
             </div>
 
-            <div className="flex gap-2">
+            <div className="relative flex gap-2">
               <MacroPill label="P" value={Math.round(nutrition.protein)} goal={goals.protein} color="bg-blue-500" />
               <MacroPill label="C" value={Math.round(nutrition.carbs)} goal={goals.carbs} color="bg-emerald-500" />
               <MacroPill label="F" value={Math.round(nutrition.fat)} goal={goals.fat} color="bg-rose-500" />
@@ -242,16 +242,9 @@ export default function HomePage() {
               onClick={() => navigate('/nutrition')}
               className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
             >
-              {/* Foto-Hintergrund über die ganze Karte (Gemini-Bild, zugeschnitten);
-                  leicht hineingezoomt (background-size), damit der Tropfen nach rechts wandern kann –
-                  reines backgroundPosition-X greift nicht, weil das Bild die Kartenbreite exakt füllt */}
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 pointer-events-none opacity-[0.16] dark:opacity-[0.22]"
-                style={{ backgroundImage: 'url(/bg-photos/water-card.jpg)', backgroundSize: '160% auto', backgroundPosition: '0% 46%' }}
-              />
+              <CardPhotoMotif src="/bg-photos/drop-icon.png" />
               <div className="relative flex items-center gap-2 mb-2">
-                <Droplets className="w-4 h-4 text-cyan-500" />
+                <img src="/bg-photos/drop-icon.png" alt="" aria-hidden="true" className="h-5 w-auto object-contain -my-0.5" />
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{t('home.water')}</span>
               </div>
               <p className="relative text-lg font-bold text-slate-900 dark:text-white">
@@ -266,9 +259,9 @@ export default function HomePage() {
               onClick={() => navigate('/nutrition')}
               className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
             >
-              <CardMotif icon={Pill} className="text-purple-500" />
-              <div className="flex items-center gap-2 mb-2">
-                <Pill className="w-4 h-4 text-purple-500" />
+              <CardPhotoMotif src="/bg-photos/supplement-icon.png" />
+              <div className="relative flex items-center gap-2 mb-2">
+                <img src="/bg-photos/supplement-icon.png" alt="" aria-hidden="true" className="h-5 w-auto object-contain -my-0.5" />
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{t('home.supplements')}</span>
               </div>
               <p className="text-lg font-bold text-slate-900 dark:text-white">
@@ -329,10 +322,10 @@ export default function HomePage() {
             onClick={() => navigate('/training')}
             className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
           >
-            <CardMotif icon={Dumbbell} className="text-primary-500 -rotate-12" />
-            <div className="flex items-center justify-between">
+            <CardPhotoMotif src="/bg-photos/training-icon.png" />
+            <div className="relative flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Dumbbell className="w-5 h-5 text-primary-500" />
+                <img src="/bg-photos/training-icon.png" alt="" aria-hidden="true" className="h-6 w-auto object-contain -my-1" />
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('home.training')}</span>
               </div>
               <ChevronRight className="w-4 h-4 text-slate-300" />
@@ -354,15 +347,15 @@ export default function HomePage() {
           </button>
           {/* Weight Chart Card */}
           <div className="relative bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">
-            <CardMotif icon={Scale} className="text-primary-500" />
+            <CardPhotoMotif src="/bg-photos/weight-icon.png" />
             <div
               role="button"
               tabIndex={0}
               onClick={() => { const next = !showWeightChart; setShowWeightChart(next); localStorage.setItem('weight_chart_collapsed', (!next).toString()); }}
-              className="w-full p-4 flex items-center justify-between cursor-pointer"
+              className="relative w-full p-4 flex items-center justify-between cursor-pointer"
             >
               <div className="flex items-center gap-2">
-                <Scale className="w-5 h-5 text-primary-500" />
+                <img src="/bg-photos/weight-icon.png" alt="" aria-hidden="true" className="h-6 w-auto object-contain -my-1" />
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('home.weight')}</span>
                 {weightEntries.length > 0 && (
                   <span className="text-sm text-slate-400 ml-1">
@@ -474,12 +467,14 @@ export default function HomePage() {
   );
 }
 
-// Großes, dezentes Symbol in der Kartenecke (rein dekorativ)
-function CardMotif({ icon: Icon, className = '' }) {
+// Großes, dezentes Foto-Motiv in der Kartenecke (rein dekorativ, wie ein Wasserzeichen)
+function CardPhotoMotif({ src, className = '' }) {
   return (
-    <Icon
+    <img
+      src={src}
+      alt=""
       aria-hidden="true"
-      className={`absolute -right-3 -bottom-4 w-20 h-20 opacity-[0.06] dark:opacity-[0.08] pointer-events-none rotate-12 ${className}`}
+      className={`absolute -right-3 -bottom-4 w-24 h-24 object-contain opacity-[0.08] dark:opacity-[0.12] pointer-events-none ${className}`}
     />
   );
 }
