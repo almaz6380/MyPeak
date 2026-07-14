@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ChevronRight, Dumbbell, Heart, Zap, Swords, Star, Clock, Calendar, Play, Check, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { saveWeeklySchedule } from '../../data/workoutStorage';
+import Toast from '../../components/Toast';
 
 import { peakPrograms, peakCategories } from '../../data/peakPrograms';
 
@@ -27,6 +28,7 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [activating, setActivating] = useState(false);
+  const [activateError, setActivateError] = useState(false);
 
   // Sort categories: show matching goal first
   const goalOrder = { muscle_gain: 'strength', weight_loss: 'hiit', maintenance: 'cardio' };
@@ -41,6 +43,14 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
   // ── Program Detail ──
   if (selectedProgram) {
     return (
+      <>
+      {activateError && (
+        <Toast
+          variant="error"
+          message={lang === 'de' ? 'Speichern fehlgeschlagen. Bitte erneut versuchen.' : 'Saving failed. Please try again.'}
+          onDismiss={() => setActivateError(false)}
+        />
+      )}
       <ProgramDetail
         program={selectedProgram}
         lang={lang}
@@ -50,14 +60,32 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
         onBack={() => setSelectedProgram(null)}
         onActivate={(customDays) => {
           const p = selectedProgram;
+          const name = lang === 'de' ? p.nameDE : p.nameEN;
           setActivating(true);
-          saveWeeklySchedule(user.id, {
-            name: lang === 'de' ? p.nameDE : p.nameEN,
+          // _meta verknüpft den Schedule mit dem Programm → Wochen-Progression
+          // wird zur Lesezeit aufgelöst (programResolver); alte Schedules ohne
+          // _meta bleiben unverändert nutzbar.
+          const days = {
+            ...customDays,
+            _meta: {
+              programId: p.id,
+              startedAt: new Date().toISOString().slice(0, 10),
+              durationWeeks: p.duration_weeks,
+            },
+          };
+          saveWeeklySchedule(user?.id || 'guest', {
+            name,
             sessions_per_week: p.sessions_per_week,
-            days: customDays,
-          }).then(() => { setActivating(false); onProgramActivated(); });
+            days,
+          })
+            .then(() => { setActivating(false); onProgramActivated(name); })
+            .catch(() => {
+              setActivating(false);
+              setActivateError(true);
+            });
         }}
       />
+      </>
     );
   }
 
@@ -346,7 +374,7 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, on
         disabled={activating}
         className="w-full py-4 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold rounded-2xl flex items-center justify-center gap-2"
       >
-        {activating ? '...' : (
+        {activating ? (lang === 'de' ? 'Wird aktiviert…' : 'Activating…') : (
           <>
             <Play className="w-5 h-5" />
             {lang === 'de' ? 'Programm starten' : 'Start Program'}

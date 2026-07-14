@@ -21,6 +21,7 @@ import MuscleGroupIcon from '../components/icons/MuscleGroupIcon';
 import WeeklySummaryBanner from '../components/progress/WeeklySummaryBanner';
 import MuscleHeatmapCard from '../components/progress/MuscleHeatmapCard';
 import MyPeakLogo from '../components/MyPeakLogo';
+import Toast from '../components/Toast';
 import DiamondCalendar from '../components/DiamondCalendar';
 import WeeklyPlanBuilder from './training/WeeklyPlanBuilder';
 import MyPlans from './training/MyPlans';
@@ -35,6 +36,7 @@ export default function TrainingPage() {
   const hasValidWorkout = activeWorkout.isActive && activeWorkout.workout?.exercises?.length > 0;
   const [view, setView] = useState(hasValidWorkout ? 'activeWorkout' : 'home');
   const [prNotification, setPrNotification] = useState(null);
+  const [toast, setToast] = useState(null); // { variant, message }
   const [cardioActivity, setCardioActivity] = useState(null);
   const [hiitConfig, setHiitConfig] = useState(null);
   const [circuitConfig, setCircuitConfig] = useState(null);
@@ -320,7 +322,23 @@ export default function TrainingPage() {
 
   if (view === 'peakPrograms') {
     try {
-      return <PeakPrograms onBack={() => setView('home')} onProgramActivated={() => { loadCalendarData(); setView('home'); }} userGoal={profile?.goal || ''} userExperience={profile?.experience || ''} />;
+      return (
+        <PeakPrograms
+          onBack={() => setView('home')}
+          onProgramActivated={(name) => {
+            loadCalendarData();
+            setView('home');
+            setToast({
+              variant: 'success',
+              message: lang === 'de'
+                ? `„${name}" aktiviert — deine Trainingstage sind jetzt blau im Kalender markiert.`
+                : `"${name}" activated — your training days are now marked blue in the calendar.`,
+            });
+          }}
+          userGoal={profile?.goal || ''}
+          userExperience={profile?.experience || ''}
+        />
+      );
     } catch (err) {
       console.error('PeakPrograms error:', err);
       return (
@@ -334,6 +352,9 @@ export default function TrainingPage() {
 
   return (
     <div className="p-4 pt-16 pb-24">
+      {toast && (
+        <Toast variant={toast.variant} message={toast.message} onDismiss={() => setToast(null)} />
+      )}
       <div className="flex flex-col items-center pt-6 mb-4">
         <MyPeakLogo size={32} />
         <h1 className="text-2xl font-bold mt-2">{t('training.title')}</h1>
