@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Dumbbell, Flame, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, User, Calendar, Plus, Scale } from 'lucide-react';
+import { Flame, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, User, Calendar, Plus, Scale } from 'lucide-react';
 import MyPeakLogo from '../components/MyPeakLogo';
 import { useAuth } from '../context/AuthContext';
 import { getNutritionEntries, getNutritionGoals, getWaterTotal } from '../data/nutritionStorage';
@@ -319,10 +319,9 @@ export default function HomePage() {
             onClick={() => navigate('/training')}
             className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
           >
-            <CardMotif icon={Dumbbell} className="text-primary-500 -rotate-12" />
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Dumbbell className="w-5 h-5 text-primary-500" />
+                <img src="/bg-photos/training-icon.png" alt="" aria-hidden="true" className="h-6 w-auto object-contain -my-1" />
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('home.training')}</span>
               </div>
               <ChevronRight className="w-4 h-4 text-slate-300" />
