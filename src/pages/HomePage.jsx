@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Dumbbell, Flame, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Pill, User, Calendar, Plus, Scale } from 'lucide-react';
+import { Dumbbell, Flame, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, User, Calendar, Plus, Scale } from 'lucide-react';
 import MyPeakLogo from '../components/MyPeakLogo';
 import { useAuth } from '../context/AuthContext';
 import { getNutritionEntries, getNutritionGoals, getWaterTotal } from '../data/nutritionStorage';
@@ -257,9 +257,8 @@ export default function HomePage() {
               onClick={() => navigate('/nutrition')}
               className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
             >
-              <CardMotif icon={Pill} className="text-purple-500" />
               <div className="flex items-center gap-2 mb-2">
-                <Pill className="w-4 h-4 text-purple-500" />
+                <img src="/bg-photos/supplement-icon.png" alt="" aria-hidden="true" className="h-5 w-auto object-contain -my-0.5" />
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{t('home.supplements')}</span>
               </div>
               <p className="text-lg font-bold text-slate-900 dark:text-white">
