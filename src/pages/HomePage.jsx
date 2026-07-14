@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Droplets, Dumbbell, Flame, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Pill, User, Calendar, Plus, Scale } from 'lucide-react';
+import { Dumbbell, Flame, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Pill, User, Calendar, Plus, Scale } from 'lucide-react';
 import MyPeakLogo from '../components/MyPeakLogo';
 import { useAuth } from '../context/AuthContext';
 import { getNutritionEntries, getNutritionGoals, getWaterTotal } from '../data/nutritionStorage';
@@ -208,15 +208,9 @@ export default function HomePage() {
             onClick={() => navigate('/nutrition')}
             className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
           >
-            {/* Freigestellte Flamme (transparentes PNG), schwebt links neben der Zahl in der Kopfzeile */}
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 pointer-events-none opacity-[0.42] dark:opacity-[0.5]"
-              style={{ backgroundImage: 'url(/bg-photos/calories-card.png)', backgroundSize: 'auto 55%', backgroundPosition: '64% 0%', backgroundRepeat: 'no-repeat' }}
-            />
             <div className="relative flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Flame className="w-5 h-5 text-primary-500" />
+                <img src="/bg-photos/flame-icon.png" alt="" aria-hidden="true" className="h-6 w-auto object-contain -my-1" />
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('home.calories')}</span>
               </div>
               <div className="flex items-center gap-1">
@@ -247,16 +241,8 @@ export default function HomePage() {
               onClick={() => navigate('/nutrition')}
               className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
             >
-              {/* Foto-Hintergrund über die ganze Karte (Gemini-Bild, zugeschnitten);
-                  leicht hineingezoomt (background-size), damit der Tropfen nach rechts wandern kann –
-                  reines backgroundPosition-X greift nicht, weil das Bild die Kartenbreite exakt füllt */}
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 pointer-events-none opacity-[0.16] dark:opacity-[0.22]"
-                style={{ backgroundImage: 'url(/bg-photos/water-card.jpg)', backgroundSize: '160% auto', backgroundPosition: '0% 46%' }}
-              />
               <div className="relative flex items-center gap-2 mb-2">
-                <Droplets className="w-4 h-4 text-cyan-500" />
+                <img src="/bg-photos/drop-icon.png" alt="" aria-hidden="true" className="h-5 w-auto object-contain -my-0.5" />
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{t('home.water')}</span>
               </div>
               <p className="relative text-lg font-bold text-slate-900 dark:text-white">
