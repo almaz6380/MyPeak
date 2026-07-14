@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dumbbell, Plus, History, ClipboardList, Trophy, ArrowLeft, ChevronRight, Heart, Zap, RefreshCw, X, Search, Play, Users, Swords, Medal, Moon } from 'lucide-react';
+import { Plus, Trophy, ArrowLeft, ChevronRight, X, Search, Play, Users, Swords, Medal, Moon } from 'lucide-react';
 import ExerciseLibrary from './training/ExerciseLibrary';
 import ActiveWorkout from './training/ActiveWorkout';
 import ActiveCardio from './training/ActiveCardio';
@@ -523,8 +523,8 @@ export default function TrainingPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <QuickAction icon={<ClipboardList className="w-6 h-6" />} label={t('training.plans')} onClick={() => setView('plans')} />
-        <QuickAction icon={<Dumbbell className="w-6 h-6" />} label={t('training.exercises')} onClick={() => setView('exercises')} />
+        <QuickAction icon={<img src="/bg-photos/plan-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />} label={t('training.plans')} onClick={() => setView('plans')} />
+        <QuickAction icon={<img src="/bg-photos/training-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />} label={t('training.exercises')} onClick={() => setView('exercises')} />
       </div>
 
       {/* History */}
@@ -534,7 +534,7 @@ export default function TrainingPage() {
       >
         <CardPhotoMotif src="/bg-photos/history-icon.png" />
         <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-          <History className="w-5 h-5 text-slate-500" />
+          <img src="/bg-photos/history-icon.png" alt="" aria-hidden="true" className="h-6 w-auto object-contain" />
         </div>
         <div className="flex-1 text-left">
           <p className="text-sm font-semibold text-slate-900 dark:text-white">{t('training.history')}</p>
@@ -721,7 +721,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
             <CardPhotoMotif src="/bg-photos/plan-icon.png" />
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center">
-                <ClipboardList className="w-6 h-6 text-primary-500" />
+                <img src="/bg-photos/plan-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />
               </div>
               <div className="flex-1">
                 <p className="font-semibold text-lg">{t('training.fromPlan')}</p>
@@ -839,7 +839,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
 
       <div className="flex flex-col gap-3">
         <TrainingTypeCard
-          icon={<Dumbbell className="w-6 h-6" />}
+          icon={<img src="/bg-photos/training-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />}
           motif="/bg-photos/training-icon.png"
           label={t('training.strength')}
           desc={t('training.strengthDesc')}
@@ -847,7 +847,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
           onClick={() => setStep('strengthChoice')}
         />
         <TrainingTypeCard
-          icon={<Heart className="w-6 h-6" />}
+          icon={<img src="/bg-photos/cardio-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />}
           motif="/bg-photos/cardio-icon.png"
           label={t('training.cardio')}
           desc={t('training.cardioDesc')}
@@ -855,7 +855,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
           onClick={() => setStep('cardioChoice')}
         />
         <TrainingTypeCard
-          icon={<Zap className="w-6 h-6" />}
+          icon={<img src="/bg-photos/hiit-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />}
           motif="/bg-photos/hiit-icon.png"
           label={t('training.hiit')}
           desc={t('training.hiitDesc')}
@@ -863,7 +863,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
           onClick={() => setStep('hiitChoice')}
         />
         <TrainingTypeCard
-          icon={<RefreshCw className="w-6 h-6" />}
+          icon={<img src="/bg-photos/circuit-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />}
           motif="/bg-photos/circuit-icon.png"
           label={t('training.circuit')}
           desc={t('training.circuitDesc')}
@@ -871,7 +871,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
           onClick={() => setStep('circuitChoice')}
         />
         <TrainingTypeCard
-          icon={<BoxingGlovesIcon className="w-6 h-6" />}
+          icon={<img src="/bg-photos/martial-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />}
           motif="/bg-photos/martial-icon.png"
           label={t('training.martialArts')}
           desc={t('training.martialArtsDesc')}
@@ -911,26 +911,6 @@ function TrainingTypeCard({ icon, motif, label, desc, color, onClick }) {
   );
 }
 
-function BoxingGlovesIcon({ className }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      {/* Glove body — left fist punching right, side view */}
-      <path d="M4 10c0-3 2-5.5 5.5-5.5S15 7 15 10v1.5c0 2-1 3.5-3.5 3.5H7c-2 0-3-1.5-3-3.5V10z" fill="currentColor" opacity="0.12" />
-      <path d="M4 10c0-3 2-5.5 5.5-5.5S15 7 15 10v1.5c0 2-1 3.5-3.5 3.5H7c-2 0-3-1.5-3-3.5V10z" />
-      {/* Thumb — pointing up/forward on top */}
-      <path d="M13 7.5c1.5-.5 2.5 0 2.5 1.5s-1 2-2.5 2" />
-      {/* Knuckle area — front of fist facing right */}
-      <path d="M4 8v5" strokeWidth="2" opacity="0.3" />
-      {/* Wrist/cuff */}
-      <path d="M7 15h5.5" />
-      <rect x="7" y="15.5" width="5.5" height="3" rx="1" fill="currentColor" opacity="0.12" />
-      <rect x="7" y="15.5" width="5.5" height="3" rx="1" />
-      {/* Arm going right */}
-      <path d="M9 18.5v2" />
-      <path d="M11 18.5v2" />
-    </svg>
-  );
-}
 
 function HiitSetup({ onBack, onStart, exercises, t }) {
   const { user } = useAuth();

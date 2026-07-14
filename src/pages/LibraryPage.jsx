@@ -1,6 +1,6 @@
 import { useState, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Syringe, ChevronRight, Scale, Loader2 } from 'lucide-react';
+import { ChevronRight, Loader2 } from 'lucide-react';
 import MyPeakLogo from '../components/MyPeakLogo';
 import CardPhotoMotif from '../components/CardPhotoMotif';
 
@@ -40,8 +40,8 @@ export default function LibraryPage() {
   // Unfertige Sektionen (training, nutrition, supplements, bloodwork) sind bis
   // zum Fertigstellen ausgeblendet — halbleere "Bald"-Kacheln wirken unfertig.
   const sections = [
-    { id: 'diets', icon: <Scale className="w-6 h-6" />, motif: '/bg-photos/weight-icon.png', label: t('library.diets'), color: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400', ready: true },
-    { id: 'peptides', icon: <Syringe className="w-6 h-6" />, motif: '/bg-photos/peptide-icon.png', label: t('library.peptides'), color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400', ready: true },
+    { id: 'diets', icon: <img src="/bg-photos/weight-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />, motif: '/bg-photos/weight-icon.png', label: t('library.diets'), color: 'bg-orange-100 dark:bg-orange-900/30', ready: true },
+    { id: 'peptides', icon: <img src="/bg-photos/peptide-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />, motif: '/bg-photos/peptide-icon.png', label: t('library.peptides'), color: 'bg-amber-100 dark:bg-amber-900/30', ready: true },
   ].filter((s) => s.ready);
 
   return (
