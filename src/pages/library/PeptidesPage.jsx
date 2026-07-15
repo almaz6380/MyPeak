@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ChevronDown, ChevronUp, AlertTriangle, Syringe, FlaskConical, Brain, Flame, Heart, ShieldCheck, BookOpen, ChevronRight, Stethoscope } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, AlertTriangle, FlaskConical, Brain, Flame, Heart, ShieldCheck, BookOpen, ChevronRight, Stethoscope } from 'lucide-react';
 import peptides from '../../data/peptidesData';
 
 const CATEGORIES = [
@@ -82,7 +82,6 @@ export default function PeptidesPage({ onBack }) {
   if (selectedPeptide) {
     const p = selectedPeptide;
     const cat = CATEGORIES.find((c) => c.id === p.category);
-    const CatIcon = cat?.icon || Syringe;
     const quick = lang === 'de' ? p.quickDE : p.quickEN;
     const hasEbook = p.sections && p.sections.length > 0;
 
@@ -97,7 +96,7 @@ export default function PeptidesPage({ onBack }) {
             <p className="text-xs text-slate-400 dark:text-slate-500">{categoryNames[p.category]?.[lang]}</p>
           </div>
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${cat?.color}`}>
-            <CatIcon className="w-5 h-5" />
+            <img src="/bg-photos/peptide-icon.png" alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
           </div>
         </div>
 
@@ -199,7 +198,6 @@ export default function PeptidesPage({ onBack }) {
       <div className="flex flex-col gap-3">
         {filtered.map((peptide) => {
           const cat = CATEGORIES.find((c) => c.id === peptide.category);
-          const CatIcon = cat?.icon || Syringe;
           const hasEbook = peptide.sections && peptide.sections.length > 0;
 
           return (
@@ -209,7 +207,7 @@ export default function PeptidesPage({ onBack }) {
               className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-left"
             >
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${cat?.color}`}>
-                <CatIcon className="w-5 h-5" />
+                <img src="/bg-photos/peptide-icon.png" alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold truncate">{lang === 'de' ? peptide.nameDE : peptide.nameEN}</p>

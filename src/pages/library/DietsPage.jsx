@@ -109,7 +109,6 @@ export default function DietsPage({ onBack }) {
   // ── DETAIL VIEW ──
   if (selectedDiet) {
     const d = selectedDiet;
-    const CatIcon = CAT_ICONS[d.category] || Flame;
     const quick = lang === 'de' ? d.quickDE : d.quickEN;
     const hasEbook = d.sections && d.sections.length > 0;
     const isActive = activeDietId === d.id;
@@ -125,7 +124,7 @@ export default function DietsPage({ onBack }) {
             <p className="text-xs text-slate-400">{dietCategories.find((c) => c.id === d.category)?.[lang === 'de' ? 'nameDE' : 'nameEN']}</p>
           </div>
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${CAT_COLORS[d.category]}`}>
-            <CatIcon className="w-5 h-5" />
+            <img src="/bg-photos/weight-icon.png" alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
           </div>
         </div>
 
@@ -266,7 +265,6 @@ export default function DietsPage({ onBack }) {
       {/* Diet Cards */}
       <div className="flex flex-col gap-3">
         {filtered.map((diet) => {
-          const CatIcon = CAT_ICONS[diet.category] || Flame;
           const isActive = activeDietId === diet.id;
           return (
             <button
@@ -278,7 +276,7 @@ export default function DietsPage({ onBack }) {
             >
               <div className="flex items-start gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${CAT_COLORS[diet.category]}`}>
-                  <CatIcon className="w-5 h-5" />
+                  <img src="/bg-photos/weight-icon.png" alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
