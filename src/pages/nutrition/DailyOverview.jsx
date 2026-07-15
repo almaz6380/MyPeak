@@ -497,6 +497,7 @@ function CalendarModal({ selectedDate, onSelect, onClose, lang, t }) {
 // ── Goal Editor Modal ────────────────────────────────────────
 
 function GoalEditorModal({ goals, onSave, onClose, t }) {
+  const { i18n } = useTranslation();
   const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
   const [calories, setCalories] = useState(String(Math.round(goals.calories)));
   const [protein, setProtein] = useState(String(Math.round(goals.protein)));

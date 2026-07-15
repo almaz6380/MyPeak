@@ -11,11 +11,12 @@ export default function PlanDetail({ plan, dayIndex, exercises: externalExercise
   const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
 
   const day = plan.days?.[dayIndex];
-  if (!day) return null;
+
+  const [changed, setChanged] = useState(false);
 
   // Initialize exercises from external state or from plan
   useEffect(() => {
-    if (!externalExercises) {
+    if (!externalExercises && day) {
       const initial = (day.exercises || []).map((id) => {
         const rawId = typeof id === 'object' ? id.id : id;
         const ex = getExerciseById(rawId);
@@ -25,12 +26,12 @@ export default function PlanDetail({ plan, dayIndex, exercises: externalExercise
     }
   }, []);
 
+  if (!day) return null;
+
   const exerciseList = (externalExercises || []).map((ex) => {
     const full = getExerciseById(ex.id);
     return { ...ex, name: full ? t(full.nameKey || ex.nameKey) : ex.id };
   });
-
-  const [changed, setChanged] = useState(false);
 
   function removeExercise(index) {
     const updated = externalExercises.filter((_, i) => i !== index);

@@ -61,9 +61,9 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - **Offen nach Launch:** AdMob-App↔Store verknüpfen; iOS-Update 1.1 (Englisch) liegt auf Branch i18n-en.
 
 ### Launch-Fixes (Juli 2026, Branch launch-fixes) — FERTIG
-- [x] Rechtsseiten Impressum/Datenschutz/AGB (`/legal/*`, `src/pages/legal/`) — PLATZHALTER in legalContent.js (Name/Adresse) noch ausfüllen!
+- [x] Rechtsseiten Impressum/Datenschutz/AGB (`/legal/*`, `src/pages/legal/`) — Betreiberdaten in `legalContent.js` eingetragen (Josef Gallab, Oberhofenweg 21b, 6380 St. Johann in Tirol; kontakt@wellbooked.at).
 - [x] Konto-Löschung (api/delete-account.js + Profil) — braucht `SUPABASE_SERVICE_ROLE_KEY` in Vercel
-- [x] RLS-Sicherheitsmigration `supabase/migration-2026-07-security.sql` — muss im Supabase SQL Editor ausgeführt werden!
+- [x] RLS-Sicherheitsmigration `supabase/migrations/20260704230000_security_fixes.sql` — muss im Supabase SQL Editor / `supabase db push --linked` ausgeführt werden!
 - [x] Gemini-Endpoint mit Login-Pflicht (Gäste bekommen Hinweis)
 - [x] Zeitzonen-Fix: lokales Datum überall (src/lib/dateUtils.js)
 - [x] Gast→Konto-Migration komplett neu (src/data/resync.js): alle Datentypen, keine Duplikate, Auto-Retry bei online
