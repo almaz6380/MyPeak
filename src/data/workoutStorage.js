@@ -22,7 +22,7 @@ export async function getWorkouts(userId) {
         .then(({ data, error }) => {
           if (!error && data) {
             const supabaseWorkouts = data.map((row) => ({
-              id: row.id, date: row.date, duration: row.duration, exercises: row.exercises,
+              id: row.id, date: row.date, duration: row.duration, type: row.type, exercises: row.exercises,
             }));
             // Keep local-only workouts (not yet synced) and merge with Supabase data
             const currentLocal = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
@@ -47,7 +47,7 @@ export async function getWorkouts(userId) {
 
       if (!error && data) {
         const workouts = data.map((row) => ({
-          id: row.id, date: row.date, duration: row.duration, exercises: row.exercises,
+          id: row.id, date: row.date, duration: row.duration, type: row.type, exercises: row.exercises,
         }));
         localStorage.setItem(WORKOUTS_KEY, JSON.stringify(workouts));
         return workouts;
@@ -77,6 +77,7 @@ export async function saveWorkout(userId, workout) {
           user_id: userId,
           date: workout.date,
           duration: workout.duration,
+          type: workout.type || null,
           exercises: workout.exercises,
         })
         .select()

@@ -11,6 +11,7 @@ import { Moon, Sun, Globe, Weight, LogOut, ChevronRight, Pencil, X, Check, Loade
 import { getOrCreateFriendCode, getXP, getLevelTitle, calculateLevel, hasGoldenFrame } from '../data/socialStorage';
 import AchievementGallery from '../components/progress/AchievementGallery';
 import { canChangeAdConsent, changeAdConsent } from '../lib/ads';
+import { clearAllLocalPhotos } from '../data/exercisePhotos';
 
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
@@ -78,7 +79,9 @@ export default function ProfilePage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('delete failed');
-      // Alle lokalen Daten entfernen, damit nichts vom Konto zurückbleibt
+      // Alle lokalen Daten entfernen, damit nichts vom Konto zurückbleibt —
+      // inkl. der IndexedDB-Fotos (Fortschritts-/Körperfotos, on-device DSGVO).
+      await clearAllLocalPhotos().catch(() => {});
       localStorage.clear();
       await supabase.auth.signOut().catch(() => {});
       window.location.href = '/';

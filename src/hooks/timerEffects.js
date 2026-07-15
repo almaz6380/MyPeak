@@ -12,6 +12,7 @@ import { useCallback, useEffect, useRef } from 'react';
 export default function useTimerEffects() {
   const audioCtxRef = useRef(null);
   const wakeLockRef = useRef(null);
+  const wakeLockWantedRef = useRef(false);
 
   const playBeep = useCallback((frequency = 880, duration = 0.15, count = 1) => {
     try {
@@ -50,9 +51,16 @@ export default function useTimerEffects() {
   }, []);
 
   const requestWakeLock = useCallback(async () => {
+    wakeLockWantedRef.current = true;
     try {
       if ('wakeLock' in navigator) {
-        wakeLockRef.current = await navigator.wakeLock.request('screen');
+        const sentinel = await navigator.wakeLock.request('screen');
+        wakeLockRef.current = sentinel;
+        // Beim automatischen Freigeben (Tab-Wechsel) die Ref nullen, damit
+        // der visibilitychange-Handler neu anfordern kann.
+        sentinel.addEventListener('release', () => {
+          if (wakeLockRef.current === sentinel) wakeLockRef.current = null;
+        });
       }
     } catch (e) {
       // Wake Lock not available
@@ -60,11 +68,25 @@ export default function useTimerEffects() {
   }, []);
 
   const releaseWakeLock = useCallback(() => {
+    wakeLockWantedRef.current = false;
     if (wakeLockRef.current) {
-      wakeLockRef.current.release();
+      wakeLockRef.current.release().catch(() => {});
       wakeLockRef.current = null;
     }
   }, []);
+
+  // Browser geben den WakeLock automatisch frei, sobald der Tab in den
+  // Hintergrund geht. Beim Zurückkehren neu anfordern, solange noch gewollt —
+  // sonst schläft der Bildschirm mitten im Timer ein.
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && wakeLockWantedRef.current && !wakeLockRef.current) {
+        requestWakeLock();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [requestWakeLock]);
 
   // AudioContext braucht eine User-Geste — beim Start aufrufen
   const initAudio = useCallback(() => {

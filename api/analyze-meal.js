@@ -23,9 +23,15 @@ export default async function handler(req, res) {
   if (!token) {
     return res.status(401).json({ error: 'Login required' });
   }
-  const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
-    headers: { apikey: anonKey, Authorization: `Bearer ${token}` },
-  });
+  let userRes;
+  try {
+    userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: { apikey: anonKey, Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(8000),
+    });
+  } catch {
+    return res.status(503).json({ error: 'Auth check failed' });
+  }
   if (!userRes.ok) {
     return res.status(401).json({ error: 'Invalid token' });
   }
@@ -142,6 +148,7 @@ Return ONLY valid JSON in this exact format, no other text:
   // Retry with exponential backoff for rate limits (429)
   const MAX_RETRIES = 3;
   let lastError = null;
+  let last429 = false;
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
@@ -149,15 +156,18 @@ Return ONLY valid JSON in this exact format, no other text:
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: geminiBody,
+        signal: AbortSignal.timeout(20000),
       });
 
       // Rate limited — wait and retry
       if (response.status === 429) {
+        last429 = true;
         const waitSeconds = Math.pow(2, attempt + 1); // 2s, 4s, 8s
         console.log(`Rate limited (429), retrying in ${waitSeconds}s (attempt ${attempt + 1}/${MAX_RETRIES})`);
         await new Promise((r) => setTimeout(r, waitSeconds * 1000));
         continue;
       }
+      last429 = false;
 
       if (!response.ok) {
         const errorData = await response.text();
@@ -193,5 +203,10 @@ Return ONLY valid JSON in this exact format, no other text:
   }
 
   console.error('All retries failed:', lastError);
-  return res.status(429).json({ error: 'rate_limit', message: 'AI service is busy. Please wait a moment and try again.' });
+  // Nur echtes Rate-Limit als 429 melden; Netzwerk-/Timeout-Fehler sonst
+  // fälschlich als „Rate-Limit" (der Nutzer wartet dann vergeblich).
+  if (last429) {
+    return res.status(429).json({ error: 'rate_limit', message: 'AI service is busy. Please wait a moment and try again.' });
+  }
+  return res.status(503).json({ error: 'ai_unavailable', message: 'AI service unavailable. Please try again.' });
 }

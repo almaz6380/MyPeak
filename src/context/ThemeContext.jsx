@@ -34,6 +34,13 @@ export function ThemeProvider({ children }) {
     setDarkMode(value);
   };
 
+  // Cloud-Einstellung (anderes Gerät) übernehmen, sobald loadSettings sie meldet.
+  useEffect(() => {
+    const onCloudDarkMode = (e) => setDarkModeValue(!!e.detail);
+    window.addEventListener('mypeak:darkmode', onCloudDarkMode);
+    return () => window.removeEventListener('mypeak:darkmode', onCloudDarkMode);
+  }, []);
+
   return (
     <ThemeContext.Provider value={{ darkMode, toggleDarkMode, setDarkModeValue }}>
       {children}

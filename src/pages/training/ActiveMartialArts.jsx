@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Check, Play, Pause } from 'lucide-react';
 import { saveWorkout } from '../../data/workoutStorage';
+import { awardWorkoutCompletion } from '../../data/socialStorage';
 import { useAuth } from '../../context/AuthContext';
 import { getExerciseById } from '../../data/exercises';
 import useIntervalTimer from '../../hooks/useIntervalTimer';
@@ -43,6 +44,7 @@ export default function ActiveMartialArts({ config, onFinish, onDiscard }) {
       }],
     };
     await saveWorkout(user.id, workout);
+    await awardWorkoutCompletion(user.id, workout);
     onFinish();
   };
 

@@ -13,7 +13,14 @@ export async function loadSettings(userId) {
   if (!error && data) {
     localStorage.setItem('weightUnit', data.weight_unit || 'kg');
     localStorage.setItem('language', data.language || 'de');
-    localStorage.setItem('darkMode', JSON.stringify(data.dark_mode ?? false));
+    // Cloud-Dark-Mode geräteübergreifend anwenden: themeChosen setzen (aktive
+    // Wahl zählt auch nach Reload) und ThemeProvider benachrichtigen — sonst
+    // ist der ThemeContext schon initialisiert und ignoriert den neuen Wert.
+    if (typeof data.dark_mode === 'boolean') {
+      localStorage.setItem('darkMode', JSON.stringify(data.dark_mode));
+      localStorage.setItem('themeChosen', 'true');
+      window.dispatchEvent(new CustomEvent('mypeak:darkmode', { detail: data.dark_mode }));
+    }
     return data;
   }
 
