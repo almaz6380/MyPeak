@@ -16,11 +16,15 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
-### Wissensbibliothek: Training-Block + Reader-Infrastruktur (15.07.2026, Branch claude/github-connection-check-v5zzpl)
-- **Generischer Reader `src/pages/library/KnowledgePage.jsx`:** datengetriebener E-Book-Reader (Liste → Kurzfassung mit Summary+Quick-Facts → aufklappbare Kapitel), wiederverwendbar für alle 4 Wissensblöcke. Props: `data`, `titleDE/EN`, `categories`, `disclaimer` ('general'|'medical'|null). Quick-Facts flexibel als Array `{label,text}`. Gleiches Muster wie PeptidesPage, aber ohne Aktion.
-- **Training-Wissen-Block LIVE:** `src/data/trainingKnowledge.js` — 6 Themen als vollständige E-Books (DE+EN, mit Studien): Progressive Überlastung, Volumen & Frequenz, Wie Muskeln wachsen, Regeneration & Übertraining, Technik & ROM, Periodisierung & Planung. Je 5 Kapitel. Kategorien: Grundlagen/Muskelaufbau/Programmierung/Regeneration.
-- **Verdrahtung:** `TrainingKnowledgePage.jsx` (dünner Wrapper) lazy in LibraryPage; Training-Karte als erste Sektion (`ready`). Eigener Bundle-Chunk ~67 KB (nur bei Öffnen geladen).
-- **OFFEN (nächste Runde):** Ernährung-, Supplement- und Blutwerte-Block im selben Muster (`nutritionKnowledge.js`/`supplementsKnowledge.js`/`bloodworkKnowledge.js` + je ein Wrapper + LibraryPage-Sektion, Blutwerte/Supplements mit `disclaimer="medical"`). i18n-Keys (`library.nutrition/supplements/bloodwork`) existieren bereits.
+### Wissensbibliothek KOMPLETT: alle 4 Blöcke live (15.07.2026, Branch claude/github-connection-check-v5zzpl)
+- **Generischer Reader `src/pages/library/KnowledgePage.jsx`:** datengetriebener E-Book-Reader (Liste → Kurzfassung mit Summary+Quick-Facts → aufklappbare Kapitel), wiederverwendbar für alle Blöcke. Props: `data`, `titleDE/EN`, `categories`, `disclaimer` ('general'|'medical'|null). Quick-Facts flexibel als Array `{label,text}`. Gleiches Muster wie PeptidesPage, aber ohne Aktion.
+- **Alle 4 Wissensblöcke fertig (DE+EN, mit Studien), je 6 Themen, zusammen 110 Kapitel, strukturvalidiert:**
+  - **Training** (`trainingKnowledge.js`, `disclaimer=general`): Progressive Überlastung, Volumen & Frequenz, Wie Muskeln wachsen, Regeneration & Übertraining, Technik & ROM, Periodisierung.
+  - **Ernährung** (`nutritionKnowledge.js`, `general`): Energiebilanz, Protein, Kohlenhydrate, Fette, Mikronährstoffe, Mahlzeiten-Timing.
+  - **Supplemente** (`supplementsKnowledge.js`, `medical`): Kreatin, Proteinpulver, Koffein, Omega-3, Vitamin D, Magnesium.
+  - **Blutwerte** (`bloodworkKnowledge.js`, `medical`): Testosteron, Vitamin D (25-OH), Eisen & Ferritin, Cholesterin, Blutzucker/HbA1c, Schilddrüse (TSH).
+- **Verdrahtung:** je ein dünner Wrapper (`{Training,Nutrition,Supplements,Bloodwork}KnowledgePage.jsx`) lazy in LibraryPage; alle als `ready`-Karten. Je eigener Bundle-Chunk (~50–60 KB, nur bei Öffnen geladen). i18n-Keys existierten bereits.
+- **Damit ist Phase 4 (Wissensbibliothek) inhaltlich abgeschlossen** — Peptide + Diäten waren schon fertig, jetzt auch die 4 Kern-Blöcke.
 
 ### Bug-Fix-Runde (15.07.2026, Branch claude/github-connection-check-v5zzpl)
 Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training, Ernährung/KI, Auth). **17 echte Bugs gefixt**, jeder im Code verifiziert. Kein Feature-Umbau.
