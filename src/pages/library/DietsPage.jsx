@@ -124,7 +124,7 @@ export default function DietsPage({ onBack }) {
             <p className="text-xs text-slate-400">{dietCategories.find((c) => c.id === d.category)?.[lang === 'de' ? 'nameDE' : 'nameEN']}</p>
           </div>
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${CAT_COLORS[d.category]}`}>
-            <img src="/bg-photos/weight-icon.png" alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
+            <img src={`/bg-photos/diet-${d.category.replace('_', '')}-icon.png`} alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
           </div>
         </div>
 
@@ -276,7 +276,7 @@ export default function DietsPage({ onBack }) {
             >
               <div className="flex items-start gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${CAT_COLORS[diet.category]}`}>
-                  <img src="/bg-photos/weight-icon.png" alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
+                  <img src={`/bg-photos/diet-${diet.category.replace('_', '')}-icon.png`} alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">

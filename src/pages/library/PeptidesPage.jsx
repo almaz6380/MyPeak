@@ -96,7 +96,7 @@ export default function PeptidesPage({ onBack }) {
             <p className="text-xs text-slate-400 dark:text-slate-500">{categoryNames[p.category]?.[lang]}</p>
           </div>
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${cat?.color}`}>
-            <img src="/bg-photos/peptide-icon.png" alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
+            <img src={`/bg-photos/pep-${p.category}-icon.png`} alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
           </div>
         </div>
 
@@ -207,7 +207,7 @@ export default function PeptidesPage({ onBack }) {
               className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-left"
             >
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${cat?.color}`}>
-                <img src="/bg-photos/peptide-icon.png" alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
+                <img src={`/bg-photos/pep-${peptide.category}-icon.png`} alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold truncate">{lang === 'de' ? peptide.nameDE : peptide.nameEN}</p>
