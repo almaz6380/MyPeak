@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trophy, ArrowLeft, ChevronRight, X, Search, Play, Users, Swords, Medal, Moon } from 'lucide-react';
+import { Plus, Trophy, ArrowLeft, ChevronRight, X, Search, Play, Moon } from 'lucide-react';
 import ExerciseLibrary from './training/ExerciseLibrary';
 import ActiveWorkout from './training/ActiveWorkout';
 import ActiveCardio from './training/ActiveCardio';
@@ -546,9 +546,9 @@ export default function TrainingPage() {
       {/* Social */}
       <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Social</h2>
       <div className="grid grid-cols-3 gap-3">
-        <QuickAction icon={<Medal className="w-6 h-6" />} label="Ranking" onClick={() => setView('leaderboard')} vertical />
-        <QuickAction icon={<Swords className="w-6 h-6" />} label="Challenges" onClick={() => setView('challenges')} vertical />
-        <QuickAction icon={<Users className="w-6 h-6" />} label={lang === 'de' ? 'Freunde' : 'Friends'} onClick={() => setView('friends')} vertical />
+        <QuickAction icon={<img src="/bg-photos/rank-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />} motif="/bg-photos/rank-icon.png" label="Ranking" onClick={() => setView('leaderboard')} vertical />
+        <QuickAction icon={<img src="/bg-photos/challenge-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />} motif="/bg-photos/challenge-icon.png" label="Challenges" onClick={() => setView('challenges')} vertical />
+        <QuickAction icon={<img src="/bg-photos/friends-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />} motif="/bg-photos/friends-icon.png" label={lang === 'de' ? 'Freunde' : 'Friends'} onClick={() => setView('friends')} vertical />
       </div>
 
       {/* Training Calendar Modal */}
@@ -597,16 +597,17 @@ function formatElapsed(ms) {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-function QuickAction({ icon, label, onClick, className = '', vertical = false }) {
+function QuickAction({ icon, label, onClick, className = '', vertical = false, motif = null }) {
   return (
     <button
       onClick={onClick}
-      className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow overflow-hidden ${
+      className={`relative bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow overflow-hidden ${
         vertical
           ? 'flex flex-col items-center justify-center gap-1.5 py-4 px-1 text-center min-h-[88px]'
           : 'flex items-center gap-3 p-4 text-left'
       } ${className}`}
     >
+      {motif && <CardPhotoMotif src={motif} />}
       <span className="text-primary-500 flex-shrink-0">{icon}</span>
       <span className={`font-medium leading-tight ${vertical ? 'text-[11px]' : 'text-sm'}`}>{label}</span>
     </button>
