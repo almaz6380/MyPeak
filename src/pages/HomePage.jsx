@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Flame, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, User, Calendar, Plus } from 'lucide-react';
+import { Flame, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Calendar, Plus } from 'lucide-react';
 import MyPeakLogo from '../components/MyPeakLogo';
 import CardPhotoMotif from '../components/CardPhotoMotif';
 import { useAuth } from '../context/AuthContext';
@@ -170,8 +170,8 @@ export default function HomePage() {
       <div className="flex items-center justify-between mb-1">
         <div className="w-9" />
         <MyPeakLogo size={32} />
-        <button onClick={() => navigate('/profile')} className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
-          <User className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+        <button onClick={() => navigate('/profile')} className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
+          <img src="/bg-photos/profile-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />
         </button>
       </div>
       <h1 className="text-xl font-bold text-slate-900 dark:text-white text-center">
