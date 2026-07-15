@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { loadSettings } from '../data/settingsStorage';
 import { syncLocalDataToCloud, registerOnlineSync } from '../data/resync';
+import { clearAllLocalPhotos } from '../data/exercisePhotos';
 
 // Geräte-Einstellungen, die beim Abmelden erhalten bleiben —
 // alle anderen Keys sind Nutzerdaten und werden entfernt, damit der
@@ -12,6 +13,9 @@ function clearLocalUserData() {
   for (const key of Object.keys(localStorage)) {
     if (!KEEP_ON_SIGNOUT.includes(key)) localStorage.removeItem(key);
   }
+  // Lokale Fotos (IndexedDB) mitlöschen — sonst sähe der nächste Nutzer auf
+  // diesem Gerät die privaten Fortschritts-/Körperfotos des vorherigen.
+  clearAllLocalPhotos().catch(() => {});
 }
 
 const AuthContext = createContext();
@@ -118,49 +122,57 @@ export function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    // Guest mode already handled in useState initializers
-    if (localStorage.getItem('guestMode') === 'true') return;
+    const isGuestMode = localStorage.getItem('guestMode') === 'true';
 
-    // Timeout: if Supabase doesn't respond in 3s, show login
-    const timeout = setTimeout(() => setLoading(false), 3000);
+    // Initiale Session nur laden, wenn KEIN Gastmodus (Gast wird in useState gesetzt).
+    if (!isGuestMode) {
+      // Timeout: if Supabase doesn't respond in 3s, show login
+      const timeout = setTimeout(() => setLoading(false), 3000);
 
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      clearTimeout(timeout);
-      setSession(s);
-      const supaUser = s?.user ?? null;
-      setUser(supaUser);
+      supabase.auth.getSession().then(({ data: { session: s } }) => {
+        clearTimeout(timeout);
+        setSession(s);
+        const supaUser = s?.user ?? null;
+        setUser(supaUser);
 
-      if (supaUser) {
-        ensureLocalDataOwner(supaUser.id);
-        // Cache user for instant restore next time
-        localStorage.setItem('cachedUser', JSON.stringify({ id: supaUser.id, email: supaUser.email }));
+        if (supaUser) {
+          ensureLocalDataOwner(supaUser.id);
+          // Cache user for instant restore next time
+          localStorage.setItem('cachedUser', JSON.stringify({ id: supaUser.id, email: supaUser.email }));
 
-        if (profile) {
-          // Already have cached profile — just refresh in background
-          fetchProfileBackground(supaUser.id);
-          setLoading(false);
+          if (profile) {
+            // Already have cached profile — just refresh in background
+            fetchProfileBackground(supaUser.id);
+            setLoading(false);
+          } else {
+            // No cached profile — must wait
+            fetchProfileBlocking(supaUser.id).finally(() => setLoading(false));
+          }
         } else {
-          // No cached profile — must wait
-          fetchProfileBlocking(supaUser.id).finally(() => setLoading(false));
+          // Not logged in — clear cached data
+          localStorage.removeItem('cachedUser');
+          localStorage.removeItem('cachedProfile');
+          setProfile(null);
+          setLoading(false);
         }
-      } else {
-        // Not logged in — clear cached data
-        localStorage.removeItem('cachedUser');
-        localStorage.removeItem('cachedProfile');
-        setProfile(null);
+      }).catch(() => {
+        clearTimeout(timeout);
         setLoading(false);
-      }
-    }).catch(() => {
-      clearTimeout(timeout);
-      setLoading(false);
-    });
+      });
+    }
 
+    // Auth-Listener IMMER registrieren — auch im Gastmodus. Sonst bleibt nach
+    // einem Gast→Konto-Login (ohne App-Reload) die UI hängen, weil user/session
+    // ausschließlich hierüber aktualisiert werden.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setSession(session);
         const supaUser = session?.user ?? null;
+        // Im Gastmodus ohne echte Session nichts überschreiben (Gast bleibt Gast).
+        if (!supaUser && localStorage.getItem('guestMode') === 'true') return;
+        setSession(session);
         setUser(supaUser);
         if (supaUser) {
+          localStorage.removeItem('guestMode'); // Gast→Konto: Gastflag entfernen
           ensureLocalDataOwner(supaUser.id);
           localStorage.setItem('cachedUser', JSON.stringify({ id: supaUser.id, email: supaUser.email }));
           fetchProfileBackground(supaUser.id);

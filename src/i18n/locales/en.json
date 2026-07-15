@@ -162,6 +162,8 @@
   },
   "nutrition": {
     "title": "Nutrition",
+    "saveErrorAll": "Saving failed. Please try again.",
+    "saveErrorSome": "Some entries could not be saved.",
     "today": "Today",
     "meals": "Meals",
     "macros": "Macros",

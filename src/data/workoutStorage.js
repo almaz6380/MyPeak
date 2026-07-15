@@ -146,7 +146,16 @@ export async function getCustomExercises(userId) {
         .select('*')
         .eq('user_id', userId)
         .then(({ data, error }) => {
-          if (!error && data) localStorage.setItem(CUSTOM_EXERCISES_KEY, JSON.stringify(data));
+          if (!error && data) {
+            // Lokal erstellte, noch nicht gesyncte Übungen (ohne user_id) bewahren —
+            // sonst löscht der Hintergrund-Refresh sie, bevor resync sie hochlädt.
+            const currentLocal = JSON.parse(localStorage.getItem(CUSTOM_EXERCISES_KEY) || '[]');
+            const cloudIds = new Set(data.map((e) => e.exercise_id || e.id));
+            const localOnly = currentLocal.filter(
+              (e) => !e.user_id && !cloudIds.has(e.exercise_id || e.id)
+            );
+            localStorage.setItem(CUSTOM_EXERCISES_KEY, JSON.stringify([...localOnly, ...data]));
+          }
         })
         .catch(() => {});
     }

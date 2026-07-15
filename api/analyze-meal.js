@@ -12,19 +12,22 @@ export default async function handler(req, res) {
   // sonst könnte jeder im Internet den Gemini-Schlüssel auf unsere Kosten verwenden.
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const anonKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
-  if (supabaseUrl && anonKey) {
-    const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
-    if (!token) {
-      return res.status(401).json({ error: 'Login required' });
-    }
-    const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
-      headers: { apikey: anonKey, Authorization: `Bearer ${token}` },
-    });
-    if (!userRes.ok) {
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-  } else {
-    console.error('Auth check skipped: SUPABASE_URL/ANON_KEY not configured');
+  // Fail-closed: fehlt die Auth-Konfiguration, wird die (kostenpflichtige)
+  // Analyse NICHT durchgelassen — sonst wäre der Gemini-Schlüssel bei einem
+  // fehlkonfigurierten Deploy offen für jeden im Internet.
+  if (!supabaseUrl || !anonKey) {
+    console.error('Auth not configured: SUPABASE_URL/ANON_KEY missing — refusing request');
+    return res.status(503).json({ error: 'Service unavailable' });
+  }
+  const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
+  if (!token) {
+    return res.status(401).json({ error: 'Login required' });
+  }
+  const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
+    headers: { apikey: anonKey, Authorization: `Bearer ${token}` },
+  });
+  if (!userRes.ok) {
+    return res.status(401).json({ error: 'Invalid token' });
   }
 
   const { image, language = 'de' } = req.body;

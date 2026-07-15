@@ -162,6 +162,8 @@
   },
   "nutrition": {
     "title": "Ernährung",
+    "saveErrorAll": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
+    "saveErrorSome": "Einige Einträge konnten nicht gespeichert werden.",
     "today": "Heute",
     "meals": "Mahlzeiten",
     "macros": "Makros",
