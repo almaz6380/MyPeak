@@ -518,6 +518,7 @@ export default function WorkoutHistory({ onBack }) {
 }
 
 function EditWorkoutModal({ workout, onSave, onClose, t, weightUnit }) {
+  const { i18n } = useTranslation();
   const [exercises, setExercises] = useState(workout.exercises || []);
   const [showAddExercise, setShowAddExercise] = useState(false);
   const lang = i18n.language?.startsWith('de') ? 'de' : 'en';

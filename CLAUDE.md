@@ -16,6 +16,27 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### Wissensbibliothek KOMPLETT: alle 4 Blöcke live (15.07.2026, Branch claude/github-connection-check-v5zzpl)
+- **Generischer Reader `src/pages/library/KnowledgePage.jsx`:** datengetriebener E-Book-Reader (Liste → Kurzfassung mit Summary+Quick-Facts → aufklappbare Kapitel), wiederverwendbar für alle Blöcke. Props: `data`, `titleDE/EN`, `categories`, `disclaimer` ('general'|'medical'|null). Quick-Facts flexibel als Array `{label,text}`. Gleiches Muster wie PeptidesPage, aber ohne Aktion.
+- **Alle 4 Wissensblöcke fertig (DE+EN, mit Studien), je 6 Themen, zusammen 110 Kapitel, strukturvalidiert:**
+  - **Training** (`trainingKnowledge.js`, `disclaimer=general`): Progressive Überlastung, Volumen & Frequenz, Wie Muskeln wachsen, Regeneration & Übertraining, Technik & ROM, Periodisierung.
+  - **Ernährung** (`nutritionKnowledge.js`, `general`): Energiebilanz, Protein, Kohlenhydrate, Fette, Mikronährstoffe, Mahlzeiten-Timing.
+  - **Supplemente** (`supplementsKnowledge.js`, `medical`): Kreatin, Proteinpulver, Koffein, Omega-3, Vitamin D, Magnesium.
+  - **Blutwerte** (`bloodworkKnowledge.js`, `medical`): Testosteron, Vitamin D (25-OH), Eisen & Ferritin, Cholesterin, Blutzucker/HbA1c, Schilddrüse (TSH).
+- **Verdrahtung:** je ein dünner Wrapper (`{Training,Nutrition,Supplements,Bloodwork}KnowledgePage.jsx`) lazy in LibraryPage; alle als `ready`-Karten. Je eigener Bundle-Chunk (~50–60 KB, nur bei Öffnen geladen). i18n-Keys existierten bereits.
+- **Damit ist Phase 4 (Wissensbibliothek) inhaltlich abgeschlossen** — Peptide + Diäten waren schon fertig, jetzt auch die 4 Kern-Blöcke.
+
+### Bug-Fix-Runde (15.07.2026, Branch claude/github-connection-check-v5zzpl)
+Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training, Ernährung/KI, Auth). **17 echte Bugs gefixt**, jeder im Code verifiziert. Kein Feature-Umbau.
+- **Crash-Bugs (Lint):** `i18n` außerhalb Scope in `WorkoutHistory` (EditWorkoutModal) + `DailyOverview` (GoalEditorModal) → Crash beim Bearbeiten; `PlanDetail` rief Hooks nach früher Rückgabe → Rules-of-Hooks.
+- **Training:** PR-Erkennung war faktisch **tot** (saveWorkout schrieb synchron VOR dem PR-Check → eigener Satz war schon der Rekord) — Rekorde jetzt vor dem Speichern lesen. XP-Verlust durch parallele read-modify-write auf `total_xp` → Vergaben seriell. **Cardio/HIIT/Circuit/Kampfsport zählen jetzt für Streak & XP** (neuer Helfer `awardWorkoutCompletion` in socialStorage) — vorher gab NUR Kraft XP/Streak. WakeLock wird nach Tab-Wechsel neu angefordert (visibilitychange in `timerEffects.js`).
+- **Privacy/DSGVO:** Fortschritts-/Körperfotos (IndexedDB) wurden beim Logout/Konto-Wechsel NIE gelöscht → fremde Fotos für den nächsten Nutzer. Neu `clearAllLocalPhotos()` (exercisePhotos.js), aufgerufen bei Logout (AuthContext) + Konto-Löschung (ProfilePage).
+- **Auth:** Auth-Listener wurde im Gastmodus nie registriert → nach Gast→Konto-Login hing die UI ohne Reload. Listener jetzt immer aktiv (im Gastmodus gegen Überschreiben geschützt).
+- **Sync/Daten:** `getCustomExercises`-Refresh verwarf ungesyncte lokale Übungen → jetzt localOnly-Merge. `removeWaterAmount` desyncte total/entries → total wird neu aus entries berechnet. `fiber`-Ziel fehlte im nutrition_goals-Upsert. Cross-Device **Dark Mode** wurde nie angewendet (`setDarkModeValue` tot) → loadSettings feuert `mypeak:darkmode`-Event, ThemeContext hört zu. DST-Kante bei Streak-„gestern" (fixe 24h → tagesmittige Berechnung).
+- **KI-Endpoint (`api/analyze-meal.js`):** Auth war **fail-open** bei fehlender Config → jetzt fail-closed (503). Server-Timeouts (AbortSignal) auf Auth- + Gemini-Fetch. Netzwerkfehler wird nicht mehr fälschlich als „429 Rate-Limit" gemeldet (503 `ai_unavailable`).
+- **⚠️ Zwei NEUE Migrationen NOCH NICHT in Prod:** `20260712200000_user_achievements.sql` (bereits offen) **und neu** `20260715120000_workout_type.sql` (`type`-Spalte in `workouts`). Letztere **vor/mit dem Deploy einspielen** — der Code schreibt `type` in den Insert; ohne Spalte scheitert der Cloud-Insert (lokal bleibt das Workout dank localStorage-first erhalten). Cardio-Historie/PRs waren ohne die Spalte nach Sync kaputt.
+- **Bewusst offen gelassen:** OFF-0-kcal-Filter (Entfernen brächte Suchrauschen), Portion-Label „60 Stück" (UX-Entscheidung), redundanter Kamera-Stream im Scanner (ohne Gerätetest zu riskant).
+
 ### Foto-Icons in allen Tabs + Kalender + Pull-to-Refresh (14.07.2026, abends) — LIVE
 - **Foto-Icons überall:** 9 weitere freigestellte Motive in `public/bg-photos/` (`plan`, `history`, `cardio`, `hiit`, `circuit`, `martial`, `peptide`, `photos`, `profile`) — Training (Pläne, Verlauf, Kraft, Cardio, HIIT, Zirkel, Kampfsport), Bibliothek (Diäten=weight, Peptide), Profil (Nutzer-Karte, Fortschrittsfotos), Ernährung (Makros=flame, Wasser=drop, Supplements=supplement). `CardPhotoMotif` liegt jetzt in `src/components/`; **`CardMotif` (Lucide) ist gelöscht**. Freistell-Skript: Flood-Fill vom Rand; Modus `key` für Motive mit Loch (Pfeilring), Modus `multi` für mehrteilige (Profil: Kopf + Bogen); danach Kleinteil-Filter gegen das Gemini-Wasserzeichen. **Beide Ebenen sind Foto** — Eck-Wasserzeichen *und* kleines Symbol am Label (letzteres sitzt weiter im farbigen Kästchen). Ausnahmen bewusst flach: das „+" beim freien Workout (Aktion, kein Thema) und die 3 Social-Kacheln (kein Motiv vorhanden). `BoxingGlovesIcon`-SVG entfernt (durch Foto ersetzt).
 - **Icon-Größe erledigt (15.07.2026):** alle 14 Karten-Icons in `public/bg-photos/*-icon.png` von zusammen ~3,3 MB auf ~183 KB verkleinert (max 256 px = 3×-Retina der w-24-Anzeige, 256-Farben-Palette-Quantisierung mit Alpha, Pillow). Sichtbar identisch. Skalier-Snippet ad hoc, nicht als Skript abgelegt.
@@ -61,9 +82,9 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - **Offen nach Launch:** AdMob-App↔Store verknüpfen; iOS-Update 1.1 (Englisch) liegt auf Branch i18n-en.
 
 ### Launch-Fixes (Juli 2026, Branch launch-fixes) — FERTIG
-- [x] Rechtsseiten Impressum/Datenschutz/AGB (`/legal/*`, `src/pages/legal/`) — PLATZHALTER in legalContent.js (Name/Adresse) noch ausfüllen!
+- [x] Rechtsseiten Impressum/Datenschutz/AGB (`/legal/*`, `src/pages/legal/`) — Betreiberdaten in `legalContent.js` eingetragen (Josef Gallab, Oberhofenweg 21b, 6380 St. Johann in Tirol; kontakt@wellbooked.at).
 - [x] Konto-Löschung (api/delete-account.js + Profil) — braucht `SUPABASE_SERVICE_ROLE_KEY` in Vercel
-- [x] RLS-Sicherheitsmigration `supabase/migration-2026-07-security.sql` — muss im Supabase SQL Editor ausgeführt werden!
+- [x] RLS-Sicherheitsmigration `supabase/migrations/20260704230000_security_fixes.sql` — muss im Supabase SQL Editor / `supabase db push --linked` ausgeführt werden!
 - [x] Gemini-Endpoint mit Login-Pflicht (Gäste bekommen Hinweis)
 - [x] Zeitzonen-Fix: lokales Datum überall (src/lib/dateUtils.js)
 - [x] Gast→Konto-Migration komplett neu (src/data/resync.js): alle Datentypen, keine Duplikate, Auto-Retry bei online

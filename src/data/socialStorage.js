@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase';
 import { isGuest } from '../context/AuthContext';
 import { todayLocal, toLocalDateString } from '../lib/dateUtils';
+import { checkAchievements } from './achievements';
 
 // ── Friend Codes ─────────────────────────────────────────────
 
@@ -353,7 +354,12 @@ export async function updateStreak(userId) {
 
   const xp = await getXP(userId);
   const today = todayLocal();
-  const yesterday = toLocalDateString(new Date(Date.now() - 86400000));
+  // „Gestern" DST-sicher: von der Tagesmitte einen Kalendertag zurück (fixe
+  // 86400000 ms daneben an DST-Tagen, weil ein lokaler Tag 23/25 h haben kann).
+  const yRef = new Date();
+  yRef.setHours(12, 0, 0, 0);
+  yRef.setDate(yRef.getDate() - 1);
+  const yesterday = toLocalDateString(yRef);
 
   let newStreak = 1;
   if (xp.last_workout_date === yesterday) {
@@ -393,6 +399,25 @@ export async function updateStreak(userId) {
   }));
 
   return { oldLevel, newLevel, xpGained: totalXPGain, streak: newStreak };
+}
+
+// Vergibt Streak + XP + prüft Achievements nach Abschluss eines Nicht-Kraft-
+// Workouts (Cardio/HIIT/Circuit/Kampfsport) — ein solcher Tag zählt genauso
+// für den Streak wie ein Kraft-Workout. Seriell, damit sich die total_xp-
+// Schreibvorgänge nicht gegenseitig überschreiben. updateStreak vergibt bereits
+// das Basis-Workout-XP + Streak-Boni; Gast-Guards greifen in den Unterfunktionen.
+export async function awardWorkoutCompletion(userId, workout) {
+  try {
+    const streakRes = await updateStreak(userId);
+    const newly = await checkAchievements(userId, {
+      type: 'workout', workout, prCount: 0, streak: streakRes?.streak,
+    });
+    if (newly.length > 0) await addXP(userId, newly.length * 50);
+    return { streakRes, newly };
+  } catch (err) {
+    console.error('Workout award error:', err);
+    return { newly: [] };
+  }
 }
 
 // ── Leaderboard ──────────────────────────────────────────────

@@ -25,6 +25,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
   const [showScanner, setShowScanner] = useState(false);
   const [showMealPhoto, setShowMealPhoto] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -47,15 +48,28 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
   // Save all selected items at once
   async function handleSaveAll() {
     if (selectedItems.length === 0) return;
+    setSaveError('');
     setSaving(true);
+    let failed = 0;
     for (const item of selectedItems) {
-      await saveNutritionEntry(user.id, {
-        date,
-        meal_slot: mealSlot,
-        ...item,
-      });
+      try {
+        const res = await saveNutritionEntry(user.id, {
+          date,
+          meal_slot: mealSlot,
+          ...item,
+        });
+        if (res && res.error) failed++;
+      } catch {
+        failed++;
+      }
     }
     setSaving(false);
+    if (failed > 0) {
+      setSaveError(failed === selectedItems.length
+        ? t('nutrition.saveErrorAll', 'Speichern fehlgeschlagen. Bitte erneut versuchen.')
+        : t('nutrition.saveErrorSome', 'Einige Einträge konnten nicht gespeichert werden.'));
+      return;
+    }
     checkAchievements(user.id, { type: 'nutrition' }).catch(() => {});
     maybeShowInterstitial();
     onSaved();
@@ -329,6 +343,9 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
                 </div>
               ))}
             </div>
+            {saveError && (
+              <p className="text-xs text-red-500 text-center mb-2">{saveError}</p>
+            )}
             {/* Save button */}
             <button
               onClick={handleSaveAll}

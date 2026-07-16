@@ -8,6 +8,10 @@ import CardPhotoMotif from '../components/CardPhotoMotif';
 // geladen, wenn die Sektion geöffnet wird — verkleinert das Start-Bundle massiv.
 const PeptidesPage = lazy(() => import('./library/PeptidesPage'));
 const DietsPage = lazy(() => import('./library/DietsPage'));
+const TrainingKnowledgePage = lazy(() => import('./library/TrainingKnowledgePage'));
+const NutritionKnowledgePage = lazy(() => import('./library/NutritionKnowledgePage'));
+const SupplementsKnowledgePage = lazy(() => import('./library/SupplementsKnowledgePage'));
+const BloodworkKnowledgePage = lazy(() => import('./library/BloodworkKnowledgePage'));
 
 function SectionLoader() {
   return (
@@ -20,6 +24,38 @@ function SectionLoader() {
 export default function LibraryPage() {
   const { t } = useTranslation();
   const [view, setView] = useState('home');
+
+  if (view === 'training') {
+    return (
+      <Suspense fallback={<SectionLoader />}>
+        <TrainingKnowledgePage onBack={() => setView('home')} />
+      </Suspense>
+    );
+  }
+
+  if (view === 'nutrition') {
+    return (
+      <Suspense fallback={<SectionLoader />}>
+        <NutritionKnowledgePage onBack={() => setView('home')} />
+      </Suspense>
+    );
+  }
+
+  if (view === 'supplements') {
+    return (
+      <Suspense fallback={<SectionLoader />}>
+        <SupplementsKnowledgePage onBack={() => setView('home')} />
+      </Suspense>
+    );
+  }
+
+  if (view === 'bloodwork') {
+    return (
+      <Suspense fallback={<SectionLoader />}>
+        <BloodworkKnowledgePage onBack={() => setView('home')} />
+      </Suspense>
+    );
+  }
 
   if (view === 'peptides') {
     return (
@@ -40,6 +76,10 @@ export default function LibraryPage() {
   // Unfertige Sektionen (training, nutrition, supplements, bloodwork) sind bis
   // zum Fertigstellen ausgeblendet — halbleere "Bald"-Kacheln wirken unfertig.
   const sections = [
+    { id: 'training', icon: <img src="/bg-photos/training-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />, motif: '/bg-photos/training-icon.png', label: t('library.training'), color: 'bg-blue-100 dark:bg-blue-900/30', ready: true },
+    { id: 'nutrition', icon: <img src="/bg-photos/flame-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />, motif: '/bg-photos/flame-icon.png', label: t('library.nutrition'), color: 'bg-red-100 dark:bg-red-900/30', ready: true },
+    { id: 'supplements', icon: <img src="/bg-photos/supplement-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />, motif: '/bg-photos/supplement-icon.png', label: t('library.supplements'), color: 'bg-green-100 dark:bg-green-900/30', ready: true },
+    { id: 'bloodwork', icon: <img src="/bg-photos/drop-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />, motif: '/bg-photos/drop-icon.png', label: t('library.bloodwork'), color: 'bg-rose-100 dark:bg-rose-900/30', ready: true },
     { id: 'diets', icon: <img src="/bg-photos/weight-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />, motif: '/bg-photos/weight-icon.png', label: t('library.diets'), color: 'bg-orange-100 dark:bg-orange-900/30', ready: true },
     { id: 'peptides', icon: <img src="/bg-photos/peptide-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />, motif: '/bg-photos/peptide-icon.png', label: t('library.peptides'), color: 'bg-amber-100 dark:bg-amber-900/30', ready: true },
   ].filter((s) => s.ready);

@@ -382,6 +382,7 @@ export async function saveNutritionGoals(userId, goals) {
         protein: goals.protein,
         carbs: goals.carbs,
         fat: goals.fat,
+        fiber: goals.fiber ?? 30,
         tdee: goals.tdee || null,
         water_ml: goals.water_ml || 3000,
         updated_at: new Date().toISOString(),
@@ -537,9 +538,10 @@ export async function removeWaterAmount(userId, date, amountMl) {
   const cacheKey = WATER_PREFIX + date;
   const cached = JSON.parse(localStorage.getItem(cacheKey) || '{"entries":[],"total":0}');
 
-  cached.total = Math.max(0, cached.total - amountMl);
-
-  // Remove entries from the end until we've removed enough
+  // Ganze Einträge vom Ende entfernen, bis die gewünschte Menge gedeckt ist,
+  // dann total aus den verbleibenden Einträgen NEU berechnen. total separat zu
+  // dekrementieren driftet auseinander (z. B. 300 ml von einem 500-ml-Eintrag:
+  // Eintrag ganz weg, aber total bliebe fälschlich bei 200).
   let remaining = amountMl;
   const toDeleteFromSupabase = [];
   while (remaining > 0 && cached.entries.length > 0) {
@@ -549,6 +551,7 @@ export async function removeWaterAmount(userId, date, amountMl) {
       toDeleteFromSupabase.push(last.id);
     }
   }
+  cached.total = cached.entries.reduce((sum, e) => sum + (e.amount_ml || 0), 0);
 
   localStorage.setItem(cacheKey, JSON.stringify(cached));
 

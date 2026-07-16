@@ -22,7 +22,7 @@ export async function getWorkouts(userId) {
         .then(({ data, error }) => {
           if (!error && data) {
             const supabaseWorkouts = data.map((row) => ({
-              id: row.id, date: row.date, duration: row.duration, exercises: row.exercises,
+              id: row.id, date: row.date, duration: row.duration, type: row.type, exercises: row.exercises,
             }));
             // Keep local-only workouts (not yet synced) and merge with Supabase data
             const currentLocal = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
@@ -47,7 +47,7 @@ export async function getWorkouts(userId) {
 
       if (!error && data) {
         const workouts = data.map((row) => ({
-          id: row.id, date: row.date, duration: row.duration, exercises: row.exercises,
+          id: row.id, date: row.date, duration: row.duration, type: row.type, exercises: row.exercises,
         }));
         localStorage.setItem(WORKOUTS_KEY, JSON.stringify(workouts));
         return workouts;
@@ -77,6 +77,7 @@ export async function saveWorkout(userId, workout) {
           user_id: userId,
           date: workout.date,
           duration: workout.duration,
+          type: workout.type || null,
           exercises: workout.exercises,
         })
         .select()
@@ -146,7 +147,16 @@ export async function getCustomExercises(userId) {
         .select('*')
         .eq('user_id', userId)
         .then(({ data, error }) => {
-          if (!error && data) localStorage.setItem(CUSTOM_EXERCISES_KEY, JSON.stringify(data));
+          if (!error && data) {
+            // Lokal erstellte, noch nicht gesyncte Übungen (ohne user_id) bewahren —
+            // sonst löscht der Hintergrund-Refresh sie, bevor resync sie hochlädt.
+            const currentLocal = JSON.parse(localStorage.getItem(CUSTOM_EXERCISES_KEY) || '[]');
+            const cloudIds = new Set(data.map((e) => e.exercise_id || e.id));
+            const localOnly = currentLocal.filter(
+              (e) => !e.user_id && !cloudIds.has(e.exercise_id || e.id)
+            );
+            localStorage.setItem(CUSTOM_EXERCISES_KEY, JSON.stringify([...localOnly, ...data]));
+          }
         })
         .catch(() => {});
     }

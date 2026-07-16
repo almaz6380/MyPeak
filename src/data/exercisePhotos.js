@@ -29,6 +29,25 @@ function openDB() {
   });
 }
 
+// Löscht ALLE lokal gespeicherten Fotos (Übungs-, Produkt- und
+// Fortschritts-/Körperfotos). Wird beim Logout und Konto-Wechsel aufgerufen,
+// damit der nächste Nutzer auf diesem Gerät keine fremden privaten Fotos sieht.
+export async function clearAllLocalPhotos() {
+  try {
+    const db = await openDB();
+    return await new Promise((resolve) => {
+      const tx = db.transaction([STORE_NAME, PRODUCT_STORE, PROGRESS_STORE], 'readwrite');
+      tx.objectStore(STORE_NAME).clear();
+      tx.objectStore(PRODUCT_STORE).clear();
+      tx.objectStore(PROGRESS_STORE).clear();
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+    });
+  } catch {
+    return false;
+  }
+}
+
 export async function getExercisePhoto(exerciseId) {
   try {
     const db = await openDB();

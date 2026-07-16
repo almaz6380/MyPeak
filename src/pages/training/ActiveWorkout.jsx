@@ -114,40 +114,42 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
       })),
     };
 
+    // PR-Erkennung: Rekorde VOR dem Speichern lesen. saveWorkout schreibt
+    // synchron in localStorage — läse man die Rekorde danach, enthielte die
+    // History bereits dieses Workout und der eigene Satz definierte den Rekord,
+    // sodass NIE ein PR erkannt würde.
+    const capturedExercises = [...validExercises];
+    const oldRecords = {};
+    for (const ex of capturedExercises) {
+      oldRecords[ex.exerciseId] = await getPersonalRecord(user.id, ex.exerciseId);
+    }
+
     // Save to localStorage + Supabase (fire-and-forget, never blocks)
     saveWorkout(user.id, workout).catch((err) => console.error('Save workout error:', err));
 
-    // XP + Streak vergeben (fire-and-forget); bei Level-Aufstieg Animation zeigen
-    const streakPromise = updateStreak(user.id)
-      .then((res) => {
-        if (res && res.newLevel > res.oldLevel) setLevelUp(res.newLevel);
-        return res;
-      })
-      .catch(() => null);
-
-    // PR check on captured data (not dependent on context state)
-    const capturedExercises = [...validExercises];
-    const checkPRsFromCapture = async () => {
-      const newPrs = {};
-      for (const ex of capturedExercises) {
-        const record = await getPersonalRecord(user.id, ex.exerciseId);
-        const exUnit = ex.unit || weightUnit;
-        for (const set of ex.sets) {
-          const w = parseFloat(set.weight);
-          const wKg = toKg(w, exUnit);
-          if (wKg && wKg > record.maxWeight) newPrs[ex.exerciseId] = true;
-        }
+    // PR gegen die zuvor gelesenen Rekorde bestimmen
+    const newPrs = {};
+    for (const ex of capturedExercises) {
+      const record = oldRecords[ex.exerciseId] || { maxWeight: 0 };
+      const exUnit = ex.unit || weightUnit;
+      for (const set of ex.sets) {
+        const wKg = toKg(parseFloat(set.weight), exUnit);
+        if (wKg && wKg > record.maxWeight) newPrs[ex.exerciseId] = true;
       }
-      return newPrs;
-    };
-    checkPRsFromCapture()
-      .then(async (prs) => {
-        setPendingPrs(prs || {});
-        const prCount = Object.keys(prs || {}).length;
+    }
+    setPendingPrs(newPrs);
+    const prCount = Object.keys(newPrs).length;
+
+    // XP/Streak/Achievements NACHEINANDER vergeben. addXP und updateStreak
+    // lesen und schreiben beide total_xp (read-modify-write) — liefen sie
+    // parallel, überschriebe der letzte Writer den Zuwachs des anderen (XP-Verlust).
+    (async () => {
+      try {
+        const streakRes = await updateStreak(user.id);
+        if (streakRes && streakRes.newLevel > streakRes.oldLevel) setLevelUp(streakRes.newLevel);
         // NEW_PR-XP vergeben (war definiert, wurde aber nie ausgezahlt)
-        if (prCount > 0) addXP(user.id, prCount * XP_VALUES.NEW_PR).catch(() => {});
+        if (prCount > 0) await addXP(user.id, prCount * XP_VALUES.NEW_PR);
         // Achievements prüfen (nach Streak-Ergebnis, damit bestStreak stimmt)
-        const streakRes = await streakPromise;
         const newly = await checkAchievements(user.id, {
           type: 'workout',
           workout,
@@ -156,10 +158,12 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
         });
         if (newly.length > 0) {
           setUnlockQueue((q) => [...q, ...newly]);
-          addXP(user.id, newly.length * 50).catch(() => {});
+          await addXP(user.id, newly.length * 50);
         }
-      })
-      .catch(() => {});
+      } catch (err) {
+        console.error('XP/achievement error:', err);
+      }
+    })();
 
     // Auto-update the source plan if started from a plan
     if (wasFromPlan && sourcePlanId) {
