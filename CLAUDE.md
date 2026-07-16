@@ -16,6 +16,15 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### Abo/Premium-Fundament (provider-agnostisch) — IN ARBEIT (16.07.2026, Branch claude/github-connection-check-v5zzpl)
+- **Provider-unabhängige Basis gebaut, noch KEIN Zahlungsanbieter angebunden.** Ziel: erst das Gerüst, RevenueCat/Stripe später einstecken.
+- **`src/context/SubscriptionContext.jsx`:** `useSubscription()` liefert `isPremium`, `isTrial`, `trialDaysLeft`, `hadTrial`, `startTrial()`, `requirePremium(reason)` (öffnet Paywall + gibt false zurück, wenn kein Premium → Feature-Gate), `openPaywall()`. Rendert die Paywall global. Gemountet in main.jsx **innerhalb** von AuthProvider.
+- **`src/data/subscriptionStorage.js`:** localStorage-first + Supabase, Gast-tauglich. `computeAccess(sub)` leitet isPremium aus Trial (7 Tage) ODER bezahltem Premium ab. `startTrial()` (einmalig), `purchasePremium()` = **Platzhalter** (gibt `provider_not_configured` zurück). `TRIAL_DAYS=7`.
+- **`src/pages/PaywallPage.jsx`:** präsentationale Paywall (Props-gesteuert, kein Zirkelimport), Gold-Design, DE/EN, Benefit-Liste, Preis-Karte (`PRICE`-Konstante = Platzhalter 4,99 €/Monat), CTA „7 Tage kostenlos testen" (Trial) bzw. „Premium freischalten" (→ Platzhalter-Toast).
+- **Profil-Karte „MyPeak Premium"** (ProfilePage) zeigt Trial-Status bzw. öffnet die Paywall.
+- **⚠️ Neue Migration NOCH NICHT in Prod:** `20260716120000_subscriptions.sql` (`subscriptions`-Tabelle + RLS). **SICHERHEIT:** Bezahltes Premium muss später serverseitig gesetzt werden (Webhook mit Service-Role); der aktuelle Client schreibt nur den kostenlosen Trial-Status. Update-RLS vor echtem Zahlungs-Go-Live entsprechend härten.
+- **OFFENE ENTSCHEIDUNGEN (User):** (1) Zahlungsanbieter — Empfehlung **RevenueCat** (iOS IAP + Google Play Billing + Web, Capacitor-Plugin); Apple/Google verbieten Stripe für digitale Abos in-app. (2) Was JETZT gaten — Vorschlag: bestehende KI-Mahlzeit-Foto-Erkennung. Noch NICHTS tatsächlich gesperrt (nur Gerüst + Paywall).
+
 ### Wissensbibliothek KOMPLETT: alle 4 Blöcke live (15.07.2026, Branch claude/github-connection-check-v5zzpl)
 - **Generischer Reader `src/pages/library/KnowledgePage.jsx`:** datengetriebener E-Book-Reader (Liste → Kurzfassung mit Summary+Quick-Facts → aufklappbare Kapitel), wiederverwendbar für alle Blöcke. Props: `data`, `titleDE/EN`, `categories`, `disclaimer` ('general'|'medical'|null). Quick-Facts flexibel als Array `{label,text}`. Gleiches Muster wie PeptidesPage, aber ohne Aktion.
 - **Alle 4 Wissensblöcke fertig (DE+EN, mit Studien), je 6 Themen, zusammen 110 Kapitel, strukturvalidiert:**

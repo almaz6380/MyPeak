@@ -1,0 +1,140 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { X, Check, Crown, Sparkles } from 'lucide-react';
+import { purchasePremium, TRIAL_DAYS } from '../data/subscriptionStorage';
+import Toast from '../components/Toast';
+
+// ── Preis-Konfiguration (zentral, leicht änderbar) ────────────────
+// TODO: An das echte Store-Produkt anpassen, sobald der Zahlungsanbieter
+// (RevenueCat/Stripe) angebunden ist. Reine Anzeige — der tatsächliche
+// Preis kommt später vom Store.
+const PRICE = { amount: '4,99', currency: '€', period: 'Monat', periodEN: 'month' };
+
+// Präsentationale Paywall. Steuerung komplett über Props (kein Zugriff auf
+// den SubscriptionContext → kein Zirkelimport).
+export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose }) {
+  const { i18n } = useTranslation();
+  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
+  const [busy, setBusy] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const benefits = lang === 'de'
+    ? [
+        'KI-Coach für Training & Ernährung',
+        'Blutwerte-Einordnung mit Empfehlungen',
+        'Nährwerttabelle per Foto einscannen',
+        'Personalisierter KI-Ernährungsplan',
+        'Detaillierte Analysen & Statistiken',
+        'Werbefrei',
+      ]
+    : [
+        'AI coach for training & nutrition',
+        'Blood work interpretation with guidance',
+        'Scan nutrition labels by photo',
+        'Personalised AI nutrition plan',
+        'Detailed analytics & statistics',
+        'Ad-free',
+      ];
+
+  const handlePrimary = async () => {
+    setBusy(true);
+    try {
+      if (!hadTrial) {
+        await onStartTrial();
+        return;
+      }
+      // Trial bereits genutzt → echter Kauf (noch kein Anbieter angebunden).
+      const res = await purchasePremium();
+      if (!res.ok) {
+        setToast({
+          type: 'error',
+          message: lang === 'de'
+            ? 'Käufe sind bald verfügbar. Wir richten den Bezahlvorgang gerade ein.'
+            : 'Purchases are coming soon. We are setting up checkout.',
+        });
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const primaryLabel = hadTrial
+    ? (lang === 'de' ? 'Premium freischalten' : 'Unlock Premium')
+    : (lang === 'de' ? `${TRIAL_DAYS} Tage kostenlos testen` : `Start ${TRIAL_DAYS}-day free trial`);
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="w-full sm:max-w-md bg-white dark:bg-surface-dark-alt rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[92vh] overflow-y-auto">
+        {/* Header */}
+        <div className="relative p-6 pb-4 text-center">
+          <button
+            onClick={onClose}
+            aria-label={lang === 'de' ? 'Schließen' : 'Close'}
+            className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-lg">
+            <Crown className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold">MyPeak Premium</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            {reason
+              ? (lang === 'de' ? 'Diese Funktion ist Teil von Premium.' : 'This feature is part of Premium.')
+              : (lang === 'de' ? 'Hol das Maximum aus deinem Training.' : 'Get the most out of your training.')}
+          </p>
+        </div>
+
+        {/* Benefits */}
+        <div className="px-6 space-y-2.5">
+          {benefits.map((b, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <span className="w-6 h-6 rounded-full bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0">
+                <Check className="w-4 h-4 text-primary-500 dark:text-primary-400" />
+              </span>
+              <span className="text-sm text-slate-700 dark:text-slate-200">{b}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Preis */}
+        <div className="px-6 mt-5">
+          <div className="rounded-2xl border-2 border-primary-400 bg-primary-50/50 dark:bg-primary-900/10 p-4 text-center">
+            <p className="text-2xl font-bold">
+              {PRICE.currency}{PRICE.amount}
+              <span className="text-sm font-normal text-slate-500 dark:text-slate-400">
+                {' '}/ {lang === 'de' ? PRICE.period : PRICE.periodEN}
+              </span>
+            </p>
+            {!hadTrial && (
+              <p className="text-xs text-primary-600 dark:text-primary-400 mt-1 flex items-center justify-center gap-1">
+                <Sparkles className="w-3.5 h-3.5" />
+                {lang === 'de'
+                  ? `${TRIAL_DAYS} Tage kostenlos, danach ${PRICE.currency}${PRICE.amount}/${PRICE.period}`
+                  : `${TRIAL_DAYS} days free, then ${PRICE.currency}${PRICE.amount}/${PRICE.periodEN}`}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="p-6 pt-4">
+          <button
+            onClick={handlePrimary}
+            disabled={busy}
+            className="w-full py-3.5 rounded-2xl bg-primary-500 hover:bg-primary-600 disabled:opacity-60 text-white font-semibold text-base shadow-lg transition-colors"
+          >
+            {busy ? '…' : primaryLabel}
+          </button>
+          <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-3 leading-relaxed">
+            {lang === 'de'
+              ? 'Jederzeit kündbar. Die Testphase kann in den Konto-Einstellungen beendet werden.'
+              : 'Cancel anytime. The trial can be ended in your account settings.'}
+          </p>
+        </div>
+      </div>
+
+      {toast && <Toast message={toast.message} variant={toast.type} onDismiss={() => setToast(null)} />}
+    </div>
+  );
+}

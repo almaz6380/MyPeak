@@ -5,6 +5,7 @@ import './index.css'
 import './i18n'
 import { ThemeProvider } from './context/ThemeContext'
 import { AuthProvider } from './context/AuthContext'
+import { SubscriptionProvider } from './context/SubscriptionContext'
 import ErrorBoundary from './components/ErrorBoundary'
 import App from './App.jsx'
 import { initAds } from './lib/ads'
@@ -15,7 +16,9 @@ createRoot(document.getElementById('root')).render(
       <BrowserRouter>
         <ThemeProvider>
           <AuthProvider>
-            <App />
+            <SubscriptionProvider>
+              <App />
+            </SubscriptionProvider>
           </AuthProvider>
         </ThemeProvider>
       </BrowserRouter>
