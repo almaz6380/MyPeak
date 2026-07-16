@@ -9,6 +9,8 @@
 // Benötigte Env-Vars: GEMINI_API_KEY, SUPABASE_URL(+ANON), SUPABASE_SERVICE_ROLE_KEY.
 // Optional: ANTHROPIC_API_KEY.
 
+import coachKnowledge from './_coachKnowledge.js';
+
 const TRIAL_LIMIT = 5;     // Coach-Fragen/Tag während der Testphase
 const PREMIUM_LIMIT = 30;  // Coach-Fragen/Tag mit bezahltem Premium
 const MAX_HISTORY = 12;    // wie viele Nachrichten Verlauf ans Modell gehen
@@ -17,18 +19,44 @@ function todayUTC() {
   return new Date().toISOString().slice(0, 10);
 }
 
-function systemPrompt(lang) {
-  if (lang === 'en') {
-    return `You are the MyPeak fitness coach. You help with questions about training, nutrition, dietary supplements, and the rough interpretation of blood work.
+// Keyword-Retrieval über die lokale Coach-Wissensbasis (kein Web-Zugriff).
+function retrieve(question, max = 3) {
+  const q = String(question || '').toLowerCase();
+  return coachKnowledge
+    .map((e) => {
+      let score = 0;
+      for (const kw of e.keywords) if (kw && q.includes(kw)) score += 1;
+      if (q.includes(String(e.id).toLowerCase())) score += 1;
+      return { e, score };
+    })
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, max)
+    .map((x) => x.e);
+}
+
+function knowledgeBlock(entries, lang) {
+  if (!entries.length) return '';
+  return entries
+    .map((e) => {
+      const brief = lang === 'en' ? e.briefEN : e.briefDE;
+      const src = e.sources?.length ? `\n[${lang === 'en' ? 'Sources' : 'Quellen'}: ${e.sources.join('; ')}]` : '';
+      return `### ${e.id}\n${brief}${src}`;
+    })
+    .join('\n\n');
+}
+
+function systemPrompt(lang, kb) {
+  const base = lang === 'en'
+    ? `You are the MyPeak fitness coach. You help with questions about training, nutrition, dietary supplements, and the rough interpretation of blood work.
 
 RULES:
 - Answer ONLY questions about these topics (training, nutrition, supplements, blood work). For anything else (coding, politics, relationships, legal/tax topics, general knowledge, etc.), politely decline and steer back.
 - Blood work: you MAY give a rough interpretation of individual values — explain what a marker means, whether it is roughly within the common reference range, and which nutrition/lifestyle factors influence it. Do NOT make a diagnosis and do NOT recommend medication or therapies. ALWAYS state that this does not replace a medical assessment and that abnormal values should be discussed with a doctor.
 - Generally give no medical diagnoses and no dosing advice for prescription or banned substances.
 - Be concise, concrete, and practical. Use short bullet lists when helpful.
-- Reply in English.`;
-  }
-  return `Du bist der MyPeak Fitness-Coach. Du hilfst bei Fragen zu Training, Ernährung, Nahrungsergänzungsmitteln (Supplementen) sowie zur groben Einordnung von Blutwerten.
+- Reply in English.`
+    : `Du bist der MyPeak Fitness-Coach. Du hilfst bei Fragen zu Training, Ernährung, Nahrungsergänzungsmitteln (Supplementen) sowie zur groben Einordnung von Blutwerten.
 
 REGELN:
 - Beantworte NUR Fragen zu diesen Themen (Training, Ernährung, Supplemente, Blutwerte). Bei allem anderen (Programmieren, Politik, Beziehungen, Rechts-/Steuerfragen, allgemeines Wissen usw.) lehne freundlich ab und lenke zurück.
@@ -36,6 +64,12 @@ REGELN:
 - Gib generell keine medizinischen Diagnosen und keine Dosierungsempfehlungen für verschreibungspflichtige oder verbotene Substanzen.
 - Antworte kurz, konkret und praxisnah. Nutze bei Bedarf kurze Aufzählungen.
 - Antworte auf Deutsch.`;
+
+  if (!kb) return base;
+  const header = lang === 'en'
+    ? `\n\nVERIFIED KNOWLEDGE BASE — prefer this and cite the sources; never invent studies or sources. If it does not cover the question, answer from general fitness knowledge and say so transparently:\n\n${kb}`
+    : `\n\nGEPRÜFTE WISSENSBASIS — bevorzugt verwenden und die Quellen nennen; erfinde niemals Studien oder Quellen. Deckt sie die Frage nicht ab, antworte aus allgemeinem Fitnesswissen und weise transparent darauf hin:\n\n${kb}`;
+  return base + header;
 }
 
 // ── Modell-Aufrufe ────────────────────────────────────────────────
@@ -192,7 +226,10 @@ export default async function handler(req, res) {
     role: m.role === 'assistant' ? 'assistant' : 'user',
     content: String(m.content || '').slice(0, 2000),
   }));
-  const sys = systemPrompt(lang === 'en' ? 'en' : 'de');
+  const outLang = lang === 'en' ? 'en' : 'de';
+  const lastUserMsg = [...trimmed].reverse().find((m) => m.role === 'user')?.content || '';
+  const kb = knowledgeBlock(retrieve(lastUserMsg), outLang);
+  const sys = systemPrompt(outLang, kb);
 
   // 5) Antwort generieren.
   let reply;
