@@ -7,7 +7,8 @@ import { saveSetting } from '../data/settingsStorage';
 import MyPeakLogo from '../components/MyPeakLogo';
 import CardPhotoMotif from '../components/CardPhotoMotif';
 import { supabase } from '../lib/supabase';
-import { Moon, Sun, Globe, Weight, LogOut, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2, ShieldCheck } from 'lucide-react';
+import { Moon, Sun, Globe, Weight, LogOut, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2, ShieldCheck, Crown } from 'lucide-react';
+import { useSubscription } from '../context/SubscriptionContext';
 import { getOrCreateFriendCode, getXP, getLevelTitle, calculateLevel, hasGoldenFrame } from '../data/socialStorage';
 import AchievementGallery from '../components/progress/AchievementGallery';
 import { canChangeAdConsent, changeAdConsent } from '../lib/ads';
@@ -17,6 +18,7 @@ export default function ProfilePage() {
   const { t, i18n } = useTranslation();
   const { darkMode, toggleDarkMode } = useTheme();
   const { user, profile, signOut, refreshProfile, isGuestMode } = useAuth();
+  const { isPremium, isTrial, trialDaysLeft, openPaywall } = useSubscription();
   const [weightUnit, setWeightUnit] = useState(() => localStorage.getItem('weightUnit') || 'kg');
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const [editField, setEditField] = useState(null); // which field is being edited
@@ -209,6 +211,35 @@ export default function ProfilePage() {
         </div>
         );
       })()}
+
+      {/* MyPeak Premium */}
+      <button
+        onClick={() => { if (!isPremium) openPaywall(); }}
+        className={`relative overflow-hidden w-full rounded-2xl shadow-soft p-4 mb-4 flex items-center justify-between border ${
+          isPremium
+            ? 'bg-gradient-to-br from-primary-400/15 to-primary-600/10 border-primary-300 dark:border-primary-700'
+            : 'bg-white dark:bg-surface-dark-alt border-slate-100 dark:border-slate-800/60'
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center flex-shrink-0">
+            <Crown className="w-5 h-5 text-white" />
+          </div>
+          <div className="text-left">
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">MyPeak Premium</p>
+            <p className="text-[11px] text-slate-400">
+              {isPremium
+                ? (isTrial
+                    ? (i18n.language?.startsWith('de') ? `Testphase aktiv — noch ${trialDaysLeft} Tage` : `Trial active — ${trialDaysLeft} days left`)
+                    : (i18n.language?.startsWith('de') ? 'Premium aktiv' : 'Premium active'))
+                : (i18n.language?.startsWith('de') ? 'KI-Coach & mehr freischalten' : 'Unlock AI coach & more')}
+            </p>
+          </div>
+        </div>
+        {isPremium
+          ? <span className="text-[11px] font-semibold text-primary-500 dark:text-primary-400">✓</span>
+          : <ChevronRight className="w-5 h-5 text-slate-300" />}
+      </button>
 
       {/* Erfolge & Abzeichen */}
       <AchievementGallery userId={user?.id} />

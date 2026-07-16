@@ -17,6 +17,7 @@ import LibraryPage from './pages/LibraryPage';
 import ProfilePage from './pages/ProfilePage';
 import CycleDetailPage from './pages/CycleDetailPage';
 import ProgressPhotosPage from './pages/progress/ProgressPhotosPage';
+import CoachPage from './pages/CoachPage';
 import AuthPage from './pages/auth/AuthPage';
 import UpdatePasswordPage from './pages/auth/UpdatePasswordPage';
 import OnboardingPage from './pages/onboarding/OnboardingPage';
@@ -54,6 +55,7 @@ export default function App() {
       <Route path="/legal/imprint" element={<LegalPage doc="imprint" />} />
       <Route path="/legal/privacy" element={<LegalPage doc="privacy" />} />
       <Route path="/legal/terms" element={<LegalPage doc="terms" />} />
+      <Route path="/coach" element={user ? <CoachPage /> : <AuthPage />} />
       <Route
         path="*"
         element={

@@ -292,6 +292,10 @@
     "peptides": "Peptide",
     "bloodwork": "Blutwerte"
   },
+  "coach": {
+    "title": "KI-Coach",
+    "subtitle": "Training, Ernährung, Supplemente & Blutwerte"
+  },
   "profile": {
     "title": "Profil",
     "settings": "Einstellungen",

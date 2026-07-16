@@ -1,8 +1,10 @@
 import { useState, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronRight, Loader2, Sparkles } from 'lucide-react';
 import MyPeakLogo from '../components/MyPeakLogo';
 import CardPhotoMotif from '../components/CardPhotoMotif';
+import { useSubscription } from '../context/SubscriptionContext';
 
 // Lazy: Die E-Book-Texte (Peptide ~480 KB, Diäten ~220 KB) werden erst
 // geladen, wenn die Sektion geöffnet wird — verkleinert das Start-Bundle massiv.
@@ -23,6 +25,8 @@ function SectionLoader() {
 
 export default function LibraryPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { requirePremium } = useSubscription();
   const [view, setView] = useState('home');
 
   if (view === 'training') {
@@ -90,6 +94,21 @@ export default function LibraryPage() {
         <MyPeakLogo size={36} />
         <h1 className="text-2xl font-bold mt-2">{t('library.title')}</h1>
       </div>
+
+      {/* KI-Coach (Premium) */}
+      <button
+        onClick={() => { if (requirePremium('ki_coach')) navigate('/coach'); }}
+        className="relative overflow-hidden w-full rounded-2xl p-4 mb-3 flex items-center gap-4 bg-gradient-to-br from-primary-400 to-primary-600 text-white shadow-lg"
+      >
+        <span className="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+          <Sparkles className="w-6 h-6" />
+        </span>
+        <div className="flex-1 text-left">
+          <p className="font-semibold">{t('coach.title')}</p>
+          <p className="text-xs text-white/80">{t('coach.subtitle')}</p>
+        </div>
+        <ChevronRight className="w-5 h-5 text-white/70" />
+      </button>
 
       <div className="flex flex-col gap-3">
         {sections.map((section) => (

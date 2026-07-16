@@ -16,6 +16,22 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### KI-Coach (Premium-Feature) — IN ARBEIT (16.07.2026, Branch claude/github-connection-check-v5zzpl)
+- **Chat-Coach für Training/Ernährung/Supplemente + grobe Blutwerte-Einordnung** (mit Arzt-Verweis, keine Diagnose/Therapie), hinter Premium-Gate (`requirePremium('ki_coach')`). Läuft ab Tag 1 mit **Gemini 2.0 Flash** (schon konfiguriert, kostenlos); ist `ANTHROPIC_API_KEY` gesetzt, werden **Claude gestuft** eingesetzt (Haiku einfach / Sonnet komplex, Länge-Heuristik) mit Gemini als Fallback — ohne Code-Änderung.
+- **`api/coach.js` (Vercel):** fail-closed Auth (Token→user), **Premium/Trial-Check** (liest `subscriptions` per Service-Role), **serverseitiges Tageskontingent** (`coach_usage`, Trial 5/Tag, Premium 30/Tag), Themen-System-Prompt (Training/Ernährung/Supplemente + grobe Blutwerte-Einordnung; keine Diagnosen/Therapien/Dosierungen, Blutwerte immer mit Arzt-Verweis), Verlauf auf 12 Nachrichten gekappt, AbortSignal-Timeouts. Zähler wird NUR serverseitig (Service-Role) hochgezählt.
+- **`src/pages/CoachPage.jsx`:** Chat-UI (eigene Route `/coach`, ohne Bottom-Nav), Rest-Kontingent-Anzeige, gesperrter Zustand mit Paywall-CTA für Nicht-Premium, Fehler-/Limit-Handling. `src/data/coachStorage.js`: `askCoach()` + `getCoachUsageToday()`. Einstieg: goldene „KI-Coach"-Karte in LibraryPage (gegated).
+- **⚠️ Neue Migration NOCH NICHT in Prod:** `20260716140000_coach_usage.sql`. **Braucht in Vercel:** `SUPABASE_SERVICE_ROLE_KEY` (Kontingent/Sub-Check), `GEMINI_API_KEY` (vorhanden); optional `ANTHROPIC_API_KEY` für Claude-Stufen. Setzt außerdem die `subscriptions`-Tabelle voraus (Abo-Migration).
+- **OFFEN:** Zahlungsanbieter noch nicht angebunden → bezahltes Premium wird noch nicht gesetzt; aktuell ist der Coach nur im **Trial** (kostenlos, 7 Tage) tatsächlich nutzbar. Limits/Preise sind Konstanten (leicht anpassbar).
+
+### Abo/Premium-Fundament (provider-agnostisch) — IN ARBEIT (16.07.2026, Branch claude/github-connection-check-v5zzpl)
+- **Provider-unabhängige Basis gebaut, noch KEIN Zahlungsanbieter angebunden.** Ziel: erst das Gerüst, RevenueCat/Stripe später einstecken.
+- **`src/context/SubscriptionContext.jsx`:** `useSubscription()` liefert `isPremium`, `isTrial`, `trialDaysLeft`, `hadTrial`, `startTrial()`, `requirePremium(reason)` (öffnet Paywall + gibt false zurück, wenn kein Premium → Feature-Gate), `openPaywall()`. Rendert die Paywall global. Gemountet in main.jsx **innerhalb** von AuthProvider.
+- **`src/data/subscriptionStorage.js`:** localStorage-first + Supabase, Gast-tauglich. `computeAccess(sub)` leitet isPremium aus Trial (7 Tage) ODER bezahltem Premium ab. `startTrial()` (einmalig), `purchasePremium()` = **Platzhalter** (gibt `provider_not_configured` zurück). `TRIAL_DAYS=7`.
+- **`src/pages/PaywallPage.jsx`:** präsentationale Paywall (Props-gesteuert, kein Zirkelimport), Gold-Design, DE/EN, Benefit-Liste, Preis-Karte (`PRICE`-Konstante = Platzhalter 4,99 €/Monat), CTA „7 Tage kostenlos testen" (Trial) bzw. „Premium freischalten" (→ Platzhalter-Toast).
+- **Profil-Karte „MyPeak Premium"** (ProfilePage) zeigt Trial-Status bzw. öffnet die Paywall.
+- **⚠️ Neue Migration NOCH NICHT in Prod:** `20260716120000_subscriptions.sql` (`subscriptions`-Tabelle + RLS). **SICHERHEIT:** Bezahltes Premium muss später serverseitig gesetzt werden (Webhook mit Service-Role); der aktuelle Client schreibt nur den kostenlosen Trial-Status. Update-RLS vor echtem Zahlungs-Go-Live entsprechend härten.
+- **OFFENE ENTSCHEIDUNGEN (User):** (1) Zahlungsanbieter — Empfehlung **RevenueCat** (iOS IAP + Google Play Billing + Web, Capacitor-Plugin); Apple/Google verbieten Stripe für digitale Abos in-app. (2) Was JETZT gaten — Vorschlag: bestehende KI-Mahlzeit-Foto-Erkennung. Noch NICHTS tatsächlich gesperrt (nur Gerüst + Paywall).
+
 ### Wissensbibliothek KOMPLETT: alle 4 Blöcke live (15.07.2026, Branch claude/github-connection-check-v5zzpl)
 - **Generischer Reader `src/pages/library/KnowledgePage.jsx`:** datengetriebener E-Book-Reader (Liste → Kurzfassung mit Summary+Quick-Facts → aufklappbare Kapitel), wiederverwendbar für alle Blöcke. Props: `data`, `titleDE/EN`, `categories`, `disclaimer` ('general'|'medical'|null). Quick-Facts flexibel als Array `{label,text}`. Gleiches Muster wie PeptidesPage, aber ohne Aktion.
 - **Alle 4 Wissensblöcke fertig (DE+EN, mit Studien), je 6 Themen, zusammen 110 Kapitel, strukturvalidiert:**
