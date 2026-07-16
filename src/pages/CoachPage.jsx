@@ -51,8 +51,8 @@ export default function CoachPage() {
           </div>
           <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
             {lang === 'de'
-              ? 'Der KI-Coach beantwortet deine Fragen zu Training, Ernährung und Supplementen — ein Premium-Feature.'
-              : 'The AI coach answers your questions about training, nutrition and supplements — a Premium feature.'}
+              ? 'Der KI-Coach beantwortet deine Fragen zu Training, Ernährung, Supplementen und ordnet Blutwerte grob ein — ein Premium-Feature.'
+              : 'The AI coach answers your questions about training, nutrition, supplements and roughly interprets blood work — a Premium feature.'}
           </p>
           <button
             onClick={() => openPaywall('ki_coach')}
@@ -124,8 +124,8 @@ export default function CoachPage() {
           <div className="text-center pt-8">
             <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
               {lang === 'de'
-                ? 'Frag mich alles rund um Training, Ernährung und Supplemente. Zum Beispiel: „Wie baue ich einen 3er-Split auf?"'
-                : 'Ask me anything about training, nutrition and supplements. For example: “How do I build a 3-day split?”'}
+                ? 'Frag mich alles rund um Training, Ernährung, Supplemente und Blutwerte. Zum Beispiel: „Wie baue ich einen 3er-Split auf?" oder „Was bedeutet ein Ferritin von 30?"'
+                : 'Ask me anything about training, nutrition, supplements and blood work. For example: “How do I build a 3-day split?” or “What does a ferritin of 30 mean?”'}
             </p>
           </div>
         )}
@@ -185,8 +185,8 @@ export default function CoachPage() {
         </div>
         <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center mt-2 leading-relaxed">
           {lang === 'de'
-            ? 'Nur Training, Ernährung & Supplemente. Ersetzt keine ärztliche Beratung.'
-            : 'Training, nutrition & supplements only. Not a substitute for medical advice.'}
+            ? 'Training, Ernährung, Supplemente & Blutwerte. Ersetzt keine ärztliche Beratung.'
+            : 'Training, nutrition, supplements & blood work. Not a substitute for medical advice.'}
         </p>
       </div>
     </div>
