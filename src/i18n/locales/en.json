@@ -292,6 +292,10 @@
     "peptides": "Peptides",
     "bloodwork": "Blood Work"
   },
+  "coach": {
+    "title": "AI Coach",
+    "subtitle": "Questions about training, nutrition & supplements"
+  },
   "profile": {
     "title": "Profile",
     "settings": "Settings",

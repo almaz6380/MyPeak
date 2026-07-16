@@ -1,0 +1,216 @@
+// MyPeak KI-Coach — Vercel Serverless Function.
+// Beantwortet ausschließlich Fragen zu Training, Ernährung und Supplementen.
+// Premium-Feature mit serverseitigem Tageskontingent pro Nutzer.
+//
+// Modell: nutzt Google Gemini (schon konfiguriert, kostenlos). Ist zusätzlich
+// ANTHROPIC_API_KEY gesetzt, werden Claude-Modelle gestuft eingesetzt
+// (Haiku für einfache, Sonnet für komplexe Fragen) mit Gemini als Fallback.
+//
+// Benötigte Env-Vars: GEMINI_API_KEY, SUPABASE_URL(+ANON), SUPABASE_SERVICE_ROLE_KEY.
+// Optional: ANTHROPIC_API_KEY.
+
+const TRIAL_LIMIT = 5;     // Coach-Fragen/Tag während der Testphase
+const PREMIUM_LIMIT = 30;  // Coach-Fragen/Tag mit bezahltem Premium
+const MAX_HISTORY = 12;    // wie viele Nachrichten Verlauf ans Modell gehen
+
+function todayUTC() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function systemPrompt(lang) {
+  if (lang === 'en') {
+    return `You are the MyPeak fitness coach. You help ONLY with questions about training, nutrition, and dietary supplements.
+
+RULES:
+- Answer ONLY questions about training, nutrition, and supplements. For anything else (coding, politics, relationships, legal/tax topics, general knowledge, etc.), politely decline and steer back to fitness.
+- Do NOT give medical diagnoses or dosing advice for prescription or banned substances. For health concerns, refer the user to a doctor.
+- Be concise, concrete, and practical. Use short bullet lists when helpful.
+- Reply in English.`;
+  }
+  return `Du bist der MyPeak Fitness-Coach. Du hilfst ausschließlich bei Fragen zu Training, Ernährung und Nahrungsergänzungsmitteln (Supplementen).
+
+REGELN:
+- Beantworte NUR Fragen zu Training, Ernährung und Supplementen. Bei allem anderen (Programmieren, Politik, Beziehungen, Rechts-/Steuerfragen, allgemeines Wissen usw.) lehne freundlich ab und lenke zurück zum Fitness-Thema.
+- Gib KEINE medizinischen Diagnosen und keine Dosierungsempfehlungen für verschreibungspflichtige oder verbotene Substanzen. Verweise bei gesundheitlichen Anliegen an eine Ärztin / einen Arzt.
+- Antworte kurz, konkret und praxisnah. Nutze bei Bedarf kurze Aufzählungen.
+- Antworte auf Deutsch.`;
+}
+
+// ── Modell-Aufrufe ────────────────────────────────────────────────
+async function callGemini(apiKey, sys, messages, signal) {
+  const contents = messages.map((m) => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: String(m.content || '') }],
+  }));
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: sys }] },
+      contents,
+      generationConfig: { temperature: 0.4, maxOutputTokens: 800 },
+    }),
+    signal,
+  });
+  if (!res.ok) throw new Error('gemini_' + res.status);
+  const data = await res.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error('gemini_empty');
+  return text.trim();
+}
+
+async function callClaude(apiKey, model, sys, messages, signal) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({
+      model,
+      max_tokens: 800,
+      system: sys,
+      messages: messages.map((m) => ({
+        role: m.role === 'assistant' ? 'assistant' : 'user',
+        content: String(m.content || ''),
+      })),
+    }),
+    signal,
+  });
+  if (!res.ok) throw new Error('claude_' + res.status);
+  const data = await res.json();
+  const text = data.content?.find((b) => b.type === 'text')?.text;
+  if (!text) throw new Error('claude_empty');
+  return text.trim();
+}
+
+// Gestufter Einsatz mit Fallback: Claude (falls Key) → sonst/danach Gemini.
+async function generateReply(sys, messages) {
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  const geminiKey = process.env.GEMINI_API_KEY;
+  const lastUser = [...messages].reverse().find((m) => m.role === 'user')?.content || '';
+  const complex = String(lastUser).length > 240;
+  const withTimeout = () => AbortSignal.timeout(22000);
+
+  const attempts = [];
+  if (anthropicKey) {
+    attempts.push(() => callClaude(anthropicKey, complex ? 'claude-sonnet-5' : 'claude-haiku-4-5', sys, messages, withTimeout()));
+  }
+  if (geminiKey) {
+    attempts.push(() => callGemini(geminiKey, sys, messages, withTimeout()));
+  }
+
+  let lastErr = null;
+  for (const attempt of attempts) {
+    try { return await attempt(); } catch (err) { lastErr = err; }
+  }
+  throw lastErr || new Error('no_model_configured');
+}
+
+// ── Supabase (Service-Role) ───────────────────────────────────────
+async function sbFetch(supabaseUrl, serviceKey, path, init = {}) {
+  return fetch(`${supabaseUrl}/rest/v1/${path}`, {
+    ...init,
+    headers: {
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
+      'Content-Type': 'application/json',
+      ...(init.headers || {}),
+    },
+  });
+}
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const anonKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  // Fail-closed: ohne Auth-/Service-Konfiguration keine (kostenpflichtige) Nutzung.
+  if (!supabaseUrl || !anonKey || !serviceKey) {
+    console.error('Coach: Supabase not fully configured');
+    return res.status(503).json({ error: 'Service unavailable' });
+  }
+
+  // 1) Auth: gültiges Nutzer-Token nötig; Nutzer-ID auslesen.
+  const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
+  if (!token) return res.status(401).json({ error: 'Login required' });
+
+  let userId;
+  try {
+    const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: { apikey: anonKey, Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!userRes.ok) return res.status(401).json({ error: 'Invalid token' });
+    const user = await userRes.json();
+    userId = user?.id;
+  } catch {
+    return res.status(503).json({ error: 'Auth check failed' });
+  }
+  if (!userId) return res.status(401).json({ error: 'Invalid token' });
+
+  // 2) Premium/Trial aktiv? (Coach ist ein Premium-Feature)
+  let dailyLimit;
+  try {
+    const subRes = await sbFetch(supabaseUrl, serviceKey, `subscriptions?user_id=eq.${userId}&select=trial_ends_at,premium_until`);
+    const rows = subRes.ok ? await subRes.json() : [];
+    const sub = rows[0] || {};
+    const now = Date.now();
+    const premium = sub.premium_until && new Date(sub.premium_until).getTime() > now;
+    const trial = sub.trial_ends_at && new Date(sub.trial_ends_at).getTime() > now;
+    if (premium) dailyLimit = PREMIUM_LIMIT;
+    else if (trial) dailyLimit = TRIAL_LIMIT;
+    else return res.status(403).json({ error: 'premium_required' });
+  } catch {
+    return res.status(503).json({ error: 'Subscription check failed' });
+  }
+
+  // 3) Tageskontingent prüfen (serverseitig, nicht manipulierbar).
+  const date = todayUTC();
+  let usedCount;
+  try {
+    const uRes = await sbFetch(supabaseUrl, serviceKey, `coach_usage?user_id=eq.${userId}&date=eq.${date}&select=count`);
+    const rows = uRes.ok ? await uRes.json() : [];
+    usedCount = rows[0]?.count || 0;
+  } catch {
+    return res.status(503).json({ error: 'Quota check failed' });
+  }
+  if (usedCount >= dailyLimit) {
+    return res.status(429).json({ error: 'quota_exceeded', remaining: 0 });
+  }
+
+  // 4) Eingabe validieren.
+  const { messages, lang } = req.body || {};
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return res.status(400).json({ error: 'No messages' });
+  }
+  const trimmed = messages.slice(-MAX_HISTORY).map((m) => ({
+    role: m.role === 'assistant' ? 'assistant' : 'user',
+    content: String(m.content || '').slice(0, 2000),
+  }));
+  const sys = systemPrompt(lang === 'en' ? 'en' : 'de');
+
+  // 5) Antwort generieren.
+  let reply;
+  try {
+    reply = await generateReply(sys, trimmed);
+  } catch (err) {
+    console.error('Coach model error:', err?.message);
+    return res.status(503).json({ error: 'ai_unavailable' });
+  }
+
+  // 6) Kontingent hochzählen (nach erfolgreicher Antwort).
+  try {
+    await sbFetch(supabaseUrl, serviceKey, 'coach_usage', {
+      method: 'POST',
+      headers: { Prefer: 'resolution=merge-duplicates' },
+      body: JSON.stringify({ user_id: userId, date, count: usedCount + 1, updated_at: new Date().toISOString() }),
+    });
+  } catch (err) {
+    console.error('Coach quota update failed (non-fatal):', err?.message);
+  }
+
+  return res.status(200).json({ reply, remaining: Math.max(0, dailyLimit - usedCount - 1) });
+}
