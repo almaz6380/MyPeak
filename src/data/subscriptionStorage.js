@@ -79,13 +79,16 @@ export async function getSubscription(userId) {
 }
 
 // Trial starten (einmalig). Nur wenn noch kein Trial lief.
+// Für eingeloggte Nutzer serverseitig (api/start-trial.js, Service-Role) —
+// der Client darf seit der RLS-Härtung nicht mehr direkt schreiben.
+// Gäste bleiben rein lokal (kein Supabase).
 export async function startTrial(userId) {
   const current = readCache(userId);
   if (current.trial_started_at) return current; // schon einmal genutzt
 
   const now = new Date();
   const ends = new Date(now.getTime() + TRIAL_DAYS * 86400000);
-  const next = {
+  const localNext = {
     ...current,
     user_id: userId,
     status: 'trial',
@@ -93,31 +96,83 @@ export async function startTrial(userId) {
     trial_ends_at: ends.toISOString(),
     updated_at: now.toISOString(),
   };
-  writeCache(next);
 
-  if (!isGuest(userId)) {
-    try {
-      await supabase.from('subscriptions').upsert({
-        user_id: userId,
-        status: next.status,
-        trial_started_at: next.trial_started_at,
-        trial_ends_at: next.trial_ends_at,
-        premium_until: next.premium_until,
-        provider: next.provider,
-        updated_at: next.updated_at,
-      }, { onConflict: 'user_id' });
-    } catch (err) {
-      console.error('Failed to save trial to Supabase:', err);
-    }
+  // Gast: nur lokal.
+  if (isGuest(userId)) {
+    writeCache(localNext);
+    return localNext;
   }
 
-  return next;
+  // Eingeloggt: Trial vom Server setzen lassen, Ergebnis übernehmen.
+  try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData?.session?.access_token;
+    if (token) {
+      const res = await fetch('/api/start-trial', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const { subscription } = await res.json();
+        if (subscription) {
+          writeCache(subscription);
+          return subscription;
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Failed to start trial on server:', err);
+  }
+
+  // Fallback (Server nicht erreichbar): lokal cachen, damit die UI nicht hängt.
+  writeCache(localNext);
+  return localNext;
 }
 
-// Platzhalter für den echten Kauf — wird später vom Zahlungsanbieter
-// (RevenueCat/Stripe) überschrieben/verdrahtet. Gibt aktuell false zurück,
-// damit die UI weiß, dass noch kein Anbieter angebunden ist.
-export async function purchasePremium() {
-  console.warn('purchasePremium(): kein Zahlungsanbieter angebunden.');
-  return { ok: false, reason: 'provider_not_configured' };
+// Echten Kauf über RevenueCat auslösen. Gäste können nicht kaufen (kein Konto,
+// kein Server-Mapping). Ohne konfigurierten RC-Key gibt der Wrapper
+// `not_configured` zurück → die Paywall zeigt „bald verfügbar".
+// Die verbindliche Freischaltung (premium_until) kommt serverseitig über den
+// RevenueCat-Webhook; nach Erfolg refreshen wir den Status aus Supabase.
+export async function purchasePremium(userId) {
+  if (!userId || isGuest(userId)) {
+    return { ok: false, reason: 'login_required' };
+  }
+  const rc = await import('../lib/revenuecat');
+  if (!rc.isConfigured()) {
+    return { ok: false, reason: 'provider_not_configured' };
+  }
+  const res = await rc.purchase(userId);
+  if (res.ok) {
+    // Cloud-Status nachladen (Webhook hat premium_until gesetzt); der
+    // Hintergrund-Refresh in getSubscription feuert das mypeak:subscription-Event.
+    getSubscription(userId).catch(() => {});
+  }
+  return res;
+}
+
+// Frühere Käufe wiederherstellen (Gerätewechsel, Neuinstallation).
+export async function restorePurchases(userId) {
+  if (!userId || isGuest(userId)) {
+    return { ok: false, reason: 'login_required' };
+  }
+  const rc = await import('../lib/revenuecat');
+  if (!rc.isConfigured()) {
+    return { ok: false, reason: 'provider_not_configured' };
+  }
+  const res = await rc.restore(userId);
+  if (res.ok) getSubscription(userId).catch(() => {});
+  return res;
+}
+
+// Lokalisierten Store-Preis holen (oder null → UI nutzt die Konstante).
+export async function getPremiumPriceString(userId) {
+  if (!userId || isGuest(userId)) return null;
+  try {
+    const rc = await import('../lib/revenuecat');
+    if (!rc.isConfigured()) return null;
+    return await rc.getPremiumPriceString(userId);
+  } catch {
+    return null;
+  }
 }
