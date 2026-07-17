@@ -17,6 +17,8 @@
     "@capacitor/ios": "^8.4.1",
     "@ericblade/quagga2": "^1.12.1",
     "@fontsource/inter": "^5.2.8",
+    "@revenuecat/purchases-capacitor": "^13.2.3",
+    "@revenuecat/purchases-js": "^1.47.3",
     "@sentry/react": "^10.63.0",
     "@supabase/supabase-js": "^2.105.3",
     "@tailwindcss/vite": "^4.2.4",

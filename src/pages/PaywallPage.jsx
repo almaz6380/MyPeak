@@ -1,22 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Check, Crown, Sparkles } from 'lucide-react';
-import { purchasePremium, TRIAL_DAYS } from '../data/subscriptionStorage';
+import { purchasePremium, restorePurchases, getPremiumPriceString, TRIAL_DAYS } from '../data/subscriptionStorage';
+import { useAuth } from '../context/AuthContext';
 import Toast from '../components/Toast';
 
-// ── Preis-Konfiguration (zentral, leicht änderbar) ────────────────
-// TODO: An das echte Store-Produkt anpassen, sobald der Zahlungsanbieter
-// (RevenueCat/Stripe) angebunden ist. Reine Anzeige — der tatsächliche
-// Preis kommt später vom Store.
-const PRICE = { amount: '4,99', currency: '€', period: 'Monat', periodEN: 'month' };
+// ── Preis-Konfiguration (Fallback-Anzeige) ────────────────────────
+// Sobald ein RevenueCat-Offering geladen ist, wird der echte, lokalisierte
+// Store-Preis angezeigt; diese Konstante ist nur der Fallback davor.
+const PRICE = { amount: '3,99', currency: '€', period: 'Monat', periodEN: 'month' };
 
-// Präsentationale Paywall. Steuerung komplett über Props (kein Zugriff auf
-// den SubscriptionContext → kein Zirkelimport).
+// Präsentationale Paywall. Trial-Steuerung über Props (kein Zugriff auf den
+// SubscriptionContext → kein Zirkelimport). Kauf/Restore laufen über den
+// Storage (mit AuthContext-User; AuthContext ist unkritisch für Zirkelimport).
 export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose }) {
   const { i18n } = useTranslation();
   const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
+  const { user } = useAuth();
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState(null);
+  const [livePrice, setLivePrice] = useState(null);
+
+  // Echten Store-Preis laden, wenn RevenueCat konfiguriert ist.
+  useEffect(() => {
+    let active = true;
+    if (user?.id) {
+      getPremiumPriceString(user.id).then((p) => { if (active && p) setLivePrice(p); });
+    }
+    return () => { active = false; };
+  }, [user?.id]);
+
+  const priceDisplay = livePrice || `${PRICE.currency}${PRICE.amount}`;
 
   const benefits = lang === 'de'
     ? [
@@ -43,15 +57,47 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
         await onStartTrial();
         return;
       }
-      // Trial bereits genutzt → echter Kauf (noch kein Anbieter angebunden).
-      const res = await purchasePremium();
-      if (!res.ok) {
+      // Trial bereits genutzt → echter Kauf über RevenueCat.
+      const res = await purchasePremium(user?.id);
+      if (res.ok) {
         setToast({
-          type: 'error',
-          message: lang === 'de'
-            ? 'Käufe sind bald verfügbar. Wir richten den Bezahlvorgang gerade ein.'
-            : 'Purchases are coming soon. We are setting up checkout.',
+          type: 'success',
+          message: lang === 'de' ? 'Premium ist aktiviert. Viel Erfolg!' : 'Premium is active. Enjoy!',
         });
+        setTimeout(() => onClose(), 1200);
+        return;
+      }
+      if (res.reason === 'cancelled') return; // Nutzer hat abgebrochen → still
+      const msg = (() => {
+        if (res.reason === 'login_required') {
+          return lang === 'de' ? 'Bitte melde dich an, um Premium zu kaufen.' : 'Please sign in to buy Premium.';
+        }
+        if (res.reason === 'provider_not_configured') {
+          return lang === 'de'
+            ? 'Käufe sind bald verfügbar. Wir richten den Bezahlvorgang gerade ein.'
+            : 'Purchases are coming soon. We are setting up checkout.';
+        }
+        return lang === 'de'
+          ? 'Der Kauf hat nicht geklappt. Bitte später erneut versuchen.'
+          : 'The purchase did not go through. Please try again later.';
+      })();
+      setToast({ type: 'error', message: msg });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleRestore = async () => {
+    setBusy(true);
+    try {
+      const res = await restorePurchases(user?.id);
+      if (res.ok && res.entitlementActive) {
+        setToast({ type: 'success', message: lang === 'de' ? 'Käufe wiederhergestellt.' : 'Purchases restored.' });
+        setTimeout(() => onClose(), 1200);
+      } else if (res.ok) {
+        setToast({ type: 'error', message: lang === 'de' ? 'Keine aktiven Käufe gefunden.' : 'No active purchases found.' });
+      } else if (res.reason !== 'provider_not_configured') {
+        setToast({ type: 'error', message: lang === 'de' ? 'Wiederherstellen fehlgeschlagen.' : 'Restore failed.' });
       }
     } finally {
       setBusy(false);
@@ -101,7 +147,7 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
         <div className="px-6 mt-5">
           <div className="rounded-2xl border-2 border-primary-400 bg-primary-50/50 dark:bg-primary-900/10 p-4 text-center">
             <p className="text-2xl font-bold">
-              {PRICE.currency}{PRICE.amount}
+              {priceDisplay}
               <span className="text-sm font-normal text-slate-500 dark:text-slate-400">
                 {' '}/ {lang === 'de' ? PRICE.period : PRICE.periodEN}
               </span>
@@ -110,8 +156,8 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
               <p className="text-xs text-primary-600 dark:text-primary-400 mt-1 flex items-center justify-center gap-1">
                 <Sparkles className="w-3.5 h-3.5" />
                 {lang === 'de'
-                  ? `${TRIAL_DAYS} Tage kostenlos, danach ${PRICE.currency}${PRICE.amount}/${PRICE.period}`
-                  : `${TRIAL_DAYS} days free, then ${PRICE.currency}${PRICE.amount}/${PRICE.periodEN}`}
+                  ? `${TRIAL_DAYS} Tage kostenlos, danach ${priceDisplay}/${PRICE.period}`
+                  : `${TRIAL_DAYS} days free, then ${priceDisplay}/${PRICE.periodEN}`}
               </p>
             )}
           </div>
@@ -126,6 +172,15 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
           >
             {busy ? '…' : primaryLabel}
           </button>
+          {hadTrial && (
+            <button
+              onClick={handleRestore}
+              disabled={busy}
+              className="w-full mt-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-primary-500 disabled:opacity-60 transition-colors"
+            >
+              {lang === 'de' ? 'Käufe wiederherstellen' : 'Restore purchases'}
+            </button>
+          )}
           <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-3 leading-relaxed">
             {lang === 'de'
               ? 'Jederzeit kündbar. Die Testphase kann in den Konto-Einstellungen beendet werden.'
