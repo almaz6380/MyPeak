@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { getSubscription, startTrial as startTrialStorage, computeAccess } from '../data/subscriptionStorage';
+import { setAdsPremiumStatus } from '../lib/ads';
 import PaywallPage from '../pages/PaywallPage';
 
 const SubscriptionContext = createContext();
@@ -27,6 +28,11 @@ export function SubscriptionProvider({ children }) {
   }, []);
 
   const access = computeAccess(sub);
+
+  // Werbung an den Premium-Status koppeln: Premium (Trial ODER bezahlt) = werbefrei.
+  useEffect(() => {
+    setAdsPremiumStatus(access.isPremium);
+  }, [access.isPremium]);
 
   const startTrial = useCallback(async () => {
     if (!user?.id) return null;
