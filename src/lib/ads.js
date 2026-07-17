@@ -108,8 +108,16 @@ const INTERSTITIAL_MIN_GAP_MS = 90_000;
 let lastInterstitial = 0;
 let actionCount = 0;
 
+// Premium-Nutzer (Trial ODER bezahlt) sind werbefrei. Der SubscriptionContext
+// hält diesen Schalter aktuell; ohne Premium bleibt es bei false (mit Werbung).
+let premiumUser = false;
+export function setAdsPremiumStatus(isPremium) {
+  premiumUser = !!isPremium;
+}
+
 export async function maybeShowInterstitial() {
   if (!ready) return;
+  if (premiumUser) return; // Premium = werbefrei
   actionCount += 1;
   if (actionCount % 2 !== 0) return; // nur jede 2. Aktion
   if (Date.now() - lastInterstitial < INTERSTITIAL_MIN_GAP_MS) return;
