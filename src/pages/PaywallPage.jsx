@@ -6,11 +6,16 @@ import { purchasePremium, restorePurchases, getPremiumPriceString, TRIAL_DAYS } 
 import { useAuth } from '../context/AuthContext';
 import Toast from '../components/Toast';
 
-// Apple erlaubt in der iOS-App keine externen Kaufmechanismen (Web-Billing/Stripe)
-// für digitale Abos — nur In-App-Purchase. Solange iOS-IAP noch nicht eingerichtet
-// ist, blenden wir auf iOS die bezahlte Kaufoption, den Restore-Link und die
-// Preisanzeige aus. Die kostenlose Testphase bleibt (Trial ist ohne Zahlung erlaubt).
-const isIOSNative = Capacitor.getPlatform() === 'ios';
+// Bezahlter Kauf ist PRO PLATTFORM freischaltbar — erst „true", wenn der jeweilige
+// Store/Provider wirklich live eingerichtet ist:
+//   ios     -> Apple In-App-Purchase (StoreKit)            [noch nicht eingerichtet]
+//   android -> Google Play Billing                          [noch nicht eingerichtet]
+//   web     -> RevenueCat Web Billing (Stripe)   [nur Sandbox -> geparkt bis Live]
+// Solange „false", zeigen wir nur die kostenlose Testphase (Trial braucht keine
+// Zahlung) — kein Kauf-Button, kein Restore, kein Preis. So läuft niemand in einen
+// Sandbox-Checkout, und iOS verletzt nicht Apples IAP-Pflicht (3.1.1).
+const PURCHASE_ENABLED = { ios: false, android: false, web: false };
+const canPurchase = PURCHASE_ENABLED[Capacitor.getPlatform()] ?? false;
 
 // ── Preis-Konfiguration (Fallback-Anzeige) ────────────────────────
 // Sobald ein RevenueCat-Offering geladen ist, wird der echte, lokalisierte
@@ -31,8 +36,8 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
   // Echten Store-Preis laden, wenn RevenueCat konfiguriert ist.
   useEffect(() => {
     let active = true;
-    // Auf iOS kein Preis/Kauf → RevenueCat-Abruf sparen.
-    if (user?.id && !isIOSNative) {
+    // Ohne Kaufmöglichkeit kein Preis nötig → RevenueCat-Abruf sparen.
+    if (user?.id && canPurchase) {
       getPremiumPriceString(user.id).then((p) => { if (active && p) setLivePrice(p); });
     }
     return () => { active = false; };
@@ -151,8 +156,8 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
           ))}
         </div>
 
-        {/* Preis — auf iOS ausgeblendet (keine externe Kaufoption erlaubt) */}
-        {!isIOSNative && (
+        {/* Preis — nur wenn hier gekauft werden kann */}
+        {canPurchase && (
         <div className="px-6 mt-5">
           <div className="rounded-2xl border-2 border-primary-400 bg-primary-50/50 dark:bg-primary-900/10 p-4 text-center">
             <p className="text-2xl font-bold">
@@ -175,7 +180,7 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
 
         {/* CTA */}
         <div className="p-6 pt-4">
-          {(!hadTrial || !isIOSNative) ? (
+          {(!hadTrial || canPurchase) ? (
             <button
               onClick={handlePrimary}
               disabled={busy}
@@ -184,14 +189,14 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
               {busy ? '…' : primaryLabel}
             </button>
           ) : (
-            // iOS, Trial bereits genutzt → kein Kauf möglich (kein externer Bezahlweg).
+            // Trial bereits genutzt + kein Kauf auf dieser Plattform → nur Hinweis.
             <p className="text-sm text-slate-600 dark:text-slate-300 text-center">
               {lang === 'de'
                 ? 'Diese Funktion ist Teil von Premium. Der Kauf ist in dieser App-Version noch nicht verfügbar.'
                 : 'This feature is part of Premium. Purchasing is not yet available in this version of the app.'}
             </p>
           )}
-          {hadTrial && !isIOSNative && (
+          {hadTrial && canPurchase && (
             <button
               onClick={handleRestore}
               disabled={busy}
@@ -200,7 +205,7 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
               {lang === 'de' ? 'Käufe wiederherstellen' : 'Restore purchases'}
             </button>
           )}
-          {(!hadTrial || !isIOSNative) && (
+          {(!hadTrial || canPurchase) && (
             <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-3 leading-relaxed">
               {lang === 'de'
                 ? 'Jederzeit kündbar. Die Testphase kann in den Konto-Einstellungen beendet werden.'
