@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Capacitor } from '@capacitor/core';
 import { X, Check, Crown, Sparkles } from 'lucide-react';
 import { purchasePremium, restorePurchases, getPremiumPriceString, TRIAL_DAYS } from '../data/subscriptionStorage';
 import { useAuth } from '../context/AuthContext';
 import Toast from '../components/Toast';
+
+// Apple erlaubt in der iOS-App keine externen Kaufmechanismen (Web-Billing/Stripe)
+// für digitale Abos — nur In-App-Purchase. Solange iOS-IAP noch nicht eingerichtet
+// ist, blenden wir auf iOS die bezahlte Kaufoption, den Restore-Link und die
+// Preisanzeige aus. Die kostenlose Testphase bleibt (Trial ist ohne Zahlung erlaubt).
+const isIOSNative = Capacitor.getPlatform() === 'ios';
 
 // ── Preis-Konfiguration (Fallback-Anzeige) ────────────────────────
 // Sobald ein RevenueCat-Offering geladen ist, wird der echte, lokalisierte
@@ -24,7 +31,8 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
   // Echten Store-Preis laden, wenn RevenueCat konfiguriert ist.
   useEffect(() => {
     let active = true;
-    if (user?.id) {
+    // Auf iOS kein Preis/Kauf → RevenueCat-Abruf sparen.
+    if (user?.id && !isIOSNative) {
       getPremiumPriceString(user.id).then((p) => { if (active && p) setLivePrice(p); });
     }
     return () => { active = false; };
@@ -143,7 +151,8 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
           ))}
         </div>
 
-        {/* Preis */}
+        {/* Preis — auf iOS ausgeblendet (keine externe Kaufoption erlaubt) */}
+        {!isIOSNative && (
         <div className="px-6 mt-5">
           <div className="rounded-2xl border-2 border-primary-400 bg-primary-50/50 dark:bg-primary-900/10 p-4 text-center">
             <p className="text-2xl font-bold">
@@ -162,17 +171,27 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
             )}
           </div>
         </div>
+        )}
 
         {/* CTA */}
         <div className="p-6 pt-4">
-          <button
-            onClick={handlePrimary}
-            disabled={busy}
-            className="w-full py-3.5 rounded-2xl bg-primary-500 hover:bg-primary-600 disabled:opacity-60 text-white font-semibold text-base shadow-lg transition-colors"
-          >
-            {busy ? '…' : primaryLabel}
-          </button>
-          {hadTrial && (
+          {(!hadTrial || !isIOSNative) ? (
+            <button
+              onClick={handlePrimary}
+              disabled={busy}
+              className="w-full py-3.5 rounded-2xl bg-primary-500 hover:bg-primary-600 disabled:opacity-60 text-white font-semibold text-base shadow-lg transition-colors"
+            >
+              {busy ? '…' : primaryLabel}
+            </button>
+          ) : (
+            // iOS, Trial bereits genutzt → kein Kauf möglich (kein externer Bezahlweg).
+            <p className="text-sm text-slate-600 dark:text-slate-300 text-center">
+              {lang === 'de'
+                ? 'Diese Funktion ist Teil von Premium. Der Kauf ist in dieser App-Version noch nicht verfügbar.'
+                : 'This feature is part of Premium. Purchasing is not yet available in this version of the app.'}
+            </p>
+          )}
+          {hadTrial && !isIOSNative && (
             <button
               onClick={handleRestore}
               disabled={busy}
@@ -181,11 +200,13 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
               {lang === 'de' ? 'Käufe wiederherstellen' : 'Restore purchases'}
             </button>
           )}
-          <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-3 leading-relaxed">
-            {lang === 'de'
-              ? 'Jederzeit kündbar. Die Testphase kann in den Konto-Einstellungen beendet werden.'
-              : 'Cancel anytime. The trial can be ended in your account settings.'}
-          </p>
+          {(!hadTrial || !isIOSNative) && (
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-3 leading-relaxed">
+              {lang === 'de'
+                ? 'Jederzeit kündbar. Die Testphase kann in den Konto-Einstellungen beendet werden.'
+                : 'Cancel anytime. The trial can be ended in your account settings.'}
+            </p>
+          )}
         </div>
       </div>
 
