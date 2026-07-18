@@ -28,6 +28,14 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - **Coach-Wissensbasis stark ausgebaut (PRs #11/#12):** `api/_coachKnowledge.js` jetzt **39 Einträge** — 21 Supplemente, 17 Blutwert-Marker (grobe Einordnung + Arzt-Verweis), 1 Kombinationen-Block; Retrieval injiziert die passenden 2–3 in den Prompt (kein Live-Web). Monats-Refresh-Playbook `docs/coach-knowledge-refresh.md`. **Cron-Routine konnte NICHT angelegt werden** (MCP-Freigabe scheiterte wiederholt) → **manueller Fallback:** auf Zuruf „aktualisiere die Coach-Wissensbasis" macht Claude den Studien-Lauf + PR.
 - **Migrationen in Prod eingespielt (17.07.):** `subscriptions`, `coach_usage`, `subscriptions_server_only`. (Frühere: `workout_type`, `user_achievements` bereits davor.)
 
+### App-Store-Status (18.07.2026) — beide Stores mit Version 1.1 eingereicht (Weg B)
+- **Weg B umgesetzt:** neuer Build aus aktuellem `main`, aber **Kauf-Button auf iOS ausgeblendet** (`PaywallPage.jsx`: `isIOSNative = Capacitor.getPlatform()==='ios'` → auf iOS kein Kauf/Restore/Preis, nur gratis 7-Tage-Trial). Umgeht Apples IAP-Pflicht (3.1.1), bis iOS-IAP eingerichtet ist. Web/Android unverändert. RevenueCat-Capacitor-Plugin per `cap sync` nativ registriert (Android `capacitor.*.gradle`, iOS `Package.swift`/`Package.resolved`).
+- **Versionen:** Android `versionName 1.1 / versionCode 2`; iOS `MARKETING_VERSION 1.0 / Build 3` (Build 1 abgelehnt, Build 2 verworfen).
+- **iOS EINGEREICHT:** Build 3 per altool zu ASC hochgeladen, Version 1.0 zugewiesen, neue Review-Submission → `WAITING_FOR_REVIEW`. Prüf-Notiz (appStoreReviewDetail) gegen 4.3(a) gesetzt + „no in-app purchases". Alte abgelehnte Submission storniert.
+- **Android AUSGEROLLT:** `.aab` (versionCode 2) per Google-Play-API in Produktion `completed` → in Google-Prüfung. Service-Account `play-upload@wellbooked-501311` hat jetzt MyPeak-Rechte.
+- **Light-Mode-Screenshots neu** (Playwright gegen lokale Dev-App, Review-Account, frische Demo-Daten): 6 Screens je iPhone 6,9″/iPad 12,9″/Android in `store-assets/`. **Android-Phone-Screenshots per Play-API hochgeladen (de-DE)**; iOS+iPad abgelegt fürs nächste Update (laufende Prüfung nicht anfassen).
+- **⚠️ Noch offen (nach bestandener iOS-Prüfung): iOS-IAP / echtes bezahltes iOS-Premium (Weg A)** — ASC-Abo-Produkt + „Paid Apps"-Vertrag/Bankdaten (nur User), RevenueCat-iOS-Key, `VITE_REVENUECAT_IOS_KEY`, iOS-Kauf-Guard wieder entfernen, neuer Build. RevenueCat hängt noch an Stripe-Sandbox (keine echten Zahlungen).
+
 ### App-Store-Status (17.07.2026) — iOS abgelehnt, Antwort unbeantwortet
 - **iOS 1.0 weiterhin „Abgelehnt" (4.3.0 Design: Spam).** Josefs Klarstellung vom 12.07. **hat Apple in 5 Tagen NICHT beantwortet** → Thread steht still, Warten bringt nichts.
 - **Empfohlener Weg: neuer, verbesserter Build** — die App ist seit der Ablehnung massiv gewachsen (KI-Coach + eigene Wissens-DB, Freemium-Abo, Wissensbibliothek) → entkräftet „Spam" direkt.
