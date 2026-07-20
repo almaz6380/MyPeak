@@ -185,8 +185,8 @@ export default function CoachPage() {
         </div>
         <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center mt-2 leading-relaxed">
           {lang === 'de'
-            ? 'Training, Ernährung, Supplemente & Blutwerte. Ersetzt keine ärztliche Beratung.'
-            : 'Training, nutrition, supplements & blood work. Not a substitute for medical advice.'}
+            ? 'Nur zu Informationszwecken, kein Ersatz für ärztliche Beratung. Wende dich bei gesundheitlichen Fragen, für eine Diagnose oder Behandlung immer an eine Ärztin oder einen Arzt.'
+            : 'For information only, not a substitute for medical advice. For medical advice, diagnosis, or treatment, always consult a doctor.'}
         </p>
       </div>
     </div>
