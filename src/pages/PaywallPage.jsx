@@ -14,7 +14,7 @@ import Toast from '../components/Toast';
 // Solange „false", zeigen wir nur die kostenlose Testphase (Trial braucht keine
 // Zahlung) — kein Kauf-Button, kein Restore, kein Preis. So läuft niemand in einen
 // Sandbox-Checkout, und iOS verletzt nicht Apples IAP-Pflicht (3.1.1).
-const PURCHASE_ENABLED = { ios: false, android: false, web: false };
+const PURCHASE_ENABLED = { ios: false, android: true, web: false };
 const canPurchase = PURCHASE_ENABLED[Capacitor.getPlatform()] ?? false;
 
 // ── Preis-Konfiguration (Fallback-Anzeige) ────────────────────────
