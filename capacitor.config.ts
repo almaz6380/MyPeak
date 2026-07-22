@@ -6,6 +6,14 @@ const config: CapacitorConfig = {
   appName: 'MyPeak',
   webDir: 'dist',
   backgroundColor: '#f6f4f0',
+  plugins: {
+    // @capacitor-community/safe-area übernimmt die Edge-to-Edge-Insets
+    // (Android-System-/Navigationsleiste). Dazu Capacitors eigenes
+    // SystemBars-Inset-Handling deaktivieren, damit das Plugin greift.
+    SystemBars: {
+      insetsHandling: 'disable',
+    },
+  },
 };
 
 export default config;
