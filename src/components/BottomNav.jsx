@@ -67,7 +67,7 @@ export default function BottomNav() {
       <div className="bg-white dark:bg-surface-dark-alt border-t border-slate-200 dark:border-slate-800">
         <div
           className="max-w-lg mx-auto flex items-center justify-around h-16"
-          style={{ paddingBottom: 'var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px))' }}
+          style={{ paddingBottom: 'max(var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)), 0.75rem)' }}
         >
           {leftItems.map((item) => (
             <NavItem key={item.path} {...item} t={t} />
