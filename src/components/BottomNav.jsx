@@ -63,12 +63,14 @@ export default function BottomNav() {
         </NavLink>
       </div>
 
-      {/* Bar */}
-      <div className="bg-white dark:bg-surface-dark-alt border-t border-slate-200 dark:border-slate-800">
-        <div
-          className="max-w-lg mx-auto flex items-center justify-around h-16"
-          style={{ paddingBottom: 'max(var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)), 0.75rem)' }}
-        >
+      {/* Bar — Safe-Area-Padding MUSS auf dem äußeren Container liegen:
+          innerhalb des h-16-Rows würde es (box-sizing: border-box) die Icons
+          nur stauchen, ohne die Leiste insgesamt zu erhöhen. */}
+      <div
+        className="bg-white dark:bg-surface-dark-alt border-t border-slate-200 dark:border-slate-800"
+        style={{ paddingBottom: 'var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px))' }}
+      >
+        <div className="max-w-lg mx-auto flex items-center justify-around h-16">
           {leftItems.map((item) => (
             <NavItem key={item.path} {...item} t={t} />
           ))}

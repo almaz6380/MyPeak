@@ -14,6 +14,9 @@ import AchievementGallery from '../components/progress/AchievementGallery';
 import { canChangeAdConsent, changeAdConsent } from '../lib/ads';
 import { clearAllLocalPhotos } from '../data/exercisePhotos';
 
+// Sichtbare Build-Kennung — muss bei jedem neuen Store-Build mitgezogen werden (siehe android/app/build.gradle)
+const APP_VERSION = '1.1.6 (11)';
+
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
   const { darkMode, toggleDarkMode } = useTheme();
@@ -403,6 +406,11 @@ export default function ProfilePage() {
           {t('auth.deleteAccount')}
         </button>
       )}
+
+      {/* App-Version — zur eindeutigen Build-Identifikation */}
+      <p className="text-center text-xs text-slate-400 dark:text-slate-600 mt-4">
+        MyPeak {APP_VERSION}
+      </p>
 
       {/* Delete Account Confirmation */}
       {showDeleteConfirm && (

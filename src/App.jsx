@@ -112,7 +112,10 @@ function AppShell() {
     <CameraProvider>
     <ActiveWorkoutProvider>
       {isGuestMode && (
-        <div className="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800 px-4 py-2 text-center">
+        <div
+          className="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800 px-4 py-2 text-center"
+          style={{ paddingTop: 'calc(0.5rem + var(--safe-area-inset-top, env(safe-area-inset-top, 0px)))' }}
+        >
           <p className="text-xs text-amber-700 dark:text-amber-400">
             {t('auth.guestBanner')}
           </p>
@@ -120,7 +123,10 @@ function AppShell() {
       )}
       <BackgroundLayer />
       <PullToRefresh onRefresh={refreshProfile}>
-        <main className="min-h-screen max-w-lg mx-auto pb-20">
+        <main
+          className="min-h-screen max-w-lg mx-auto"
+          style={{ paddingBottom: 'calc(5rem + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)))' }}
+        >
           <AppRoutes />
         </main>
       </PullToRefresh>
