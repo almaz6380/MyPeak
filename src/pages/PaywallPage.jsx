@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Capacitor } from '@capacitor/core';
 import { X, Check, Crown, Sparkles } from 'lucide-react';
-import { purchasePremium, restorePurchases, getPremiumPriceString, TRIAL_DAYS } from '../data/subscriptionStorage';
+import { purchasePremium, restorePurchases, getPremiumPrices, TRIAL_DAYS } from '../data/subscriptionStorage';
 import { useAuth } from '../context/AuthContext';
 import Toast from '../components/Toast';
 
@@ -18,9 +18,15 @@ const PURCHASE_ENABLED = { ios: false, android: true, web: false };
 const canPurchase = PURCHASE_ENABLED[Capacitor.getPlatform()] ?? false;
 
 // ── Preis-Konfiguration (Fallback-Anzeige) ────────────────────────
-// Sobald ein RevenueCat-Offering geladen ist, wird der echte, lokalisierte
-// Store-Preis angezeigt; diese Konstante ist nur der Fallback davor.
-const PRICE = { amount: '3,99', currency: '€', period: 'Monat', periodEN: 'month' };
+// Sobald ein RevenueCat-Offering geladen ist, werden die echten, lokalisierten
+// Store-Preise angezeigt; diese Konstanten sind nur der Fallback davor.
+// Struktur: Monat 4,49 € · Jahr 44,90 € (= 3,74 €/Monat, ~17 % / „2 Monate gratis").
+const CURRENCY = '€';
+const PRICES = {
+  monthly: { amount: '4,49' },
+  annual: { amount: '44,90', perMonth: '3,74' },
+};
+const ANNUAL_SAVINGS = '17'; // Prozent gespart ggü. 12× Monatspreis
 
 // Präsentationale Paywall. Trial-Steuerung über Props (kein Zugriff auf den
 // SubscriptionContext → kein Zirkelimport). Kauf/Restore laufen über den
@@ -31,19 +37,24 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
   const { user } = useAuth();
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState(null);
-  const [livePrice, setLivePrice] = useState(null);
+  const [livePrices, setLivePrices] = useState({ monthly: null, annual: null });
+  const [selectedPlan, setSelectedPlan] = useState('annual'); // Jahr = „bester Wert" vorausgewählt
 
-  // Echten Store-Preis laden, wenn RevenueCat konfiguriert ist.
+  // Echte Store-Preise (Monat + Jahr) laden, wenn RevenueCat konfiguriert ist.
   useEffect(() => {
     let active = true;
     // Ohne Kaufmöglichkeit kein Preis nötig → RevenueCat-Abruf sparen.
     if (user?.id && canPurchase) {
-      getPremiumPriceString(user.id).then((p) => { if (active && p) setLivePrice(p); });
+      getPremiumPrices(user.id).then((p) => { if (active && p) setLivePrices(p); });
     }
     return () => { active = false; };
   }, [user?.id]);
 
-  const priceDisplay = livePrice || `${PRICE.currency}${PRICE.amount}`;
+  // Live-Store-Preis eines Plans, sonst Fallback-Konstante.
+  const priceFor = (plan) => livePrices[plan] || `${CURRENCY}${PRICES[plan].amount}`;
+  const periodLabel = (plan) => (plan === 'annual'
+    ? (lang === 'de' ? 'Jahr' : 'year')
+    : (lang === 'de' ? 'Monat' : 'month'));
 
   const benefits = lang === 'de'
     ? [
@@ -70,8 +81,8 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
         await onStartTrial();
         return;
       }
-      // Trial bereits genutzt → echter Kauf über RevenueCat.
-      const res = await purchasePremium(user?.id);
+      // Trial bereits genutzt → echter Kauf des gewählten Plans über RevenueCat.
+      const res = await purchasePremium(user?.id, selectedPlan);
       if (res.ok) {
         setToast({
           type: 'success',
@@ -156,25 +167,74 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
           ))}
         </div>
 
-        {/* Preis — nur wenn hier gekauft werden kann */}
+        {/* Plan-Auswahl — nur wenn hier gekauft werden kann */}
         {canPurchase && (
-        <div className="px-6 mt-5">
-          <div className="rounded-2xl border-2 border-primary-400 bg-primary-50/50 dark:bg-primary-900/10 p-4 text-center">
-            <p className="text-2xl font-bold">
-              {priceDisplay}
-              <span className="text-sm font-normal text-slate-500 dark:text-slate-400">
-                {' '}/ {lang === 'de' ? PRICE.period : PRICE.periodEN}
-              </span>
+        <div className="px-6 mt-5 space-y-2.5">
+          {/* Jahr (bester Wert, vorausgewählt) */}
+          <button
+            type="button"
+            onClick={() => setSelectedPlan('annual')}
+            aria-pressed={selectedPlan === 'annual'}
+            className={`relative w-full rounded-2xl border-2 p-4 text-left transition-colors ${
+              selectedPlan === 'annual'
+                ? 'border-primary-400 bg-primary-50/50 dark:bg-primary-900/10'
+                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+            }`}
+          >
+            <span className="absolute -top-2.5 right-4 px-2 py-0.5 rounded-full bg-primary-500 text-white text-[10px] font-semibold uppercase tracking-wide">
+              {lang === 'de' ? 'Bester Wert' : 'Best value'}
+            </span>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="font-semibold text-sm">{lang === 'de' ? 'Jährlich' : 'Yearly'}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {CURRENCY}{PRICES.annual.perMonth} / {lang === 'de' ? 'Monat' : 'month'}
+                  {' · '}
+                  {lang === 'de' ? '2 Monate gratis' : '2 months free'}
+                </p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="font-bold">{priceFor('annual')}</p>
+                <p className="text-[11px] text-primary-600 dark:text-primary-400 font-semibold">
+                  −{ANNUAL_SAVINGS}%
+                </p>
+              </div>
+            </div>
+          </button>
+
+          {/* Monat */}
+          <button
+            type="button"
+            onClick={() => setSelectedPlan('monthly')}
+            aria-pressed={selectedPlan === 'monthly'}
+            className={`w-full rounded-2xl border-2 p-4 text-left transition-colors ${
+              selectedPlan === 'monthly'
+                ? 'border-primary-400 bg-primary-50/50 dark:bg-primary-900/10'
+                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+            }`}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="font-semibold text-sm">{lang === 'de' ? 'Monatlich' : 'Monthly'}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {lang === 'de' ? 'Flexibel, monatlich kündbar' : 'Flexible, cancel monthly'}
+                </p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="font-bold">{priceFor('monthly')}</p>
+                <p className="text-[11px] text-slate-400">/ {lang === 'de' ? 'Monat' : 'month'}</p>
+              </div>
+            </div>
+          </button>
+
+          {!hadTrial && (
+            <p className="text-xs text-primary-600 dark:text-primary-400 mt-1 flex items-center justify-center gap-1 text-center">
+              <Sparkles className="w-3.5 h-3.5 shrink-0" />
+              {lang === 'de'
+                ? `${TRIAL_DAYS} Tage kostenlos, danach ${priceFor(selectedPlan)} / ${periodLabel(selectedPlan)}`
+                : `${TRIAL_DAYS} days free, then ${priceFor(selectedPlan)} / ${periodLabel(selectedPlan)}`}
             </p>
-            {!hadTrial && (
-              <p className="text-xs text-primary-600 dark:text-primary-400 mt-1 flex items-center justify-center gap-1">
-                <Sparkles className="w-3.5 h-3.5" />
-                {lang === 'de'
-                  ? `${TRIAL_DAYS} Tage kostenlos, danach ${priceDisplay}/${PRICE.period}`
-                  : `${TRIAL_DAYS} days free, then ${priceDisplay}/${PRICE.periodEN}`}
-              </p>
-            )}
-          </div>
+          )}
         </div>
         )}
 

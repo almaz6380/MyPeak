@@ -134,7 +134,47 @@ export async function startTrial(userId) {
 // `not_configured` zurück → die Paywall zeigt „bald verfügbar".
 // Die verbindliche Freischaltung (premium_until) kommt serverseitig über den
 // RevenueCat-Webhook; nach Erfolg refreshen wir den Status aus Supabase.
-export async function purchasePremium(userId) {
+// Nach erfolgreichem Kauf/Restore: Premium SOFORT optimistisch freischalten
+// (die UI soll nicht erst nach App-Neustart reagieren), dann den authoritativen
+// Server-Wert nachpollen. Der RevenueCat-Webhook setzt premium_until 1–3 s
+// später serverseitig — bis dahin überbrücken wir mit dem echten Ablaufdatum
+// aus dem Kauf (expiresAt) bzw. einer Laufzeit-Schätzung.
+function confirmPurchase(userId, planType, expiresAt) {
+  const current = readCache(userId);
+  const fallbackDays = planType === 'annual' ? 366 : 31;
+  const until = expiresAt || new Date(Date.now() + fallbackDays * 86400000).toISOString();
+  const optimistic = {
+    ...current,
+    user_id: userId,
+    status: 'premium',
+    premium_until: until,
+    provider: 'revenuecat',
+    updated_at: new Date().toISOString(),
+  };
+  writeCache(optimistic);
+  window.dispatchEvent(new CustomEvent('mypeak:subscription', { detail: optimistic }));
+
+  // Authoritativen Wert nachpollen (Webhook). Läuft im Hintergrund weiter.
+  (async () => {
+    if (isGuest(userId)) return;
+    for (const delay of [1500, 3000, 5000, 8000]) {
+      await new Promise((r) => setTimeout(r, delay));
+      try {
+        const { data, error } = await supabase
+          .from('subscriptions').select('*').eq('user_id', userId).maybeSingle();
+        if (!error && data?.premium_until && new Date(data.premium_until).getTime() > Date.now()) {
+          writeCache(data);
+          window.dispatchEvent(new CustomEvent('mypeak:subscription', { detail: data }));
+          return; // serverseitig bestätigt
+        }
+      } catch { /* weiter versuchen */ }
+    }
+    // Webhook noch nicht durch: optimistischer Wert bleibt; nächster
+    // getSubscription (App-Fokus/Neustart) holt den echten Wert nach.
+  })();
+}
+
+export async function purchasePremium(userId, planType = 'monthly') {
   if (!userId || isGuest(userId)) {
     return { ok: false, reason: 'login_required' };
   }
@@ -142,11 +182,9 @@ export async function purchasePremium(userId) {
   if (!rc.isConfigured()) {
     return { ok: false, reason: 'provider_not_configured' };
   }
-  const res = await rc.purchase(userId);
+  const res = await rc.purchase(userId, planType);
   if (res.ok) {
-    // Cloud-Status nachladen (Webhook hat premium_until gesetzt); der
-    // Hintergrund-Refresh in getSubscription feuert das mypeak:subscription-Event.
-    getSubscription(userId).catch(() => {});
+    confirmPurchase(userId, planType, res.expiresAt); // optimistisch + Nachpolling
   }
   return res;
 }
@@ -161,18 +199,34 @@ export async function restorePurchases(userId) {
     return { ok: false, reason: 'provider_not_configured' };
   }
   const res = await rc.restore(userId);
-  if (res.ok) getSubscription(userId).catch(() => {});
+  if (res.ok && res.entitlementActive) {
+    confirmPurchase(userId, 'monthly', res.expiresAt); // optimistisch + Nachpolling
+  } else if (res.ok) {
+    getSubscription(userId).catch(() => {}); // kein aktives Abo → nur Status auffrischen
+  }
   return res;
 }
 
-// Lokalisierten Store-Preis holen (oder null → UI nutzt die Konstante).
-export async function getPremiumPriceString(userId) {
+// Lokalisierten Store-Preis eines Plans holen (oder null → UI nutzt die Konstante).
+export async function getPremiumPriceString(userId, planType = 'monthly') {
   if (!userId || isGuest(userId)) return null;
   try {
     const rc = await import('../lib/revenuecat');
     if (!rc.isConfigured()) return null;
-    return await rc.getPremiumPriceString(userId);
+    return await rc.getPremiumPriceString(userId, planType);
   } catch {
     return null;
+  }
+}
+
+// Beide lokalisierten Store-Preise (Monat + Jahr) in einem Abruf.
+export async function getPremiumPrices(userId) {
+  if (!userId || isGuest(userId)) return { monthly: null, annual: null };
+  try {
+    const rc = await import('../lib/revenuecat');
+    if (!rc.isConfigured()) return { monthly: null, annual: null };
+    return await rc.getPremiumPrices(userId);
+  } catch {
+    return { monthly: null, annual: null };
   }
 }

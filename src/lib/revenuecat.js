@@ -77,9 +77,17 @@ async function currentOffering() {
   }
 }
 
-function monthlyPackage(offering) {
+// Package für den gewünschten Plan auflösen. Jahr wird STRIKT per Typ/Identifier
+// gematcht (kein Index-Fallback → sonst könnte bei zwei Packages das falsche
+// greifen). Monat behält einen Fallback aufs erste Package, damit der bereits
+// live laufende Monatsweg nicht regressiert, falls der Identifier mal fehlt.
+function packageFor(offering, planType = 'monthly') {
   if (!offering?.availablePackages?.length) return null;
-  // Bevorzugt das als "monthly" markierte Package, sonst das erste.
+  if (planType === 'annual') {
+    return (
+      offering.availablePackages.find((p) => p.packageType === 'ANNUAL' || p.identifier === '$rc_annual') || null
+    );
+  }
   return (
     offering.availablePackages.find((p) => p.packageType === 'MONTHLY' || p.identifier === '$rc_monthly') ||
     offering.availablePackages[0]
@@ -112,32 +120,59 @@ function entitlementActive(customerInfo) {
   }
 }
 
-// Öffentlich: lokalisierter Store-Preis (oder null → UI nimmt die Konstante).
-export async function getPremiumPriceString(userId) {
+// Ablaufzeitpunkt des Premium-Entitlements als ISO-String (oder null).
+// Erlaubt der App, nach dem Kauf sofort mit dem ECHTEN Ablauf optimistisch
+// freizuschalten, bevor der Webhook premium_until serverseitig setzt.
+function entitlementExpiry(customerInfo) {
+  try {
+    const ent = customerInfo?.entitlements?.active?.[PREMIUM_ENTITLEMENT];
+    const exp = ent?.expirationDate ?? ent?.expiresDate ?? null;
+    if (!exp) return null;
+    if (typeof exp === 'number') return new Date(exp).toISOString();
+    if (exp instanceof Date) return exp.toISOString();
+    return new Date(exp).toISOString(); // ISO-String
+  } catch {
+    return null;
+  }
+}
+
+// Öffentlich: lokalisierter Store-Preis eines Plans (oder null → UI nimmt die Konstante).
+export async function getPremiumPriceString(userId, planType = 'monthly') {
   const ready = await ensure(userId);
   if (!ready.ok) return null;
   const offering = await currentOffering();
-  const pkg = monthlyPackage(offering);
+  const pkg = packageFor(offering, planType);
   return priceStringFromPackage(pkg, sdk?.kind);
 }
 
-// Öffentlich: Premium kaufen. Gibt Zugang optimistisch zurück; die
-// verbindliche Freischaltung kommt über den Webhook.
-export async function purchase(userId) {
+// Öffentlich: beide lokalisierten Store-Preise auf einmal (ein Offering-Abruf).
+export async function getPremiumPrices(userId) {
+  const ready = await ensure(userId);
+  if (!ready.ok) return { monthly: null, annual: null };
+  const offering = await currentOffering();
+  return {
+    monthly: priceStringFromPackage(packageFor(offering, 'monthly'), sdk?.kind),
+    annual: priceStringFromPackage(packageFor(offering, 'annual'), sdk?.kind),
+  };
+}
+
+// Öffentlich: Premium kaufen (planType 'monthly' | 'annual'). Gibt Zugang
+// optimistisch zurück; die verbindliche Freischaltung kommt über den Webhook.
+export async function purchase(userId, planType = 'monthly') {
   const ready = await ensure(userId);
   if (!ready.ok) return { ok: false, reason: ready.reason };
 
   const offering = await currentOffering();
-  const pkg = monthlyPackage(offering);
+  const pkg = packageFor(offering, planType);
   if (!pkg) return { ok: false, reason: 'no_offering' };
 
   try {
     if (sdk.kind === 'web') {
       const result = await sdk.purchases.purchase({ rcPackage: pkg });
-      return { ok: true, entitlementActive: entitlementActive(result?.customerInfo) };
+      return { ok: true, entitlementActive: entitlementActive(result?.customerInfo), expiresAt: entitlementExpiry(result?.customerInfo) };
     }
     const result = await sdk.purchases.purchasePackage({ aPackage: pkg });
-    return { ok: true, entitlementActive: entitlementActive(result?.customerInfo) };
+    return { ok: true, entitlementActive: entitlementActive(result?.customerInfo), expiresAt: entitlementExpiry(result?.customerInfo) };
   } catch (err) {
     // Abbruch durch den Nutzer sauber melden.
     const cancelled = err?.userCancelled || err?.code === 'PurchaseCancelledError' || /cancel/i.test(err?.message || '');
@@ -157,7 +192,7 @@ export async function restore(userId) {
       const r = await sdk.purchases.restorePurchases();
       customerInfo = r?.customerInfo;
     }
-    return { ok: true, entitlementActive: entitlementActive(customerInfo) };
+    return { ok: true, entitlementActive: entitlementActive(customerInfo), expiresAt: entitlementExpiry(customerInfo) };
   } catch (err) {
     console.error('RevenueCat restore failed:', err?.message);
     return { ok: false, reason: 'restore_failed' };

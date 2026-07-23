@@ -15,7 +15,7 @@ import { canChangeAdConsent, changeAdConsent } from '../lib/ads';
 import { clearAllLocalPhotos } from '../data/exercisePhotos';
 
 // Sichtbare Build-Kennung — muss bei jedem neuen Store-Build mitgezogen werden (siehe android/app/build.gradle)
-const APP_VERSION = '1.1.6 (11)';
+const APP_VERSION = '1.1.8 (13)';
 
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
