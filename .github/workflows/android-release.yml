@@ -1,0 +1,119 @@
+# Android bauen, signieren und zu Google Play hochladen — auf GitHubs Rechnern.
+# Damit braucht ein Release keinen Mac mehr und laesst sich aus jeder Claude-Sitzung
+# ausloesen (Actions -> "Android Release" -> Run workflow).
+#
+# Einmalige Einrichtung: siehe docs/release-ci.md (fuenf Android-Secrets).
+# WICHTIG: versionCode in android/app/build.gradle vorher erhoehen — Play lehnt
+# einen bereits benutzten versionCode ab.
+name: Android Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      rollout:
+        description: 'An wie viele Nutzer veroeffentlichen?'
+        type: choice
+        default: 'complete'
+        options: ['complete', '0.2', '0.5']
+      notes:
+        description: 'Was-ist-neu-Text (de-DE)'
+        type: string
+        default: 'Fehlerkorrekturen und Verbesserungen.'
+      upload:
+        description: 'Wirklich zu Play hochladen? (aus = nur bauen und als Artefakt ablegen)'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'   # Capacitor 8 / AGP 8.13 brauchen JDK 21
+
+      - name: Abhaengigkeiten
+        run: npm ci
+
+      - name: Keine Test-Werbung im Release
+        run: |
+          if ! grep -q 'const USE_TEST_ADS = false' src/lib/ads.js; then
+            echo "ABBRUCH: USE_TEST_ADS steht nicht auf false — es wuerden Test-Anzeigen ausgeliefert."
+            exit 1
+          fi
+          echo "ok — echte Anzeigen-IDs"
+
+      - name: Versionsnummer anzeigen
+        run: |
+          VC=$(grep -m1 versionCode android/app/build.gradle | tr -dc '0-9')
+          VN=$(grep -m1 versionName android/app/build.gradle | cut -d'"' -f2)
+          echo "versionCode $VC · versionName $VN"
+          echo "VC=$VC" >> "$GITHUB_ENV"
+          echo "VN=$VN" >> "$GITHUB_ENV"
+
+      - name: Web-Bundle + Capacitor-Sync
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_REVENUECAT_ANDROID_KEY: ${{ secrets.VITE_REVENUECAT_ANDROID_KEY }}
+        run: |
+          npm run build
+          npx cap sync android
+
+      - name: Signaturschluessel bereitstellen
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          printf '%s' "$KEYSTORE_B64" | tr -cd 'A-Za-z0-9+/=' | base64 -d > android/upload-keystore.jks
+          # storeFile laeuft hier ueber rootProject.file(), also relativ zu android/.
+          cat > android/keystore.properties <<EOF
+          storeFile=upload-keystore.jks
+          storePassword=$STORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+
+      - name: AAB bauen
+        run: cd android && ./gradlew --no-daemon bundleRelease
+
+      - name: AAB als Artefakt ablegen
+        uses: actions/upload-artifact@v4
+        with:
+          name: MyPeak-${{ env.VN }}-vc${{ env.VC }}
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+      - name: Zu Google Play hochladen
+        if: ${{ inputs.upload }}
+        env:
+          PLAY_KEY_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          ROLLOUT: ${{ inputs.rollout }}
+          NOTES: ${{ inputs.notes }}
+        run: |
+          # Eigene venv: Ubuntu-Runner erlauben kein pip3 install ins System-Python.
+          python3 -m venv /tmp/venv
+          /tmp/venv/bin/pip install --quiet pyjwt cryptography
+          printf '%s' "$PLAY_KEY_JSON" > /tmp/play-key.json
+          if [ "$ROLLOUT" = "complete" ]; then ARG="--complete"; else ARG="--fraction $ROLLOUT"; fi
+          PLAY_KEY=/tmp/play-key.json /tmp/venv/bin/python scripts/play-upload.py \
+            --aab android/app/build/outputs/bundle/release/app-release.aab \
+            $ARG --notes "$NOTES"
+          rm -f /tmp/play-key.json
+
+      - name: Schluessel aufraeumen
+        if: always()
+        run: rm -f android/upload-keystore.jks android/keystore.properties /tmp/play-key.json
