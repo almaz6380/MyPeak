@@ -128,7 +128,33 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
 - **iOS:** IPA bei App Store Connect eingereicht (App-ID 6788461300, Bundle at.gallab.mypeak). Manuelle Distributions-Signierung im pbxproj (Team JU8STVD4SJ, Profil „MyPeak AppStore"). Build: `xcodebuild ... archive` + `-exportArchive` (ExportOptions auf ~/Desktop/mypeak-ios-export/), Upload via `altool` (ASC-Key VGHCB8Z8Q2). Metadaten per ASC-API gesetzt.
 - **Werbung (AdMob, `src/lib/ads.js`):** Interstitials (jede 2. qualifizierende Aktion, ≥90s Abstand) nach Workout-Speichern + Mahlzeit-Hinzufügen, mit DSGVO-Einwilligung (UMP, nativ in @capacitor-community/admob@8). `USE_TEST_ADS`-Flag: `false`=echte Anzeigen (Launch). Echte IDs (Konto pub-8860791993288062): Android App `~3613953701`/Interstitial `/7984478947`, iOS App `~8812263899`/Interstitial `/5028931559`. **NIE eigene Live-Anzeigen anklicken** (Kontosperre). Nur nativ — Web zeigt keine Ads.
 - **Store-Assets:** `store-assets/` (Screenshots iOS+Android, iPad, Feature-Grafik, App-Icon, `store-texte.md`). Review-Demo-Account: appreview@wellbooked.at / MyPeak-Review#2026.
-- **Offen nach Launch:** AdMob-App↔Store verknüpfen; iOS-Update 1.1 (Englisch) liegt auf Branch i18n-en.
+- **Offen nach Launch:** ~~AdMob-App↔Store verknüpfen~~ (am 29.07.2026 erledigt, siehe unten);
+  iOS-Update 1.1 (Englisch) liegt auf Branch i18n-en.
+
+### AdMob: Store-Verknüpfung + app-ads.txt (29.07.2026) — ERLEDIGT
+- **Android-App in AdMob war nie mit dem Play-Eintrag verknüpft** („Details zum App-Shop" leer,
+  Genehmigungsstatus „Überprüfung nötig"). **Das ist die wahrscheinlichste Erklärung für die
+  bis dahin null Impressionen** — trotz `USE_TEST_ADS = false` und korrekter Produktiv-IDs
+  (`~3613953701`) wird eine nicht genehmigte App nicht ausgeliefert. Verknüpft über
+  AdMob → App-Einstellungen → Details zum App-Shop → Hinzufügen, Suche mit der vollständigen
+  **URL** `https://play.google.com/store/apps/details?id=at.gallab.mypeak` (die nackte Paket-
+  oder App-ID findet die Suche NICHT).
+- **`public/app-ads.txt`** ergänzt: `google.com, pub-8860791993288062, DIRECT, f08c47fec0942fa0`.
+  Ohne sie kaufen Werbetreibende, die nur bei autorisierten Verkäufern einkaufen, unser Inventar
+  nicht — sichtbar nur an niedrigerem eCPM, nie als Fehlermeldung. Die Publisher-ID gilt
+  **kontoweit**, dieselbe Zeile liegt bei Mahjong Royale und Swaply.
+- **Wo Google sie sucht:** an der Website aus dem Play-Eintrag (`contactWebsite`, aktuell
+  `https://my-peak.vercel.app`) + `/app-ads.txt`. Ändert sich die Domain im Store, muss die Datei
+  mitwandern, sonst ist sie wirkungslos.
+- **Achtung, SPA-Falle:** `vercel.json` hat einen Catch-all `"/(.*)" → "/index.html"`, d. h. **jeder**
+  unbekannte Pfad antwortet mit `200` und HTML statt mit `404`. Für app-ads.txt ist das entschärft,
+  weil Vercel-`rewrites` erst greifen, wenn keine echte Datei passt — `public/` landet in der
+  Deploy-Wurzel und schlägt den Catch-all (an `favicon.svg`/`icon-192.png` verifiziert). **Eine
+  Änderung an `vercel.json` war deshalb NICHT nötig.** Beim Prüfen aber nicht auf den Statuscode
+  hereinfallen: `200` allein beweist nichts, es zählt `Content-Type: text/plain` plus Inhalt.
+- **Prüfen:** `curl -sD- https://my-peak.vercel.app/app-ads.txt | head -3` — muss `text/plain` und
+  die Zeile zeigen. Googles Bestätigung in AdMob läuft als täglicher Crawl, nicht sofort; die
+  Meldung „konnte nicht bestätigt werden" direkt nach dem Verknüpfen ist normal.
 
 ### Launch-Fixes (Juli 2026, Branch launch-fixes) — FERTIG
 - [x] Rechtsseiten Impressum/Datenschutz/AGB (`/legal/*`, `src/pages/legal/`) — Betreiberdaten in `legalContent.js` eingetragen (Josef Gallab, Oberhofenweg 21b, 6380 St. Johann in Tirol; kontakt@wellbooked.at).
