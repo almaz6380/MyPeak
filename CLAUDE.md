@@ -48,13 +48,31 @@ Coach bereits an, Quellen zu nennen und niemals welche zu erfinden.
 Prüfung eingereicht → Apple bricht ab.
 → Code-Seite behoben: `PURCHASE_ENABLED.ios = true` in `PaywallPage.jsx`.
 
-**⚠️ NOCH OFFEN (nur Josef, in App Store Connect):**
-1. **Review-Screenshot** beim Abo `mypeak_premium_monthly` hochladen (steht auf „Missing Metadata")
-2. **IAP-Produkt zusammen mit der Version** einreichen, nicht separat
-3. Anzeigename auf `FullRep: Training & Ernährung`, neuer Build (iOS Build 3 → 4), `npx cap sync`
-4. Die **neuen** iPhone-/iPad-Screenshots aus `store-assets/ios` bzw. `store-assets/ios-ipad`
+**⚠️ NOCH OFFEN (iOS) — blockiert an fehlenden Secrets, nicht am Code:**
+Der Preflight-Lauf vom 30.07. (Run #1) sagt eindeutig: von zehn Release-Secrets ist
+**nur `PLAY_SERVICE_ACCOUNT_JSON` gesetzt**, die neun iOS-relevanten fehlen alle. Deshalb
+läuft `ios-release.yml` nicht, und die ASC-API ist von hier aus nicht erreichbar — es geht
+nichts iOS-seitiges ohne Josef, auch kein Umweg.
+
+| Secret | Woher |
+|---|---|
+| `IOS_CERT_P12_BASE64`, `IOS_CERT_PASSWORD` | Distributionszertifikat als .p12 exportieren, `base64 -i cert.p12 \| pbcopy` |
+| `IOS_PROVISIONING_PROFILE_BASE64` | Profil „MyPeak AppStore", genauso base64 |
+| `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8_BASE64` | ASC → Benutzer und Zugriff → Integrationen (vorhandener Key VGHCB8Z8Q2) |
+| `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_REVENUECAT_IOS_KEY` | aus der lokalen `.env` |
+
+Setzen mit `gh secret set <NAME> --repo almaz6380/MyPeak < datei` — so geht kein Schlüssel
+durch einen Chat. Danach `release-preflight.yml` laufen lassen: muss zehnmal „gesetzt" zeigen.
+
+**Danach, in dieser Reihenfolge:**
+1. `ios-release.yml` auslösen (Build 4 liegt schon im `project.pbxproj`, `cap sync` macht der
+   Workflow selbst)
+2. In ASC: **Review-Screenshot** beim Abo `mypeak_premium_monthly` (steht auf „Missing Metadata")
+3. **IAP-Produkt zusammen mit der Version** einreichen, nicht separat — daran ist 2.1(b) gescheitert
+4. Anzeigename auf `FullRep: Training & Ernährung`
+5. Die **neuen** iPhone-/iPad-Screenshots aus `store-assets/ios` bzw. `store-assets/ios-ipad`
    hochladen — zusammen mit dem Build, nicht in die laufende Einreichung hinein.
-   (Android ist erledigt, siehe unten.)
+   (Android ist komplett erledigt, siehe unten.)
 
 ### Store-Screenshots neu + Play-Upload automatisiert (30.07.2026)
 **18 neue Screenshots** (6 Motive × iPhone 6,9″ / iPad 12,9″ / Android) in `store-assets/`.
@@ -64,8 +82,12 @@ das Skript weder Supabase-Zugang noch den Review-Account; die Demo-Daten kommen 
 `addInitScript` in localStorage. Zwei Gastmodus-Artefakte (Hinweisbanner, Platzhaltername
 „Gast") werden vor dem Auslösen weggeräumt — beides existiert im angemeldeten Betrieb nicht.
 
-**Android-Screenshots sind live** (de-DE, `phoneScreenshots`, 30.07. 19:09 UTC): alte Bilder
-gelöscht, sechs neue in Dateinamen-Reihenfolge hochgeladen, Edit committet.
+**Android ist damit komplett umgestellt** (de-DE, 30.07.):
+- **19:09 UTC — Screenshots:** alte Bilder gelöscht, sechs neue in Dateinamen-Reihenfolge
+  hochgeladen, Edit committet.
+- **19:22 UTC — Texte:** Titel `MyPeak: Fitness & Ernährung` → **`FullRep: Training &
+  Ernährung`**, Volltext MyPeak → FullRep. Die Kurzbeschreibung stand schon richtig.
+  Google prüft eine Titeländerung nach; im Store schlägt sie mit Verzögerung durch.
 
 **Der Upload läuft auf GitHubs Rechnern, nicht hier** — das Dienstkonto-JSON liegt als Secret
 `PLAY_SERVICE_ACCOUNT_JSON` und verlässt die Secrets nie.
@@ -147,7 +169,8 @@ nutzt `.splash-circle` / `.splash-parts`. Die alten Klassen `ptr-line-animate`, 
 1. ~~Logo-Redesign~~ — **erledigt**, siehe „Neues Logo" oben.
 2. **Register-Check FullRep** — EUIPO/DPMA/Patentamt AT, Klassen 9, 25, 41, 44; Domain `.app`/`.com`.
 3. **Domain-Umzug** — danach `my-peak.vercel.app` → neue Domain, dazu Supabase-Redirect-URLs (Login-Bestätigung, Passwort-Reset), RevenueCat-Webhook-URL, OG-Tags, Store-URLs.
-4. **Store-Anzeigenamen** in App Store Connect + Play Console ändern (Bundle-IDs bleiben).
+4. **Store-Anzeigename**: Play **erledigt** (30.07. per API); App Store Connect offen.
+   Bundle-IDs bleiben in beiden Fällen.
 5. ~~Store-Screenshots~~ — Android **erledigt** (live in de-DE); iOS/iPad liegen fertig in
    `store-assets/`, gehen mit dem nächsten Build hoch. Siehe eigenen Abschnitt oben.
 
