@@ -32,6 +32,12 @@ export const diets = [
       calorie_offset: -500,
       protein_per_kg: 2.0,
     },
+    references: [
+      { authors: 'Byrne, N.M. et al.', year: 2018, title: 'Intermittent energy restriction improves weight loss efficiency in obese men: the MATADOR study',
+        source: 'International Journal of Obesity 42:129–138', url: 'https://www.nature.com/articles/ijo2017206' },
+      { authors: 'Helms, E.R., Aragon, A.A. & Fitschen, P.J.', year: 2014, title: 'Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation',
+        source: 'Journal of the International Society of Sports Nutrition 11:20', url: 'https://pubmed.ncbi.nlm.nih.gov/24864135/' },
+    ],
     sections: [
       {
         titleDE: 'Was ist das klassische Kaloriendefizit?',
@@ -219,6 +225,12 @@ Finally, the "yo-yo effect" is a real risk: after ending the diet, many return t
         { weeks: 2, calorie_change: 100 },
       ],
     },
+    references: [
+      { authors: 'Byrne, N.M. et al.', year: 2018, title: 'Intermittent energy restriction improves weight loss efficiency in obese men: the MATADOR study',
+        source: 'International Journal of Obesity 42:129–138', url: 'https://www.nature.com/articles/ijo2017206' },
+      { authors: 'Anderson, J.W. et al.', year: 2001, title: 'Long-term weight-loss maintenance: a meta-analysis of US studies',
+        source: 'American Journal of Clinical Nutrition 74(5):579–584' },
+    ],
     sections: [
       {
         titleDE: 'Was ist Reverse Dieting?',
@@ -414,6 +426,12 @@ Finally, some individuals may never reach their "old" maintenance calories — p
       calorie_offset: 0,
       protein_per_kg: 2.2,
     },
+    references: [
+      { authors: 'Morton, R.W. et al.', year: 2018, title: 'A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength',
+        source: 'British Journal of Sports Medicine 52(6):376–384', url: 'https://pubmed.ncbi.nlm.nih.gov/29462923/' },
+      { authors: 'Helms, E.R., Aragon, A.A. & Fitschen, P.J.', year: 2014, title: 'Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation',
+        source: 'Journal of the International Society of Sports Nutrition 11:20', url: 'https://pubmed.ncbi.nlm.nih.gov/24864135/' },
+    ],
     sections: [
       {
         titleDE: 'Was ist Body Recomposition?',
@@ -615,6 +633,12 @@ A methodological error is incorrect self-assessment: advanced trainees frequentl
       calorie_offset: -300,
       protein_per_kg: 2.0,
     },
+    references: [
+      { authors: 'Byrne, N.M. et al.', year: 2018, title: 'Intermittent energy restriction improves weight loss efficiency in obese men: the MATADOR study',
+        source: 'International Journal of Obesity 42:129–138', url: 'https://www.nature.com/articles/ijo2017206' },
+      { authors: 'Helms, E.R., Aragon, A.A. & Fitschen, P.J.', year: 2014, title: 'Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation',
+        source: 'Journal of the International Society of Sports Nutrition 11:20', url: 'https://pubmed.ncbi.nlm.nih.gov/24864135/' },
+    ],
     sections: [
       {
         titleDE: 'Was ist Intermittierendes Fasten (16:8)?',
@@ -826,6 +850,12 @@ Dehydration is an often-overlooked risk. Many people receive a significant porti
       calorie_offset: -400,
       protein_per_kg: 2.8
     },
+    references: [
+      { authors: 'Morton, R.W. et al.', year: 2018, title: 'A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength',
+        source: 'British Journal of Sports Medicine 52(6):376–384', url: 'https://pubmed.ncbi.nlm.nih.gov/29462923/' },
+      { authors: 'Helms, E.R., Aragon, A.A. & Fitschen, P.J.', year: 2014, title: 'Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation',
+        source: 'Journal of the International Society of Sports Nutrition 11:20', url: 'https://pubmed.ncbi.nlm.nih.gov/24864135/' },
+    ],
     sections: [
       {
         titleDE: 'Was ist die High-Protein-Diät?',
@@ -897,6 +927,12 @@ Dehydration is an often-overlooked risk. Many people receive a significant porti
         { name: 'rest_day', calorie_change: -400, carb_ratio: 0.25 }
       ]
     },
+    references: [
+      { authors: 'Helms, E.R., Aragon, A.A. & Fitschen, P.J.', year: 2014, title: 'Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation',
+        source: 'Journal of the International Society of Sports Nutrition 11:20', url: 'https://pubmed.ncbi.nlm.nih.gov/24864135/' },
+      { authors: 'Impey, S.G. et al.', year: 2016, title: 'Fuel for the work required: a practical approach to amalgamating train-low paradigms',
+        source: 'Sports Medicine 46:1815–1824' },
+    ],
     sections: [
       {
         titleDE: 'Was ist Carb Cycling?',
@@ -968,6 +1004,10 @@ Dehydration is an often-overlooked risk. Many people receive a significant porti
         { name: 'maintenance', weeks: 1, calorie_change: 0 }
       ]
     },
+    references: [
+      { authors: 'Byrne, N.M. et al.', year: 2018, title: 'Intermittent energy restriction improves weight loss efficiency in obese men: the MATADOR study',
+        source: 'International Journal of Obesity 42:129–138', url: 'https://www.nature.com/articles/ijo2017206' },
+    ],
     sections: [
       {
         titleDE: 'Was ist ein Diet Break?',
@@ -1035,6 +1075,12 @@ Dehydration is an often-overlooked risk. Many people receive a significant porti
       calorie_offset: -800,
       protein_per_kg: 2.5
     },
+    references: [
+      { authors: 'Byrne, N.M. et al.', year: 2018, title: 'Intermittent energy restriction improves weight loss efficiency in obese men: the MATADOR study',
+        source: 'International Journal of Obesity 42:129–138', url: 'https://www.nature.com/articles/ijo2017206' },
+      { authors: 'Helms, E.R., Aragon, A.A. & Fitschen, P.J.', year: 2014, title: 'Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation',
+        source: 'Journal of the International Society of Sports Nutrition 11:20', url: 'https://pubmed.ncbi.nlm.nih.gov/24864135/' },
+    ],
     sections: [
       {
         titleDE: 'Was ist ein Mini Cut?',

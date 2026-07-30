@@ -28,6 +28,12 @@ export const nutritionTopics = [
       { label: 'Core idea', text: 'Deficit → lose, surplus → gain, maintenance → stable. Calories are king.' },
       { label: 'Practice', text: 'Estimate TDEE, set a target, observe 2–3 weeks, then adjust.' },
     ],
+    references: [
+      { authors: 'Helms, E.R., Aragon, A.A. & Fitschen, P.J.', year: 2014, title: 'Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation',
+        source: 'Journal of the International Society of Sports Nutrition 11:20', url: 'https://pubmed.ncbi.nlm.nih.gov/24864135/' },
+      { authors: 'Hall, K.D. & Guo, J.', year: 2017, title: 'Obesity energetics: body weight regulation and the effects of diet composition',
+        source: 'Gastroenterology 152(7):1718–1727' },
+    ],
     sections: [
       {
         titleDE: 'Das Prinzip der Energiebilanz',
@@ -119,6 +125,12 @@ Food quality, protein and satiety determine how pleasant and healthy it is to ma
     quickEN: [
       { label: 'Target', text: 'About 1.6–2.2 g per kg body weight daily; toward the upper end when dieting.' },
       { label: 'Sources', text: 'Meat, fish, eggs, dairy, legumes, tofu, whey/protein powder.' },
+    ],
+    references: [
+      { authors: 'Morton, R.W. et al.', year: 2018, title: 'A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength',
+        source: 'British Journal of Sports Medicine 52(6):376–384', url: 'https://pubmed.ncbi.nlm.nih.gov/29462923/' },
+      { authors: 'Helms, E.R., Aragon, A.A. & Fitschen, P.J.', year: 2014, title: 'Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation',
+        source: 'Journal of the International Society of Sports Nutrition 11:20', url: 'https://pubmed.ncbi.nlm.nih.gov/24864135/' },
     ],
     sections: [
       {
@@ -212,6 +224,12 @@ The common warnings about "too much" protein are unfounded for healthy people. P
       { label: 'Function', text: 'Main fuel for intense effort; fill glycogen stores in muscles and liver.' },
       { label: 'Practice', text: 'Mostly fibre-rich, minimally processed sources; scale amount to activity.' },
     ],
+    references: [
+      { authors: 'Helms, E.R., Aragon, A.A. & Fitschen, P.J.', year: 2014, title: 'Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation',
+        source: 'Journal of the International Society of Sports Nutrition 11:20', url: 'https://pubmed.ncbi.nlm.nih.gov/24864135/' },
+      { authors: 'Hall, K.D. et al.', year: 2016, title: 'Energy expenditure and body composition changes after an isocaloric ketogenic diet in overweight and obese men',
+        source: 'American Journal of Clinical Nutrition 104(2):324–333' },
+    ],
     sections: [
       {
         titleDE: 'Was Kohlenhydrate im Körper tun',
@@ -303,6 +321,10 @@ Neither low-carb nor high-carb is inherently superior — both work with appropr
     quickEN: [
       { label: 'Minimum', text: 'Do not stay below ~0.5–0.8 g per kg body weight long term (hormone function).' },
       { label: 'Quality', text: 'Favour unsaturated fats (olive oil, nuts, fish); avoid trans fats.' },
+    ],
+    references: [
+      { authors: 'Helms, E.R., Aragon, A.A. & Fitschen, P.J.', year: 2014, title: 'Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation',
+        source: 'Journal of the International Society of Sports Nutrition 11:20', url: 'https://pubmed.ncbi.nlm.nih.gov/24864135/' },
     ],
     sections: [
       {
@@ -396,6 +418,10 @@ Above the minimum, the amount of fat is flexible and a matter of taste. Choose t
       { label: 'Basic rule', text: 'A variety of vegetables, fruit, whole grains and protein sources covers most micronutrients.' },
       { label: 'Watch', text: 'Vitamin D, omega-3, possibly iron (women), B12 (vegan), iodine, magnesium.' },
     ],
+    references: [
+      { authors: 'National Institutes of Health, Office of Dietary Supplements', title: 'Dietary Supplement Fact Sheets',
+        source: 'NIH ODS', url: 'https://ods.od.nih.gov/factsheets/list-all/' },
+    ],
     sections: [
       {
         titleDE: 'Was Mikronährstoffe sind',
@@ -487,6 +513,12 @@ Whole foods come before supplements. Variety and colour on the plate are the bes
     quickEN: [
       { label: 'Priority', text: 'Total calories and protein first — timing is fine-tuning, not the foundation.' },
       { label: 'Useful', text: 'Spread protein across the day; eat adequately around training.' },
+    ],
+    references: [
+      { authors: 'Helms, E.R., Aragon, A.A. & Fitschen, P.J.', year: 2014, title: 'Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation',
+        source: 'Journal of the International Society of Sports Nutrition 11:20', url: 'https://pubmed.ncbi.nlm.nih.gov/24864135/' },
+      { authors: 'Schoenfeld, B.J., Aragon, A.A. & Krieger, J.W.', year: 2013, title: 'The effect of protein timing on muscle strength and hypertrophy: a meta-analysis',
+        source: 'Journal of the International Society of Sports Nutrition 10:53' },
     ],
     sections: [
       {

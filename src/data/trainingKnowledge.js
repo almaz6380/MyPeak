@@ -29,6 +29,12 @@ export const trainingTopics = [
       { label: 'Core idea', text: 'Gradually more weight, reps, sets or better technique — the stimulus must keep rising.' },
       { label: 'For whom', text: 'All levels. Beginners progress fast; advanced lifters need smaller, more planned increments.' },
     ],
+    references: [
+      { authors: 'American College of Sports Medicine', year: 2009, title: 'Position Stand: Progression Models in Resistance Training for Healthy Adults',
+        source: 'Medicine & Science in Sports & Exercise 41(3):687–708', url: 'https://pubmed.ncbi.nlm.nih.gov/19204579/' },
+      { authors: 'DeLorme, T.L.', year: 1945, title: 'Restoration of muscle power by heavy-resistance exercises',
+        source: 'Journal of Bone and Joint Surgery 27(4):645–667' },
+    ],
     sections: [
       {
         titleDE: 'Was ist progressive Überlastung?',
@@ -120,6 +126,12 @@ Those who progress patiently and systematically build strength and muscle contin
     quickEN: [
       { label: 'Volume guideline', text: 'About 10–20 hard sets per muscle group per week for most trainees.' },
       { label: 'Frequency guideline', text: 'Training each muscle 2×/week usually beats 1× at equal weekly volume.' },
+    ],
+    references: [
+      { authors: 'Schoenfeld, B.J., Ogborn, D. & Krieger, J.W.', year: 2017, title: 'Dose-response relationship between weekly resistance training volume and increases in muscle mass: a systematic review and meta-analysis',
+        source: 'Journal of Sports Sciences 35(11):1073–1082', url: 'https://pubmed.ncbi.nlm.nih.gov/27805470/' },
+      { authors: 'American College of Sports Medicine', year: 2009, title: 'Position Stand: Progression Models in Resistance Training for Healthy Adults',
+        source: 'Medicine & Science in Sports & Exercise 41(3):687–708', url: 'https://pubmed.ncbi.nlm.nih.gov/19204579/' },
     ],
     sections: [
       {
@@ -213,6 +225,12 @@ Volume and frequency are not rigid rules but tools you adapt to your recovery ca
       { label: 'Main driver', text: 'Mechanical tension: sets close to failure with controlled technique.' },
       { label: 'Requirements', text: 'Enough protein (~1.6–2.2 g/kg), maintenance to slight surplus calories, sleep.' },
     ],
+    references: [
+      { authors: 'Schoenfeld, B.J., Ogborn, D. & Krieger, J.W.', year: 2017, title: 'Dose-response relationship between weekly resistance training volume and increases in muscle mass: a systematic review and meta-analysis',
+        source: 'Journal of Sports Sciences 35(11):1073–1082', url: 'https://pubmed.ncbi.nlm.nih.gov/27805470/' },
+      { authors: 'Damas, F. et al.', year: 2016, title: 'Resistance training-induced changes in integrated myofibrillar protein synthesis are related to hypertrophy only after attenuation of muscle damage',
+        source: 'The Journal of Physiology 594(18):5209–5222' },
+    ],
     sections: [
       {
         titleDE: 'Die Biologie des Muskelwachstums',
@@ -304,6 +322,12 @@ Muscle growth is a slow, cumulative process. Those who train hard patiently, eat
     quickEN: [
       { label: 'Basic rule', text: 'Muscle grows during rest. No recovery, no progress.' },
       { label: 'Key levers', text: 'Sleep (7–9 h), enough calories & protein, deload weeks, stress management.' },
+    ],
+    references: [
+      { authors: 'American College of Sports Medicine', year: 2009, title: 'Position Stand: Progression Models in Resistance Training for Healthy Adults',
+        source: 'Medicine & Science in Sports & Exercise 41(3):687–708', url: 'https://pubmed.ncbi.nlm.nih.gov/19204579/' },
+      { authors: 'Nedeltcheva, A.V. et al.', year: 2010, title: 'Insufficient sleep undermines dietary efforts to reduce adiposity',
+        source: 'Annals of Internal Medicine 153(7):435–441' },
     ],
     sections: [
       {
@@ -397,6 +421,12 @@ Recovery is not a sign of weakness but the part of training in which the actual 
       { label: 'Basic rule', text: 'Full range of motion, controlled, focused on the target muscle — technique before weight.' },
       { label: 'Why it matters', text: 'Better stimulus, lower injury risk, a clean basis for progression.' },
     ],
+    references: [
+      { authors: 'American College of Sports Medicine', year: 2009, title: 'Position Stand: Progression Models in Resistance Training for Healthy Adults',
+        source: 'Medicine & Science in Sports & Exercise 41(3):687–708', url: 'https://pubmed.ncbi.nlm.nih.gov/19204579/' },
+      { authors: 'Schoenfeld, B.J. & Grgic, J.', year: 2020, title: 'Effects of range of motion on muscle development during resistance training interventions: a systematic review',
+        source: 'SAGE Open Medicine 8' },
+    ],
     sections: [
       {
         titleDE: 'Warum Technik zählt',
@@ -488,6 +518,12 @@ Good technique is not a one-off but an ongoing priority. Those who maintain it t
     quickEN: [
       { label: 'Core idea', text: 'Plan training deliberately in phases instead of training the same every week.' },
       { label: 'For whom', text: 'Mainly advanced lifters; beginners do well with simple linear progression for a long time.' },
+    ],
+    references: [
+      { authors: 'American College of Sports Medicine', year: 2009, title: 'Position Stand: Progression Models in Resistance Training for Healthy Adults',
+        source: 'Medicine & Science in Sports & Exercise 41(3):687–708', url: 'https://pubmed.ncbi.nlm.nih.gov/19204579/' },
+      { authors: 'Williams, T.D. et al.', year: 2017, title: 'Comparison of periodized and non-periodized resistance training on maximal strength: a meta-analysis',
+        source: 'Sports Medicine 47(10):2083–2100' },
     ],
     sections: [
       {
