@@ -49,14 +49,29 @@ beschreibend, damit schützbar. Nachbarn zur Kenntnis: [fullreps.co.uk](https://
 **Freundescode:** Präfix `MP-` → **`FR-`**. Bestehende `MP-`-Codes funktionieren weiter
 (Lookup ist exakt), nur neue Codes bekommen `FR-`.
 
-**Icon-Pipeline neu:** Einzige Quelle ist `public/favicon.svg`. Daraus werden per Headless-Chromium
-+ Pillow gerendert: 2 Web-Icons, 18 Android-Icons (6 Dichten × launcher/round/foreground),
-1 iOS-Icon (1024, **ohne Alpha** — Apple lehnt Alpha ab), 26 Splash-Screens. Ein Logo-Wechsel =
-SVG tauschen + Skript erneut laufen lassen. (Nebenbei gefixt: die Splashes hatten weiße Ecken
+**Neues Logo (30.07.2026):** Schwarzes Icon, durchgehender goldener Kreisrahmen **ohne Füllung**,
+darin drei gleich große Felder (Y-förmige Trennlinien). Je Feld ein Symbol: **Hantel oben, Buch
+rechts, Apfel links** — alles in Gold `#fbbf24`. Die Symbole sind **1:1 die Lucide-Pfade**, die
+`src/components/BottomNav.jsx` importiert (`Dumbbell`, `BookOpen`, `Apple`, lucide-react v1.14.0).
+⚠️ **Nicht nachzeichnen oder ersetzen** — bei einem lucide-Update die Pfade erneut aus
+`node_modules/lucide-react/dist/esm/icons/*.mjs` übernehmen, in `public/favicon.svg` **und** in
+`FullRepLogo.jsx`. Der alte Zigzag-Pfeil ist weg.
+
+**Icon-Pipeline:** Einzige Quelle ist `public/favicon.svg`, Renderer ist **`scripts/render-icons.py`**
+(Headless-Chromium + Pillow). Erzeugt 47 Dateien: 2 Web-Icons, 18 Android-Icons (6 Dichten ×
+launcher/round/foreground), 1 iOS-Icon (1024, **ohne Alpha** — Apple lehnt Alpha ab), 26
+Splash-Screens. Logo-Wechsel = `favicon.svg` tauschen + `python3 scripts/render-icons.py`.
+`ic_launcher_background.png` bleibt unberührt. (Nebenbei gefixt: die Splashes hatten weiße Ecken
 um das Icon.)
 
+**In-App-Logo:** `FullRepLogo.jsx` exportiert zusätzlich `LogoParts` (Speichen + Symbole), das der
+`SplashScreen` mitbenutzt. Pull-to-Refresh animiert über `.ptr-circle-animate` (Kreis zeichnen,
+`stroke-dasharray: 1106` = Umfang bei r=176) und `.ptr-parts-animate` (Rest einblenden); der Splash
+nutzt `.splash-circle` / `.splash-parts`. Die alten Klassen `ptr-line-animate`, `ptr-arrow-animate`,
+`splash-line`, `splash-arrow` samt `draw-line`/`draw-arrow`-Keyframes sind entfernt.
+
 **⚠️ NOCH OFFEN:**
-1. **Logo-Redesign** — Josef zeichnet einen Entwurf; Empfehlung: Schriftzug aus dem Icon nehmen (bei 48 px unlesbar).
+1. ~~Logo-Redesign~~ — **erledigt**, siehe „Neues Logo" oben.
 2. **Register-Check FullRep** — EUIPO/DPMA/Patentamt AT, Klassen 9, 25, 41, 44; Domain `.app`/`.com`.
 3. **Domain-Umzug** — danach `my-peak.vercel.app` → neue Domain, dazu Supabase-Redirect-URLs (Login-Bestätigung, Passwort-Reset), RevenueCat-Webhook-URL, OG-Tags, Store-URLs.
 4. **Store-Anzeigenamen** in App Store Connect + Play Console ändern (Bundle-IDs bleiben).
@@ -655,7 +670,7 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 ## Design-Richtlinien
 
 - **Oberstes Prinzip:** Nicht überfüllt, einfach zu bedienen trotz vieler Features
-- **Logo:** Goldener Zigzag-Chart-Pfeil auf schwarzem Hintergrund mit "FullRep FITNESS" Text. Zentriert oben in allen Tab-Headern (pt-12 für Notch) + Favicon + PWA-Icon. Komponente: `src/components/FullRepLogo.jsx`
+- **Logo:** Goldener Kreisrahmen ohne Füllung auf schwarzem Grund, dreigeteilt; Hantel oben, Buch rechts, Apfel links (Lucide-Symbole aus der Bottom-Nav, 1:1). Zentriert oben in allen Tab-Headern (pt-12 für Notch) + Favicon + PWA-Icon. Komponente: `src/components/FullRepLogo.jsx`, Quelle `public/favicon.svg`
 - **Farbpalette Dark Mode (Standard):** Hintergrund #0a0a0a / #1a1a1a (Karten), Akzentfarbe Gold #fbbf24, Texte Cremeweiß #fef3c7, sekundäre Texte gedämpftes Gold
 - **Farbpalette Light Mode:** Hintergrund #ffffff / #f5f5f5, Akzentfarbe dunkleres Gold #b45309, Texte Schwarz/Dunkelgrau
 - **Primary-Farben:** Gold-Palette (primary-400: #fbbf24, primary-500: #f59e0b, primary-600: #d97706)
