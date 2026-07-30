@@ -72,9 +72,16 @@ gelöscht, sechs neue in Dateinamen-Reihenfolge hochgeladen, Edit committet.
 - `scripts/play-upload.py --screenshots store-assets/android --lang de-DE [--dry-run]`
   (eine Edit-Transaktion: `edits.insert` → `images.deleteall` → je Bild `images.upload` →
   `:validate` → `:commit`)
-- Workflow **`.github/workflows/play-screenshots.yml`**, nur `workflow_dispatch`, `dry_run`
-  standardmäßig **true**. Ein Live-Listing ändert man absichtlich, nicht als Nebenwirkung.
-  Immer erst trocken laufen lassen — die Ausgabe muss genau `01-…` bis `06-…` listen.
+- `scripts/play-upload.py --listing store-assets/play-listing.de-DE.json [--dry-run]`
+  setzt **Titel/Kurz-/Volltext** (PATCH, also bleibt stehen, was nicht in der Datei steht).
+  Die Texte liegen als versionierte JSON-Datei im Repo statt in Workflow-Eingaben —
+  so steht im Diff, was im Store landet. Längen (30/80/4000) prüft das Skript vorab.
+- Workflow **`.github/workflows/play-listing.yml`**, nur `workflow_dispatch`, Eingabe
+  `mode` = `screenshots` | `texte`, `dry_run` standardmäßig **true**. Ein Live-Listing
+  ändert man absichtlich, nicht als Nebenwirkung — immer erst trocken laufen lassen.
+- **`.github/workflows/release-preflight.yml`** meldet in Sekunden, welche Release-Secrets
+  gesetzt sind bzw. fehlen (nur „gesetzt"/„FEHLT", nie Werte). Vor jedem iOS-Lauf sinnvoll:
+  ein macOS-Lauf kostet sonst 20 Minuten bis zum Scheitern.
 
 ⚠️ **Abhängigkeit zum Merken:** Das Dienstkonto `play-upload@wellbooked-501311` liegt im
 GCP-Projekt **`wellbooked-501311`** (dem WELLbooked-Projekt, nicht FullRep). Für Play ist das
@@ -831,11 +838,12 @@ hingehört**, statt zu raten oder einen Umweg zu bauen.
 → Bild herunterladen, ins Repo legen, committen, im Chat zeigen. Ohne gesetzten
 `FAL_KEY` ist der Weg zu: dann sagen, dass die Variable in der Umgebung fehlt.
 
-**Auslösen in diesem Repo:** drei Workflows unter `.github/workflows/`, alle nur
-`workflow_dispatch` — `android-release.yml`, `ios-release.yml`, `play-screenshots.yml`.
+**Auslösen in diesem Repo:** vier Workflows unter `.github/workflows/`, alle nur
+`workflow_dispatch` — `android-release.yml`, `ios-release.yml`, `play-listing.yml`,
+`release-preflight.yml`.
 Auslösbar sind sie nur in der Fassung, die auf `main` liegt (GitHub liest
 `workflow_dispatch` vom Standard-Branch) — eine Änderung wirkt also erst nach dem Merge.
-Alle drei ziehen ihre Schlüssel aus den Repo-Secrets; `play-screenshots.yml` ist
-end-to-end erprobt (30.07.), die beiden Release-Workflows sind es noch nicht.
+Alle ziehen ihre Schlüssel aus den Repo-Secrets; `play-listing.yml` ist end-to-end
+erprobt (30.07.), die beiden Release-Workflows sind es noch nicht.
 Die Web-App deployt Vercel automatisch über GitHub. Vor jedem Release-Build prüfen:
 `USE_TEST_ADS` in `src/lib/ads.js` und `PURCHASE_ENABLED` in `PaywallPage.jsx`.

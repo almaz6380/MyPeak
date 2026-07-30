@@ -123,6 +123,59 @@ def lade_screenshots(tok, verzeichnis, lang, dry_run=False, image_type='phoneScr
     print('  committet — im Play-Eintrag jetzt sichtbar.')
 
 
+# Play weist Ueberlaenge erst beim Commit ab, mit einer wenig sprechenden
+# Meldung. Deshalb vorher selbst pruefen.
+LISTING_LIMITS = {'title': 30, 'shortDescription': 80, 'fullDescription': 4000}
+
+
+def setze_listing(tok, datei, lang, dry_run=False):
+    """Titel, Kurz- und Volltext des Store-Eintrags setzen.
+
+    Der Titel ist der Name, unter dem die App im Play Store steht — die
+    Paket-ID (at.gallab.mypeak) bleibt davon unberuehrt, die ist nach der
+    Veroeffentlichung unveraenderlich.
+
+    Gesendet wird per PATCH, also nur die Felder aus der Datei. Was der
+    Eintrag sonst noch hat (z. B. ein Promo-Video), bleibt stehen.
+    """
+    with open(datei, encoding='utf-8') as fh:
+        neu = json.load(fh)
+
+    unbekannt = set(neu) - set(LISTING_LIMITS)
+    if unbekannt:
+        sys.exit(f'Unbekannte Felder in {datei}: {", ".join(sorted(unbekannt))}')
+    for feld, grenze in LISTING_LIMITS.items():
+        if feld in neu and len(neu[feld]) > grenze:
+            sys.exit(f'{feld} ist {len(neu[feld])} Zeichen lang, erlaubt sind {grenze}.')
+
+    eid = call(tok, 'POST', f'{API}/applications/{PKG}/edits')['id']
+    url = f'{API}/applications/{PKG}/edits/{eid}/listings/{lang}'
+    alt = call(tok, 'GET', url)
+
+    print(f'Store-Eintrag {lang}:')
+    for feld in ('title', 'shortDescription', 'fullDescription'):
+        if feld not in neu:
+            continue
+        vorher, nachher = alt.get(feld, ''), neu[feld]
+        if vorher == nachher:
+            print(f'  {feld}: unveraendert')
+            continue
+        print(f'  {feld}:')
+        print(f'    vorher : {vorher[:70]}{"…" if len(vorher) > 70 else ""}')
+        print(f'    nachher: {nachher[:70]}{"…" if len(nachher) > 70 else ""}')
+
+    if dry_run:
+        call(tok, 'DELETE', f'{API}/applications/{PKG}/edits/{eid}')
+        print('\n--dry-run: Edit verworfen, am Eintrag hat sich nichts geaendert.')
+        return
+
+    call(tok, 'PATCH', url, data=dict(neu, language=lang))
+    call(tok, 'POST', f'{API}/applications/{PKG}/edits/{eid}:validate')
+    print('\n  validiert')
+    call(tok, 'POST', f'{API}/applications/{PKG}/edits/{eid}:commit')
+    print('  committet — der neue Name ist im Play Store gesetzt.')
+
+
 def zeige_status(tok, track='production'):
     eid = call(tok, 'POST', f'{API}/applications/{PKG}/edits')['id']
     tr = call(tok, 'GET', f'{API}/applications/{PKG}/edits/{eid}/tracks/{track}')
@@ -141,6 +194,8 @@ def main():
     p.add_argument('--status', action='store_true', help='nur den Track anzeigen')
     p.add_argument('--screenshots', metavar='VERZEICHNIS',
                    help='Store-Eintrag-Screenshots ersetzen (z. B. store-assets/android)')
+    p.add_argument('--listing', metavar='JSON',
+                   help='Titel/Beschreibung setzen (z. B. store-assets/play-listing.de-DE.json)')
     p.add_argument('--lang', default='de-DE', help='Sprache des Eintrags (Standard: de-DE)')
     p.add_argument('--dry-run', action='store_true',
                    help='nur auflisten, nichts hochladen — das Listing ist oeffentlich')
@@ -149,8 +204,8 @@ def main():
                    help='Play-Track (Standard: production)')
     a = p.parse_args()
 
-    if not (a.aab or a.promote or a.status or a.screenshots):
-        p.error('--aab, --promote, --status oder --screenshots angeben')
+    if not (a.aab or a.promote or a.status or a.screenshots or a.listing):
+        p.error('--aab, --promote, --status, --screenshots oder --listing angeben')
     if a.aab and not a.complete and a.fraction is None:
         p.error('--fraction 0.2 oder --complete angeben')
 
@@ -159,6 +214,8 @@ def main():
         return zeige_status(tok, a.track)
     if a.screenshots:
         return lade_screenshots(tok, a.screenshots, a.lang, a.dry_run)
+    if a.listing:
+        return setze_listing(tok, a.listing, a.lang, a.dry_run)
 
     eid = call(tok, 'POST', f'{API}/applications/{PKG}/edits')['id']
     print(f'Edit {eid} geöffnet')

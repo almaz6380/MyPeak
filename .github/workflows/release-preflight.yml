@@ -1,0 +1,63 @@
+name: Release-Preflight
+
+# Beantwortet in ein paar Sekunden die Frage, an der ein Release-Lauf sonst erst
+# nach 20 Minuten macOS-Zeit scheitert: liegen alle noetigen Secrets im Repo?
+#
+# Ausgegeben wird ausschliesslich "gesetzt" oder "FEHLT" — nie ein Wert, nie eine
+# Laenge, nie ein Praefix. Ein Schluessel, der irgendwo im Klartext auftaucht,
+# gilt als verbrannt.
+on:
+  workflow_dispatch:
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Secrets pruefen
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          IOS_CERT_P12_BASE64: ${{ secrets.IOS_CERT_P12_BASE64 }}
+          IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_REVENUECAT_IOS_KEY: ${{ secrets.VITE_REVENUECAT_IOS_KEY }}
+        run: |
+          fehlt=0
+          pruefe() {
+            if [ -n "${!1:-}" ]; then
+              printf '  %-34s gesetzt\n' "$1"
+            else
+              printf '  %-34s FEHLT\n' "$1"
+              fehlt=$((fehlt + 1))
+            fi
+          }
+
+          echo "Android (android-release.yml, play-listing.yml)"
+          pruefe PLAY_SERVICE_ACCOUNT_JSON
+
+          echo
+          echo "iOS-Signierung (ios-release.yml)"
+          for s in IOS_CERT_P12_BASE64 IOS_CERT_PASSWORD IOS_PROVISIONING_PROFILE_BASE64; do
+            pruefe "$s"
+          done
+
+          echo
+          echo "App Store Connect (Upload + ASC-API)"
+          for s in ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8_BASE64; do pruefe "$s"; done
+
+          echo
+          echo "Build-Umgebung (sonst startet die App ohne Backend)"
+          for s in VITE_SUPABASE_URL VITE_SUPABASE_ANON_KEY VITE_REVENUECAT_IOS_KEY; do
+            pruefe "$s"
+          done
+
+          echo
+          if [ "$fehlt" -gt 0 ]; then
+            echo "$fehlt Secret(s) fehlen — siehe docs/release-ci.md."
+          else
+            echo "Alle Secrets vorhanden."
+          fi
