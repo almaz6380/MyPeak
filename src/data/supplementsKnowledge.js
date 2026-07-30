@@ -28,6 +28,10 @@ export const supplementsTopics = [
       { label: 'Dosage', text: '3–5 g monohydrate daily, ongoing — timing irrelevant. Loading phase optional.' },
       { label: 'Effect', text: 'More strength and reps, supports muscle growth, well-evidenced and safe.' },
     ],
+    references: [
+      { authors: 'Kreider, R.B. et al.', year: 2017, title: 'International Society of Sports Nutrition position stand: safety and efficacy of creatine supplementation in exercise, sport, and medicine',
+        source: 'Journal of the International Society of Sports Nutrition 14:18', url: 'https://www.tandfonline.com/doi/abs/10.1186/s12970-017-0173-z' },
+    ],
     sections: [
       {
         titleDE: 'Was Kreatin ist und wie es wirkt',
@@ -120,6 +124,10 @@ If you were to choose only a single supplement for performance, creatine would b
       { label: 'Purpose', text: 'A practical addition to reach the daily protein target — not a must.' },
       { label: 'Choice', text: 'Whey (fast), casein (slow), plant-based (vegan). All effective at adequate amounts.' },
     ],
+    references: [
+      { authors: 'Morton, R.W. et al.', year: 2018, title: 'A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength in healthy adults',
+        source: 'British Journal of Sports Medicine 52(6):376–384', url: 'https://pubmed.ncbi.nlm.nih.gov/29462923/' },
+    ],
     sections: [
       {
         titleDE: 'Was Proteinpulver ist',
@@ -197,6 +205,10 @@ In summary, protein powder is a practical, not an essential product. It does not
     quickEN: [
       { label: 'Dosage', text: 'About 3–6 mg per kg body weight, 30–60 min before training.' },
       { label: 'Caution', text: 'Protect sleep (not late in the day), mind tolerance, test individual tolerability.' },
+    ],
+    references: [
+      { authors: 'Grgic, J. et al.', year: 2020, title: 'Wake up and smell the coffee: caffeine supplementation and exercise performance — an umbrella review of 21 published meta-analyses',
+        source: 'British Journal of Sports Medicine 54(11):681–688', url: 'https://pubmed.ncbi.nlm.nih.gov/30926628/' },
     ],
     sections: [
       {
@@ -290,6 +302,10 @@ Caffeine is safe in moderate amounts but can cause problems with overdosing or p
       { label: 'Source & dose', text: 'Oily fish 2–3×/week; as a supplement often ~1–2 g EPA+DHA daily.' },
       { label: 'Benefit', text: 'Cardiovascular and brain health, inflammation regulation; for vegans via algae oil.' },
     ],
+    references: [
+      { authors: 'National Institutes of Health, Office of Dietary Supplements', title: 'Omega-3 Fatty Acids — Fact Sheet for Health Professionals',
+        source: 'NIH ODS', url: 'https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/' },
+    ],
     sections: [
       {
         titleDE: 'Was Omega-3-Fettsäuren sind',
@@ -368,6 +384,12 @@ For health questions, existing conditions or medication use, medical consultatio
       { label: 'Source', text: 'Sunlight (skin), little from food. In winter a supplement is often needed.' },
       { label: 'Practice', text: 'With deficiency often ~1000–2000 IU/day; guide dose via blood test ideally.' },
     ],
+    references: [
+      { authors: 'National Institutes of Health, Office of Dietary Supplements', title: 'Vitamin D — Fact Sheet for Health Professionals',
+        source: 'NIH ODS', url: 'https://ods.od.nih.gov/factsheets/VitaminD-HealthProfessional/' },
+      { authors: 'Ross, A.C. et al.', year: 2011, title: 'The 2011 Report on Dietary Reference Intakes for Calcium and Vitamin D from the Institute of Medicine: What Clinicians Need to Know',
+        source: 'Journal of Clinical Endocrinology & Metabolism 96(1):53–58', url: 'https://academic.oup.com/jcem/article-abstract/96/1/53/2833225' },
+    ],
     sections: [
       {
         titleDE: 'Warum Vitamin D besonders ist',
@@ -445,6 +467,10 @@ In summary, vitamin D is one of the few supplements that actually has a real ben
     quickEN: [
       { label: 'Function', text: 'Muscle & nerve function, energy metabolism, sleep, bones.' },
       { label: 'Sources', text: 'Nuts, seeds, whole grains, legumes, green vegetables; supplement if needed.' },
+    ],
+    references: [
+      { authors: 'National Institutes of Health, Office of Dietary Supplements', title: 'Magnesium — Fact Sheet for Health Professionals',
+        source: 'NIH ODS', url: 'https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/' },
     ],
     sections: [
       {
