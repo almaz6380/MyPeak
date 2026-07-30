@@ -1,4 +1,4 @@
-// MyPeak: Trial serverseitig starten — Vercel Serverless Function.
+// FullRep: Trial serverseitig starten — Vercel Serverless Function.
 // Setzt einmalig die kostenlose 7-Tage-Testphase in `subscriptions`.
 // Läuft über die Service-Role, weil der Client seit der Härtung
 // (20260717100000_subscriptions_server_only.sql) nicht mehr in die

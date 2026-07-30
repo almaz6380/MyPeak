@@ -290,8 +290,8 @@ export default function BarcodeScanner({ onScanned, onClose }) {
 
           <p className="text-[10px] text-slate-500 mt-3 leading-relaxed">
             {lang === 'de'
-              ? 'Dieses Produkt wird der MyPeak-Community zur Verfügung gestellt. Andere User können es dann ebenfalls per Barcode finden.'
-              : 'This product will be shared with the MyPeak community. Other users will be able to find it by barcode too.'}
+              ? 'Dieses Produkt wird der FullRep-Community zur Verfügung gestellt. Andere User können es dann ebenfalls per Barcode finden.'
+              : 'This product will be shared with the FullRep community. Other users will be able to find it by barcode too.'}
           </p>
 
           <button onClick={handleAddProduct} disabled={!productName.trim()}

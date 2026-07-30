@@ -1,14 +1,14 @@
 import { Capacitor } from '@capacitor/core';
 
 // ===========================================================================
-//  AdMob-Anbindung für MyPeak (Interstitial-Vollbildanzeigen)
+//  AdMob-Anbindung für FullRep (Interstitial-Vollbildanzeigen)
 // ===========================================================================
 //  Solange USE_TEST_ADS = true laufen Google-Test-Anzeigen. Das ist während
 //  der Entwicklung Pflicht — echte Anzeigen selbst anzuklicken wäre ein
 //  Policy-Verstoß und kann das AdMob-Konto sperren.
 //
 //  Vor dem Launch-Build:
-//   1. In AdMob eine App „MyPeak" anlegen (iOS + Android) → App-IDs
+//   1. In AdMob eine App „FullRep" anlegen (iOS + Android) → App-IDs
 //      in Info.plist (GADApplicationIdentifier) und AndroidManifest eintragen.
 //   2. Interstitial-Anzeigenblöcke erstellen → IDs unten in PROD eintragen.
 //   3. USE_TEST_ADS = false setzen.
@@ -21,9 +21,9 @@ const TEST = {
   android: { interstitial: 'ca-app-pub-3940256099942544/1033173712' },
 };
 
-// Platzhalter — vor Launch durch echte MyPeak-Anzeigenblöcke ersetzen
+// Platzhalter — vor Launch durch echte FullRep-Anzeigenblöcke ersetzen
 // (Konto pub-8860791993288062).
-// Echte MyPeak-Anzeigenblöcke (Konto pub-8860791993288062).
+// Echte FullRep-Anzeigenblöcke (Konto pub-8860791993288062).
 const PROD = {
   ios: { interstitial: 'ca-app-pub-8860791993288062/5028931559' },
   android: { interstitial: 'ca-app-pub-8860791993288062/7984478947' },

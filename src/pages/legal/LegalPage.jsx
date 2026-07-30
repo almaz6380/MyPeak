@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import MyPeakLogo from '../../components/MyPeakLogo';
+import FullRepLogo from '../../components/FullRepLogo';
 import { legalDocs } from './legalContent';
 
 // Eigenständige Rechtsseite — auch ohne Login erreichbar (Routen: /legal/imprint|privacy|terms)
@@ -24,7 +24,7 @@ export default function LegalPage({ doc }) {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <MyPeakLogo size={28} />
+          <FullRepLogo size={28} />
         </div>
 
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{content.title}</h1>

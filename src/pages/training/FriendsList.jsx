@@ -89,13 +89,13 @@ export default function FriendsList({ onBack, onAddFriend }) {
       {/* Add Friend */}
       {showAdd && (
         <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
-          <p className="text-sm font-medium mb-2">{lang === 'de' ? 'MyPeak-Code eingeben' : 'Enter MyPeak Code'}</p>
+          <p className="text-sm font-medium mb-2">{lang === 'de' ? 'FullRep-Code eingeben' : 'Enter FullRep Code'}</p>
           <div className="flex gap-2">
             <input
               type="text"
               value={codeInput}
               onChange={(e) => { setCodeInput(e.target.value.toUpperCase()); setAddStatus(null); }}
-              placeholder="MP-NAME-1234"
+              placeholder="FR-NAME-1234"
               className="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-mono text-center focus:outline-none focus:ring-2 focus:ring-primary-400"
             />
             <button onClick={handleSendRequest} disabled={!codeInput.trim() || addStatus === 'sending'} className="px-4 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white text-sm font-medium">
@@ -137,7 +137,7 @@ export default function FriendsList({ onBack, onAddFriend }) {
         <p className="text-center text-sm text-slate-400 py-8">{t('common.loading')}</p>
       ) : friends.length === 0 ? (
         <p className="text-center text-sm text-slate-400 dark:text-slate-500 py-8">
-          {lang === 'de' ? 'Noch keine Freunde. Teile deinen MyPeak-Code!' : 'No friends yet. Share your MyPeak code!'}
+          {lang === 'de' ? 'Noch keine Freunde. Teile deinen FullRep-Code!' : 'No friends yet. Share your FullRep code!'}
         </p>
       ) : (
         <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">

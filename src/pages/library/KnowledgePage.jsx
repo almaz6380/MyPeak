@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ChevronDown, ChevronUp, AlertTriangle, BookOpen, ChevronRight, Stethoscope } from 'lucide-react';
+import References from '../../components/References';
 
 // Generischer Reader für die Wissensbibliothek-Blöcke (Training, Ernährung,
 // Supplements, Blutwerte). Datengetrieben — jeder Block liefert `data` (Themen)
@@ -64,6 +65,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, categori
           ))}
         </div>
 
+        <References items={p.references} lang={lang} />
         <Disclaimer lang={lang} type={disclaimer} />
       </div>
     );
@@ -128,6 +130,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, categori
           </button>
         )}
 
+        <References items={p.references} lang={lang} />
         <Disclaimer lang={lang} type={disclaimer} />
       </div>
     );

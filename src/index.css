@@ -73,30 +73,6 @@
   to { transform: translateY(0); }
 }
 
-/* Splash screen line draw animation */
-@keyframes draw-line {
-  from { stroke-dashoffset: 900; }
-  to { stroke-dashoffset: 0; }
-}
-
-@keyframes draw-arrow {
-  from { stroke-dashoffset: 100; opacity: 0; }
-  to { stroke-dashoffset: 0; opacity: 1; }
-}
-
-.splash-line {
-  stroke-dasharray: 900;
-  stroke-dashoffset: 900;
-  animation: draw-line 0.6s ease-out forwards;
-}
-
-.splash-arrow {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  opacity: 0;
-  animation: draw-arrow 0.3s ease-out 0.5s forwards;
-}
-
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
 }
@@ -174,18 +150,29 @@
   cursor: pointer;
 }
 
-/* Pull-to-refresh zigzag animation */
-.ptr-line-animate {
-  stroke-dasharray: 900;
-  stroke-dashoffset: 900;
-  animation: draw-line 0.6s ease-out forwards;
+/* Logo-Animation: erst den Kreis zeichnen, dann Speichen + Symbole einblenden.
+   Der Versatz entspricht dem Kreisumfang bei r=176 (2*pi*176 = 1106). */
+@keyframes draw-circle {
+  from { stroke-dashoffset: 1106; }
+  to { stroke-dashoffset: 0; }
 }
 
-.ptr-arrow-animate {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
+@keyframes logo-parts-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ptr-circle-animate,
+.splash-circle {
+  stroke-dasharray: 1106;
+  stroke-dashoffset: 1106;
+  animation: draw-circle 0.6s ease-out forwards;
+}
+
+.ptr-parts-animate,
+.splash-parts {
   opacity: 0;
-  animation: draw-arrow 0.3s ease-out 0.5s forwards;
+  animation: logo-parts-in 0.35s ease-out 0.45s forwards;
 }
 
 /* Übungs-Demo: weiches Hin- und Herblenden zwischen Start- und Endposition

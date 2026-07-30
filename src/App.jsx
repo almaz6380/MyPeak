@@ -43,7 +43,7 @@ export default function App() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f6f4f0] dark:bg-[#0a0a0a] flex flex-col items-center justify-center gap-4">
-        <img src="/mypeak-icon-v2.svg" alt="MyPeak" className="w-28 h-28 opacity-50" />
+        <img src="/fullrep-icon-v2.svg" alt="FullRep" className="w-28 h-28 opacity-50" />
         <Loader2 className="w-6 h-6 text-primary-400 animate-spin" />
       </div>
     );

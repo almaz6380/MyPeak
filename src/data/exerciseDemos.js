@@ -1,4 +1,4 @@
-// Zuordnung MyPeak-Übungs-ID → free-exercise-db-ID (Public Domain, github.com/yuhonas/free-exercise-db).
+// Zuordnung FullRep-Übungs-ID → free-exercise-db-ID (Public Domain, github.com/yuhonas/free-exercise-db).
 // Jede DB-ID hat zwei Fotos (Start-/Endposition) unter /exercise-demos/<dbId>/0.jpg und 1.jpg.
 // Kuratiert am 12.07.2026 — bei neuen Übungen hier ergänzen.
 const exerciseDemos = {

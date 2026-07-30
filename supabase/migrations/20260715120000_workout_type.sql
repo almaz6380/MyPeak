@@ -1,5 +1,5 @@
 -- ============================================================
--- MyPeak: Workout-Typ persistieren (Juli 2026)
+-- FullRep: Workout-Typ persistieren (Juli 2026)
 --
 -- Cardio/HIIT/Circuit/Kampfsport-Workouts tragen ein Feld `type`
 -- (z. B. 'cardio', 'hiit', 'circuit', 'martial-arts'). Die Spalte

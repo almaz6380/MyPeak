@@ -10,7 +10,7 @@ const strokeProps = {
   strokeLinejoin: 'round',
 };
 
-// Home: Bergpanorama mit Gipfel-Zigzag (Anlehnung ans MyPeak-Logo)
+// Home: Bergpanorama mit Gipfel-Zigzag (Anlehnung ans FullRep-Logo)
 export function MountainMotif(props) {
   return (
     <svg viewBox="0 0 400 300" aria-hidden="true" {...props}>

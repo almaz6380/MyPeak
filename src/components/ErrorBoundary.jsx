@@ -19,7 +19,7 @@ export default class ErrorBoundary extends Component {
     const de = (localStorage.getItem('language') || 'de') === 'de';
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center gap-4 p-6 text-center">
-        <img src="/mypeak-icon-v2.svg" alt="MyPeak" className="w-20 h-20 opacity-60" />
+        <img src="/fullrep-icon-v2.svg" alt="FullRep" className="w-20 h-20 opacity-60" />
         <h1 className="text-xl font-bold text-white">
           {de ? 'Ups — etwas ist schiefgelaufen' : 'Oops — something went wrong'}
         </h1>

@@ -22,6 +22,7 @@ Beispiele:
   python3 scripts/play-upload.py --status
 """
 import argparse
+import glob
 import json
 import os
 import sys
@@ -84,6 +85,44 @@ def call(tok, method, url, data=None, ctype='application/json'):
         sys.exit(f'\nFEHLER {e.code} bei {method} {url}\n{detail}\n')
 
 
+def lade_screenshots(tok, verzeichnis, lang, dry_run=False, image_type='phoneScreenshots'):
+    """Store-Eintrag-Screenshots ersetzen — alte loeschen, neue in Dateinamen-
+    Reihenfolge hochladen. Play zeigt sie in genau dieser Reihenfolge an.
+
+    Achtung: Das Listing ist oeffentlich. Ohne --dry-run ist die Aenderung nach
+    dem Commit sofort sichtbar.
+    """
+    bilder = sorted(glob.glob(os.path.join(verzeichnis, '[0-9][0-9]-*.png')))
+    if not bilder:
+        sys.exit(f'Keine Screenshots in {verzeichnis} (erwartet: 01-….png)')
+
+    print(f'{len(bilder)} Screenshots fuer {lang} / {image_type}:')
+    for b in bilder:
+        print(f'  {os.path.basename(b):26} {os.path.getsize(b) // 1024:>5} KB')
+
+    if dry_run:
+        print('\n--dry-run: nichts hochgeladen, nichts geaendert.')
+        return
+
+    eid = call(tok, 'POST', f'{API}/applications/{PKG}/edits')['id']
+    print(f'\nEdit {eid} geoeffnet')
+    base = f'applications/{PKG}/edits/{eid}/listings/{lang}/{image_type}'
+
+    call(tok, 'DELETE', f'{API}/{base}')
+    print('  alte Bilder entfernt')
+
+    for b in bilder:
+        with open(b, 'rb') as fh:
+            call(tok, 'POST', f'{UPLOAD}/{base}?uploadType=media',
+                 data=fh.read(), ctype='image/png')
+        print(f'  hochgeladen: {os.path.basename(b)}')
+
+    call(tok, 'POST', f'{API}/applications/{PKG}/edits/{eid}:validate')
+    print('  validiert')
+    call(tok, 'POST', f'{API}/applications/{PKG}/edits/{eid}:commit')
+    print('  committet — im Play-Eintrag jetzt sichtbar.')
+
+
 def zeige_status(tok, track='production'):
     eid = call(tok, 'POST', f'{API}/applications/{PKG}/edits')['id']
     tr = call(tok, 'GET', f'{API}/applications/{PKG}/edits/{eid}/tracks/{track}')
@@ -100,19 +139,26 @@ def main():
     p.add_argument('--complete', action='store_true', help='an alle ausrollen')
     p.add_argument('--notes', default='', help='Was-ist-neu-Text (de-DE)')
     p.add_argument('--status', action='store_true', help='nur den Track anzeigen')
+    p.add_argument('--screenshots', metavar='VERZEICHNIS',
+                   help='Store-Eintrag-Screenshots ersetzen (z. B. store-assets/android)')
+    p.add_argument('--lang', default='de-DE', help='Sprache des Eintrags (Standard: de-DE)')
+    p.add_argument('--dry-run', action='store_true',
+                   help='nur auflisten, nichts hochladen — das Listing ist oeffentlich')
     p.add_argument('--track', default='production',
                    choices=['production', 'beta', 'alpha', 'internal'],
                    help='Play-Track (Standard: production)')
     a = p.parse_args()
 
-    if not (a.aab or a.promote or a.status):
-        p.error('--aab, --promote oder --status angeben')
+    if not (a.aab or a.promote or a.status or a.screenshots):
+        p.error('--aab, --promote, --status oder --screenshots angeben')
     if a.aab and not a.complete and a.fraction is None:
         p.error('--fraction 0.2 oder --complete angeben')
 
     tok = token()
     if a.status:
         return zeige_status(tok, a.track)
+    if a.screenshots:
+        return lade_screenshots(tok, a.screenshots, a.lang, a.dry_run)
 
     eid = call(tok, 'POST', f'{API}/applications/{PKG}/edits')['id']
     print(f'Edit {eid} geöffnet')

@@ -1,5 +1,5 @@
 -- ============================================================
--- MyPeak: subscriptions absichern für echtes bezahltes Premium (Juli 2026)
+-- FullRep: subscriptions absichern für echtes bezahltes Premium (Juli 2026)
 --
 -- Vor Zahlungs-Go-Live: der Client darf seinen Abo-Status NICHT mehr
 -- selbst schreiben (sonst könnte sich jeder premium_until setzen).

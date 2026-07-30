@@ -14,7 +14,10 @@ import Toast from '../components/Toast';
 // Solange „false", zeigen wir nur die kostenlose Testphase (Trial braucht keine
 // Zahlung) — kein Kauf-Button, kein Restore, kein Preis. So läuft niemand in einen
 // Sandbox-Checkout, und iOS verletzt nicht Apples IAP-Pflicht (3.1.1).
-const PURCHASE_ENABLED = { ios: false, android: true, web: false };
+// iOS aktiviert seit der Ablehnung 29.07.2026 (Guideline 2.1(b)): Apple bricht die
+// Pruefung ab, solange die App aufs Abo verweist, das IAP-Produkt aber nicht mit
+// eingereicht wird. Das Produkt wird jetzt mitgeschickt — der Kauf muss also sichtbar sein.
+const PURCHASE_ENABLED = { ios: true, android: true, web: false };
 const canPurchase = PURCHASE_ENABLED[Capacitor.getPlatform()] ?? false;
 
 // ── Preis-Konfiguration (Fallback-Anzeige) ────────────────────────
@@ -147,7 +150,7 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
           <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-lg">
             <Crown className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold">MyPeak Premium</h1>
+          <h1 className="text-2xl font-bold">FullRep Premium</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             {reason
               ? (lang === 'de' ? 'Diese Funktion ist Teil von Premium.' : 'This feature is part of Premium.')

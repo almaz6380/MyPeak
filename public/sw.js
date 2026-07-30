@@ -1,5 +1,5 @@
-const CACHE_NAME = 'mypeak-v3';
-const STATIC_ASSETS = ['/', '/manifest.json', '/mypeak-icon-v2.svg', '/mypeak-arrow-v2.svg'];
+const CACHE_NAME = 'fullrep-v1';
+const STATIC_ASSETS = ['/', '/manifest.json', '/fullrep-icon-v2.svg', '/fullrep-arrow-v2.svg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

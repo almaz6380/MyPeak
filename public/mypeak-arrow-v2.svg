@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <!-- Transparent background -->
-  
-  <!-- Zigzag chart line -->
-  <polyline points="45,400 130,270 195,340 275,210 340,280 430,150" stroke="#fbbf24" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  
-  <!-- Arrow head — gleiche Farbe -->
-  <path d="M400,165 L430,150 L432,183" stroke="#fbbf24" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>

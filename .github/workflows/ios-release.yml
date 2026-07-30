@@ -120,7 +120,7 @@ jobs:
       - name: IPA als Artefakt ablegen
         uses: actions/upload-artifact@v4
         with:
-          name: MyPeak-ios-${{ env.V }}-b${{ env.B }}
+          name: FullRep-ios-${{ env.V }}-b${{ env.B }}
           path: ${{ runner.temp }}/export/*.ipa
           retention-days: 30
 

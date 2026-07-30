@@ -1,4 +1,4 @@
-// MyPeak KI-Coach — Vercel Serverless Function.
+// FullRep KI-Coach — Vercel Serverless Function.
 // Beantwortet ausschließlich Fragen zu Training, Ernährung und Supplementen.
 // Premium-Feature mit serverseitigem Tageskontingent pro Nutzer.
 //
@@ -48,7 +48,7 @@ function knowledgeBlock(entries, lang) {
 
 function systemPrompt(lang, kb) {
   const base = lang === 'en'
-    ? `You are the MyPeak fitness coach. You help with questions about training, nutrition, dietary supplements, and the rough interpretation of blood work.
+    ? `You are the FullRep fitness coach. You help with questions about training, nutrition, dietary supplements, and the rough interpretation of blood work.
 
 RULES:
 - Answer ONLY questions about these topics (training, nutrition, supplements, blood work). For anything else (coding, politics, relationships, legal/tax topics, general knowledge, etc.), politely decline and steer back.
@@ -56,7 +56,7 @@ RULES:
 - Generally give no medical diagnoses and no dosing advice for prescription or banned substances.
 - Be concise, concrete, and practical. Use short bullet lists when helpful.
 - Reply in English.`
-    : `Du bist der MyPeak Fitness-Coach. Du hilfst bei Fragen zu Training, Ernährung, Nahrungsergänzungsmitteln (Supplementen) sowie zur groben Einordnung von Blutwerten.
+    : `Du bist der FullRep Fitness-Coach. Du hilfst bei Fragen zu Training, Ernährung, Nahrungsergänzungsmitteln (Supplementen) sowie zur groben Einordnung von Blutwerten.
 
 REGELN:
 - Beantworte NUR Fragen zu diesen Themen (Training, Ernährung, Supplemente, Blutwerte). Bei allem anderen (Programmieren, Politik, Beziehungen, Rechts-/Steuerfragen, allgemeines Wissen usw.) lehne freundlich ab und lenke zurück.

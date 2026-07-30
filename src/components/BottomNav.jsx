@@ -40,23 +40,15 @@ export default function BottomNav() {
         <NavLink to="/">
           {({ isActive }) => (
             <div className={`w-14 h-14 rounded-full bg-primary-500 flex items-center justify-center shadow-lg shadow-primary-500/30 transition-transform ${isActive ? 'scale-105' : ''}`}>
+              {/* Kreis + Speichen des FullRep-Zeichens, ohne die drei Symbole:
+                  bei 28 px waeren sie nicht mehr lesbar. Dunkel auf Gold. */}
               <svg width="28" height="28" viewBox="0 0 512 512" fill="none">
-                <polyline
-                  points="45,400 130,270 195,340 275,210 340,280 430,150"
-                  stroke="#0a0a0a"
-                  strokeWidth="12"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M400,165 L430,150 L432,183"
-                  stroke="#0a0a0a"
-                  strokeWidth="12"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+                <g stroke="#0a0a0a" strokeWidth="34" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="256" cy="256" r="176" />
+                  <path d="M256,256 L103.58,168" />
+                  <path d="M256,256 L408.42,168" />
+                  <path d="M256,256 L256,432" />
+                </g>
               </svg>
             </div>
           )}
