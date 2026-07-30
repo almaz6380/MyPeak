@@ -52,7 +52,42 @@ Prüfung eingereicht → Apple bricht ab.
 1. **Review-Screenshot** beim Abo `mypeak_premium_monthly` hochladen (steht auf „Missing Metadata")
 2. **IAP-Produkt zusammen mit der Version** einreichen, nicht separat
 3. Anzeigename auf `FullRep: Training & Ernährung`, neuer Build (iOS Build 3 → 4), `npx cap sync`
-4. Store-Screenshots neu — die bestehenden zeigen MyPeak und das alte Logo
+4. Die **neuen** iPhone-/iPad-Screenshots aus `store-assets/ios` bzw. `store-assets/ios-ipad`
+   hochladen — zusammen mit dem Build, nicht in die laufende Einreichung hinein.
+   (Android ist erledigt, siehe unten.)
+
+### Store-Screenshots neu + Play-Upload automatisiert (30.07.2026)
+**18 neue Screenshots** (6 Motive × iPhone 6,9″ / iPad 12,9″ / Android) in `store-assets/`.
+Erzeugt von **`scripts/store-screenshots.mjs`** (Playwright + Chromium aus `/opt/pw-browsers`)
+gegen `npx vite preview`. Läuft im **Gastmodus** — der macht keinen Netzaufruf, deshalb braucht
+das Skript weder Supabase-Zugang noch den Review-Account; die Demo-Daten kommen per
+`addInitScript` in localStorage. Zwei Gastmodus-Artefakte (Hinweisbanner, Platzhaltername
+„Gast") werden vor dem Auslösen weggeräumt — beides existiert im angemeldeten Betrieb nicht.
+
+**Android-Screenshots sind live** (de-DE, `phoneScreenshots`, 30.07. 19:09 UTC): alte Bilder
+gelöscht, sechs neue in Dateinamen-Reihenfolge hochgeladen, Edit committet.
+
+**Der Upload läuft auf GitHubs Rechnern, nicht hier** — das Dienstkonto-JSON liegt als Secret
+`PLAY_SERVICE_ACCOUNT_JSON` und verlässt die Secrets nie.
+- `scripts/play-upload.py --screenshots store-assets/android --lang de-DE [--dry-run]`
+  (eine Edit-Transaktion: `edits.insert` → `images.deleteall` → je Bild `images.upload` →
+  `:validate` → `:commit`)
+- `scripts/play-upload.py --listing store-assets/play-listing.de-DE.json [--dry-run]`
+  setzt **Titel/Kurz-/Volltext** (PATCH, also bleibt stehen, was nicht in der Datei steht).
+  Die Texte liegen als versionierte JSON-Datei im Repo statt in Workflow-Eingaben —
+  so steht im Diff, was im Store landet. Längen (30/80/4000) prüft das Skript vorab.
+- Workflow **`.github/workflows/play-listing.yml`**, nur `workflow_dispatch`, Eingabe
+  `mode` = `screenshots` | `texte`, `dry_run` standardmäßig **true**. Ein Live-Listing
+  ändert man absichtlich, nicht als Nebenwirkung — immer erst trocken laufen lassen.
+- **`.github/workflows/release-preflight.yml`** meldet in Sekunden, welche Release-Secrets
+  gesetzt sind bzw. fehlen (nur „gesetzt"/„FEHLT", nie Werte). Vor jedem iOS-Lauf sinnvoll:
+  ein macOS-Lauf kostet sonst 20 Minuten bis zum Scheitern.
+
+⚠️ **Abhängigkeit zum Merken:** Das Dienstkonto `play-upload@wellbooked-501311` liegt im
+GCP-Projekt **`wellbooked-501311`** (dem WELLbooked-Projekt, nicht FullRep). Für Play ist das
+egal — der Zugriff hängt an der Play-Console-Freigabe, nicht am Projektnamen. Aber wird dieses
+Projekt aufgeräumt oder der Service-Account dort gelöscht, stirbt damit auch der
+FullRep-Upload **und** `android-release.yml`.
 
 ### Umbenennung MyPeak → FullRep (30.07.2026) — CODE FERTIG, Stores/Domain OFFEN
 **Warum:** Markenkollision. **Aima Interactive S.L.** (Spanien) betreibt eine Fitness-App namens
@@ -113,7 +148,8 @@ nutzt `.splash-circle` / `.splash-parts`. Die alten Klassen `ptr-line-animate`, 
 2. **Register-Check FullRep** — EUIPO/DPMA/Patentamt AT, Klassen 9, 25, 41, 44; Domain `.app`/`.com`.
 3. **Domain-Umzug** — danach `my-peak.vercel.app` → neue Domain, dazu Supabase-Redirect-URLs (Login-Bestätigung, Passwort-Reset), RevenueCat-Webhook-URL, OG-Tags, Store-URLs.
 4. **Store-Anzeigenamen** in App Store Connect + Play Console ändern (Bundle-IDs bleiben).
-5. **Store-Screenshots** neu — die bestehenden zeigen alle „MyPeak".
+5. ~~Store-Screenshots~~ — Android **erledigt** (live in de-DE); iOS/iPad liegen fertig in
+   `store-assets/`, gehen mit dem nächsten Build hoch. Siehe eigenen Abschnitt oben.
 
 ### Zahlungsanbieter (RevenueCat) + Freemium/Werbung + Coach-Ausbau (17.07.2026) — CODE LIVE, Live-Zahlung OFFEN
 - **RevenueCat angebunden (PR #13, in `main`, deployt):** echtes bezahltes Premium **3,99 €/Monat**, Web sofort (RevenueCat Web Billing/Stripe), iOS/Android später über dieselbe Schicht.
@@ -802,8 +838,12 @@ hingehört**, statt zu raten oder einen Umweg zu bauen.
 → Bild herunterladen, ins Repo legen, committen, im Chat zeigen. Ohne gesetzten
 `FAL_KEY` ist der Weg zu: dann sagen, dass die Variable in der Umgebung fehlt.
 
-**Auslösen in diesem Repo:** Noch **kein** Release-Workflow vorhanden. Vorlage:
-`mahjong-app/.github/workflows/*` + `store/ci-setup.md`. Bis dahin laufen
-iOS-Archiv und Play-Upload nur am Mac. Die Web-App deployt Vercel automatisch über
-GitHub. Vor jedem Release-Build prüfen: `USE_TEST_ADS` in `src/lib/ads.js` und
-`PURCHASE_ENABLED` in `PaywallPage.jsx`.
+**Auslösen in diesem Repo:** vier Workflows unter `.github/workflows/`, alle nur
+`workflow_dispatch` — `android-release.yml`, `ios-release.yml`, `play-listing.yml`,
+`release-preflight.yml`.
+Auslösbar sind sie nur in der Fassung, die auf `main` liegt (GitHub liest
+`workflow_dispatch` vom Standard-Branch) — eine Änderung wirkt also erst nach dem Merge.
+Alle ziehen ihre Schlüssel aus den Repo-Secrets; `play-listing.yml` ist end-to-end
+erprobt (30.07.), die beiden Release-Workflows sind es noch nicht.
+Die Web-App deployt Vercel automatisch über GitHub. Vor jedem Release-Build prüfen:
+`USE_TEST_ADS` in `src/lib/ads.js` und `PURCHASE_ENABLED` in `PaywallPage.jsx`.
