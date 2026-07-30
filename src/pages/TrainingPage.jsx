@@ -22,7 +22,7 @@ import { useActiveWorkout } from '../context/ActiveWorkoutContext';
 import MuscleGroupIcon from '../components/icons/MuscleGroupIcon';
 import WeeklySummaryBanner from '../components/progress/WeeklySummaryBanner';
 import MuscleHeatmapCard from '../components/progress/MuscleHeatmapCard';
-import MyPeakLogo from '../components/MyPeakLogo';
+import FullRepLogo from '../components/FullRepLogo';
 import Toast from '../components/Toast';
 import DiamondCalendar from '../components/DiamondCalendar';
 import CardPhotoMotif from '../components/CardPhotoMotif';
@@ -427,7 +427,7 @@ export default function TrainingPage() {
         <Toast variant={toast.variant} message={toast.message} onDismiss={() => setToast(null)} />
       )}
       <div className="flex flex-col items-center pt-6 mb-4">
-        <MyPeakLogo size={32} />
+        <FullRepLogo size={32} />
         <h1 className="text-2xl font-bold mt-2">{t('training.title')}</h1>
       </div>
 

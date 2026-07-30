@@ -2,7 +2,7 @@ import { useState, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Loader2, Sparkles } from 'lucide-react';
-import MyPeakLogo from '../components/MyPeakLogo';
+import FullRepLogo from '../components/FullRepLogo';
 import CardPhotoMotif from '../components/CardPhotoMotif';
 import { useSubscription } from '../context/SubscriptionContext';
 
@@ -91,7 +91,7 @@ export default function LibraryPage() {
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex flex-col items-center pt-12 mb-6">
-        <MyPeakLogo size={36} />
+        <FullRepLogo size={36} />
         <h1 className="text-2xl font-bold mt-2">{t('library.title')}</h1>
       </div>
 

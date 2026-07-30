@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">MyPeak</string>
-    <string name="title_activity_main">MyPeak</string>
+    <string name="app_name">FullRep</string>
+    <string name="title_activity_main">FullRep</string>
     <string name="package_name">at.gallab.mypeak</string>
     <string name="custom_url_scheme">at.gallab.mypeak</string>
 </resources>

@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { PullToRefreshContext } from './pullToRefreshContext';
 
-export default function MyPeakLogo({ size = 36, className = '' }) {
+export default function FullRepLogo({ size = 36, className = '' }) {
   const ptr = useContext(PullToRefreshContext);
   const animating = ptr?.refreshing || false;
 

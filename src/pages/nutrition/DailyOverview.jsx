@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Settings, UtensilsCrossed, Pencil, X, Check, GlassWater, BookOpen } from 'lucide-react';
 import CardPhotoMotif from '../../components/CardPhotoMotif';
 import MacroRing from './MacroRing';
-import MyPeakLogo from '../../components/MyPeakLogo';
+import FullRepLogo from '../../components/FullRepLogo';
 import { useAuth } from '../../context/AuthContext';
 import { getNutritionEntries, getNutritionGoals, deleteNutritionEntry, saveNutritionGoals, getWaterTotal, addWater, removeWaterAmount } from '../../data/nutritionStorage';
 import { toLocalDateString } from '../../lib/dateUtils';
@@ -104,7 +104,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
     <div className="p-4 pt-16 pb-24">
       {/* Header */}
       <div className="flex flex-col items-center pt-12 mb-4">
-        <MyPeakLogo size={36} />
+        <FullRepLogo size={36} />
         <h1 className="text-2xl font-bold mt-2">{t('nutrition.title')}</h1>
       </div>
       <div className="flex items-center justify-end mb-4">

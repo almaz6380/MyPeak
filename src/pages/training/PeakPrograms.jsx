@@ -166,8 +166,8 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
 
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
         {lang === 'de'
-          ? 'Professionelle Trainingsprogramme von MyPeak. Wähle eine Kategorie.'
-          : 'Professional training programs by MyPeak. Choose a category.'}
+          ? 'Professionelle Trainingsprogramme von FullRep. Wähle eine Kategorie.'
+          : 'Professional training programs by FullRep. Choose a category.'}
       </p>
 
       <div className="space-y-3">

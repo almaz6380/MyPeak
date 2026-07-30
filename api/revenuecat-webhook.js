@@ -1,4 +1,4 @@
-// MyPeak: RevenueCat-Webhook — Vercel Serverless Function.
+// FullRep: RevenueCat-Webhook — Vercel Serverless Function.
 // Die EINZIGE Stelle, die bezahltes Premium setzt. RevenueCat schickt bei
 // Kauf/Verlängerung/Ablauf ein Event; wir verifizieren das gemeinsame
 // Secret, mappen app_user_id → Supabase-user_id und schreiben premium_until

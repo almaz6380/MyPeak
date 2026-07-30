@@ -93,7 +93,7 @@ jobs:
       - name: AAB als Artefakt ablegen
         uses: actions/upload-artifact@v4
         with:
-          name: MyPeak-${{ env.VN }}-vc${{ env.VC }}
+          name: FullRep-${{ env.VN }}-vc${{ env.VC }}
           path: android/app/build/outputs/bundle/release/app-release.aab
           retention-days: 30
 

@@ -1,5 +1,5 @@
 -- ============================================================
--- MyPeak: Abo / Premium (Juli 2026)
+-- FullRep: Abo / Premium (Juli 2026)
 --
 -- Speichert den Abo-Status pro Nutzer (eine Zeile). Provider-agnostisch:
 -- 'provider' hält fest, woher das Abo kommt (revenuecat/stripe/promo),

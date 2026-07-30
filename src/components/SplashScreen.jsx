@@ -35,7 +35,7 @@ export default function SplashScreen({ onFinished }) {
           className="splash-arrow"
         />
 
-        {/* MyPeak text — fade in after line draws */}
+        {/* FullRep text — fade in after line draws */}
         <text
           x="256" y="418"
           textAnchor="middle"
@@ -46,7 +46,7 @@ export default function SplashScreen({ onFinished }) {
           letterSpacing="3"
           className={`transition-opacity duration-300 ${phase === 'drawing' ? 'opacity-0' : 'opacity-100'}`}
         >
-          MyPeak
+          FullRep
         </text>
 
         {/* FITNESS text */}

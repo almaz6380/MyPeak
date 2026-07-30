@@ -8,8 +8,8 @@
   <!-- Arrow head — symmetrisch -->
   <path d="M388,133 L415,120 L417,151" stroke="#fef3c7" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
   
-  <!-- Text: MyPeak -->
-  <text x="256" y="418" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="50" font-weight="500" fill="#fef3c7" letter-spacing="3">MyPeak</text>
+  <!-- Text: FullRep -->
+  <text x="256" y="418" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="50" font-weight="500" fill="#fef3c7" letter-spacing="3">FullRep</text>
   
   <!-- Text: FITNESS -->
   <text x="256" y="458" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="400" fill="#fbbf24" letter-spacing="6">FITNESS</text>

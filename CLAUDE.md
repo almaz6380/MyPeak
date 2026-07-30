@@ -4,9 +4,9 @@
 
 Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Tracking in einer einzigen, übersichtlichen App vereint. Die App soll trotz vieler Features einfach zu bedienen und nicht überfüllt sein.
 
-**App-Name:** MyPeak
-**Live-URL:** https://my-peak.vercel.app
-**Git-Repository:** https://github.com/almaz6380/MyPeak
+**App-Name:** FullRep (bis 30.07.2026: MyPeak — siehe „Umbenennung" unten)
+**Live-URL:** https://my-peak.vercel.app (Domain noch nicht umgezogen)
+**Git-Repository:** https://github.com/almaz6380/MyPeak (Repo-Name unverändert)
 **Zielplattform:** Web-App → PWA → später App Store (iOS + Android)
 **Sprachen:** Mehrsprachig (Deutsch + Englisch)
 **Geschäftsmodell:** Freemium mit 7 Tagen kostenloser Testphase
@@ -15,6 +15,52 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 ---
 
 ## Aktueller Stand
+
+### Umbenennung MyPeak → FullRep (30.07.2026) — CODE FERTIG, Stores/Domain OFFEN
+**Warum:** Markenkollision. **Aima Interactive S.L.** (Spanien) betreibt eine Fitness-App namens
+**MyPeak** ([Play](https://play.google.com/store/apps/details?id=com.mypeak.app) /
+[App Store id6758337601](https://apps.apple.com/gb/app/mypeak-gym-workout-tracker/id6758337601),
+[mypeakapp.com](https://mypeakapp.com)) — Workout-Tracker mit KI-Coach, also Zeichen- **und**
+Dienstleistungsidentität im selben Markt. Deren App-Store-ID (`6758337601`) liegt unter unserer
+(`6788461300`), die Priorität liegt also sehr wahrscheinlich bei ihnen. **Verdacht:** Das war
+möglicherweise der echte Auslöser der Apple-Ablehnung 4.3(a) „Spam" — die Antwort vom 12.07.
+blieb unbeantwortet, weil sie am Thema vorbeiging.
+
+**Namenssuche:** ~30 Kandidaten geprüft (Store-, Firmen- und Websuche). Alle „…Peak"-Varianten
+kollidierten (PeakX → [peakx.fitness](https://www.peakx.fitness); BodyPeak → drei bestehende Apps,
+eine featuregleich; HighPeak → deutsche Outdoor-Marke + geografische Angabe, nicht eintragbar).
+**FullRep** kam ohne Blocker durch: Gym-Sprache („volle Wiederholung"), suggestiv statt
+beschreibend, damit schützbar. Nachbarn zur Kenntnis: [fullreps.co.uk](https://fullreps.co.uk)
+(UK-Gym-Bekleidung, Klasse 25) und FullReps Training Center (Baseball, Pennsylvania).
+
+**Store-Namen:** DE `FullRep: Training & Ernährung` · EN `FullRep: Workout & Nutrition`
+(je ≤30 Zeichen). Untertitel: `Workout-Tracker & KI-Coach` / `Workout Tracker & AI Coach`.
+
+**Bewusst NICHT umbenannt** (Umbenennen würde Nutzerdaten zerstören oder ist technisch unmöglich):
+| Bleibt | Grund |
+|---|---|
+| `at.gallab.mypeak` | Bundle-ID/`applicationId`. Nach Play-Veröffentlichung unveränderlich — sonst neue App ohne Update-Pfad. Unsichtbar. |
+| `mypeak_premium_monthly` | Produkt-IDs bei Apple/Google nach Anlage unveränderlich. Unsichtbar. |
+| `mypeak_photos` (IndexedDB) | Enthält die Fortschrittsfotos der Nutzer. |
+| `mypeak:darkmode`, `mypeak:subscription` | Interne Event-Namen. |
+| localStorage-Keys | Sonst Datenverlust bei bestehenden Nutzern. |
+| RevenueCat-Projekt, AdMob „MyPeak GDPR", iOS-Profil „MyPeak AppStore", GitHub-Repo | Fremdsystem-Namen, hängen an der Bundle-ID, nicht am Markennamen. |
+
+**Freundescode:** Präfix `MP-` → **`FR-`**. Bestehende `MP-`-Codes funktionieren weiter
+(Lookup ist exakt), nur neue Codes bekommen `FR-`.
+
+**Icon-Pipeline neu:** Einzige Quelle ist `public/favicon.svg`. Daraus werden per Headless-Chromium
++ Pillow gerendert: 2 Web-Icons, 18 Android-Icons (6 Dichten × launcher/round/foreground),
+1 iOS-Icon (1024, **ohne Alpha** — Apple lehnt Alpha ab), 26 Splash-Screens. Ein Logo-Wechsel =
+SVG tauschen + Skript erneut laufen lassen. (Nebenbei gefixt: die Splashes hatten weiße Ecken
+um das Icon.)
+
+**⚠️ NOCH OFFEN:**
+1. **Logo-Redesign** — Josef zeichnet einen Entwurf; Empfehlung: Schriftzug aus dem Icon nehmen (bei 48 px unlesbar).
+2. **Register-Check FullRep** — EUIPO/DPMA/Patentamt AT, Klassen 9, 25, 41, 44; Domain `.app`/`.com`.
+3. **Domain-Umzug** — danach `my-peak.vercel.app` → neue Domain, dazu Supabase-Redirect-URLs (Login-Bestätigung, Passwort-Reset), RevenueCat-Webhook-URL, OG-Tags, Store-URLs.
+4. **Store-Anzeigenamen** in App Store Connect + Play Console ändern (Bundle-IDs bleiben).
+5. **Store-Screenshots** neu — die bestehenden zeigen alle „MyPeak".
 
 ### Zahlungsanbieter (RevenueCat) + Freemium/Werbung + Coach-Ausbau (17.07.2026) — CODE LIVE, Live-Zahlung OFFEN
 - **RevenueCat angebunden (PR #13, in `main`, deployt):** echtes bezahltes Premium **3,99 €/Monat**, Web sofort (RevenueCat Web Billing/Stripe), iOS/Android später über dieselbe Schicht.
@@ -40,7 +86,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - **Weg B umgesetzt:** neuer Build aus aktuellem `main`, aber **Kauf-Button auf iOS ausgeblendet** (`PaywallPage.jsx`: `isIOSNative = Capacitor.getPlatform()==='ios'` → auf iOS kein Kauf/Restore/Preis, nur gratis 7-Tage-Trial). Umgeht Apples IAP-Pflicht (3.1.1), bis iOS-IAP eingerichtet ist. Web/Android unverändert. RevenueCat-Capacitor-Plugin per `cap sync` nativ registriert (Android `capacitor.*.gradle`, iOS `Package.swift`/`Package.resolved`).
 - **Versionen:** Android `versionName 1.1 / versionCode 2`; iOS `MARKETING_VERSION 1.0 / Build 3` (Build 1 abgelehnt, Build 2 verworfen).
 - **iOS EINGEREICHT:** Build 3 per altool zu ASC hochgeladen, Version 1.0 zugewiesen, neue Review-Submission → `WAITING_FOR_REVIEW`. Prüf-Notiz (appStoreReviewDetail) gegen 4.3(a) gesetzt + „no in-app purchases". Alte abgelehnte Submission storniert.
-- **Android AUSGEROLLT:** `.aab` (versionCode 2) per Google-Play-API in Produktion `completed` → in Google-Prüfung. Service-Account `play-upload@wellbooked-501311` hat jetzt MyPeak-Rechte.
+- **Android AUSGEROLLT:** `.aab` (versionCode 2) per Google-Play-API in Produktion `completed` → in Google-Prüfung. Service-Account `play-upload@wellbooked-501311` hat jetzt FullRep-Rechte.
 - **Light-Mode-Screenshots neu** (Playwright gegen lokale Dev-App, Review-Account, frische Demo-Daten): 6 Screens je iPhone 6,9″/iPad 12,9″/Android in `store-assets/`. **Android-Phone-Screenshots per Play-API hochgeladen (de-DE)**; iOS+iPad abgelegt fürs nächste Update (laufende Prüfung nicht anfassen).
 - **⚠️ Noch offen (nach bestandener iOS-Prüfung): iOS-IAP / echtes bezahltes iOS-Premium (Weg A)** — ASC-Abo-Produkt + „Paid Apps"-Vertrag/Bankdaten (nur User), RevenueCat-iOS-Key, `VITE_REVENUECAT_IOS_KEY`, iOS-Kauf-Guard wieder entfernen, neuer Build. RevenueCat hängt noch an Stripe-Sandbox (keine echten Zahlungen).
 
@@ -61,7 +107,7 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 - **`src/context/SubscriptionContext.jsx`:** `useSubscription()` liefert `isPremium`, `isTrial`, `trialDaysLeft`, `hadTrial`, `startTrial()`, `requirePremium(reason)` (öffnet Paywall + gibt false zurück, wenn kein Premium → Feature-Gate), `openPaywall()`. Rendert die Paywall global. Gemountet in main.jsx **innerhalb** von AuthProvider.
 - **`src/data/subscriptionStorage.js`:** localStorage-first + Supabase, Gast-tauglich. `computeAccess(sub)` leitet isPremium aus Trial (7 Tage) ODER bezahltem Premium ab. `startTrial()` (einmalig), `purchasePremium()` = **Platzhalter** (gibt `provider_not_configured` zurück). `TRIAL_DAYS=7`.
 - **`src/pages/PaywallPage.jsx`:** präsentationale Paywall (Props-gesteuert, kein Zirkelimport), Gold-Design, DE/EN, Benefit-Liste, Preis-Karte (`PRICE`-Konstante = Platzhalter 4,99 €/Monat), CTA „7 Tage kostenlos testen" (Trial) bzw. „Premium freischalten" (→ Platzhalter-Toast).
-- **Profil-Karte „MyPeak Premium"** (ProfilePage) zeigt Trial-Status bzw. öffnet die Paywall.
+- **Profil-Karte „FullRep Premium"** (ProfilePage) zeigt Trial-Status bzw. öffnet die Paywall.
 - **⚠️ Neue Migration NOCH NICHT in Prod:** `20260716120000_subscriptions.sql` (`subscriptions`-Tabelle + RLS). **SICHERHEIT:** Bezahltes Premium muss später serverseitig gesetzt werden (Webhook mit Service-Role); der aktuelle Client schreibt nur den kostenlosen Trial-Status. Update-RLS vor echtem Zahlungs-Go-Live entsprechend härten.
 - **OFFENE ENTSCHEIDUNGEN (User):** (1) Zahlungsanbieter — Empfehlung **RevenueCat** (iOS IAP + Google Play Billing + Web, Capacitor-Plugin); Apple/Google verbieten Stripe für digitale Abos in-app. (2) Was JETZT gaten — Vorschlag: bestehende KI-Mahlzeit-Foto-Erkennung. Noch NICHTS tatsächlich gesperrt (nur Gerüst + Paywall).
 
@@ -153,8 +199,8 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
 - [x] Gewichtsdiagramm: Standard ausgeklappt, Profil-Gewicht als Startwert
 - [x] Zyklustracking: 4 Phasen mit Training-/Ernährungs-Empfehlungen, Symptom-Tagebuch, Home-Widget (nur female)
 - [x] Zyklustracking: Setup-Karte auf Home wenn noch nicht eingerichtet (🌸 "Zyklus einrichten")
-- [x] Home-Button als goldener Kreis-FAB mit MyPeak-Pfeil, ragt über Nav hinaus
-- [x] Pull-to-Refresh: MyPeak-Logo zeichnet sich neu beim Aktualisieren
+- [x] Home-Button als goldener Kreis-FAB mit FullRep-Pfeil, ragt über Nav hinaus
+- [x] Pull-to-Refresh: FullRep-Logo zeichnet sich neu beim Aktualisieren
 - [x] Mehrsprachigkeit (DE/EN) mit i18next eingerichtet
 - [x] Basis-Design mit Farbschema, Typografie, Dark/Light Mode
 - [x] Einheiten umschaltbar (kg/lbs) im Profil
@@ -198,7 +244,7 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
 - [x] Weißer Bildschirm behoben (localStorage-Validierung + Safety-Checks)
 - [x] 5 neue Kampfsportarten: Judo, BJJ, Taekwondo, Wrestling (je 4 Übungen)
 - [x] Eigene Übungen erstellen (Name, Muskelgruppe, Equipment → Supabase custom_exercises)
-- [x] Freunde-System: MyPeak-Code (MP-NAME-XXXX), per Code hinzufügen, Anfragen annehmen/ablehnen
+- [x] Freunde-System: FullRep-Code (FR-NAME-XXXX), per Code hinzufügen, Anfragen annehmen/ablehnen
 - [x] Leaderboard: Wöchentlich rotierende Kategorie (Volumen/Streak/Trainings), nur Freunde
 - [x] Challenges: Freund herausfordern, Volumen oder Runden, Zeitraum wählbar, Live-Score
 - [x] XP-System: Workout +50 XP, Challenge gewinnen +150 XP, Streak-Boni 7/14/30 Tage (+100/200/500 XP), Level-Anzeige im Profil; vergeben beim Workout-Beenden (updateStreak in ActiveWorkout), Level-Up-Animation eingebunden
@@ -432,7 +478,7 @@ api/
 - **nutrition_entries** — Lebensmittel-Einträge pro Tag/Mahlzeit (date, meal_slot, food_name, serving_size, calories, protein, carbs, fat, source)
 - **custom_meals** — Gespeicherte Mahlzeit-Vorlagen (name, items als JSONB, Gesamtmakros, Soft-Delete)
 - **nutrition_goals** — Tägliche Kalorien-/Makro-/Wasser-Ziele pro User (1 Zeile, Upsert)
-- **friend_codes** — Einzigartiger MyPeak-Code pro User (MP-NAME-XXXX)
+- **friend_codes** — Einzigartiger FullRep-Code pro User (FR-NAME-XXXX)
 - **friendships** — Freundschaftsverbindungen (sender_id, receiver_id, status: pending/accepted/declined)
 - **challenges** — Herausforderungen (exercise_ids, criteria: volume/rounds, Zeitraum, Scores, winner_id)
 - **user_xp** — Erfahrungspunkte, Level, Streak pro User
@@ -609,12 +655,12 @@ Mehrere Blöcke mit ausführlichen Erklärungen:
 ## Design-Richtlinien
 
 - **Oberstes Prinzip:** Nicht überfüllt, einfach zu bedienen trotz vieler Features
-- **Logo:** Goldener Zigzag-Chart-Pfeil auf schwarzem Hintergrund mit "MyPeak FITNESS" Text. Zentriert oben in allen Tab-Headern (pt-12 für Notch) + Favicon + PWA-Icon. Komponente: `src/components/MyPeakLogo.jsx`
+- **Logo:** Goldener Zigzag-Chart-Pfeil auf schwarzem Hintergrund mit "FullRep FITNESS" Text. Zentriert oben in allen Tab-Headern (pt-12 für Notch) + Favicon + PWA-Icon. Komponente: `src/components/FullRepLogo.jsx`
 - **Farbpalette Dark Mode (Standard):** Hintergrund #0a0a0a / #1a1a1a (Karten), Akzentfarbe Gold #fbbf24, Texte Cremeweiß #fef3c7, sekundäre Texte gedämpftes Gold
 - **Farbpalette Light Mode:** Hintergrund #ffffff / #f5f5f5, Akzentfarbe dunkleres Gold #b45309, Texte Schwarz/Dunkelgrau
 - **Primary-Farben:** Gold-Palette (primary-400: #fbbf24, primary-500: #f59e0b, primary-600: #d97706)
 - **Stil:** Modern, clean — Gold als Primärfarbe, abgerundete Karten, weiche Schatten
-- **Navigation:** Bottom-Navigation mit 5 Tabs (Training, Ernährung, HOME-FAB, Bibliothek, Profil), Home-Button als goldener Kreis-FAB mit MyPeak-Pfeil
+- **Navigation:** Bottom-Navigation mit 5 Tabs (Training, Ernährung, HOME-FAB, Bibliothek, Profil), Home-Button als goldener Kreis-FAB mit FullRep-Pfeil
 - **Responsiv:** Mobile-first, muss auf dem Handy perfekt funktionieren
 - **Dark Mode:** Standard beim ersten Öffnen, umschaltbar im Profil
 

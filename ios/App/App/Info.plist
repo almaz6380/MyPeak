@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>MyPeak</string>
+        <string>FullRep</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -50,7 +50,7 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-	<string>MyPeak nutzt die Kamera, um Barcodes von Lebensmitteln zu scannen und Mahlzeiten zu fotografieren.</string>
+	<string>FullRep nutzt die Kamera, um Barcodes von Lebensmitteln zu scannen und Mahlzeiten zu fotografieren.</string>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-8860791993288062~8812263899</string>
 	<key>NSUserTrackingUsageDescription</key>

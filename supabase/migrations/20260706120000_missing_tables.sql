@@ -1,5 +1,5 @@
 -- ============================================================
--- MyPeak: Fehlende Tabellen (Juli 2026)
+-- FullRep: Fehlende Tabellen (Juli 2026)
 --
 -- Der Code referenziert 7 Tabellen, die in der Produktions-DB
 -- nie angelegt wurden (schema.sql wurde nicht vollständig

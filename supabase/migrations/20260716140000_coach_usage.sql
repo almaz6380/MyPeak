@@ -1,5 +1,5 @@
 -- ============================================================
--- MyPeak: KI-Coach-Kontingent (Juli 2026)
+-- FullRep: KI-Coach-Kontingent (Juli 2026)
 --
 -- Zählt pro Nutzer und Tag die Coach-Anfragen, um das API-Budget
 -- zu deckeln und Premium-Stufen zu staffeln (z. B. Trial 5/Tag,

@@ -8,7 +8,7 @@ import { checkAchievements } from './achievements';
 export function generateFriendCode(name) {
   const cleanName = (name || 'USER').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 8);
   const num = Math.floor(1000 + Math.random() * 9000);
-  return `MP-${cleanName}-${num}`;
+  return `FR-${cleanName}-${num}`;
 }
 
 export async function getOrCreateFriendCode(userId, name) {

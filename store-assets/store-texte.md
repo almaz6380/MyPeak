@@ -1,4 +1,4 @@
-# MyPeak — Store-Texte & Einreichungs-Angaben
+# FullRep — Store-Texte & Einreichungs-Angaben
 
 Stand: 07.07.2026 · Für App Store Connect (iOS) und Google Play Console (Android)
 
@@ -8,7 +8,7 @@ Stand: 07.07.2026 · Für App Store Connect (iOS) und Google Play Console (Andro
 
 ### Name (max. 30 Zeichen)
 ```
-MyPeak: Fitness & Ernährung
+FullRep: Training & Ernährung
 ```
 
 ### Untertitel (max. 30 Zeichen)
@@ -29,7 +29,7 @@ Mit Barcode-Scanner, KI-Foto-Erkennung und 21 fertigen Trainingsprogrammen.
 
 ### Beschreibung (Deutsch)
 ```
-MyPeak vereint Training und Ernährung in einer App — übersichtlich,
+FullRep vereint Training und Ernährung in einer App — übersichtlich,
 schnell und ohne Überforderung. Egal ob Anfänger oder Fortgeschrittener:
 Du trackst dein Workout, deine Kalorien und deinen Fortschritt an einem Ort.
 
@@ -64,12 +64,12 @@ AUSSERDEM
 • Gastmodus: Erst ausprobieren, dann registrieren
 • Funktioniert auch offline — deine Daten synchronisieren sich automatisch
 
-Lade MyPeak herunter und erreiche deinen Peak.
+Lade FullRep herunter und erreiche deinen Peak.
 ```
 
 ### Beschreibung (Englisch)
 ```
-MyPeak combines workout tracking and nutrition tracking in one app —
+FullRep combines workout tracking and nutrition tracking in one app —
 clean, fast and clutter-free. Whether you're a beginner or advanced:
 track your workouts, calories and progress in one place.
 
@@ -104,7 +104,7 @@ ALSO INCLUDED
 • Guest mode: try everything before signing up
 • Works offline — your data syncs automatically
 
-Download MyPeak and reach your peak.
+Download FullRep and reach your peak.
 ```
 
 ### URLs
@@ -149,7 +149,7 @@ Notes:
 
 ### Titel (max. 30 Zeichen)
 ```
-MyPeak: Fitness & Ernährung
+FullRep: Training & Ernährung
 ```
 
 ### Kurzbeschreibung (max. 80 Zeichen)

@@ -147,7 +147,7 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
           <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-lg">
             <Crown className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold">MyPeak Premium</h1>
+          <h1 className="text-2xl font-bold">FullRep Premium</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             {reason
               ? (lang === 'de' ? 'Diese Funktion ist Teil von Premium.' : 'This feature is part of Premium.')

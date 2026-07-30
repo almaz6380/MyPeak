@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { saveSetting } from '../data/settingsStorage';
-import MyPeakLogo from '../components/MyPeakLogo';
+import FullRepLogo from '../components/FullRepLogo';
 import CardPhotoMotif from '../components/CardPhotoMotif';
 import { supabase } from '../lib/supabase';
 import { Moon, Sun, Globe, Weight, LogOut, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2, ShieldCheck, Crown } from 'lucide-react';
@@ -149,7 +149,7 @@ export default function ProfilePage() {
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex flex-col items-center pt-12 mb-6">
-        <MyPeakLogo size={36} />
+        <FullRepLogo size={36} />
         <h1 className="text-2xl font-bold mt-2">{t('profile.title')}</h1>
       </div>
 
@@ -167,7 +167,7 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* MyPeak Code + XP */}
+      {/* FullRep Code + XP */}
       {!isGuestMode && (() => {
         const levelInfo = calculateLevel(xpData.total_xp || 0);
         const title = getLevelTitle(levelInfo.level);
@@ -197,7 +197,7 @@ export default function ProfilePage() {
           {/* Friend Code */}
           {friendCode && (
             <div>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">{i18n.language?.startsWith('de') ? 'Mein MyPeak-Code' : 'My MyPeak Code'}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">{i18n.language?.startsWith('de') ? 'Mein FullRep-Code' : 'My FullRep Code'}</p>
               <div className="flex items-center gap-2">
                 <code className="flex-1 bg-slate-50 dark:bg-slate-800 rounded-xl px-4 py-2.5 text-center font-mono text-sm font-bold tracking-wider text-primary-400">
                   {friendCode}
@@ -215,7 +215,7 @@ export default function ProfilePage() {
         );
       })()}
 
-      {/* MyPeak Premium */}
+      {/* FullRep Premium */}
       <button
         onClick={() => { if (!isPremium) openPaywall(); }}
         className={`relative overflow-hidden w-full rounded-2xl shadow-soft p-4 mb-4 flex items-center justify-between border ${
@@ -229,7 +229,7 @@ export default function ProfilePage() {
             <Crown className="w-5 h-5 text-white" />
           </div>
           <div className="text-left">
-            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">MyPeak Premium</p>
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">FullRep Premium</p>
             <p className="text-[11px] text-slate-400">
               {isPremium
                 ? (isTrial
@@ -409,7 +409,7 @@ export default function ProfilePage() {
 
       {/* App-Version — zur eindeutigen Build-Identifikation */}
       <p className="text-center text-xs text-slate-400 dark:text-slate-600 mt-4">
-        MyPeak {APP_VERSION}
+        FullRep {APP_VERSION}
       </p>
 
       {/* Delete Account Confirmation */}

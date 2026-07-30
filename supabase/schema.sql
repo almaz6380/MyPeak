@@ -1,5 +1,5 @@
 -- ============================================================
--- MyPeak Supabase Schema
+-- FullRep Supabase Schema
 -- Dieses SQL im Supabase Dashboard unter SQL Editor ausfuehren
 -- ============================================================
 
@@ -199,7 +199,7 @@ CREATE POLICY "Users can manage their own water entries"
 
 CREATE INDEX idx_water_entries_user_date ON water_entries(user_id, date DESC);
 
--- 10. Friend Codes (einzigartiger MyPeak-Code pro User)
+-- 10. Friend Codes (einzigartiger FullRep-Code pro User)
 CREATE TABLE friend_codes (
   user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   code text UNIQUE NOT NULL,

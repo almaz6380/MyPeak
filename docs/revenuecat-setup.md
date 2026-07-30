@@ -1,4 +1,4 @@
-# RevenueCat einrichten — MyPeak Premium (3,99 €/Monat)
+# RevenueCat einrichten — FullRep Premium (3,99 €/Monat)
 
 Der Code ist fertig verdrahtet. Damit echte Käufe funktionieren, brauchst du ein
 RevenueCat-Konto, ein Produkt und ein paar Schlüssel. Bis das eingerichtet ist, läuft die App
@@ -19,7 +19,10 @@ der Server (Trial-Endpoint + RevenueCat-Webhook) den Abo-Status.
 
 ## 2. RevenueCat-Projekt & Produkt
 
-1. Konto auf [revenuecat.com](https://www.revenuecat.com) anlegen, Projekt „MyPeak" erstellen.
+1. Konto auf [revenuecat.com](https://www.revenuecat.com) anlegen, Projekt anlegen.
+   ⚠️ Das bestehende RevenueCat-Projekt heißt noch **„MyPeak"** — der Projektname ist rein
+   intern und muss nicht umbenannt werden. Produkt-IDs (`mypeak_premium_monthly`) bleiben
+   ohnehin unverändert, weil Apple/Google sie nach Anlage nicht mehr ändern lassen.
 2. **Entitlement** anlegen mit dem Identifier **`premium`** (genau so — der Code prüft darauf).
 3. **Produkt** „Monatliches Premium" zu **3,99 €/Monat** anlegen. Wo, hängt von der Plattform ab:
    - **Web** (jetzt): über RevenueCat **Web Billing** (Schritt 3).

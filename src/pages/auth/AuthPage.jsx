@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import MyPeakLogo from '../../components/MyPeakLogo';
+import FullRepLogo from '../../components/FullRepLogo';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import ResetPasswordForm from './ResetPasswordForm';
@@ -17,7 +17,7 @@ export default function AuthPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <MyPeakLogo size={64} />
+            <FullRepLogo size={64} />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
             {t('auth.welcomeTitle')}

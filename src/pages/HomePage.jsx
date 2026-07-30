@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Flame, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Calendar, Plus } from 'lucide-react';
-import MyPeakLogo from '../components/MyPeakLogo';
+import FullRepLogo from '../components/FullRepLogo';
 import CardPhotoMotif from '../components/CardPhotoMotif';
 import { useAuth } from '../context/AuthContext';
 import { getNutritionEntries, getNutritionGoals, getWaterTotal } from '../data/nutritionStorage';
@@ -169,7 +169,7 @@ export default function HomePage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-1">
         <div className="w-9" />
-        <MyPeakLogo size={32} />
+        <FullRepLogo size={32} />
         <button onClick={() => navigate('/profile')} className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
           <img src="/bg-photos/profile-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />
         </button>

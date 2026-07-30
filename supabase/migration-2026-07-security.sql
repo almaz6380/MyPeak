@@ -1,5 +1,5 @@
 -- ============================================================
--- MyPeak Sicherheits-Migration (Juli 2026)
+-- FullRep Sicherheits-Migration (Juli 2026)
 -- Im Supabase Dashboard unter SQL Editor ausführen (einmalig).
 --
 -- Behebt:
