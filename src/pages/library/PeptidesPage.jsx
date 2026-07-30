@@ -158,6 +158,7 @@ export default function PeptidesPage({ onBack }) {
           {hasEbook && <ChevronRight className="w-5 h-5" />}
         </button>
 
+        <References items={p.references} lang={lang} />
         <Disclaimer lang={lang} />
       </div>
     );
@@ -262,10 +263,10 @@ function Disclaimer({ lang }) {
   return (
     <div className="mt-6 mb-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 flex gap-3">
       <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-      <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+      <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed whitespace-pre-line">
         {lang === 'de'
-          ? 'Diese Informationen dienen nur zu Bildungszwecken und ersetzen keine ärztliche Beratung. Peptide sind in vielen Ländern verschreibungspflichtig oder nicht zugelassen. Konsultiere immer einen Arzt vor der Anwendung.'
-          : 'This information is for educational purposes only and does not replace medical advice. Peptides are prescription-only or unapproved in many countries. Always consult a doctor before use.'}
+          ? 'Diese Informationen dienen nur zu Bildungszwecken und ersetzen keine ärztliche Beratung. Peptide sind in vielen Ländern verschreibungspflichtig oder nicht zugelassen. Konsultiere immer einen Arzt vor der Anwendung.\n\nZum Stand der Forschung: Nur wenige der hier beschriebenen Substanzen sind als Arzneimittel zugelassen (z. B. Semaglutid, Tirzepatid, Bremelanotid, Afamelanotid). Für die meisten übrigen stammt die Evidenz überwiegend aus Tier- und Laborstudien; belastbare Studien am Menschen fehlen. Die Quellenangaben unter jedem Eintrag verweisen auf die zugrunde liegende Literatur.'
+          : 'This information is for educational purposes only and does not replace medical advice. Peptides are prescription-only or unapproved in many countries. Always consult a doctor before use.\n\nOn the state of research: only a few of the substances described here are approved medicines (e.g. semaglutide, tirzepatide, bremelanotide, afamelanotide). For most of the others the evidence comes largely from animal and laboratory studies; robust human trials are lacking. The references below each entry link to the underlying literature.'}
       </p>
     </div>
   );

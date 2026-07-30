@@ -16,6 +16,44 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### iOS-Ablehnung 29.07.2026 behoben — Quellenangaben + IAP (30.07.2026)
+**Gute Nachricht zuerst: 4.3(a) „Spam" taucht in dieser Ablehnung NICHT mehr auf.** Apple hat
+Build 1.0 (3) inhaltlich geprüft (Prüfgerät iPad Air 11"). Zwei Punkte blieben:
+
+**1.4.1 Safety – Physical Harm:** medizinische Inhalte ohne Quellenangaben. Apple verlangt
+Belege „such as links to those sources", für Nutzer „easy to find".
+→ **Behoben.** Neue Komponente `src/components/References.jsx` — dauerhaft sichtbare
+Quellenliste (nicht eingeklappt), Links öffnen extern. Eingebunden in alle drei Reader:
+`KnowledgePage` (deckt Training/Ernährung/Supplemente/Blutwerte ab), `PeptidesPage`,
+`DietsPage`. Datenmodell je Thema: `references: [{ authors, year, title, source, url? }]`.
+
+**Abdeckung: 76/76 Themen, 120 Quellen, davon 97 verlinkt.** Nur anerkannte Domains
+(PubMed, PMC, NEJM, Oxford Academic, NIH ODS, WHO, ADA, ETA, Endocrine Society, Wiley,
+Taylor & Francis, Nature) — maschinell gegengeprüft.
+
+⚠️ **Grundregel, unbedingt beibehalten: keine DOI, kein Link, keine Quelle wird erfunden.**
+PubMed/doi.org/Crossref sind vom Proxy blockiert, verifiziert wurde je Quelle einzeln per
+Websuche. 23 im Text genannte Werke ohne verifizierbaren stabilen Link stehen bibliografisch
+vollständig, aber **ohne** `url` — das ist Absicht, nicht Lücke. Ein toter Link in einer
+Gesundheits-App ist schlimmer als keiner.
+Für Peptide gilt zusätzlich: **niemals Peptid-Shops als Beleg verlinken** — die dominieren
+die allgemeine Websuche. Domain-beschränkte Suche auf `pubmed.ncbi.nlm.nih.gov` nutzen.
+
+Weitere Stellen: TDEE-Rechner zitiert jetzt sichtbar Mifflin-St Jeor (1990) direkt am
+Ergebnis. Peptide-Disclaimer um einen Evidenz-Hinweis ergänzt (nur wenige Substanzen sind
+zugelassene Arzneimittel, sonst überwiegend Tier-/Laborstudien). `api/coach.js` weist den
+Coach bereits an, Quellen zu nennen und niemals welche zu erfinden.
+
+**2.1(b) Performance – App Completeness:** App verweist aufs Abo, IAP-Produkt wurde nie zur
+Prüfung eingereicht → Apple bricht ab.
+→ Code-Seite behoben: `PURCHASE_ENABLED.ios = true` in `PaywallPage.jsx`.
+
+**⚠️ NOCH OFFEN (nur Josef, in App Store Connect):**
+1. **Review-Screenshot** beim Abo `mypeak_premium_monthly` hochladen (steht auf „Missing Metadata")
+2. **IAP-Produkt zusammen mit der Version** einreichen, nicht separat
+3. Anzeigename auf `FullRep: Training & Ernährung`, neuer Build (iOS Build 3 → 4), `npx cap sync`
+4. Store-Screenshots neu — die bestehenden zeigen MyPeak und das alte Logo
+
 ### Umbenennung MyPeak → FullRep (30.07.2026) — CODE FERTIG, Stores/Domain OFFEN
 **Warum:** Markenkollision. **Aima Interactive S.L.** (Spanien) betreibt eine Fitness-App namens
 **MyPeak** ([Play](https://play.google.com/store/apps/details?id=com.mypeak.app) /
