@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ChevronDown, ChevronUp, AlertTriangle, FlaskConical, Brain, Flame, Heart, ShieldCheck, BookOpen, ChevronRight, Stethoscope } from 'lucide-react';
 import peptides from '../../data/peptidesData';
+import References from '../../components/References';
 
 const CATEGORIES = [
   { id: 'healing', icon: Heart, color: 'text-green-500 bg-green-50 dark:bg-green-900/20' },
@@ -73,6 +74,7 @@ export default function PeptidesPage({ onBack }) {
           </div>
         )}
 
+        <References items={p.references} lang={lang} />
         <Disclaimer lang={lang} />
       </div>
     );

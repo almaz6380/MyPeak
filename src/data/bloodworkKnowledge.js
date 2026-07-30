@@ -29,6 +29,12 @@ export const bloodworkTopics = [
       { label: 'Significance', text: 'Muscle building, bone density, libido, drive, mood.' },
       { label: 'Support naturally', text: 'Strength training, good sleep, healthy body weight, enough fat & micronutrients.' },
     ],
+    references: [
+      { authors: 'Bhasin, S. et al.', year: 2018, title: 'Testosterone Therapy in Men With Hypogonadism: An Endocrine Society Clinical Practice Guideline',
+        source: 'Journal of Clinical Endocrinology & Metabolism 103(5):1715–1744', url: 'https://pubmed.ncbi.nlm.nih.gov/29562364/' },
+      { authors: 'Endocrine Society', title: 'Testosterone Therapy for Hypogonadism — Guideline Resources',
+        source: 'Endocrine Society', url: 'https://www.endocrine.org/clinical-practice-guidelines/testosterone-therapy' },
+    ],
     sections: [
       {
         titleDE: 'Was Testosteron im Körper bewirkt',
@@ -106,6 +112,10 @@ Self-directed use of anabolic steroids for performance enhancement is strongly d
     quickEN: [
       { label: 'What is measured', text: '25-OH vitamin D in the blood — the standard value for vitamin D status.' },
       { label: 'Improve', text: 'Sunlight, oily fish, supplement if deficient — guide dose via blood test.' },
+    ],
+    references: [
+      { authors: 'Ross, A.C. et al.', year: 2011, title: 'The 2011 Report on Dietary Reference Intakes for Calcium and Vitamin D from the Institute of Medicine: What Clinicians Need to Know',
+        source: 'Journal of Clinical Endocrinology & Metabolism 96(1):53–58', url: 'https://academic.oup.com/jcem/article-abstract/96/1/53/2833225' },
     ],
     sections: [
       {
@@ -185,6 +195,12 @@ The vitamin D value is a good example of how useful a data-based approach is: in
       { label: 'What is measured', text: 'Ferritin (stores), often with haemoglobin, transferrin & transferrin saturation.' },
       { label: 'Risk groups', text: 'Menstruating women, endurance athletes, vegetarian/vegan diets.' },
     ],
+    references: [
+      { authors: 'World Health Organization', year: 2020, title: 'WHO guideline on use of ferritin concentrations to assess iron status in individuals and populations',
+        source: 'WHO, Geneva', url: 'https://www.who.int/publications/i/item/9789240000124' },
+      { authors: 'World Health Organization', year: 2020, title: 'WHO guideline on use of ferritin concentrations to assess iron status (NCBI-Eintrag)',
+        source: 'PubMed', url: 'https://pubmed.ncbi.nlm.nih.gov/33909381/' },
+    ],
     sections: [
       {
         titleDE: 'Die Rolle von Eisen',
@@ -262,6 +278,12 @@ Therefore, with iron especially: measure first, then act specifically. The dosag
     quickEN: [
       { label: 'Key values', text: 'Total cholesterol, LDL, HDL, triglycerides — together as the lipid profile.' },
       { label: 'Influence favourably', text: 'Fibre, unsaturated fats, exercise, healthy weight, few trans fats.' },
+    ],
+    references: [
+      { authors: 'Mach, F. et al.', year: 2020, title: '2019 ESC/EAS Guidelines for the management of dyslipidaemias: lipid modification to reduce cardiovascular risk',
+        source: 'European Heart Journal 41(1):111–188', url: 'https://academic.oup.com/eurheartj/article/41/1/111/5556353' },
+      { authors: 'Mach, F. et al.', year: 2025, title: '2025 Focused Update of the 2019 ESC/EAS Guidelines for the management of dyslipidaemias',
+        source: 'European Heart Journal 46(42):4359', url: 'https://academic.oup.com/eurheartj/article/46/42/4359/8234482' },
     ],
     sections: [
       {
@@ -341,6 +363,10 @@ Use this knowledge to better understand your own lipid profile and to address li
       { label: 'What is measured', text: 'Fasting blood sugar (snapshot) and HbA1c (average of the last ~3 months).' },
       { label: 'Influence favourably', text: 'Exercise, healthy weight, fibre-rich diet, less sugar; muscle training helps.' },
     ],
+    references: [
+      { authors: 'American Diabetes Association', year: 2025, title: 'Diagnosis and Classification of Diabetes: Standards of Care in Diabetes—2025',
+        source: 'Diabetes Care 48(Suppl. 1):S27–S49', url: 'https://diabetesjournals.org/care/article/48/Supplement_1/S27/157566/2-Diagnosis-and-Classification-of-Diabetes' },
+    ],
     sections: [
       {
         titleDE: 'Blutzucker und Insulin',
@@ -418,6 +444,10 @@ Use this knowledge to understand the significance of your values and to use nutr
     quickEN: [
       { label: 'What is measured', text: 'TSH as a screening test; if abnormal, additionally fT3/fT4 and possibly antibodies.' },
       { label: 'Symptoms', text: 'Fatigue, weight change, cold/heat sensitivity, mood — non-specific, clarify medically.' },
+    ],
+    references: [
+      { authors: 'Pearce, S.H.S. et al.', year: 2013, title: '2013 ETA Guideline: Management of Subclinical Hypothyroidism',
+        source: 'European Thyroid Journal 2(4):215–228', url: 'https://etj.bioscientifica.com/view/journals/etj/2/4/ETJ356507.xml' },
     ],
     sections: [
       {

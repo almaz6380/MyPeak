@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ChevronDown, ChevronUp, BookOpen, ChevronRight, Flame, TrendingUp, Clock, Zap, Scale, Play, Square, AlertTriangle } from 'lucide-react';
 import { diets, dietCategories } from '../../data/dietsData';
+import References from '../../components/References';
 import { useAuth } from '../../context/AuthContext';
 import { startDiet, stopDiet, getActiveDiet, calculateDietGoals, applyDietGoals } from '../../data/dietStorage';
 import { getNutritionGoals } from '../../data/nutritionStorage';
@@ -102,6 +103,8 @@ export default function DietsPage({ onBack }) {
             <p className="text-slate-400 text-sm">{lang === 'de' ? 'E-Book wird erstellt...' : 'E-Book coming soon...'}</p>
           </div>
         )}
+
+        <References items={d.references} lang={lang} />
       </div>
     );
   }
