@@ -133,12 +133,18 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
 
 ### AdMob: Store-Verknüpfung + app-ads.txt (29.07.2026) — ERLEDIGT
 - **Android-App in AdMob war nie mit dem Play-Eintrag verknüpft** („Details zum App-Shop" leer,
-  Genehmigungsstatus „Überprüfung nötig"). **Das ist die wahrscheinlichste Erklärung für die
-  bis dahin null Impressionen** — trotz `USE_TEST_ADS = false` und korrekter Produktiv-IDs
-  (`~3613953701`) wird eine nicht genehmigte App nicht ausgeliefert. Verknüpft über
-  AdMob → App-Einstellungen → Details zum App-Shop → Hinzufügen, Suche mit der vollständigen
-  **URL** `https://play.google.com/store/apps/details?id=at.gallab.mypeak` (die nackte Paket-
-  oder App-ID findet die Suche NICHT).
+  Genehmigungsstatus „Überprüfung nötig"). Verknüpft über AdMob → App-Einstellungen → Details
+  zum App-Shop → Hinzufügen, Suche mit der vollständigen **URL**
+  `https://play.google.com/store/apps/details?id=at.gallab.mypeak` (die nackte Paket- oder
+  App-ID findet die Suche NICHT). Am 30.07. stand der Status auf „Bestätigt / ✓ Überprüft".
+- **Die Verknüpfung erklärt die null Impressionen NICHT** (frühere Fassung dieser Notiz behauptete
+  das — falsch). Gegenbeweis: Mahjong Royale Android war ebenfalls unverknüpft und lieferte
+  trotzdem aus (176 Impressionen in 7 Tagen). Die Verknüpfung braucht es für die
+  **app-ads.txt-Zuordnung**, nicht für die Auslieferung. Wahrscheinlichere Gründe für MyPeaks
+  Null, in dieser Reihenfolge zu prüfen: (a) zu wenige Nutzer lösen den Interstitial überhaupt
+  aus — er kommt nur bei jeder 2. qualifizierenden Aktion mit ≥90 s Abstand und nur **nativ**;
+  (b) die im Play Store veröffentlichte Fassung ist älter als der AdMob-Einbau; (c) AdMob-Genehmigung
+  stand noch aus. Erst wenn Impressionen auflaufen, lohnt weitere Fehlersuche.
 - **`public/app-ads.txt`** ergänzt: `google.com, pub-8860791993288062, DIRECT, f08c47fec0942fa0`.
   Ohne sie kaufen Werbetreibende, die nur bei autorisierten Verkäufern einkaufen, unser Inventar
   nicht — sichtbar nur an niedrigerem eCPM, nie als Fehlermeldung. Die Publisher-ID gilt
