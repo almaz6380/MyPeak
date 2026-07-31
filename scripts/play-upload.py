@@ -160,9 +160,18 @@ def setze_listing(tok, datei, lang, dry_run=False):
         if vorher == nachher:
             print(f'  {feld}: unveraendert')
             continue
-        print(f'  {feld}:')
-        print(f'    vorher : {vorher[:70]}{"…" if len(vorher) > 70 else ""}')
-        print(f'    nachher: {nachher[:70]}{"…" if len(nachher) > 70 else ""}')
+        print(f'  {feld}: {len(vorher)} -> {len(nachher)} Zeichen')
+        # Ab der ersten abweichenden Stelle zeigen, nicht ab Zeichen 0: bei einem
+        # angehaengten Absatz waeren sonst beide Ausschnitte identisch und der
+        # Trockenlauf wertlos.
+        i = 0
+        while i < min(len(vorher), len(nachher)) and vorher[i] == nachher[i]:
+            i += 1
+        if i:
+            print(f'    ... die ersten {i} Zeichen sind gleich, ab da:')
+        for name, wert in (('vorher ', vorher), ('nachher', nachher)):
+            rest = wert[i:i + 200].replace('\n', '⏎')
+            print(f'    {name}: {rest or "(nichts)"}{"…" if len(wert) > i + 200 else ""}')
 
     if dry_run:
         call(tok, 'DELETE', f'{API}/applications/{PKG}/edits/{eid}')
