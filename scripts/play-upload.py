@@ -145,6 +145,37 @@ def commit_edit(tok, eid):
     print('  dort von Hand zur Pruefung geschickt werden.')
 
 
+def lade_einzelbild(tok, datei, lang, image_type, dry_run=False):
+    """App-Symbol oder Vorstellungsgrafik ersetzen.
+
+    Die beiden stecken NICHT in der App — sie sind eigene Uploads im
+    Store-Eintrag und wandern beim App-Update nicht mit. Genau deshalb standen
+    sie nach der Umbenennung noch auf MyPeak, obwohl die App laengst FullRep
+    hiess. Beim naechsten Logo- oder Namenswechsel also mit erneuern.
+    """
+    if not os.path.exists(datei):
+        sys.exit(f'Bild nicht gefunden: {datei}')
+    print(f'{image_type} fuer {lang}: {os.path.basename(datei)} '
+          f'({os.path.getsize(datei) // 1024} KB)')
+
+    if dry_run:
+        print('\n--dry-run: nichts hochgeladen, nichts geaendert.')
+        return
+
+    eid = call(tok, 'POST', f'{API}/applications/{PKG}/edits')['id']
+    print(f'\nEdit {eid} geoeffnet')
+    base = f'applications/{PKG}/edits/{eid}/listings/{lang}/{image_type}'
+
+    # Play erlaubt hier genau ein Bild — das alte muss weg, sonst kommt 409.
+    call(tok, 'DELETE', f'{API}/{base}')
+    with open(datei, 'rb') as fh:
+        call(tok, 'POST', f'{UPLOAD}/{base}?uploadType=media',
+             data=fh.read(), ctype='image/png')
+    print(f'  hochgeladen: {os.path.basename(datei)}')
+
+    commit_edit(tok, eid)
+
+
 def lade_screenshots(tok, verzeichnis, lang, dry_run=False, image_type='phoneScreenshots'):
     """Store-Eintrag-Screenshots ersetzen — alte loeschen, neue in Dateinamen-
     Reihenfolge hochladen. Play zeigt sie in genau dieser Reihenfolge an.
@@ -260,6 +291,10 @@ def main():
                    help='Store-Eintrag-Screenshots ersetzen (z. B. store-assets/android)')
     p.add_argument('--listing', metavar='JSON',
                    help='Titel/Beschreibung setzen (z. B. store-assets/play-listing.de-DE.json)')
+    p.add_argument('--icon', metavar='PNG',
+                   help='App-Symbol im Store-Eintrag ersetzen (512x512)')
+    p.add_argument('--feature', metavar='PNG',
+                   help='Vorstellungsgrafik ersetzen (1024x500)')
     p.add_argument('--lang', default='de-DE', help='Sprache des Eintrags (Standard: de-DE)')
     p.add_argument('--dry-run', action='store_true',
                    help='nur auflisten, nichts hochladen — das Listing ist oeffentlich')
@@ -268,8 +303,10 @@ def main():
                    help='Play-Track (Standard: production)')
     a = p.parse_args()
 
-    if not (a.aab or a.promote or a.status or a.screenshots or a.listing):
-        p.error('--aab, --promote, --status, --screenshots oder --listing angeben')
+    if not (a.aab or a.promote or a.status or a.screenshots or a.listing
+            or a.icon or a.feature):
+        p.error('--aab, --promote, --status, --screenshots, --listing, '
+                '--icon oder --feature angeben')
     if a.aab and not a.complete and a.fraction is None:
         p.error('--fraction 0.2 oder --complete angeben')
 
@@ -280,6 +317,10 @@ def main():
         return lade_screenshots(tok, a.screenshots, a.lang, a.dry_run)
     if a.listing:
         return setze_listing(tok, a.listing, a.lang, a.dry_run)
+    if a.icon:
+        return lade_einzelbild(tok, a.icon, a.lang, 'icon', a.dry_run)
+    if a.feature:
+        return lade_einzelbild(tok, a.feature, a.lang, 'featureGraphic', a.dry_run)
 
     eid = call(tok, 'POST', f'{API}/applications/{PKG}/edits')['id']
     print(f'Edit {eid} geöffnet')
