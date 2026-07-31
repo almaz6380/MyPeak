@@ -570,6 +570,19 @@ def diagnose(tok):
                 print(f'      Review-Screenshot: hochgeladen={sa.get("assetDeliveryState", {}).get("state")}')
             else:
                 print('      Review-Screenshot: FEHLT')
+            # Alles Erwartbare ist vorhanden und der Zustand bleibt trotzdem
+            # MISSING_METADATA — also die Rohdaten zeigen, statt weiter zu
+            # raten, welches Feld Apple vermisst.
+            print(f'      roh: {json.dumps(a, ensure_ascii=False, sort_keys=True)}')
+            for bez in ('introductoryOffers', 'promotionalOffers',
+                        'promotedPurchase', 'offerCodes', 'images'):
+                r = api(tok, f'subscriptions/{s["id"]}/{bez}?limit=1', fatal=False)
+                if r.get('_fehler'):
+                    print(f'      {bez}: (kein Endpunkt)')
+                else:
+                    dd = r.get('data')
+                    anz = len(dd) if isinstance(dd, list) else (1 if dd else 0)
+                    print(f'      {bez}: {anz}')
 
 
 def abo_namen(tok):
