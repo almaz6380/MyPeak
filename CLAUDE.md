@@ -100,11 +100,27 @@ In ASC → Abos → `mypeak_premium_monthly` steht der Grund im gelben Hinweis.
 (`--trotzdem` überbrückt). Ginge die Version allein durch, wäre das exakt der Zustand, für
 den Apple 2.1(b) vergeben hat.
 
-### Version 1.0 / Build 4 eingereicht — 31.07.2026, 12:46 UTC, `WAITING_FOR_REVIEW`
+### Version 1.0 / Build 4 eingereicht — 31.07.2026, 17:56 UTC, `WAITING_FOR_REVIEW`
 Auf Josefs ausdrückliche Anweisung mit `--trotzdem` abgesendet, obwohl beide Abos noch auf
 `MISSING_METADATA` stehen. ⚠️ **Die Abos sind also NICHT mitgegangen** — 2.1(b) kann sich
-dadurch wiederholen. Solange der Zustand `WAITING_FOR_REVIEW` (nicht `IN_REVIEW`) ist,
-lässt sich das heilen: `--aufraeumen`, Abos in Ordnung bringen, erneut einreichen.
+dadurch wiederholen. Zum Heilen: `--aufraeumen`, dann in ASC je Abo den blauen Knopf
+**„Zur Prüfung hinzufügen"** drücken, dann `--einreichen`.
+
+**Was Apple beim ersten Anlauf blockierte, war ein fehlender Preis.** Das Jahresabo
+`mypeak_premium_annual` hatte **keinen Abopreis** — ASC meldet dazu in der Oberfläche
+„Kann nicht zur Prüfung hinzugefügt werden · Füge einen Abopreis hinzu", über die API aber
+nur `MISSING_METADATA`. Am 31.07. nachgetragen: **44,90 €** (Deutschland), passend zu
+`PaywallPage.jsx` (`PRICES.annual` = 44,90 · 3,74 €/Monat). Monatlich steht auf 4,49 €.
+
+⚠️ **Eigener Fehler, der Stunden gekostet hat:** `--warum` zählte `subscriptions/{id}/prices`
+und meldete „Preise hinterlegt: 1" — auch für das Abo **ohne** Preis. Die Beziehung liefert
+offenbar auch Einträge, die kein gültiger Preis sind. **Anzahl ≠ vorhanden.** Wer das prüft,
+muss den Inhalt ansehen (Territorium + Betrag), nicht die Länge der Liste.
+
+**Der Ablauf für IAP hat sich bei Apple geändert** (Stand 31.07.): Auf der Versionsseite gibt
+es **kein `+`** mehr zum Anhängen. Stattdessen sammelt man: je Abo **„Zur Prüfung hinzufügen"**,
+dann auf der Version **„Zur Prüfung hinzufügen"** — alles landet in **einer** `reviewSubmission`
+und geht gemeinsam raus. Das erste Abo einer App geht zwingend mit einer App-Version mit.
 
 **Der eigentliche Blocker war eine Altlast, kein fehlendes Feld.** Zwei Stunden Suche gingen
 daran vorbei, deshalb ausführlich:
@@ -183,11 +199,11 @@ in der Console** und muss dort von Hand zur Prüfung geschickt werden — die Au
 ausdrücklich, statt „sichtbar" zu melden. Alle drei Wege (Screenshots, Texte, AAB) laufen
 darüber.
 
-**⚠️ NOCH OFFEN:** Store-Text ausrollen (`play-listing.yml`, `mode: texte`) **und in der
-Console zur Prüfung schicken**, AAB 14 bauen (braucht die vier Keystore-Secrets), danach
-unter „Probleme beheben" bestätigen. Fertige Antwort an den Support liegt in
-`store-assets/play-richtlinie-antwort.md` — erst **nach** dem Rollout absenden, vorher öffnet
-der Prüfer die alte App und bestätigt die Beanstandung.
+**✅ ERLEDIGT (31.07.2026, von Josef in der Play Console abgeschlossen — „Google ist bereits
+durch").** Damit sind Store-Text, AAB 14, Store-Symbol und Vorstellungsgrafik draußen und
+die Beanstandung ist abgearbeitet. Die vorbereitete Support-Antwort in
+`store-assets/play-richtlinie-antwort.md` wird nicht mehr gebraucht.
+Nicht selbst nachgeprüft — hier steht, was gemeldet wurde.
 
 ### Store-Screenshots neu + Play-Upload automatisiert (30.07.2026)
 **18 neue Screenshots** (6 Motive × iPhone 6,9″ / iPad 12,9″ / Android) in `store-assets/`.
