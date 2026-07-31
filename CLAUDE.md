@@ -27,9 +27,14 @@ Quellenliste (nicht eingeklappt), Links öffnen extern. Eingebunden in alle drei
 `KnowledgePage` (deckt Training/Ernährung/Supplemente/Blutwerte ab), `PeptidesPage`,
 `DietsPage`. Datenmodell je Thema: `references: [{ authors, year, title, source, url? }]`.
 
-**Abdeckung: 76/76 Themen, 120 Quellen, davon 97 verlinkt.** Nur anerkannte Domains
-(PubMed, PMC, NEJM, Oxford Academic, NIH ODS, WHO, ADA, ETA, Endocrine Society, Wiley,
-Taylor & Francis, Nature) — maschinell gegengeprüft.
+**Abdeckung: 52/52 Themen, 82 Quellen, davon 67 verlinkt** (Training 6, Ernährung 6,
+Supplemente 6, Blutwerte 6, Peptide 20, Diäten 8) — **kein Thema ohne Quellenblock.**
+Nur anerkannte Domains (PubMed, PMC, NEJM, Oxford Academic, NIH ODS, WHO, ADA, ETA,
+Endocrine Society, Wiley, Taylor & Francis, Nature) — maschinell gegengeprüft.
+⚠️ Hier stand vorher „76/76 Themen, 120 Quellen, 97 verlinkt". Am Code nachgezählt
+(31.07.) stimmt das nicht; 76 entsteht, wenn man die Wissensthemen je Sprache doppelt
+zählt (24×2+20+8). An der Lückenlosigkeit ändert das nichts — beim Zitieren aber die
+gemessenen Zahlen nehmen, nicht die alten.
 
 ⚠️ **Grundregel, unbedingt beibehalten: keine DOI, kein Link, keine Quelle wird erfunden.**
 PubMed/doi.org/Crossref sind vom Proxy blockiert, verifiziert wurde je Quelle einzeln per
@@ -52,31 +57,46 @@ Prüfung eingereicht → Apple bricht ab.
 verfügbar", der Nutzer sähe also Preise mit totem Knopf. Erst mit `goog_`-Key und dem
 Play-Produkt am Entitlement einschalten.
 
-**⚠️ NOCH OFFEN (iOS) — blockiert an fehlenden Secrets, nicht am Code:**
-Der Preflight-Lauf vom 30.07. (Run #1) sagt eindeutig: von zehn Release-Secrets ist
-**nur `PLAY_SERVICE_ACCOUNT_JSON` gesetzt**, die neun iOS-relevanten fehlen alle. Deshalb
-läuft `ios-release.yml` nicht, und die ASC-API ist von hier aus nicht erreichbar — es geht
-nichts iOS-seitiges ohne Josef, auch kein Umweg.
+### iOS-Stand 31.07.2026 — Build 4 oben, Metadaten gesetzt, Einreichung hakt an den Abos
+Die iOS-Secrets sind alle gesetzt (Josef am 31.07.), `ios-release.yml` lief durch,
+**Build 4 liegt in ASC und ist `VALID`**. Alles Weitere läuft über **`scripts/asc.py`** und
+den Workflow **`.github/workflows/asc.yml`** (Linux — die ASC-API braucht keinen Mac).
 
-| Secret | Woher |
+**Erledigt, je am echten Endpunkt bestätigt:**
+
+| | |
 |---|---|
-| `IOS_CERT_P12_BASE64`, `IOS_CERT_PASSWORD` | Distributionszertifikat als .p12 exportieren, `base64 -i cert.p12 \| pbcopy` |
-| `IOS_PROVISIONING_PROFILE_BASE64` | Profil „MyPeak AppStore", genauso base64 |
-| `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8_BASE64` | ASC → Benutzer und Zugriff → Integrationen (vorhandener Key VGHCB8Z8Q2) |
-| `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_REVENUECAT_IOS_KEY` | aus der lokalen `.env` |
+| Anzeigename | `MyPeak: Fitness & Ernährung` → `FullRep: Training & Ernährung` |
+| Build 4 | der Version 1.0 zugewiesen → Zustand `REJECTED` → `PREPARE_FOR_SUBMISSION` |
+| Screenshots | je 6 alte gelöscht, 6 iPhone (`APP_IPHONE_67`) + 6 iPad (`APP_IPAD_PRO_3GEN_129`) neu |
+| Abo-Screenshots | beide Abos, `assetDeliveryState = COMPLETE` |
+| Prüfnotiz | `appStoreReviewDetail.notes`, 1520 Zeichen, benennt **beide** Ablehnungsgründe mit Klickweg |
 
-Setzen mit `gh secret set <NAME> --repo almaz6380/MyPeak < datei` — so geht kein Schlüssel
-durch einen Chat. Danach `release-preflight.yml` laufen lassen: muss zehnmal „gesetzt" zeigen.
+⚠️ **Nur `de-DE` existiert in ASC.** Es gibt keine `en-US`-Lokalisierung, deshalb bleibt
+`FullRep: Workout & Nutrition` ungenutzt. Anlegen hieße englische Beschreibung, Keywords und
+eigene Screenshots — eigene Aufgabe, keine Nebensache.
 
-**Danach, in dieser Reihenfolge:**
-1. `ios-release.yml` auslösen (Build 4 liegt schon im `project.pbxproj`, `cap sync` macht der
-   Workflow selbst)
-2. In ASC: **Review-Screenshot** beim Abo `mypeak_premium_monthly` (steht auf „Missing Metadata")
-3. **IAP-Produkt zusammen mit der Version** einreichen, nicht separat — daran ist 2.1(b) gescheitert
-4. Anzeigename auf `FullRep: Training & Ernährung`
-5. Die **neuen** iPhone-/iPad-Screenshots aus `store-assets/ios` bzw. `store-assets/ios-ipad`
-   hochladen — zusammen mit dem Build, nicht in die laufende Einreichung hinein.
-   (Android ist komplett erledigt, siehe unten.)
+**⚠️ OFFEN — die Einreichung geht noch nicht durch:**
+Beide Abos stehen auf `MISSING_METADATA`, obwohl `--warum` alles Erwartbare als vorhanden
+meldet: Lokalisierungen DE+EN mit Beschreibung, Preis, **175 Länder**, Review-Screenshot
+`COMPLETE`. Solange das so bleibt, ginge die Version durch und die Abos nicht — **exakt der
+Zustand, der 2.1(b) ausgelöst hat.** Nicht einreichen, bevor beide `READY_TO_SUBMIT` zeigen.
+
+**Drei Dinge, die die API nachweislich NICHT kann** (am 31.07. gemessen, nicht vermutet):
+1. **Abos an eine Einreichung hängen** — `subscription` ist keine Beziehung an
+   `reviewSubmissionItems`; Apple antwortet „unknown relationship". Abos fahren mit der
+   Version mit, sobald sie `READY_TO_SUBMIT` sind.
+2. **Das Resolution Center** — kein öffentlicher Endpunkt. Die geschriebene Antwort auf
+   Apples Ablehnung bleibt Handarbeit. Die Prüfnotiz erreicht denselben Prüfer anders.
+3. **Eine `en-US`-Lokalisierung sinnvoll füllen** — technisch anlegbar, inhaltlich nicht.
+
+**Zwei Fallen, die je einen Fehlversuch gekostet haben:**
+- Bei `reviewSubmissionItems` heißt die **Beziehung im Singular** (`appStoreVersion`), der
+  **Typ im Plural** (`appStoreVersions`). Beides gleich zu benennen quittiert Apple mit
+  „unknown relationship" — dieselbe Meldung wie bei einer gar nicht existierenden Beziehung,
+  was in die falsche Richtung führt.
+- Die **Alterseinstufung hängt am `appInfo`, nicht am `appStoreVersion`**. Wer nur an der
+  Version nachsieht, meldet „fehlt", obwohl sie gesetzt ist. `--warum` fragt beide Orte ab.
 
 ### Play-Richtlinienverstoß „Gesundheitsbezogene Inhalte" (30.07.2026) — CODE FERTIG, Rollout OFFEN
 Google hat am 30.07. durchgesetzt: „Ihre App erinnert Nutzer offenbar nicht daran, einen Arzt
