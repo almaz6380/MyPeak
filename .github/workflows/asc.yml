@@ -10,6 +10,7 @@ name: App Store Connect
 #   screenshots     iPhone- + iPad-Bilder ersetzen
 #   abo-screenshot  Paywall-Bild an alle Abos (gegen "Missing Metadata")
 #   abo-namen       Abo-Anzeigenamen MyPeak -> FullRep
+#   abo-notiz       Prueferhinweis am Abo setzen
 #   inhaberrechte   contentRightsDeclaration setzen (app-weit)
 #   warum           liest nur: was blockiert die Einreichung?
 #   exportfrage     usesNonExemptEncryption am Build beantworten
@@ -29,6 +30,7 @@ on:
           - screenshots
           - abo-screenshot
           - abo-namen
+          - abo-notiz
           - inhaberrechte
           - warum
           - exportfrage
