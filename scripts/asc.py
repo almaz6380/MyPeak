@@ -306,6 +306,69 @@ def setze_abo_screenshot(tok):
                                           'id': s['id']}}})
 
 
+# Antwort auf die Ablehnung vom 29.07. Der Pruefer sieht sonst nur, DASS
+# sich etwas geaendert hat, nicht wo. Englisch, weil das App Review liest.
+PRUEFNOTIZ = """What changed since the rejected build (1.0 build 3)
+
+Guideline 1.4.1 - Safety, Physical Harm (missing sources)
+Every article that touches health now ends with a permanently visible
+"Sources" list - not collapsed, no tap required. Links open in Safari.
+Coverage is complete: 24 knowledge articles (training, nutrition,
+supplements, blood markers), 20 peptide articles and 8 diet articles.
+Where to look, starting from the app's Library tab:
+  Library > Training / Nutrition / Supplements / Blood values > any topic
+  Library > Peptides > any substance
+  Library > Diets > any diet
+The TDEE calculator cites Mifflin-St Jeor (1990) next to its result.
+Sources are real, verified references (PubMed, NIH, WHO, NEJM and similar).
+Entries without a stable public link are listed bibliographically without a
+URL rather than linked to an unreliable page.
+The AI coach is instructed to name its sources and never to invent one.
+
+Guideline 2.1(b) - Performance, App Completeness (subscription)
+The auto-renewable subscriptions are submitted together with this version.
+Both now carry a review screenshot of the paywall.
+To reach the paywall in the app: Profile tab > "FullRep Premium" card.
+A 7-day free trial is offered before any purchase.
+
+Medical disclaimer
+FullRep does not replace medical advice. A disclaimer appears on every
+health-related screen, and a dedicated page is reachable at
+Profile > Health notice.
+
+Demo account (not required - the app is fully usable as a guest):
+appreview@wellbooked.at / MyPeak-Review#2026
+"""
+
+
+def setze_pruefnotiz(tok):
+    aid = app_id(tok)
+    v = offene_version(tok, aid)
+    print(f'  Version {v["attributes"]["versionString"]}')
+    detail = api(tok, f'appStoreVersions/{v["id"]}/appStoreReviewDetail',
+                 fatal=False)
+    if TROCKEN:
+        alt = (detail.get('data') or {}).get('attributes', {}).get('notes') or ''
+        print(f'  [trocken] Notiz ersetzen ({len(alt)} -> {len(PRUEFNOTIZ)} Zeichen)')
+        return
+    if detail.get('data'):
+        res = api(tok, f'appStoreReviewDetails/{detail["data"]["id"]}', 'PATCH', {
+            'data': {'type': 'appStoreReviewDetails', 'id': detail['data']['id'],
+                     'attributes': {'notes': PRUEFNOTIZ}},
+        }, fatal=False)
+    else:
+        res = api(tok, 'appStoreReviewDetails', 'POST', {
+            'data': {'type': 'appStoreReviewDetails',
+                     'attributes': {'notes': PRUEFNOTIZ},
+                     'relationships': {'appStoreVersion': {'data': {
+                         'type': 'appStoreVersions', 'id': v['id']}}}},
+        }, fatal=False)
+    if res.get('_fehler'):
+        print(f'  FEHLER: {fehler_text(res)}')
+    else:
+        print(f'  Notiz gesetzt ({len(PRUEFNOTIZ)} Zeichen)')
+
+
 def einreichen(tok):
     """Version + Abos in einer Einreichung zu Apple schicken.
 
@@ -357,7 +420,10 @@ def einreichen(tok):
                 hab.add(bez['data']['id'])
     print(f'  bisher {len(drin.get("data", []))} Elemente')
 
-    def anhaengen(art, ident, label):
+    def anhaengen(bezug, art, ident, label):
+        # Die Beziehung heisst im Singular ('appStoreVersion'), der Typ im
+        # Plural ('appStoreVersions'). Beides gleich zu benennen quittiert
+        # Apple mit "unknown relationship".
         if ident in hab:
             print(f'    {label}: schon enthalten')
             return
@@ -369,14 +435,14 @@ def einreichen(tok):
                      'relationships': {
                          'reviewSubmission': {'data': {
                              'type': 'reviewSubmissions', 'id': sub['id']}},
-                         art: {'data': {'type': art, 'id': ident}}}},
+                         bezug: {'data': {'type': art, 'id': ident}}}},
         }, fatal=False)
         if res.get('_fehler'):
             print(f'    {label} NICHT angenommen: {fehler_text(res)}')
         else:
             print(f'    {label} angehaengt')
 
-    anhaengen('appStoreVersions', v['id'],
+    anhaengen('appStoreVersion', 'appStoreVersions', v['id'],
               f'Version {v["attributes"]["versionString"]}')
 
     grp = api(tok, f'apps/{aid}/subscriptionGroups')
@@ -387,7 +453,8 @@ def einreichen(tok):
             if a.get('state') == 'APPROVED':
                 print(f'    {a.get("productId")}: bereits freigegeben')
                 continue
-            anhaengen('subscriptions', s['id'], a.get('productId'))
+            anhaengen('subscription', 'subscriptions', s['id'],
+                      a.get('productId'))
 
     if TROCKEN:
         print('  [trocken] wuerde submitted=true setzen')
@@ -482,17 +549,20 @@ def main():
                    help='iPhone- und iPad-Screenshots ersetzen')
     p.add_argument('--abo-screenshot', action='store_true',
                    help='Paywall-Bild als Review-Screenshot an alle Abos')
+    p.add_argument('--pruefnotiz', action='store_true',
+                   help='App-Review-Notiz: was sich seit der Ablehnung aendert')
     p.add_argument('--einreichen', action='store_true',
                    help='Version samt Abos zur Pruefung schicken')
     p.add_argument('--alles', action='store_true',
-                   help='name, build 4, screenshots, abo-screenshot, einreichen')
+                   help='name, build 4, screenshots, abo-screenshot, '
+                        'pruefnotiz, einreichen')
     p.add_argument('--dry-run', action='store_true',
                    help='nur zeigen, nichts an Apple senden')
     a = p.parse_args()
     TROCKEN = a.dry_run
 
     tat = [a.status, a.name, a.build, a.screenshots, a.abo_screenshot,
-           a.einreichen, a.alles]
+           a.pruefnotiz, a.einreichen, a.alles]
     if not any(tat):
         p.error('Einen Befehl angeben, z. B. --status')
 
@@ -504,6 +574,7 @@ def main():
                           ('Build 4', lambda: setze_build(tok, '4')),
                           ('Screenshots', lambda: setze_screenshots(tok)),
                           ('Abo-Screenshot', lambda: setze_abo_screenshot(tok)),
+                          ('Pruefnotiz', lambda: setze_pruefnotiz(tok)),
                           ('Einreichen', lambda: einreichen(tok))):
             print(f'\n═══ {titel} ═══')
             fn()
@@ -516,6 +587,8 @@ def main():
         setze_screenshots(tok)
     if a.abo_screenshot:
         setze_abo_screenshot(tok)
+    if a.pruefnotiz:
+        setze_pruefnotiz(tok)
     if a.einreichen:
         einreichen(tok)
 

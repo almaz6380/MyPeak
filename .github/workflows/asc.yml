@@ -9,8 +9,9 @@ name: App Store Connect
 #   build           Build 4 der offenen Version zuweisen
 #   screenshots     iPhone- + iPad-Bilder ersetzen
 #   abo-screenshot  Paywall-Bild an alle Abos (gegen "Missing Metadata")
+#   pruefnotiz      App-Review-Notiz: was sich seit der Ablehnung aendert
 #   einreichen      Version samt Abos zur Pruefung
-#   alles           die fuenf schreibenden der Reihe nach
+#   alles           die sechs schreibenden der Reihe nach
 on:
   workflow_dispatch:
     inputs:
@@ -23,6 +24,7 @@ on:
           - build
           - screenshots
           - abo-screenshot
+          - pruefnotiz
           - einreichen
           - alles
         default: status
