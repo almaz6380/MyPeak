@@ -55,6 +55,7 @@ export default function App() {
       <Route path="/legal/imprint" element={<LegalPage doc="imprint" />} />
       <Route path="/legal/privacy" element={<LegalPage doc="privacy" />} />
       <Route path="/legal/terms" element={<LegalPage doc="terms" />} />
+      <Route path="/legal/health" element={<LegalPage doc="health" />} />
       <Route path="/coach" element={user ? <CoachPage /> : <AuthPage />} />
       <Route
         path="*"

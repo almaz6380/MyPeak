@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ChevronDown, ChevronUp, BookOpen, ChevronRight, Flame, TrendingUp, Clock, Zap, Scale, Play, Square, AlertTriangle } from 'lucide-react';
 import { diets, dietCategories } from '../../data/dietsData';
 import References from '../../components/References';
+import MedicalDisclaimer from '../../components/MedicalDisclaimer';
 import { useAuth } from '../../context/AuthContext';
 import { startDiet, stopDiet, getActiveDiet, calculateDietGoals, applyDietGoals } from '../../data/dietStorage';
 import { getNutritionGoals } from '../../data/nutritionStorage';
@@ -216,6 +217,10 @@ export default function DietsPage({ onBack }) {
                   <p className="text-[10px] text-slate-400">Fat</p>
                 </div>
               </div>
+
+              {/* Letzter Punkt vor dem Setzen der Ziele. */}
+              <MedicalDisclaimer lang={lang} className="mb-4" />
+
               <div className="flex gap-2">
                 <button onClick={() => setShowConfirm(false)} className="flex-1 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold text-sm">
                   {lang === 'de' ? 'Abbrechen' : 'Cancel'}
@@ -260,6 +265,10 @@ export default function DietsPage({ onBack }) {
           );
         })}
       </div>
+
+      {/* Eine Diaet setzt Kalorien- und Makroziele — der Hinweis gehoert vor die
+          Auswahl, nicht ans Seitenende. */}
+      <MedicalDisclaimer lang={lang} className="mb-4" />
 
       <p className="text-xs text-slate-400 mb-3">
         {filtered.length} {lang === 'de' ? 'Diätformen' : 'Diet types'}

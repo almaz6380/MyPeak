@@ -16,6 +16,11 @@ jobs:
       - name: Secrets pruefen
         env:
           PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          VITE_REVENUECAT_ANDROID_KEY: ${{ secrets.VITE_REVENUECAT_ANDROID_KEY }}
           IOS_CERT_P12_BASE64: ${{ secrets.IOS_CERT_P12_BASE64 }}
           IOS_CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
           IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
@@ -36,8 +41,15 @@ jobs:
             fi
           }
 
-          echo "Android (android-release.yml, play-listing.yml)"
+          echo "Play-API (play-listing.yml, Upload in android-release.yml)"
           pruefe PLAY_SERVICE_ACCOUNT_JSON
+
+          echo
+          echo "Android-Signierung (android-release.yml)"
+          for s in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS \
+                   ANDROID_KEY_PASSWORD; do
+            pruefe "$s"
+          done
 
           echo
           echo "iOS-Signierung (ios-release.yml)"
@@ -51,7 +63,8 @@ jobs:
 
           echo
           echo "Build-Umgebung (sonst startet die App ohne Backend)"
-          for s in VITE_SUPABASE_URL VITE_SUPABASE_ANON_KEY VITE_REVENUECAT_IOS_KEY; do
+          for s in VITE_SUPABASE_URL VITE_SUPABASE_ANON_KEY VITE_REVENUECAT_IOS_KEY \
+                   VITE_REVENUECAT_ANDROID_KEY; do
             pruefe "$s"
           done
 

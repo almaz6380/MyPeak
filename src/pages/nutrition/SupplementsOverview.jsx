@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Plus, Check, Pill, Settings, Sun, Moon, Dumbbell, Coffee, Sunset } from 'lucide-react';
 import CardPhotoMotif from '../../components/CardPhotoMotif';
+import MedicalDisclaimer from '../../components/MedicalDisclaimer';
 import { useAuth } from '../../context/AuthContext';
 import {
   getSupplements,
@@ -28,7 +29,7 @@ function formatDate(d) {
 }
 
 export default function SupplementsOverview({ onBack, onManage, onAdd }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [supplements, setSupplements] = useState([]);
   const [logs, setLogs] = useState([]);
@@ -106,6 +107,10 @@ export default function SupplementsOverview({ onBack, onManage, onAdd }) {
           </button>
         </div>
       </div>
+
+      {/* Nahrungsergaenzung ist gesundheitsbezogen — Hinweis oberhalb des
+          Einnahmeplans, damit er nicht erst nach dem Abhaken auftaucht. */}
+      <MedicalDisclaimer lang={i18n.language} className="mb-4" />
 
       {/* Progress */}
       {scheduled.length > 0 && (

@@ -215,4 +215,71 @@ export const legalDocs = {
       ],
     },
   },
+
+  // Eigene Seite statt nur Punkt 4 der AGB: Google Play verlangt, dass der
+  // Arzt-Hinweis fuer Nutzer leicht auffindbar ist (Richtlinie zu gesundheits-
+  // bezogenen Inhalten, durchgesetzt am 30.07.2026). In den Nutzungsbedingungen
+  // vergraben zaehlt das nicht — deshalb direkt im Profil verlinkt.
+  health: {
+    de: {
+      title: 'Gesundheitshinweis',
+      updated: 'Stand: Juli 2026',
+      sections: [
+        {
+          heading: 'FullRep ersetzt keine ärztliche Beratung',
+          body: 'Wende dich bei gesundheitlichen Fragen, für eine Diagnose oder eine Behandlung immer an eine Ärztin oder einen Arzt. FullRep ist eine App zum Protokollieren von Training und Ernährung — kein Medizinprodukt und kein Ersatz für ärztliche Untersuchung, Diagnose oder Therapie.',
+        },
+        {
+          heading: 'Wann du ärztlichen Rat einholen solltest',
+          body: 'Vor Beginn eines Trainings- oder Ernährungsprogramms, vor einer Diät und vor der Einnahme von Nahrungsergänzungsmitteln — insbesondere bei Vorerkrankungen, Beschwerden, Schwangerschaft, Stillzeit oder wenn du Medikamente einnimmst.\n\nBrich das Training ab und hole ärztlichen Rat ein, wenn Beschwerden auftreten — etwa Schmerzen in der Brust, Atemnot, Schwindel oder Ohnmacht.',
+        },
+        {
+          heading: 'Was die Inhalte der App sind — und was nicht',
+          body: 'Trainingspläne, Ernährungs- und Diätinformationen, Kalorien- und Makroberechnungen sowie die Wissensbibliothek (einschließlich Supplemente, Blutwerte und Peptide) dienen ausschließlich der allgemeinen Information. Sie sind allgemein gehalten und berücksichtigen deine persönliche Situation nicht.\n\nDie Angaben zu Blutwerten ordnen Werte allenfalls grob ein und stellen keine Diagnose dar. Eine Beurteilung deiner Werte kann nur ärztlich erfolgen.\n\nZu Peptiden: Diese Substanzen sind in vielen Ländern verschreibungspflichtig oder nicht zugelassen. Die Inhalte enthalten bewusst keine Dosierungsangaben.',
+        },
+        {
+          heading: 'Schätzwerte, keine Messungen',
+          body: 'Der TDEE-Rechner (Mifflin-St Jeor) und die KI-gestützte Foto-Analyse von Mahlzeiten liefern Schätzungen. Ihre Richtigkeit wird nicht garantiert; sie ersetzen keine Messung und keine ernährungsmedizinische Beratung.',
+        },
+        {
+          heading: 'Der KI-Coach ist kein Arzt',
+          body: 'Der KI-Coach beantwortet allgemeine Fragen zu Training, Ernährung und Supplementen. Er stellt keine Diagnosen, empfiehlt keine Therapien und nennt keine Dosierungen. Seine Antworten können Fehler enthalten. Für medizinischen Rat, eine Diagnose oder eine Behandlung wende dich an eine Ärztin oder einen Arzt.',
+        },
+        {
+          heading: 'Im Notfall',
+          body: 'Bei einem medizinischen Notfall rufe den Rettungsdienst (in Österreich und Deutschland 112). Nutze FullRep nicht, um in einer Notlage Hilfe zu suchen oder ärztliche Versorgung hinauszuzögern.',
+        },
+      ],
+    },
+    en: {
+      title: 'Health Notice',
+      updated: 'Last updated: July 2026',
+      sections: [
+        {
+          heading: 'FullRep does not replace medical advice',
+          body: 'For any health concern, diagnosis or treatment, always consult a doctor. FullRep is an app for logging training and nutrition — not a medical device and no substitute for medical examination, diagnosis or therapy.',
+        },
+        {
+          heading: 'When to seek medical advice',
+          body: 'Before starting a training or nutrition programme, before a diet and before taking any supplement — especially if you have a pre-existing condition or symptoms, are pregnant or breastfeeding, or take medication.\n\nStop exercising and seek medical advice if symptoms occur — such as chest pain, shortness of breath, dizziness or fainting.',
+        },
+        {
+          heading: 'What the content is — and what it is not',
+          body: 'Training plans, nutrition and diet information, calorie and macro calculations and the knowledge library (including supplements, blood values and peptides) are for general information only. They are generic and do not take your personal situation into account.\n\nInformation on blood values offers only a rough orientation and is not a diagnosis. Only a doctor can assess your results.\n\nOn peptides: these substances are prescription-only or unapproved in many countries. The content deliberately contains no dosage information.',
+        },
+        {
+          heading: 'Estimates, not measurements',
+          body: 'The TDEE calculator (Mifflin-St Jeor) and the AI photo analysis of meals produce estimates. Their accuracy is not guaranteed; they replace neither a measurement nor nutritional counselling.',
+        },
+        {
+          heading: 'The AI coach is not a doctor',
+          body: 'The AI coach answers general questions about training, nutrition and supplements. It does not diagnose, recommend therapies or state dosages. Its answers may contain errors. For medical advice, a diagnosis or treatment, consult a doctor.',
+        },
+        {
+          heading: 'In an emergency',
+          body: 'In a medical emergency call the emergency services (112 in Austria and Germany). Do not use FullRep to seek help in an emergency or to delay medical care.',
+        },
+      ],
+    },
+  },
 };

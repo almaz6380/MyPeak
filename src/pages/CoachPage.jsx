@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, Sparkles, Crown, AlertTriangle } from 'lucide-react';
+import { medicalDisclaimerText } from '../components/MedicalDisclaimer';
 import { useAuth } from '../context/AuthContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { askCoach, getCoachUsageToday } from '../data/coachStorage';
@@ -184,9 +185,7 @@ export default function CoachPage() {
           </button>
         </div>
         <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center mt-2 leading-relaxed">
-          {lang === 'de'
-            ? 'Nur zu Informationszwecken, kein Ersatz für ärztliche Beratung. Wende dich bei gesundheitlichen Fragen, für eine Diagnose oder Behandlung immer an eine Ärztin oder einen Arzt.'
-            : 'For information only, not a substitute for medical advice. For medical advice, diagnosis, or treatment, always consult a doctor.'}
+          {medicalDisclaimerText(lang)}
         </p>
       </div>
     </div>

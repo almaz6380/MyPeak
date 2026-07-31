@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ChevronDown, ChevronUp, AlertTriangle, FlaskConical, Brain, Flame, Heart, ShieldCheck, BookOpen, ChevronRight, Stethoscope } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, FlaskConical, Brain, Flame, Heart, ShieldCheck, BookOpen, ChevronRight, Stethoscope } from 'lucide-react';
 import peptides from '../../data/peptidesData';
 import References from '../../components/References';
+import MedicalDisclaimer from '../../components/MedicalDisclaimer';
 
 const CATEGORIES = [
   { id: 'healing', icon: Heart, color: 'text-green-500 bg-green-50 dark:bg-green-900/20' },
@@ -260,14 +261,11 @@ function EbookSection({ title, content, colorClass, defaultOpen = false }) {
 }
 
 function Disclaimer({ lang }) {
-  return (
-    <div className="mt-6 mb-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 flex gap-3">
-      <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-      <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed whitespace-pre-line">
-        {lang === 'de'
-          ? 'Diese Informationen dienen nur zu Bildungszwecken und ersetzen keine ärztliche Beratung. Peptide sind in vielen Ländern verschreibungspflichtig oder nicht zugelassen. Konsultiere immer einen Arzt vor der Anwendung.\n\nZum Stand der Forschung: Nur wenige der hier beschriebenen Substanzen sind als Arzneimittel zugelassen (z. B. Semaglutid, Tirzepatid, Bremelanotid, Afamelanotid). Für die meisten übrigen stammt die Evidenz überwiegend aus Tier- und Laborstudien; belastbare Studien am Menschen fehlen. Die Quellenangaben unter jedem Eintrag verweisen auf die zugrunde liegende Literatur.'
-          : 'This information is for educational purposes only and does not replace medical advice. Peptides are prescription-only or unapproved in many countries. Always consult a doctor before use.\n\nOn the state of research: only a few of the substances described here are approved medicines (e.g. semaglutide, tirzepatide, bremelanotide, afamelanotide). For most of the others the evidence comes largely from animal and laboratory studies; robust human trials are lacking. The references below each entry link to the underlying literature.'}
-      </p>
-    </div>
-  );
+  // Der Grundhinweis kommt aus dem gemeinsamen Baustein; peptidspezifisch bleiben
+  // die Verschreibungspflicht und der Stand der Forschung.
+  const extra = lang === 'de'
+    ? 'Peptide sind in vielen Ländern verschreibungspflichtig oder nicht zugelassen. Konsultiere immer einen Arzt vor der Anwendung.\n\nZum Stand der Forschung: Nur wenige der hier beschriebenen Substanzen sind als Arzneimittel zugelassen (z. B. Semaglutid, Tirzepatid, Bremelanotid, Afamelanotid). Für die meisten übrigen stammt die Evidenz überwiegend aus Tier- und Laborstudien; belastbare Studien am Menschen fehlen. Die Quellenangaben unter jedem Eintrag verweisen auf die zugrunde liegende Literatur.'
+    : 'Peptides are prescription-only or unapproved in many countries. Always consult a doctor before use.\n\nOn the state of research: only a few of the substances described here are approved medicines (e.g. semaglutide, tirzepatide, bremelanotide, afamelanotide). For most of the others the evidence comes largely from animal and laboratory studies; robust human trials are lacking. The references below each entry link to the underlying literature.';
+
+  return <MedicalDisclaimer lang={lang} type="medical" extra={extra} className="mt-6 mb-4" />;
 }
