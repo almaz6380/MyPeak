@@ -8,7 +8,7 @@ on:
       mode:
         description: 'Was aktualisiert wird'
         type: choice
-        options: [screenshots, texte]
+        options: [screenshots, texte, grafiken]
         default: screenshots
       lang:
         description: 'Sprache des Store-Eintrags'
@@ -45,21 +45,33 @@ jobs:
           mkdir -p ~/.config/play-publisher
           printf '%s' "$PLAY_KEY_JSON" > ~/.config/play-publisher/key.json
 
-          if [ "$MODE" = "texte" ]; then
-            ARGS=(--listing "store-assets/play-listing.$LANG_INPUT.json")
-          else
-            ARGS=(--screenshots store-assets/android)
-          fi
-          ARGS+=(--lang "$LANG_INPUT")
-
+          GEMEINSAM=(--lang "$LANG_INPUT")
           if [ "$DRY_RUN" = "true" ]; then
-            ARGS+=(--dry-run)
+            GEMEINSAM+=(--dry-run)
             echo "::notice::Trockenlauf — es wird nichts am Store-Eintrag geaendert."
           else
             echo "::warning::Echter Lauf — der oeffentliche Play-Eintrag wird jetzt geaendert."
           fi
 
-          python3 scripts/play-upload.py "${ARGS[@]}"
+          case "$MODE" in
+            texte)
+              python3 scripts/play-upload.py \
+                --listing "store-assets/play-listing.$LANG_INPUT.json" "${GEMEINSAM[@]}"
+              ;;
+            grafiken)
+              # App-Symbol und Vorstellungsgrafik sind zwei getrennte Uploads;
+              # jeder braucht seine eigene Edit-Transaktion.
+              python3 scripts/play-upload.py \
+                --icon store-assets/android/icon-512.png "${GEMEINSAM[@]}"
+              echo
+              python3 scripts/play-upload.py \
+                --feature store-assets/android/feature-graphic.png "${GEMEINSAM[@]}"
+              ;;
+            *)
+              python3 scripts/play-upload.py \
+                --screenshots store-assets/android "${GEMEINSAM[@]}"
+              ;;
+          esac
 
       - name: Schluessel entfernen
         if: always()
