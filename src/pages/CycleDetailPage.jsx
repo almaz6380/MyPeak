@@ -2,6 +2,7 @@ import { toLocalDateString } from '../lib/dateUtils';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Dumbbell, Apple, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import MedicalDisclaimer from '../components/MedicalDisclaimer';
 import { useAuth } from '../context/AuthContext';
 import {
   getCycleSettings, saveCycleSettings,
@@ -125,6 +126,10 @@ export default function CycleDetailPage({ onBack }) {
           </div>
         </div>
       )}
+
+      {/* Zyklusdaten sind Gesundheitsdaten, die Empfehlungen darunter sind
+          allgemein gehalten — der Hinweis steht deshalb direkt davor. */}
+      <MedicalDisclaimer lang={lang} className="mb-4" />
 
       {/* Recommendations */}
       {recs && (

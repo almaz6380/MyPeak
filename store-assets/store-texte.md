@@ -65,6 +65,9 @@ AUSSERDEM
 • Funktioniert auch offline — deine Daten synchronisieren sich automatisch
 
 Lade FullRep herunter und erreiche deinen Peak.
+
+WICHTIGER GESUNDHEITSHINWEIS
+FullRep ersetzt keine ärztliche Beratung. Wende dich bei gesundheitlichen Fragen, für eine Diagnose oder eine Behandlung immer an eine Ärztin oder einen Arzt. Sprich insbesondere vor Beginn eines Trainings- oder Ernährungsprogramms, vor einer Diät und vor der Einnahme von Nahrungsergänzungsmitteln mit einer Ärztin oder einem Arzt — vor allem bei Vorerkrankungen, Beschwerden, Schwangerschaft oder wenn du Medikamente einnimmst. Alle Inhalte der App dienen der allgemeinen Information und sind kein Medizinprodukt.
 ```
 
 ### Beschreibung (Englisch)
@@ -105,6 +108,9 @@ ALSO INCLUDED
 • Works offline — your data syncs automatically
 
 Download FullRep and reach your peak.
+
+IMPORTANT HEALTH NOTICE
+FullRep does not replace medical advice. For any health concern, diagnosis or treatment, always consult a doctor. In particular, talk to a doctor before starting a training or nutrition programme, before a diet and before taking any supplement — especially if you have a pre-existing condition or symptoms, are pregnant, or take medication. All content in the app is for general information and is not a medical device.
 ```
 
 ### URLs

@@ -368,6 +368,9 @@ export default function ProfilePage() {
         <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 px-4 pt-4 pb-2">
           {t('legal.title')}
         </h2>
+        {/* Gesundheitshinweis zuerst — er muss leicht auffindbar sein, nicht
+            hinter Impressum und AGB (Play-Richtlinie zu Gesundheitsinhalten). */}
+        <LegalRow to="/legal/health" label={t('legal.health')} />
         <LegalRow to="/legal/imprint" label={t('legal.imprint')} />
         <LegalRow to="/legal/privacy" label={t('legal.privacy')} />
         <LegalRow to="/legal/terms" label={t('legal.terms')} last={!canChangeAdConsent()} />

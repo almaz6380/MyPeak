@@ -74,6 +74,42 @@ durch einen Chat. Danach `release-preflight.yml` laufen lassen: muss zehnmal „
    hochladen — zusammen mit dem Build, nicht in die laufende Einreichung hinein.
    (Android ist komplett erledigt, siehe unten.)
 
+### Play-Richtlinienverstoß „Gesundheitsbezogene Inhalte" (30.07.2026) — CODE FERTIG, Rollout OFFEN
+Google hat am 30.07. durchgesetzt: „Ihre App erinnert Nutzer offenbar nicht daran, einen Arzt
+aufzusuchen, wenn sie medizinischen Rat, eine **Diagnose** oder eine **Behandlung** benötigen."
+Fundort laut Google: die **vollständige Beschreibung (de-DE)**. Vorherige Version bleibt live.
+Entscheidung: **beheben, kein Einspruch** — der Befund traf zu.
+
+⚠️ **Der Kernsatz muss alle drei Fälle nennen — Rat, Diagnose, Behandlung.** Danach sucht die
+Prüfung. Beim Kürzen also aufpassen: das ist juristischer Text, keine UI-Kopie.
+
+**Neu `src/components/MedicalDisclaimer.jsx`** (Muster wie `References.jsx`, `lang`-Prop statt
+i18n-Keys — der Wortlaut soll sich nicht nebenbei mitändern). Varianten `medical` (Standard) /
+`general`, optionaler `extra`-Absatz, dazu `medicalDisclaimerText()` für Stellen ohne Kasten.
+Er löst die **zwei divergierenden Kopien** in `KnowledgePage` und `PeptidesPage` ab.
+
+Eingebaut, wo bisher **gar nichts** stand: `library/DietsPage` (Liste **und** direkt über dem
+Bestätigen von „Diät starten"), `CycleDetailPage` (über den Empfehlungen),
+`nutrition/SupplementsOverview` (über dem Einnahmeplan). `CoachPage` nutzt jetzt
+`medicalDisclaimerText()` — die 10-px-Fußzeile unter dem Eingabefeld bleibt, die Box wäre dort
+zu schwer.
+
+**Dauerhaft auffindbar: `/legal/health`** (`legalDocs.health`, DE+EN, 6 Abschnitte inkl.
+Notfall-Hinweis und „KI-Coach ist kein Arzt"), im Profil als **erste** Zeile über Impressum —
+in den AGB vergraben (dort Punkt 4) zählt es für Google nicht.
+
+Store-Beschreibung um „WICHTIGER GESUNDHEITSHINWEIS" ergänzt: `play-listing.de-DE.json`
+(2326/4000 Zeichen) und spiegelbildlich DE+EN in `store-texte.md`, damit die iOS-Beschreibung
+nicht auseinanderläuft — Apples 1.4.1 zielt auf dasselbe.
+
+**Version für die Auslieferung: `versionCode 14` / `versionName 1.2.0`.** Achtung: 13/1.1.8 war
+zugleich die live ausgelieferte Fassung — die **erste** AAB mit dem gesamten FullRep-Umbau
+(Name, Logo, Quellenangaben) ist also erst diese hier.
+
+**⚠️ NOCH OFFEN:** Store-Text ausrollen (`play-listing.yml`, `mode: texte`), AAB 14 bauen
+(braucht die vier Keystore-Secrets), danach in der Play Console „Probleme beheben" bestätigen.
+Erst **nach** dem Rollout dem Support antworten — vorher öffnet der Prüfer die alte App.
+
 ### Store-Screenshots neu + Play-Upload automatisiert (30.07.2026)
 **18 neue Screenshots** (6 Motive × iPhone 6,9″ / iPad 12,9″ / Android) in `store-assets/`.
 Erzeugt von **`scripts/store-screenshots.mjs`** (Playwright + Chromium aus `/opt/pw-browsers`)

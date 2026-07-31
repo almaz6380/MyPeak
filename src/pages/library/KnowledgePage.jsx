@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ChevronDown, ChevronUp, AlertTriangle, BookOpen, ChevronRight, Stethoscope } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, BookOpen, ChevronRight, Stethoscope } from 'lucide-react';
 import References from '../../components/References';
+import MedicalDisclaimer from '../../components/MedicalDisclaimer';
 
 // Generischer Reader für die Wissensbibliothek-Blöcke (Training, Ernährung,
 // Supplements, Blutwerte). Datengetrieben — jeder Block liefert `data` (Themen)
@@ -106,8 +107,8 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, categori
             <Stethoscope className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
             <p className="text-xs text-blue-700 dark:text-blue-400 leading-relaxed">
               {lang === 'de'
-                ? 'Diese Inhalte ersetzen keine ärztliche Beratung. Bei gesundheitlichen Fragen wende dich an einen Arzt.'
-                : 'This content does not replace medical advice. Consult a physician for health concerns.'}
+                ? 'Diese Inhalte ersetzen keine ärztliche Beratung. Wende dich bei gesundheitlichen Fragen, für eine Diagnose oder eine Behandlung an eine Ärztin oder einen Arzt.'
+                : 'This content does not replace medical advice. For any health concern, diagnosis or treatment, consult a doctor.'}
             </p>
           </div>
         )}
@@ -220,17 +221,5 @@ function EbookSection({ title, content, colorClass, defaultOpen = false }) {
 
 function Disclaimer({ lang, type }) {
   if (!type) return null;
-  const text = type === 'medical'
-    ? (lang === 'de'
-        ? 'Diese Informationen dienen nur zu Bildungszwecken und ersetzen keine ärztliche Beratung oder Diagnose. Konsultiere bei gesundheitlichen Fragen immer einen Arzt.'
-        : 'This information is for educational purposes only and does not replace medical advice or diagnosis. Always consult a doctor for health concerns.')
-    : (lang === 'de'
-        ? 'Diese Informationen dienen zu Bildungszwecken. Trainings- und Ernährungsempfehlungen sind allgemein gehalten und ersetzen keine individuelle Beratung.'
-        : 'This information is for educational purposes. Training and nutrition recommendations are general and do not replace individual guidance.');
-  return (
-    <div className="mt-6 mb-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 flex gap-3">
-      <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-      <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">{text}</p>
-    </div>
-  );
+  return <MedicalDisclaimer lang={lang} type={type} className="mt-6 mb-4" />;
 }
