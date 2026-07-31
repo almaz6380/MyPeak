@@ -94,30 +94,41 @@ def call(tok, method, url, data=None, ctype='application/json', fatal=True):
 
 
 def commit_edit(tok, eid):
-    """Edit abschliessen.
+    """Edit pruefen und abschliessen.
 
     Normalerweise reicht Google die Aenderung gleich zur Pruefung ein. Steht die
     App aber unter einer laufenden Richtlinienpruefung, lehnt die API genau das
-    ab (400, "Changes cannot be sent for review automatically"). Dann committen
-    wir mit changesNotSentForReview=true: die Aenderung ist gespeichert und liegt
-    in der Play Console, muss dort aber von Hand zur Pruefung geschickt werden.
+    ab (400, "Changes cannot be sent for review automatically") — und zwar schon
+    bei :validate, nicht erst bei :commit. Deshalb wird der ganze Abschluss
+    wiederholt, beide Aufrufe mit changesNotSentForReview=true.
 
-    Ohne diesen Zweig geht der Commit verloren und die Edit-Transaktion verfaellt.
+    Die Aenderung ist dann gespeichert, liegt aber als Entwurf in der Play
+    Console und muss dort von Hand zur Pruefung geschickt werden.
+
+    Ohne diesen Zweig verfaellt die Edit-Transaktion und die ganze vorherige
+    Arbeit (bei einem AAB: Minuten an Upload) ist weg.
     """
-    url = f'{API}/applications/{PKG}/edits/{eid}:commit'
+    basis = f'{API}/applications/{PKG}/edits/{eid}'
+
+    def abschliessen(suffix=''):
+        call(tok, 'POST', f'{basis}:validate{suffix}', fatal=bool(suffix))
+        print('  validiert')
+        call(tok, 'POST', f'{basis}:commit{suffix}', fatal=bool(suffix))
+
     try:
-        call(tok, 'POST', url, fatal=False)
+        abschliessen()
         print('  committet — im Play-Eintrag jetzt sichtbar.')
         return
     except ApiError as e:
         if e.code != 400 or 'changesNotSentForReview' not in e.detail:
-            sys.exit(f'\nFEHLER {e.code} bei POST {url}\n{e.detail}\n')
+            sys.exit(f'\nFEHLER {e.code} beim Abschliessen von Edit {eid}\n{e.detail}\n')
 
-    call(tok, 'POST', f'{url}?changesNotSentForReview=true')
+    print('  Google nimmt gerade keine automatisch eingereichte Aenderung an —')
+    print('  zweiter Versuch ohne Einreichung zur Pruefung …')
+    abschliessen('?changesNotSentForReview=true')
     print('  committet — ABER NICHT zur Pruefung eingereicht.')
-    print('  Google laesst das automatische Einreichen gerade nicht zu (laufende')
-    print('  Richtlinienpruefung). Die Aenderung liegt jetzt in der Play Console')
-    print('  und muss dort von Hand zur Pruefung geschickt werden.')
+    print('  Die Aenderung liegt jetzt als Entwurf in der Play Console und muss')
+    print('  dort von Hand zur Pruefung geschickt werden.')
 
 
 def lade_screenshots(tok, verzeichnis, lang, dry_run=False, image_type='phoneScreenshots'):
@@ -152,8 +163,6 @@ def lade_screenshots(tok, verzeichnis, lang, dry_run=False, image_type='phoneScr
                  data=fh.read(), ctype='image/png')
         print(f'  hochgeladen: {os.path.basename(b)}')
 
-    call(tok, 'POST', f'{API}/applications/{PKG}/edits/{eid}:validate')
-    print('  validiert')
     commit_edit(tok, eid)
 
 
@@ -213,8 +222,7 @@ def setze_listing(tok, datei, lang, dry_run=False):
         return
 
     call(tok, 'PATCH', url, data=dict(neu, language=lang))
-    call(tok, 'POST', f'{API}/applications/{PKG}/edits/{eid}:validate')
-    print('\n  validiert')
+    print()
     commit_edit(tok, eid)
 
 
@@ -286,10 +294,8 @@ def main():
     ziel = 'alle Nutzer' if a.complete else f'{a.fraction * 100:.0f} % der Nutzer'
     print(f'Track {a.track} gesetzt: versionCode {vc} an {ziel}')
 
-    call(tok, 'POST', f'{API}/applications/{PKG}/edits/{eid}:validate')
-    print('validiert')
-    # Auch hier ueber den Helfer: steht die App unter Richtlinienpruefung, wuerde
-    # ein direkter Commit die ganze Hochlade-Arbeit verwerfen.
+    # Ueber den Helfer: steht die App unter Richtlinienpruefung, wuerde ein
+    # direkter Abschluss die ganze Hochlade-Arbeit verwerfen.
     commit_edit(tok, eid)
 
 
