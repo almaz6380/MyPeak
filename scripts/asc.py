@@ -488,6 +488,19 @@ def diagnose(tok):
     Hier werden die ueblichen Sperren einzeln abgefragt.
     """
     aid = app_id(tok)
+
+    # App-weite Pflichtfelder. contentRightsDeclaration ist der Klassiker:
+    # fehlt sie, sperrt sie die Einreichung, ohne dass an Version oder Abo
+    # etwas fehlt — man sucht dann lange an der falschen Stelle.
+    print('\n── App-weite Angaben ──')
+    app = api(tok, f'apps/{aid}', fatal=False)
+    aa = (app.get('data') or {}).get('attributes', {})
+    for feld in ('primaryLocale', 'contentRightsDeclaration',
+                 'availableInNewTerritories'):
+        wert = aa.get(feld)
+        marke = '  ⚠ nicht gesetzt' if wert is None else ''
+        print(f'  {feld}: {wert!r}{marke}')
+
     v = offene_version(tok, aid)
     va = v['attributes']
     print(f'\n── Version {va["versionString"]} ({va.get("appStoreState")}) ──')
@@ -637,6 +650,33 @@ def abo_namen(tok):
                       else f'    FEHLER: {fehler_text(res)}')
 
 
+def inhaberrechte(tok):
+    """contentRightsDeclaration setzen — app-weites Pflichtfeld.
+
+    FullRep zeigt keine Inhalte Dritter, für die Rechte nachzuweisen wären:
+    Übungsfotos stammen aus der Public Domain (free-exercise-db), die
+    Quellenangaben sind bibliografische Zitate. Also
+    DOES_NOT_USE_THIRD_PARTY_CONTENT.
+    """
+    aid = app_id(tok)
+    app = api(tok, f'apps/{aid}')
+    jetzt = app['data']['attributes'].get('contentRightsDeclaration')
+    soll = 'DOES_NOT_USE_THIRD_PARTY_CONTENT'
+    print(f'  contentRightsDeclaration: {jetzt!r} -> {soll}')
+    if jetzt == soll:
+        print('  steht schon so')
+        return
+    if TROCKEN:
+        print('  [trocken] wuerde gesetzt')
+        return
+    res = api(tok, f'apps/{aid}', 'PATCH', {
+        'data': {'type': 'apps', 'id': aid,
+                 'attributes': {'contentRightsDeclaration': soll}},
+    }, fatal=False)
+    print('  gesetzt' if not res.get('_fehler')
+          else f'  FEHLER: {fehler_text(res)}')
+
+
 def exportfrage(tok, wert=False):
     """Die Frage nach Verschluesselung am Build beantworten.
 
@@ -751,6 +791,8 @@ def main():
                    help='Was blockiert die Einreichung? (liest nur)')
     p.add_argument('--abo-namen', action='store_true',
                    help='Abo-Anzeigenamen von MyPeak auf FullRep ziehen')
+    p.add_argument('--inhaberrechte', action='store_true',
+                   help='contentRightsDeclaration setzen (app-weites Pflichtfeld)')
     p.add_argument('--exportfrage', action='store_true',
                    help='usesNonExemptEncryption am Build auf false setzen')
     p.add_argument('--pruefnotiz', action='store_true',
@@ -766,8 +808,8 @@ def main():
     TROCKEN = a.dry_run
 
     tat = [a.status, a.name, a.build, a.screenshots, a.abo_screenshot,
-           a.warum, a.abo_namen, a.exportfrage, a.pruefnotiz, a.einreichen,
-           a.alles]
+           a.warum, a.abo_namen, a.inhaberrechte, a.exportfrage, a.pruefnotiz,
+           a.einreichen, a.alles]
     if not any(tat):
         p.error('Einen Befehl angeben, z. B. --status')
 
@@ -780,6 +822,7 @@ def main():
                           ('Screenshots', lambda: setze_screenshots(tok)),
                           ('Abo-Screenshot', lambda: setze_abo_screenshot(tok)),
                           ('Abo-Namen', lambda: abo_namen(tok)),
+                          ('Inhaberrechte', lambda: inhaberrechte(tok)),
                           ('Pruefnotiz', lambda: setze_pruefnotiz(tok)),
                           ('Einreichen', lambda: einreichen(tok))):
             print(f'\n═══ {titel} ═══')
@@ -797,6 +840,8 @@ def main():
         diagnose(tok)
     if a.abo_namen:
         abo_namen(tok)
+    if a.inhaberrechte:
+        inhaberrechte(tok)
     if a.exportfrage:
         exportfrage(tok)
     if a.pruefnotiz:
