@@ -50,6 +50,7 @@ BILDER = [
 ]
 
 TROCKEN = False
+TROTZDEM = False
 
 
 def token() -> str:
@@ -462,9 +463,16 @@ def einreichen(tok):
             if a.get('state') not in ('READY_TO_SUBMIT', 'APPROVED',
                                       'WAITING_FOR_REVIEW', 'IN_REVIEW'):
                 offen_abo.append(a.get('productId'))
-    if offen_abo:
-        print(f'    ⚠ noch nicht einreichbar: {", ".join(offen_abo)} '
-              f'— mit --warum nachsehen, was fehlt')
+    if offen_abo and not TROTZDEM:
+        # Harte Sperre, kein blosser Hinweis. Ginge die Version ohne die Abos
+        # zur Pruefung, waere das exakt der Zustand, fuer den Apple am
+        # 29.07. 2.1(b) vergeben hat — ein Fehlversuch kostet hier keine
+        # Minuten, sondern eine weitere Ablehnung samt Wartezeit.
+        print(f'\n  ABBRUCH: {", ".join(offen_abo)} noch nicht einreichbar.')
+        print('  Die Version ginge durch, die Abos nicht — genau daran ist')
+        print('  2.1(b) gescheitert. Erst klaeren, dann einreichen.')
+        print('  Wer es trotzdem will: --trotzdem.')
+        return
 
     if TROCKEN:
         print('  [trocken] wuerde submitted=true setzen')
@@ -775,7 +783,7 @@ def zeige_status(tok):
 
 
 def main():
-    global TROCKEN
+    global TROCKEN, TROTZDEM
     p = argparse.ArgumentParser()
     p.add_argument('--status', action='store_true',
                    help='Zeigt Name, Versionen, Builds, Abos, Screenshots')
@@ -802,10 +810,13 @@ def main():
     p.add_argument('--alles', action='store_true',
                    help='name, build 4, screenshots, abo-screenshot, '
                         'pruefnotiz, einreichen')
+    p.add_argument('--trotzdem', action='store_true',
+                   help='einreichen, auch wenn Abos nicht mitkoennen')
     p.add_argument('--dry-run', action='store_true',
                    help='nur zeigen, nichts an Apple senden')
     a = p.parse_args()
     TROCKEN = a.dry_run
+    TROTZDEM = a.trotzdem
 
     tat = [a.status, a.name, a.build, a.screenshots, a.abo_screenshot,
            a.warum, a.abo_namen, a.inhaberrechte, a.exportfrage, a.pruefnotiz,
