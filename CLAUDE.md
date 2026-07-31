@@ -86,7 +86,7 @@ nur intern sichtbar, deshalb belassen.
 | Geprüft | Ergebnis |
 |---|---|
 | Lokalisierungen DE + EN | Name + Beschreibung vorhanden |
-| Preis / Verkaufsgebiete | hinterlegt / 175 Länder |
+| Preis / Verkaufsgebiete | ⚠️ **Fehlmessung** — siehe unten / 175 Länder |
 | Review-Screenshot | `assetDeliveryState = COMPLETE` |
 | Alterseinstufung | gesetzt (am `appInfo`) |
 | Exportbestimmungen | `usesNonExemptEncryption = False` |
@@ -94,7 +94,9 @@ nur intern sichtbar, deshalb belassen.
 | Rohattribute | vollständig, `reviewNote: null` (optional) |
 
 **Welches Feld ASC vermisst, gibt die API nicht her — das zeigt nur die Oberfläche.**
-In ASC → Abos → `mypeak_premium_monthly` steht der Grund im gelben Hinweis.
+In ASC → Abos → `mypeak_premium_monthly` steht der Grund im gelben Hinweis. **Am 31.07.
+war es der fehlende Abopreis beim Jahresabo** — die Zeile „Preis" in der Tabelle oben war
+eine Fehlmessung meinerseits, siehe „Eigener Fehler" weiter unten.
 
 ⚠️ **`--einreichen` ist deshalb gesperrt**, solange ein Abo nicht `READY_TO_SUBMIT` ist
 (`--trotzdem` überbrückt). Ginge die Version allein durch, wäre das exakt der Zustand, für
