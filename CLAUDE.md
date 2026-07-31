@@ -76,11 +76,33 @@ den Workflow **`.github/workflows/asc.yml`** (Linux — die ASC-API braucht kein
 `FullRep: Workout & Nutrition` ungenutzt. Anlegen hieße englische Beschreibung, Keywords und
 eigene Screenshots — eigene Aufgabe, keine Nebensache.
 
-**⚠️ OFFEN — die Einreichung geht noch nicht durch:**
-Beide Abos stehen auf `MISSING_METADATA`, obwohl `--warum` alles Erwartbare als vorhanden
-meldet: Lokalisierungen DE+EN mit Beschreibung, Preis, **175 Länder**, Review-Screenshot
-`COMPLETE`. Solange das so bleibt, ginge die Version durch und die Abos nicht — **exakt der
-Zustand, der 2.1(b) ausgelöst hat.** Nicht einreichen, bevor beide `READY_TO_SUBMIT` zeigen.
+Ebenfalls gesetzt: Abo-Anzeigenamen `MyPeak Premium` → **`FullRep Premium`** (alle vier
+Lokalisierungen). Der interne `name` („MyPeak Premium Jahr") ist die Referenzbezeichnung —
+nur intern sichtbar, deshalb belassen.
+
+**⚠️ DER EINE OFFENE PUNKT — beide Abos bleiben `MISSING_METADATA`:**
+`--warum` meldet **alles** als vorhanden, was die API offenlegt:
+
+| Geprüft | Ergebnis |
+|---|---|
+| Lokalisierungen DE + EN | Name + Beschreibung vorhanden |
+| Preis / Verkaufsgebiete | hinterlegt / 175 Länder |
+| Review-Screenshot | `assetDeliveryState = COMPLETE` |
+| Alterseinstufung | gesetzt (am `appInfo`) |
+| Exportbestimmungen | `usesNonExemptEncryption = False` |
+| Inhaberrechte | `DOES_NOT_USE_THIRD_PARTY_CONTENT` |
+| Rohattribute | vollständig, `reviewNote: null` (optional) |
+
+**Welches Feld ASC vermisst, gibt die API nicht her — das zeigt nur die Oberfläche.**
+In ASC → Abos → `mypeak_premium_monthly` steht der Grund im gelben Hinweis.
+Nächster Verdacht ohne API-Beleg: der **Vertrag „Paid Applications"** könnte erneut zu
+bestätigen sein (Apple erneuert ihn periodisch) — das sperrt alle IAP gleichzeitig und ist
+über die API nicht sichtbar. Erst nachsehen, dann handeln.
+
+⚠️ **`--einreichen` ist deshalb hart gesperrt**, solange ein Abo nicht `READY_TO_SUBMIT`
+ist (`--trotzdem` überbrückt). Ginge die Version allein durch, wäre das exakt der Zustand,
+für den Apple 2.1(b) vergeben hat — der Fehlversuch kostet keine Minuten, sondern eine
+weitere Ablehnung samt Wartezeit.
 
 **Drei Dinge, die die API nachweislich NICHT kann** (am 31.07. gemessen, nicht vermutet):
 1. **Abos an eine Einreichung hängen** — `subscription` ist keine Beziehung an
