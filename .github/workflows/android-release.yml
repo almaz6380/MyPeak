@@ -78,14 +78,54 @@ jobs:
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
+          set -euo pipefail
           printf '%s' "$KEYSTORE_B64" | tr -cd 'A-Za-z0-9+/=' | base64 -d > android/upload-keystore.jks
+
+          # ACHTUNG: build.gradle liest diese Datei mit Properties.load(). Dort ist der
+          # Backslash ein Escape-Zeichen — aus a\b wird ab. Ein Passwort mit \ kaeme also
+          # veraendert bei Gradle an, und der Build scheitert beim Signieren mit einer
+          # Meldung, die nach einem kaputten Keystore aussieht ("Tag number over 30 is
+          # not supported"). Deshalb vor dem Schreiben verdoppeln.
+          esc() { printf '%s' "$1" | sed 's/\\/\\\\/g'; }
+
           # storeFile laeuft hier ueber rootProject.file(), also relativ zu android/.
           cat > android/keystore.properties <<EOF
           storeFile=upload-keystore.jks
-          storePassword=$STORE_PASSWORD
-          keyAlias=$KEY_ALIAS
-          keyPassword=$KEY_PASSWORD
+          storePassword=$(esc "$STORE_PASSWORD")
+          keyAlias=$(esc "$KEY_ALIAS")
+          keyPassword=$(esc "$KEY_PASSWORD")
           EOF
+
+      # Gradle braucht 4-5 Minuten bis zum Signieren. Ein falsches Passwort faellt hier
+      # in Sekunden auf — und sagt ausserdem, WELCHER Teil klemmt.
+      - name: Signaturschluessel pruefen
+        env:
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -uo pipefail
+          KS=android/upload-keystore.jks
+          echo "Keystore: $(wc -c < "$KS") Bytes"
+
+          # Mit dem ROHEN Wert aus der Umgebung, nicht ueber keystore.properties —
+          # so trennt der Test das Secret selbst vom Schreiben der Properties-Datei.
+          if ! "$JAVA_HOME/bin/keytool" -list -keystore "$KS" \
+                 -storepass "$STORE_PASSWORD" > /tmp/kt.out 2>&1; then
+            echo "::error::Keystore laesst sich mit ANDROID_KEYSTORE_PASSWORD nicht oeffnen."
+            echo "Entweder stimmt das Passwort nicht, oder die Datei ist beschaedigt."
+            head -5 /tmp/kt.out
+            exit 1
+          fi
+          echo "Store-Passwort ok"
+
+          if ! grep -qiF "$KEY_ALIAS," /tmp/kt.out; then
+            echo "::error::Alias aus ANDROID_KEY_ALIAS ist nicht in diesem Keystore."
+            echo "Vorhandene Eintraege:"
+            grep -i "PrivateKeyEntry\|trustedCertEntry" /tmp/kt.out | cut -d, -f1
+            exit 1
+          fi
+          echo "Alias gefunden"
+          rm -f /tmp/kt.out
 
       - name: AAB bauen
         run: cd android && ./gradlew --no-daemon bundleRelease
