@@ -1,0 +1,38 @@
+name: App Store Connect
+
+# Nur manuell. Laeuft auf Linux — die ASC-API braucht keinen Mac, anders als
+# der Build. Der .p8-Schluessel wird aus dem base64-Secret dekodiert und nur
+# als Umgebungsvariable weitergereicht, nie in eine Datei geschrieben.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Was getan wird'
+        type: choice
+        options: [status]
+        default: status
+
+jobs:
+  asc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Abhaengigkeiten
+        run: pip3 install --quiet pyjwt cryptography
+
+      - name: App Store Connect
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          MODE: ${{ inputs.mode }}
+        run: |
+          set -euo pipefail
+          ASC_KEY_P8=$(printf '%s' "$ASC_KEY_P8_BASE64" | tr -cd 'A-Za-z0-9+/=' | base64 -d)
+          if [ -z "$ASC_KEY_P8" ]; then
+            echo "::error::ASC_KEY_P8_BASE64 laesst sich nicht dekodieren."
+            exit 1
+          fi
+          export ASC_KEY_P8
+          python3 scripts/asc.py "--$MODE"
