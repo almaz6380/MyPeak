@@ -37,12 +37,23 @@ jobs:
           # das versehentlich auf den Wert "-" gesetzt wurde (gh secret set --body -
           # nimmt den Wert direkt, nicht von der Standardeingabe). "gesetzt" allein
           # sagt darueber nichts.
+          # Mindestlaenge je Secret. Der Keystore-Alias darf kurz sein — er ist ein
+          # frei gewaehlter Name, sechs Zeichen sind voellig normal. Fuer ihn also
+          # nur der Schutz gegen den "-"-Fall, nicht die allgemeine Heuristik.
+          minimum() {
+            case "$1" in
+              ANDROID_KEY_ALIAS|ASC_KEY_ID) echo 3 ;;
+              *) echo 8 ;;
+            esac
+          }
+
           pruefe() {
             wert="${!1:-}"
+            min=$(minimum "$1")
             if [ -z "$wert" ]; then
               printf '  %-34s FEHLT\n' "$1"
               fehlt=$((fehlt + 1))
-            elif [ "${#wert}" -lt 8 ]; then
+            elif [ "${#wert}" -lt "$min" ]; then
               printf '  %-34s VERDAECHTIG — nur %s Zeichen\n' "$1" "${#wert}"
               fehlt=$((fehlt + 1))
             else
@@ -79,7 +90,11 @@ jobs:
 
           echo
           if [ "$fehlt" -gt 0 ]; then
-            echo "$fehlt Secret(s) fehlen — siehe docs/release-ci.md."
+            echo "$fehlt Secret(s) fehlen oder sind verdaechtig — siehe docs/release-ci.md."
+            # Der Lauf muss rot werden. Ein gruener Preflight, der darunter
+            # "14 fehlen" schreibt, ist genau die Falle, die uns heute drei
+            # Fehlversuche gekostet hat.
+            exit 1
           else
             echo "Alle Secrets vorhanden."
           fi
