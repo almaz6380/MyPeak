@@ -47,6 +47,10 @@ Coach bereits an, Quellen zu nennen und niemals welche zu erfinden.
 **2.1(b) Performance – App Completeness:** App verweist aufs Abo, IAP-Produkt wurde nie zur
 Prüfung eingereicht → Apple bricht ab.
 → Code-Seite behoben: `PURCHASE_ENABLED.ios = true` in `PaywallPage.jsx`.
+⚠️ **`android` bleibt `false`**, bis RevenueCat-Android eingerichtet ist. Ohne
+`VITE_REVENUECAT_ANDROID_KEY` meldet `isConfigured()` false → der Kauf endet in „bald
+verfügbar", der Nutzer sähe also Preise mit totem Knopf. Erst mit `goog_`-Key und dem
+Play-Produkt am Entitlement einschalten.
 
 **⚠️ NOCH OFFEN (iOS) — blockiert an fehlenden Secrets, nicht am Code:**
 Der Preflight-Lauf vom 30.07. (Run #1) sagt eindeutig: von zehn Release-Secrets ist
