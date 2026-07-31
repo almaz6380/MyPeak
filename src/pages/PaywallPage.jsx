@@ -17,7 +17,12 @@ import Toast from '../components/Toast';
 // iOS aktiviert seit der Ablehnung 29.07.2026 (Guideline 2.1(b)): Apple bricht die
 // Pruefung ab, solange die App aufs Abo verweist, das IAP-Produkt aber nicht mit
 // eingereicht wird. Das Produkt wird jetzt mitgeschickt — der Kauf muss also sichtbar sein.
-const PURCHASE_ENABLED = { ios: true, android: true, web: false };
+//
+// ANDROID BLEIBT AUS, bis RevenueCat-Android eingerichtet ist. Ohne
+// VITE_REVENUECAT_ANDROID_KEY meldet isConfigured() false, der Kauf endet also in
+// „bald verfuegbar" — ein sichtbarer Preis mit totem Knopf. Erst einschalten, wenn
+// der goog_-Key gesetzt und das Play-Produkt am Entitlement haengt.
+const PURCHASE_ENABLED = { ios: true, android: false, web: false };
 const canPurchase = PURCHASE_ENABLED[Capacitor.getPlatform()] ?? false;
 
 // ── Preis-Konfiguration (Fallback-Anzeige) ────────────────────────
