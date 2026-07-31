@@ -106,9 +106,23 @@ nicht auseinanderläuft — Apples 1.4.1 zielt auf dasselbe.
 zugleich die live ausgelieferte Fassung — die **erste** AAB mit dem gesamten FullRep-Umbau
 (Name, Logo, Quellenangaben) ist also erst diese hier.
 
-**⚠️ NOCH OFFEN:** Store-Text ausrollen (`play-listing.yml`, `mode: texte`), AAB 14 bauen
-(braucht die vier Keystore-Secrets), danach in der Play Console „Probleme beheben" bestätigen.
-Erst **nach** dem Rollout dem Support antworten — vorher öffnet der Prüfer die alte App.
+⚠️ **Solange die Richtlinienprüfung läuft, nimmt die Play-API keine automatisch eingereichte
+Änderung mehr an** — `400 INVALID_ARGUMENT`, „Changes cannot be sent for review
+automatically". Und zwar schon bei **`:validate`**, nicht erst bei `:commit`. Am 30.07. ging
+derselbe Aufruf noch durch; das ist eine Folge der Beanstandung, kein Skriptfehler. Weil der
+Abschluss die letzte Stufe der Edit-Transaktion ist, verfällt sonst **alles** Vorherige —
+beim AAB also Minuten an Upload, und der nächste Versuch bräuchte einen neuen `versionCode`.
+`commit_edit()` in `play-upload.py` fängt das ab und wiederholt validate+commit mit
+`changesNotSentForReview=true`. Die Änderung ist dann gespeichert, liegt aber als **Entwurf
+in der Console** und muss dort von Hand zur Prüfung geschickt werden — die Ausgabe sagt das
+ausdrücklich, statt „sichtbar" zu melden. Alle drei Wege (Screenshots, Texte, AAB) laufen
+darüber.
+
+**⚠️ NOCH OFFEN:** Store-Text ausrollen (`play-listing.yml`, `mode: texte`) **und in der
+Console zur Prüfung schicken**, AAB 14 bauen (braucht die vier Keystore-Secrets), danach
+unter „Probleme beheben" bestätigen. Fertige Antwort an den Support liegt in
+`store-assets/play-richtlinie-antwort.md` — erst **nach** dem Rollout absenden, vorher öffnet
+der Prüfer die alte App und bestätigt die Beanstandung.
 
 ### Store-Screenshots neu + Play-Upload automatisiert (30.07.2026)
 **18 neue Screenshots** (6 Motive × iPhone 6,9″ / iPad 12,9″ / Android) in `store-assets/`.

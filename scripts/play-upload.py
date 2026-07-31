@@ -110,22 +110,36 @@ def commit_edit(tok, eid):
     """
     basis = f'{API}/applications/{PKG}/edits/{eid}'
 
-    def abschliessen(suffix=''):
-        call(tok, 'POST', f'{basis}:validate{suffix}', fatal=bool(suffix))
-        print('  validiert')
-        call(tok, 'POST', f'{basis}:commit{suffix}', fatal=bool(suffix))
+    def blockiert(e):
+        return e.code == 400 and 'changesNotSentForReview' in e.detail
 
+    def hart_raus(e, stufe):
+        sys.exit(f'\nFEHLER {e.code} bei {stufe} von Edit {eid}\n{e.detail}\n')
+
+    # :validate nimmt changesNotSentForReview NICHT entgegen ("could not be found
+    # in request message"). Der 400er dort heisst also nur: Vorpruefung geht
+    # gerade nicht — dann ohne sie weiter, direkt zum Commit.
+    ohne_pruefung = False
     try:
-        abschliessen()
-        print('  committet — im Play-Eintrag jetzt sichtbar.')
-        return
+        call(tok, 'POST', f'{basis}:validate', fatal=False)
+        print('  validiert')
     except ApiError as e:
-        if e.code != 400 or 'changesNotSentForReview' not in e.detail:
-            sys.exit(f'\nFEHLER {e.code} beim Abschliessen von Edit {eid}\n{e.detail}\n')
+        if not blockiert(e):
+            hart_raus(e, ':validate')
+        ohne_pruefung = True
+        print('  Vorpruefung uebersprungen — Google laesst gerade kein')
+        print('  automatisches Einreichen zu (laufende Richtlinienpruefung).')
 
-    print('  Google nimmt gerade keine automatisch eingereichte Aenderung an —')
-    print('  zweiter Versuch ohne Einreichung zur Pruefung …')
-    abschliessen('?changesNotSentForReview=true')
+    if not ohne_pruefung:
+        try:
+            call(tok, 'POST', f'{basis}:commit', fatal=False)
+            print('  committet — im Play-Eintrag jetzt sichtbar.')
+            return
+        except ApiError as e:
+            if not blockiert(e):
+                hart_raus(e, ':commit')
+
+    call(tok, 'POST', f'{basis}:commit?changesNotSentForReview=true')
     print('  committet — ABER NICHT zur Pruefung eingereicht.')
     print('  Die Aenderung liegt jetzt als Entwurf in der Play Console und muss')
     print('  dort von Hand zur Pruefung geschickt werden.')
