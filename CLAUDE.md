@@ -95,14 +95,33 @@ nur intern sichtbar, deshalb belassen.
 
 **Welches Feld ASC vermisst, gibt die API nicht her — das zeigt nur die Oberfläche.**
 In ASC → Abos → `mypeak_premium_monthly` steht der Grund im gelben Hinweis.
-Nächster Verdacht ohne API-Beleg: der **Vertrag „Paid Applications"** könnte erneut zu
-bestätigen sein (Apple erneuert ihn periodisch) — das sperrt alle IAP gleichzeitig und ist
-über die API nicht sichtbar. Erst nachsehen, dann handeln.
 
-⚠️ **`--einreichen` ist deshalb hart gesperrt**, solange ein Abo nicht `READY_TO_SUBMIT`
-ist (`--trotzdem` überbrückt). Ginge die Version allein durch, wäre das exakt der Zustand,
-für den Apple 2.1(b) vergeben hat — der Fehlversuch kostet keine Minuten, sondern eine
-weitere Ablehnung samt Wartezeit.
+⚠️ **`--einreichen` ist deshalb gesperrt**, solange ein Abo nicht `READY_TO_SUBMIT` ist
+(`--trotzdem` überbrückt). Ginge die Version allein durch, wäre das exakt der Zustand, für
+den Apple 2.1(b) vergeben hat.
+
+### Version 1.0 / Build 4 eingereicht — 31.07.2026, 12:46 UTC, `WAITING_FOR_REVIEW`
+Auf Josefs ausdrückliche Anweisung mit `--trotzdem` abgesendet, obwohl beide Abos noch auf
+`MISSING_METADATA` stehen. ⚠️ **Die Abos sind also NICHT mitgegangen** — 2.1(b) kann sich
+dadurch wiederholen. Solange der Zustand `WAITING_FOR_REVIEW` (nicht `IN_REVIEW`) ist,
+lässt sich das heilen: `--aufraeumen`, Abos in Ordnung bringen, erneut einreichen.
+
+**Der eigentliche Blocker war eine Altlast, kein fehlendes Feld.** Zwei Stunden Suche gingen
+daran vorbei, deshalb ausführlich:
+
+Die Einreichung `4ffb285d-eb99-4e9d-a74d-d6edcac4a1a9` vom **18.07.** stand auf
+`UNRESOLVED_ISSUES` (Element `REJECTED`) und hielt Version 1.0 besetzt. Apple meldet dazu
+nur `appStoreVersions with id '887964240' is not in valid state` — **ohne** zu sagen, dass
+eine alte Einreichung schuld ist. Sichtbar wurde es erst über die ASC-Oberfläche
+(„Ungelöste Probleme"), nicht über die API.
+
+⚠️ **Fehlerquelle zum Merken:** `--einreichen` filterte serverseitig auf
+`filter[state]=READY_FOR_REVIEW,WAITING_FOR_REVIEW,IN_REVIEW`. `UNRESOLVED_ISSUES` war
+nicht dabei → die blockierende Einreichung blieb unsichtbar, und es entstand eine zweite,
+leere daneben. **Ein Zustandsfilter verschweigt, wonach man nicht fragt.** Jetzt wird ohne
+Filter geholt und im Code aussortiert (`--einreichungen` zeigt alle, `--aufraeumen` zieht
+blockierende mit `canceled: true` zurück; `CANCELING` → `COMPLETE` dauert ein bis zwei
+Minuten).
 
 **Drei Dinge, die die API nachweislich NICHT kann** (am 31.07. gemessen, nicht vermutet):
 1. **Abos an eine Einreichung hängen** — `subscription` ist keine Beziehung an
