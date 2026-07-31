@@ -69,7 +69,13 @@ def token() -> str:
         return json.load(r)['access_token']
 
 
-def call(tok, method, url, data=None, ctype='application/json'):
+class ApiError(Exception):
+    def __init__(self, code, detail):
+        super().__init__(f'{code}: {detail}')
+        self.code, self.detail = code, detail
+
+
+def call(tok, method, url, data=None, ctype='application/json', fatal=True):
     if data is not None and ctype == 'application/json':
         data = json.dumps(data).encode()
     req = urllib.request.Request(url, data=data, method=method)
@@ -82,7 +88,36 @@ def call(tok, method, url, data=None, ctype='application/json'):
             return json.loads(raw) if raw else {}
     except urllib.error.HTTPError as e:
         detail = e.read().decode(errors='replace')
+        if not fatal:
+            raise ApiError(e.code, detail) from None
         sys.exit(f'\nFEHLER {e.code} bei {method} {url}\n{detail}\n')
+
+
+def commit_edit(tok, eid):
+    """Edit abschliessen.
+
+    Normalerweise reicht Google die Aenderung gleich zur Pruefung ein. Steht die
+    App aber unter einer laufenden Richtlinienpruefung, lehnt die API genau das
+    ab (400, "Changes cannot be sent for review automatically"). Dann committen
+    wir mit changesNotSentForReview=true: die Aenderung ist gespeichert und liegt
+    in der Play Console, muss dort aber von Hand zur Pruefung geschickt werden.
+
+    Ohne diesen Zweig geht der Commit verloren und die Edit-Transaktion verfaellt.
+    """
+    url = f'{API}/applications/{PKG}/edits/{eid}:commit'
+    try:
+        call(tok, 'POST', url, fatal=False)
+        print('  committet — im Play-Eintrag jetzt sichtbar.')
+        return
+    except ApiError as e:
+        if e.code != 400 or 'changesNotSentForReview' not in e.detail:
+            sys.exit(f'\nFEHLER {e.code} bei POST {url}\n{e.detail}\n')
+
+    call(tok, 'POST', f'{url}?changesNotSentForReview=true')
+    print('  committet — ABER NICHT zur Pruefung eingereicht.')
+    print('  Google laesst das automatische Einreichen gerade nicht zu (laufende')
+    print('  Richtlinienpruefung). Die Aenderung liegt jetzt in der Play Console')
+    print('  und muss dort von Hand zur Pruefung geschickt werden.')
 
 
 def lade_screenshots(tok, verzeichnis, lang, dry_run=False, image_type='phoneScreenshots'):
@@ -119,8 +154,7 @@ def lade_screenshots(tok, verzeichnis, lang, dry_run=False, image_type='phoneScr
 
     call(tok, 'POST', f'{API}/applications/{PKG}/edits/{eid}:validate')
     print('  validiert')
-    call(tok, 'POST', f'{API}/applications/{PKG}/edits/{eid}:commit')
-    print('  committet — im Play-Eintrag jetzt sichtbar.')
+    commit_edit(tok, eid)
 
 
 # Play weist Ueberlaenge erst beim Commit ab, mit einer wenig sprechenden
@@ -181,8 +215,7 @@ def setze_listing(tok, datei, lang, dry_run=False):
     call(tok, 'PATCH', url, data=dict(neu, language=lang))
     call(tok, 'POST', f'{API}/applications/{PKG}/edits/{eid}:validate')
     print('\n  validiert')
-    call(tok, 'POST', f'{API}/applications/{PKG}/edits/{eid}:commit')
-    print('  committet — der neue Name ist im Play Store gesetzt.')
+    commit_edit(tok, eid)
 
 
 def zeige_status(tok, track='production'):
@@ -255,8 +288,9 @@ def main():
 
     call(tok, 'POST', f'{API}/applications/{PKG}/edits/{eid}:validate')
     print('validiert')
-    call(tok, 'POST', f'{API}/applications/{PKG}/edits/{eid}:commit')
-    print('✅ veröffentlicht')
+    # Auch hier ueber den Helfer: steht die App unter Richtlinienpruefung, wuerde
+    # ein direkter Commit die ganze Hochlade-Arbeit verwerfen.
+    commit_edit(tok, eid)
 
 
 if __name__ == '__main__':
