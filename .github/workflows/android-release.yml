@@ -78,8 +78,23 @@ jobs:
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          set -euo pipefail
-          printf '%s' "$KEYSTORE_B64" | tr -cd 'A-Za-z0-9+/=' | base64 -d > android/upload-keystore.jks
+          set -uo pipefail
+          # Nur Laengen und Rueckgabewerte ausgeben, nie Inhalte. GitHub maskiert
+          # Secrets im Log ohnehin, aber eine Laenge sagt genug, um zu erkennen ob
+          # der Wert ueberhaupt ankommt.
+          echo "Secret-Laenge: ${#KEYSTORE_B64} Zeichen"
+          SAUBER=$(printf '%s' "$KEYSTORE_B64" | tr -cd 'A-Za-z0-9+/=')
+          echo "davon base64-tauglich: ${#SAUBER} Zeichen"
+
+          printf '%s' "$SAUBER" | base64 -d > android/upload-keystore.jks 2>/tmp/b64.err
+          RC=$?
+          echo "base64 -d: Rueckgabewert $RC, Datei $(wc -c < android/upload-keystore.jks) Bytes"
+          if [ "$RC" -ne 0 ] || [ ! -s android/upload-keystore.jks ]; then
+            echo "::error::Der Keystore konnte nicht aus ANDROID_KEYSTORE_BASE64 entpackt werden."
+            head -3 /tmp/b64.err 2>/dev/null
+            exit 1
+          fi
+          rm -f /tmp/b64.err
 
           # ACHTUNG: build.gradle liest diese Datei mit Properties.load(). Dort ist der
           # Backslash ein Escape-Zeichen — aus a\b wird ab. Ein Passwort mit \ kaeme also
