@@ -370,6 +370,67 @@ def setze_pruefnotiz(tok):
         print(f'  Notiz gesetzt ({len(PRUEFNOTIZ)} Zeichen)')
 
 
+# Zustaende, in denen eine Einreichung die Version blockiert. UNRESOLVED_ISSUES
+# ist der entscheidende: die Einreichung vom 18.07. steckt dort fest, haelt die
+# Version besetzt, und Apple meldet beim naechsten Versuch nur
+# "is not in valid state" — ohne zu sagen, dass es an einer alten Einreichung
+# liegt. Wer nur nach WAITING_FOR_REVIEW sucht, sieht sie nicht.
+BLOCKIERT = {'UNRESOLVED_ISSUES', 'READY_FOR_REVIEW', 'WAITING_FOR_REVIEW',
+             'IN_REVIEW'}
+
+
+def zeige_einreichungen(tok):
+    aid = app_id(tok)
+    subm = api(tok, f'apps/{aid}/reviewSubmissions?limit=20')
+    if not subm.get('data'):
+        print('  Keine Einreichungen.')
+        return
+    for s in subm.get('data', []):
+        a = s['attributes']
+        print(f'\n  {s["id"]}')
+        print(f'    Zustand: {a.get("state")}  platform={a.get("platform")}')
+        print(f'    eingereicht: {a.get("submittedDate")}')
+        items = api(tok, f'reviewSubmissions/{s["id"]}/items', fatal=False)
+        for i in items.get('data', []):
+            ziele = [f'{n}={b["data"]["id"]}'
+                     for n, b in (i.get('relationships') or {}).items()
+                     if (b or {}).get('data')]
+            print(f'    Element {i["attributes"].get("state")}: '
+                  f'{", ".join(ziele) or "—"}')
+        if not items.get('data'):
+            print('    Elemente: keine')
+
+
+def aufraeumen(tok):
+    """Festhaengende Einreichungen zurueckziehen.
+
+    Solange eine alte Einreichung die Version haelt, laesst sich keine neue
+    anlegen — Apple sagt dazu nur "is not in valid state".
+    """
+    aid = app_id(tok)
+    subm = api(tok, f'apps/{aid}/reviewSubmissions?limit=20')
+    getan = False
+    for s in subm.get('data', []):
+        a = s['attributes']
+        if a.get('state') not in BLOCKIERT:
+            continue
+        getan = True
+        print(f'  {s["id"]}  {a.get("state")}  -> zurueckziehen')
+        if TROCKEN:
+            continue
+        res = api(tok, f'reviewSubmissions/{s["id"]}', 'PATCH', {
+            'data': {'type': 'reviewSubmissions', 'id': s['id'],
+                     'attributes': {'canceled': True}},
+        }, fatal=False)
+        if res.get('_fehler'):
+            print(f'    FEHLER: {fehler_text(res)}')
+        else:
+            print(f'    Zustand jetzt '
+                  f'{res["data"]["attributes"].get("state")}')
+    if not getan:
+        print('  Keine blockierende Einreichung gefunden.')
+
+
 def einreichen(tok):
     """Version + Abos in einer Einreichung zu Apple schicken.
 
@@ -382,14 +443,24 @@ def einreichen(tok):
     print(f'  Version {v["attributes"]["versionString"]} '
           f'({v["attributes"].get("appStoreState")})')
 
-    offen = api(tok, f'apps/{aid}/reviewSubmissions'
-                     f'?filter[state]=READY_FOR_REVIEW,WAITING_FOR_REVIEW,IN_REVIEW',
-                fatal=False)
+    # Ohne Zustandsfilter holen und selbst aussortieren. Ein serverseitiger
+    # Filter verschweigt, was man nicht abgefragt hat — genau so blieb die
+    # festhaengende Einreichung vom 18.07. unsichtbar.
+    offen = api(tok, f'apps/{aid}/reviewSubmissions?limit=20', fatal=False)
     lauf = [s for s in offen.get('data', [])
             if s['attributes'].get('state') in ('WAITING_FOR_REVIEW', 'IN_REVIEW')]
     if lauf:
         print(f'  Es laeuft schon eine Einreichung ({lauf[0]["attributes"]["state"]}) '
               f'— nichts zu tun.')
+        return
+
+    steckt = [s for s in offen.get('data', [])
+              if s['attributes'].get('state') == 'UNRESOLVED_ISSUES']
+    if steckt:
+        print(f'  ABBRUCH: Einreichung {steckt[0]["id"]} steht auf '
+              f'UNRESOLVED_ISSUES und haelt die Version besetzt.')
+        print('  Deshalb meldet Apple "is not in valid state" — es fehlt kein')
+        print('  Feld. Erst mit --aufraeumen zurueckziehen, dann erneut.')
         return
 
     entwurf = [s for s in offen.get('data', [])
@@ -832,6 +903,10 @@ def main():
                    help='Was blockiert die Einreichung? (liest nur)')
     p.add_argument('--abo-namen', action='store_true',
                    help='Abo-Anzeigenamen von MyPeak auf FullRep ziehen')
+    p.add_argument('--einreichungen', action='store_true',
+                   help='alle Einreichungen samt Zustand und Elementen zeigen')
+    p.add_argument('--aufraeumen', action='store_true',
+                   help='festhaengende Einreichungen zurueckziehen')
     p.add_argument('--abo-notiz', action='store_true',
                    help='Prueferhinweis am Abo setzen (einziges leeres Feld)')
     p.add_argument('--inhaberrechte', action='store_true',
@@ -854,7 +929,8 @@ def main():
     TROTZDEM = a.trotzdem
 
     tat = [a.status, a.name, a.build, a.screenshots, a.abo_screenshot,
-           a.warum, a.abo_namen, a.abo_notiz, a.inhaberrechte, a.exportfrage, a.pruefnotiz,
+           a.warum, a.einreichungen, a.aufraeumen, a.abo_namen, a.abo_notiz,
+           a.inhaberrechte, a.exportfrage, a.pruefnotiz,
            a.einreichen, a.alles]
     if not any(tat):
         p.error('Einen Befehl angeben, z. B. --status')
@@ -887,6 +963,10 @@ def main():
         diagnose(tok)
     if a.abo_namen:
         abo_namen(tok)
+    if a.einreichungen:
+        zeige_einreichungen(tok)
+    if a.aufraeumen:
+        aufraeumen(tok)
     if a.abo_notiz:
         abo_notiz(tok)
     if a.inhaberrechte:
