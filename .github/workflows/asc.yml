@@ -10,6 +10,8 @@ name: App Store Connect
 #   screenshots     iPhone- + iPad-Bilder ersetzen
 #   abo-screenshot  Paywall-Bild an alle Abos (gegen "Missing Metadata")
 #   abo-namen       Abo-Anzeigenamen MyPeak -> FullRep
+#   einreichungen   alle Einreichungen samt Zustand zeigen (liest nur)
+#   aufraeumen      festhaengende Einreichungen zurueckziehen
 #   abo-notiz       Prueferhinweis am Abo setzen
 #   inhaberrechte   contentRightsDeclaration setzen (app-weit)
 #   warum           liest nur: was blockiert die Einreichung?
@@ -30,6 +32,8 @@ on:
           - screenshots
           - abo-screenshot
           - abo-namen
+          - einreichungen
+          - aufraeumen
           - abo-notiz
           - inhaberrechte
           - warum
@@ -81,7 +85,7 @@ jobs:
             ARGS="--$MODE"
           fi
           # warum liest nur, kennt --dry-run also nicht.
-          if [ "$MODE" != "status" ] && [ "$MODE" != "warum" ] && [ "$DRY" = "true" ]; then
+          if [ "$MODE" != "status" ] && [ "$MODE" != "warum" ] && [ "$MODE" != "einreichungen" ] && [ "$DRY" = "true" ]; then
             ARGS="$ARGS --dry-run"
           fi
           # Nur beim Einreichen sinnvoll; ueberall sonst waere er wirkungslos
