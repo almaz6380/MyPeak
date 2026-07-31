@@ -40,6 +40,10 @@ on:
         description: 'Nur zeigen, nichts an Apple senden'
         type: boolean
         default: true
+      trotzdem:
+        description: 'Einreichen, auch wenn die Abos nicht mitkoennen (2.1b-Risiko)'
+        type: boolean
+        default: false
 
 jobs:
   asc:
@@ -57,6 +61,7 @@ jobs:
           ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
           MODE: ${{ inputs.mode }}
           DRY: ${{ inputs.dry_run }}
+          TROTZDEM: ${{ inputs.trotzdem }}
         run: |
           set -euo pipefail
           ASC_KEY_P8=$(printf '%s' "$ASC_KEY_P8_BASE64" | tr -cd 'A-Za-z0-9+/=' | base64 -d)
@@ -76,6 +81,11 @@ jobs:
           # warum liest nur, kennt --dry-run also nicht.
           if [ "$MODE" != "status" ] && [ "$MODE" != "warum" ] && [ "$DRY" = "true" ]; then
             ARGS="$ARGS --dry-run"
+          fi
+          # Nur beim Einreichen sinnvoll; ueberall sonst waere er wirkungslos
+          # und wuerde nur den Eindruck erwecken, es sei etwas erzwungen worden.
+          if [ "$MODE" = "einreichen" ] && [ "$TROTZDEM" = "true" ]; then
+            ARGS="$ARGS --trotzdem"
           fi
           echo "scripts/asc.py $ARGS"
           python3 scripts/asc.py $ARGS
