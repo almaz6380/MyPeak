@@ -445,16 +445,26 @@ def einreichen(tok):
     anhaengen('appStoreVersion', 'appStoreVersions', v['id'],
               f'Version {v["attributes"]["versionString"]}')
 
+    # Abos lassen sich NICHT anhaengen — 'subscription' ist keine Beziehung
+    # an reviewSubmissionItems (am 31.07. am echten Endpunkt geprueft, Apple
+    # antwortet "unknown relationship"). Sie fahren mit der Version mit,
+    # sobald sie READY_TO_SUBMIT sind. Deshalb hier nur der Zustand: steht
+    # eines auf MISSING_METADATA, geht die Version zwar durch, das Abo aber
+    # nicht — und genau daran ist 2.1(b) gescheitert.
+    print('  Abos (fahren mit der Version mit, nicht anhaengbar):')
     grp = api(tok, f'apps/{aid}/subscriptionGroups')
+    offen_abo = []
     for g in grp.get('data', []):
         subs = api(tok, f'subscriptionGroups/{g["id"]}/subscriptions')
         for s in subs.get('data', []):
             a = s['attributes']
-            if a.get('state') == 'APPROVED':
-                print(f'    {a.get("productId")}: bereits freigegeben')
-                continue
-            anhaengen('subscription', 'subscriptions', s['id'],
-                      a.get('productId'))
+            print(f'    {a.get("productId")}: {a.get("state")}')
+            if a.get('state') not in ('READY_TO_SUBMIT', 'APPROVED',
+                                      'WAITING_FOR_REVIEW', 'IN_REVIEW'):
+                offen_abo.append(a.get('productId'))
+    if offen_abo:
+        print(f'    ⚠ noch nicht einreichbar: {", ".join(offen_abo)} '
+              f'— mit --warum nachsehen, was fehlt')
 
     if TROCKEN:
         print('  [trocken] wuerde submitted=true setzen')
@@ -468,6 +478,109 @@ def einreichen(tok):
     else:
         print(f'  abgesendet — Zustand jetzt '
               f'{res["data"]["attributes"].get("state")}')
+
+
+def diagnose(tok):
+    """Warum laesst sich die Version nicht einreichen?
+
+    Apple antwortet beim Einreichen nur "is not in valid state" und verweist
+    auf "associated errors" — die stehen aber an den einzelnen Ressourcen.
+    Hier werden die ueblichen Sperren einzeln abgefragt.
+    """
+    aid = app_id(tok)
+    v = offene_version(tok, aid)
+    va = v['attributes']
+    print(f'\n── Version {va["versionString"]} ({va.get("appStoreState")}) ──')
+    for feld in ('releaseType', 'earliestReleaseDate', 'downloadable'):
+        print(f'  {feld}: {va.get(feld)}')
+
+    print('\n── Build + Exportbestimmungen ──')
+    b = api(tok, f'appStoreVersions/{v["id"]}/build', fatal=False)
+    if not b.get('data'):
+        print('  KEIN Build zugewiesen — das allein blockiert die Einreichung.')
+    else:
+        ba = b['data']['attributes']
+        ver = ba.get('version')
+        enc = ba.get('usesNonExemptEncryption')
+        print(f'  Build {ver}  {ba.get("processingState")}')
+        print(f'  usesNonExemptEncryption: {enc!r}')
+        if enc is None:
+            print('  ⚠ unbeantwortet — ASC verlangt die Antwort vor dem '
+                  'Einreichen. Mit --exportfrage beantworten.')
+
+    print('\n── Texte je Sprache ──')
+    locs = api(tok, f'appStoreVersions/{v["id"]}/appStoreVersionLocalizations')
+    for loc in locs.get('data', []):
+        a = loc['attributes']
+        leer = [f for f in ('description', 'keywords', 'supportUrl',
+                            'whatsNew', 'marketingUrl', 'promotionalText')
+                if not a.get(f)]
+        print(f'  {a["locale"]:8} leer: {", ".join(leer) or "nichts"}')
+
+    print('\n── Alterseinstufung ──')
+    ar = api(tok, f'appStoreVersions/{v["id"]}/ageRatingDeclaration', fatal=False)
+    print('  gesetzt' if ar.get('data') else '  FEHLT')
+
+    print('\n── Abos: warum MISSING_METADATA ──')
+    grp = api(tok, f'apps/{aid}/subscriptionGroups')
+    for g in grp.get('data', []):
+        gl = api(tok, f'subscriptionGroups/{g["id"]}/subscriptionGroupLocalizations',
+                 fatal=False)
+        print(f'  Gruppe {g["attributes"].get("referenceName")}: '
+              f'{len(gl.get("data", []))} Lokalisierung(en)')
+        subs = api(tok, f'subscriptionGroups/{g["id"]}/subscriptions')
+        for s in subs.get('data', []):
+            a = s['attributes']
+            print(f'\n  {a.get("productId")}  {a.get("state")}')
+            sl = api(tok, f'subscriptions/{s["id"]}/subscriptionLocalizations',
+                     fatal=False)
+            for loc in sl.get('data', []):
+                la = loc['attributes']
+                print(f'      {la.get("locale"):8} name={la.get("name")!r} '
+                      f'beschreibung={"ja" if la.get("description") else "FEHLT"}')
+            if not sl.get('data'):
+                print('      Lokalisierungen: KEINE')
+            pr = api(tok, f'subscriptions/{s["id"]}/prices?limit=3', fatal=False)
+            print(f'      Preise hinterlegt: {len(pr.get("data", []))}')
+            shot = api(tok, f'subscriptions/{s["id"]}/appStoreReviewScreenshot',
+                       fatal=False)
+            d = shot.get('data')
+            if d:
+                sa = d['attributes']
+                print(f'      Review-Screenshot: hochgeladen={sa.get("assetDeliveryState", {}).get("state")}')
+            else:
+                print('      Review-Screenshot: FEHLT')
+
+
+def exportfrage(tok, wert=False):
+    """Die Frage nach Verschluesselung am Build beantworten.
+
+    Bleibt sie offen, laesst ASC die Version nicht einreichen. FullRep nutzt
+    nur HTTPS — das faellt unter die Ausnahme, also 'false'.
+    """
+    aid = app_id(tok)
+    v = offene_version(tok, aid)
+    b = api(tok, f'appStoreVersions/{v["id"]}/build', fatal=False)
+    if not b.get('data'):
+        sys.exit('  Kein Build zugewiesen.')
+    bid = b['data']['id']
+    jetzt = b['data']['attributes'].get('usesNonExemptEncryption')
+    print(f'  Build {b["data"]["attributes"].get("version")}: '
+          f'usesNonExemptEncryption {jetzt!r} -> {wert}')
+    if jetzt == wert:
+        print('  steht schon so')
+        return
+    if TROCKEN:
+        print('  [trocken] wuerde gesetzt')
+        return
+    res = api(tok, f'builds/{bid}', 'PATCH', {
+        'data': {'type': 'builds', 'id': bid,
+                 'attributes': {'usesNonExemptEncryption': wert}},
+    }, fatal=False)
+    if res.get('_fehler'):
+        print(f'  FEHLER: {fehler_text(res)}')
+    else:
+        print('  gesetzt')
 
 
 def zeige_status(tok):
@@ -549,6 +662,10 @@ def main():
                    help='iPhone- und iPad-Screenshots ersetzen')
     p.add_argument('--abo-screenshot', action='store_true',
                    help='Paywall-Bild als Review-Screenshot an alle Abos')
+    p.add_argument('--warum', action='store_true',
+                   help='Was blockiert die Einreichung? (liest nur)')
+    p.add_argument('--exportfrage', action='store_true',
+                   help='usesNonExemptEncryption am Build auf false setzen')
     p.add_argument('--pruefnotiz', action='store_true',
                    help='App-Review-Notiz: was sich seit der Ablehnung aendert')
     p.add_argument('--einreichen', action='store_true',
@@ -562,7 +679,7 @@ def main():
     TROCKEN = a.dry_run
 
     tat = [a.status, a.name, a.build, a.screenshots, a.abo_screenshot,
-           a.pruefnotiz, a.einreichen, a.alles]
+           a.warum, a.exportfrage, a.pruefnotiz, a.einreichen, a.alles]
     if not any(tat):
         p.error('Einen Befehl angeben, z. B. --status')
 
@@ -587,6 +704,10 @@ def main():
         setze_screenshots(tok)
     if a.abo_screenshot:
         setze_abo_screenshot(tok)
+    if a.warum:
+        diagnose(tok)
+    if a.exportfrage:
+        exportfrage(tok)
     if a.pruefnotiz:
         setze_pruefnotiz(tok)
     if a.einreichen:

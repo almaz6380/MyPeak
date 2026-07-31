@@ -9,6 +9,8 @@ name: App Store Connect
 #   build           Build 4 der offenen Version zuweisen
 #   screenshots     iPhone- + iPad-Bilder ersetzen
 #   abo-screenshot  Paywall-Bild an alle Abos (gegen "Missing Metadata")
+#   warum           liest nur: was blockiert die Einreichung?
+#   exportfrage     usesNonExemptEncryption am Build beantworten
 #   pruefnotiz      App-Review-Notiz: was sich seit der Ablehnung aendert
 #   einreichen      Version samt Abos zur Pruefung
 #   alles           die sechs schreibenden der Reihe nach
@@ -24,6 +26,8 @@ on:
           - build
           - screenshots
           - abo-screenshot
+          - warum
+          - exportfrage
           - pruefnotiz
           - einreichen
           - alles
@@ -65,7 +69,8 @@ jobs:
           else
             ARGS="--$MODE"
           fi
-          if [ "$MODE" != "status" ] && [ "$DRY" = "true" ]; then
+          # warum liest nur, kennt --dry-run also nicht.
+          if [ "$MODE" != "status" ] && [ "$MODE" != "warum" ] && [ "$DRY" = "true" ]; then
             ARGS="$ARGS --dry-run"
           fi
           echo "scripts/asc.py $ARGS"
