@@ -517,9 +517,18 @@ def diagnose(tok):
                 if not a.get(f)]
         print(f'  {a["locale"]:8} leer: {", ".join(leer) or "nichts"}')
 
+    # Apple hat die Alterseinstufung irgendwann vom appStoreVersion an den
+    # appInfo verschoben. Beide Orte abfragen, sonst meldet man "fehlt",
+    # obwohl sie nur woanders liegt.
     print('\n── Alterseinstufung ──')
     ar = api(tok, f'appStoreVersions/{v["id"]}/ageRatingDeclaration', fatal=False)
-    print('  gesetzt' if ar.get('data') else '  FEHLT')
+    print(f'  an der Version: {"gesetzt" if ar.get("data") else "nicht dort"}')
+    for info in api(tok, f'apps/{aid}/appInfos').get('data', []):
+        ai = api(tok, f'appInfos/{info["id"]}/ageRatingDeclaration', fatal=False)
+        zustand = (info['attributes'].get('appStoreState')
+                   or info['attributes'].get('state') or '?')
+        print(f'  an appInfo {info["id"][:8]} ({zustand}): '
+              f'{"gesetzt" if ai.get("data") else "FEHLT"}')
 
     print('\n── Abos: warum MISSING_METADATA ──')
     grp = api(tok, f'apps/{aid}/subscriptionGroups')
@@ -542,6 +551,17 @@ def diagnose(tok):
                 print('      Lokalisierungen: KEINE')
             pr = api(tok, f'subscriptions/{s["id"]}/prices?limit=3', fatal=False)
             print(f'      Preise hinterlegt: {len(pr.get("data", []))}')
+            av = api(tok, f'subscriptions/{s["id"]}/subscriptionAvailability',
+                     fatal=False)
+            if av.get('data'):
+                aa = av['data']['attributes']
+                terr = api(tok, f'subscriptionAvailabilities/{av["data"]["id"]}'
+                                f'/availableTerritories?limit=1', fatal=False)
+                anz = (terr.get('meta') or {}).get('paging', {}).get('total', '?')
+                print(f'      Verfuegbarkeit: alleNeuen={aa.get("availableInNewTerritories")} '
+                      f'Laender={anz}')
+            else:
+                print('      Verfuegbarkeit: FEHLT — Abo ist nirgends verkaeuflich')
             shot = api(tok, f'subscriptions/{s["id"]}/appStoreReviewScreenshot',
                        fatal=False)
             d = shot.get('data')
@@ -550,6 +570,58 @@ def diagnose(tok):
                 print(f'      Review-Screenshot: hochgeladen={sa.get("assetDeliveryState", {}).get("state")}')
             else:
                 print('      Review-Screenshot: FEHLT')
+
+
+def abo_namen(tok):
+    """Anzeigenamen der Abos von MyPeak auf FullRep ziehen.
+
+    Die Produkt-IDs bleiben (nach Anlage unveraenderlich), aber der Name im
+    Kaufdialog ist sichtbar — er darf nicht die alte Marke tragen.
+    """
+    aid = app_id(tok)
+    for g in api(tok, f'apps/{aid}/subscriptionGroups').get('data', []):
+        for art, pfad in (('subscriptionGroupLocalizations',
+                           f'subscriptionGroups/{g["id"]}/subscriptionGroupLocalizations'),
+                          (None, None)):
+            if not art:
+                continue
+            for loc in api(tok, pfad, fatal=False).get('data', []):
+                a = loc['attributes']
+                neu = (a.get('name') or '').replace('MyPeak', 'FullRep')
+                if not neu or neu == a.get('name'):
+                    continue
+                print(f'  Gruppe {a.get("locale")}: {a.get("name")!r} -> {neu!r}')
+                if TROCKEN:
+                    continue
+                res = api(tok, f'{art}/{loc["id"]}', 'PATCH', {
+                    'data': {'type': art, 'id': loc['id'],
+                             'attributes': {'name': neu}},
+                }, fatal=False)
+                print('    gesetzt' if not res.get('_fehler')
+                      else f'    FEHLER: {fehler_text(res)}')
+
+        for s in api(tok, f'subscriptionGroups/{g["id"]}/subscriptions').get('data', []):
+            pid = s['attributes'].get('productId')
+            for loc in api(tok, f'subscriptions/{s["id"]}/subscriptionLocalizations',
+                           fatal=False).get('data', []):
+                a = loc['attributes']
+                felder = {}
+                for f in ('name', 'description'):
+                    wert = a.get(f) or ''
+                    if 'MyPeak' in wert:
+                        felder[f] = wert.replace('MyPeak', 'FullRep')
+                if not felder:
+                    print(f'  {pid} {a.get("locale")}: steht schon richtig')
+                    continue
+                print(f'  {pid} {a.get("locale")}: {felder}')
+                if TROCKEN:
+                    continue
+                res = api(tok, f'subscriptionLocalizations/{loc["id"]}', 'PATCH', {
+                    'data': {'type': 'subscriptionLocalizations',
+                             'id': loc['id'], 'attributes': felder},
+                }, fatal=False)
+                print('    gesetzt' if not res.get('_fehler')
+                      else f'    FEHLER: {fehler_text(res)}')
 
 
 def exportfrage(tok, wert=False):
@@ -664,6 +736,8 @@ def main():
                    help='Paywall-Bild als Review-Screenshot an alle Abos')
     p.add_argument('--warum', action='store_true',
                    help='Was blockiert die Einreichung? (liest nur)')
+    p.add_argument('--abo-namen', action='store_true',
+                   help='Abo-Anzeigenamen von MyPeak auf FullRep ziehen')
     p.add_argument('--exportfrage', action='store_true',
                    help='usesNonExemptEncryption am Build auf false setzen')
     p.add_argument('--pruefnotiz', action='store_true',
@@ -679,7 +753,8 @@ def main():
     TROCKEN = a.dry_run
 
     tat = [a.status, a.name, a.build, a.screenshots, a.abo_screenshot,
-           a.warum, a.exportfrage, a.pruefnotiz, a.einreichen, a.alles]
+           a.warum, a.abo_namen, a.exportfrage, a.pruefnotiz, a.einreichen,
+           a.alles]
     if not any(tat):
         p.error('Einen Befehl angeben, z. B. --status')
 
@@ -691,6 +766,7 @@ def main():
                           ('Build 4', lambda: setze_build(tok, '4')),
                           ('Screenshots', lambda: setze_screenshots(tok)),
                           ('Abo-Screenshot', lambda: setze_abo_screenshot(tok)),
+                          ('Abo-Namen', lambda: abo_namen(tok)),
                           ('Pruefnotiz', lambda: setze_pruefnotiz(tok)),
                           ('Einreichen', lambda: einreichen(tok))):
             print(f'\n═══ {titel} ═══')
@@ -706,6 +782,8 @@ def main():
         setze_abo_screenshot(tok)
     if a.warum:
         diagnose(tok)
+    if a.abo_namen:
+        abo_namen(tok)
     if a.exportfrage:
         exportfrage(tok)
     if a.pruefnotiz:
