@@ -32,12 +32,21 @@ jobs:
           VITE_REVENUECAT_IOS_KEY: ${{ secrets.VITE_REVENUECAT_IOS_KEY }}
         run: |
           fehlt=0
+          # Die Laenge mitzuzeigen ist kein Leck — GitHub maskiert Werte ohnehin —,
+          # faengt aber den Fall ab, der uns 45 Minuten gekostet hat: ein Secret,
+          # das versehentlich auf den Wert "-" gesetzt wurde (gh secret set --body -
+          # nimmt den Wert direkt, nicht von der Standardeingabe). "gesetzt" allein
+          # sagt darueber nichts.
           pruefe() {
-            if [ -n "${!1:-}" ]; then
-              printf '  %-34s gesetzt\n' "$1"
-            else
+            wert="${!1:-}"
+            if [ -z "$wert" ]; then
               printf '  %-34s FEHLT\n' "$1"
               fehlt=$((fehlt + 1))
+            elif [ "${#wert}" -lt 8 ]; then
+              printf '  %-34s VERDAECHTIG — nur %s Zeichen\n' "$1" "${#wert}"
+              fehlt=$((fehlt + 1))
+            else
+              printf '  %-34s gesetzt (%s Zeichen)\n' "$1" "${#wert}"
             fi
           }
 
