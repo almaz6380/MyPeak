@@ -685,6 +685,39 @@ def inhaberrechte(tok):
           else f'  FEHLER: {fehler_text(res)}')
 
 
+# Prueferhinweis am Abo. Gilt als optional — in den Rohdaten ist es aber das
+# einzige leere Feld, und der Hinweis gehoert inhaltlich ohnehin dorthin.
+ABO_NOTIZ = (
+    'The subscription unlocks the AI coach, blood-marker guidance and the '
+    'AI meal photo analysis. To reach it in the app: Profile tab > '
+    '"FullRep Premium" card. A 7-day free trial is offered before any '
+    'purchase, so the paywall can be reviewed without buying. '
+    'No account is required — the app is fully usable as a guest.'
+)
+
+
+def abo_notiz(tok):
+    aid = app_id(tok)
+    for g in api(tok, f'apps/{aid}/subscriptionGroups').get('data', []):
+        for s in api(tok, f'subscriptionGroups/{g["id"]}/subscriptions').get('data', []):
+            a = s['attributes']
+            if a.get('reviewNote') == ABO_NOTIZ:
+                print(f'  {a.get("productId")}: steht schon richtig')
+                continue
+            print(f'  {a.get("productId")}: Notiz setzen ({len(ABO_NOTIZ)} Zeichen)')
+            if TROCKEN:
+                continue
+            res = api(tok, f'subscriptions/{s["id"]}', 'PATCH', {
+                'data': {'type': 'subscriptions', 'id': s['id'],
+                         'attributes': {'reviewNote': ABO_NOTIZ}},
+            }, fatal=False)
+            if res.get('_fehler'):
+                print(f'    FEHLER: {fehler_text(res)}')
+            else:
+                neu = res['data']['attributes'].get('state')
+                print(f'    gesetzt — Zustand jetzt {neu}')
+
+
 def exportfrage(tok, wert=False):
     """Die Frage nach Verschluesselung am Build beantworten.
 
@@ -799,6 +832,8 @@ def main():
                    help='Was blockiert die Einreichung? (liest nur)')
     p.add_argument('--abo-namen', action='store_true',
                    help='Abo-Anzeigenamen von MyPeak auf FullRep ziehen')
+    p.add_argument('--abo-notiz', action='store_true',
+                   help='Prueferhinweis am Abo setzen (einziges leeres Feld)')
     p.add_argument('--inhaberrechte', action='store_true',
                    help='contentRightsDeclaration setzen (app-weites Pflichtfeld)')
     p.add_argument('--exportfrage', action='store_true',
@@ -819,7 +854,7 @@ def main():
     TROTZDEM = a.trotzdem
 
     tat = [a.status, a.name, a.build, a.screenshots, a.abo_screenshot,
-           a.warum, a.abo_namen, a.inhaberrechte, a.exportfrage, a.pruefnotiz,
+           a.warum, a.abo_namen, a.abo_notiz, a.inhaberrechte, a.exportfrage, a.pruefnotiz,
            a.einreichen, a.alles]
     if not any(tat):
         p.error('Einen Befehl angeben, z. B. --status')
@@ -833,6 +868,7 @@ def main():
                           ('Screenshots', lambda: setze_screenshots(tok)),
                           ('Abo-Screenshot', lambda: setze_abo_screenshot(tok)),
                           ('Abo-Namen', lambda: abo_namen(tok)),
+                          ('Abo-Notiz', lambda: abo_notiz(tok)),
                           ('Inhaberrechte', lambda: inhaberrechte(tok)),
                           ('Pruefnotiz', lambda: setze_pruefnotiz(tok)),
                           ('Einreichen', lambda: einreichen(tok))):
@@ -851,6 +887,8 @@ def main():
         diagnose(tok)
     if a.abo_namen:
         abo_namen(tok)
+    if a.abo_notiz:
+        abo_notiz(tok)
     if a.inhaberrechte:
         inhaberrechte(tok)
     if a.exportfrage:
