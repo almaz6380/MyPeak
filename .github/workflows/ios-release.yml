@@ -90,7 +90,31 @@ jobs:
 
       - name: ExportOptions schreiben
         run: |
-          cat > /tmp/ExportOptions.plist <<'EOF'
+          set -euo pipefail
+          PROFILE=~/Library/MobileDevice/Provisioning\ Profiles/app.mobileprovision
+
+          # Bei signingStyle=manual verlangt xcodebuild eine Zuordnung
+          # Bundle-ID -> Profilname; ohne sie bricht der Export ab mit
+          # "App.app requires a provisioning profile" — und zwar erst NACH dem
+          # Archivieren, also nach drei Minuten.
+          #
+          # Name und Bundle-ID kommen aus dem Profil selbst statt aus einer
+          # Konstante: wird das Profil bei Apple neu erzeugt oder umbenannt,
+          # stimmt es hier automatisch weiter.
+          security cms -D -i "$PROFILE" > /tmp/profile.plist
+          NAME=$(/usr/libexec/PlistBuddy -c "Print :Name" /tmp/profile.plist)
+          APPID=$(/usr/libexec/PlistBuddy -c "Print :Entitlements:application-identifier" /tmp/profile.plist)
+          BUNDLE=${APPID#*.}          # fuehrende Team-ID abschneiden
+          echo "Profil \"$NAME\" fuer $BUNDLE"
+
+          ERWARTET=$(grep -m1 PRODUCT_BUNDLE_IDENTIFIER ios/App/App.xcodeproj/project.pbxproj \
+                     | cut -d'=' -f2 | tr -d ' ;')
+          if [ "$BUNDLE" != "$ERWARTET" ]; then
+            echo "::error::Profil gilt fuer $BUNDLE, die App ist $ERWARTET."
+            exit 1
+          fi
+
+          cat > /tmp/ExportOptions.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -99,9 +123,14 @@ jobs:
             <key>teamID</key><string>JU8STVD4SJ</string>
             <key>uploadSymbols</key><true/>
             <key>signingStyle</key><string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>$BUNDLE</key><string>$NAME</string>
+            </dict>
           </dict>
           </plist>
           EOF
+          rm -f /tmp/profile.plist
 
       - name: Archivieren
         run: |
