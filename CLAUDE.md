@@ -994,12 +994,18 @@ hingehört**, statt zu raten oder einen Umweg zu bauen.
 → Bild herunterladen, ins Repo legen, committen, im Chat zeigen. Ohne gesetzten
 `FAL_KEY` ist der Weg zu: dann sagen, dass die Variable in der Umgebung fehlt.
 
-**Auslösen in diesem Repo:** vier Workflows unter `.github/workflows/`, alle nur
-`workflow_dispatch` — `android-release.yml`, `ios-release.yml`, `play-listing.yml`,
-`release-preflight.yml`.
-Auslösbar sind sie nur in der Fassung, die auf `main` liegt (GitHub liest
-`workflow_dispatch` vom Standard-Branch) — eine Änderung wirkt also erst nach dem Merge.
-Alle ziehen ihre Schlüssel aus den Repo-Secrets; `play-listing.yml` ist end-to-end
-erprobt (30.07.), die beiden Release-Workflows sind es noch nicht.
-Die Web-App deployt Vercel automatisch über GitHub. Vor jedem Release-Build prüfen:
-`USE_TEST_ADS` in `src/lib/ads.js` und `PURCHASE_ENABLED` in `PaywallPage.jsx`.
+**Auslösen in diesem Repo:** `Android Release` und `iOS Release` liegen unter
+`.github/workflows/`, Secret-Namen in `docs/release-ci.md`. **Beide am 4.8.2026 grün
+getestet** (Bau + Signierung, Upload abgeschaltet); Android lief schon am 31.7.
+erfolgreich. Start per `workflow_dispatch`. Vorher `versionCode` in
+`android/app/build.gradle` und `CURRENT_PROJECT_VERSION` im pbxproj erhöhen. Vor jedem
+Release-Build prüfen: `USE_TEST_ADS` in `src/lib/ads.js` und `PURCHASE_ENABLED` in
+`PaywallPage.jsx`.
+
+⚠ **Falle beim iOS-Export** (4.8.26 zweimal reingelaufen): Bei manueller
+Signierung braucht `ExportOptions.plist` die Zuordnung **Bundle-ID → Profilname**.
+Fehlt sie, läuft der Bau vollständig durch und erst der Export bricht ab —
+`exportArchive "App.app" requires a provisioning profile`. Das liest sich wie ein
+fehlendes Profil, obwohl das Profil längst installiert ist. Der Workflow zieht beides
+jetzt zur Laufzeit aus dem Profil selbst (`security cms -D` + `plutil -extract`),
+damit es auch nach einer Profilerneuerung bei Apple stimmt.
