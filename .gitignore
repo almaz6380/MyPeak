@@ -25,3 +25,7 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# Python-Zwischenstaende gehoeren nicht ins Repo
+__pycache__/
+*.pyc
