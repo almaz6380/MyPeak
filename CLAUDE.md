@@ -16,6 +16,31 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### Play-Abos: gemessener Stand 14.08.2026 (`play-listing.yml` → `abos`)
+```
+mypeak_premium_monthly        Listing de-DE: 'MyPeak Premium'   ⚠ alter Name
+  Tarif monthly  auto-renew P1M  ACTIVE   4,49 EUR (AT)   173 von 173 Regionen
+  Tarif annual   auto-renew P1Y  ACTIVE  44,90 EUR (AT)   173 von 173 Regionen
+```
+
+⚠️ **Play ist anders gebaut als der App Store — das ist für RevenueCat entscheidend.**
+Play hat **ein Produkt mit zwei Basis-Tarifen**, Apple hat **zwei getrennte Produkte**.
+In RevenueCat heißen die Play-Produkte deshalb `mypeak_premium_monthly:monthly` und
+`mypeak_premium_monthly:annual` (Produkt-ID **plus** Basis-Tarif-ID). Beide ans
+`premium`-Entitlement und ins Default-Offering als Monthly- bzw. Annual-Package.
+
+⚠️ **Drei Abweichungen zum App Store, Stand 14.08.:**
+1. **Preis:** Play 4,49 / 44,90 — Apple und die Paywall 4,99 / 44,99. Die Paywall zeigt
+   zwar den Live-Store-Preis, aber `perMonth` und `ANNUAL_SAVINGS` stehen fest im Binary
+   und rechnen mit 4,99/44,99. Auf Android stimmten sie damit nicht.
+2. **Anzeigename** im Play-Listing ist noch `MyPeak Premium`, in ASC längst
+   `FullRep Premium`.
+3. Die Tarif-IDs heißen `monthly`/`annual` — sie tauchen im RevenueCat-Produktnamen auf.
+
+**Gegenprobe jederzeit:** `play-listing.yml` mit `mode = abos` (liest nur). Es zeigt
+Betrag **und** „Regionen mit Preis: n von m" — ein Tarif mit Preis in nur einer Region
+oder ohne `ACTIVE` ist nicht kaufbar.
+
 ### iOS-Ablehnung 14.08.2026 — 2.1(b) erneut, weil die Abos NICHT mitgingen
 Apple hat Build **1.0 (4)** abgelehnt (Prüfgerät iPad Air 11″ (M3), 15:32).
 **1.4.1 ist weg** — die Quellenangaben haben getragen. Übrig bleibt allein:
@@ -432,7 +457,7 @@ nutzt `.splash-circle` / `.splash-parts`. Die alten Klassen `ptr-line-animate`, 
 - **Web-Kauf geparkt (live, Commit b380b1e):** `PaywallPage.jsx` → `PURCHASE_ENABLED = { ios:false, android:false, web:false }`, `canPurchase = PURCHASE_ENABLED[Capacitor.getPlatform()]`. Aktuell zeigt die Paywall ÜBERALL nur die Gratis-Testphase (kein Kauf/Preis/Restore) — Web-Billing hing nur an Stripe-Sandbox, so läuft niemand in einen Sandbox-Checkout. Je Store mit `PURCHASE_ENABLED.<platform>=true` freischaltbar. **iOS/Android-Käufe laufen über Apple IAP bzw. Google Play Billing — NICHT Stripe** (das ist nur der Web-Weg).
 - **AdMob-DSGVO veröffentlicht:** eigene UMP-Einwilligungsnachricht „MyPeak GDPR" für iOS+Android (Consent + Optionen-verwalten, Datenschutz-URL /legal/privacy). Offen: AdMob-App↔Store verknüpfen nach Launch.
 - **iOS-Abo fertig aufgesetzt:** ASC-Abo `mypeak_premium_monthly` (3,99 €/Monat, alle Territorien, DE/EN) per API angelegt (Status Missing-Metadata, fehlt nur Review-Screenshot → kommt mit dem Build). **RevenueCat iOS komplett:** App verbunden (In-App-Purchase-Key gültig), Produkt → `premium`-Entitlement → Monthly-Package. iOS-SDK-Key als `VITE_REVENUECAT_IOS_KEY` in lokaler `.env` (gitignored; nativer Build liest .env). Apple „Paid Apps"-Vertrag + N26-Bank aktiv.
-- **Android-Abo aufgesetzt:** Play-Zahlungsprofil (Österreich, Organisation) verknüpft + N26-Bank hinterlegt („Bestätigung steht aus", normal). Abo `mypeak_premium_monthly`, Basis-Tarif `monthly` (auto-renew, 3,99 € — Österreich manuell auf 3,99 € gesetzt; ⚠️ prüfen, ob DE + übrige €-Länder auch 3,99 zeigen).
+- **Android-Abo aufgesetzt:** Play-Zahlungsprofil (Österreich, Organisation) verknüpft + N26-Bank hinterlegt („Bestätigung steht aus", normal). ⚠️ Hier stand „3,99 €" — **überholt**, am 14.08. per `--abos` am Endpunkt gemessen (siehe unten).
 - **⚠️ Steuer/KU:** Josef ist **Kleinunternehmer (AT)**. EU-B2C: Apple/Google = deemed supplier, führen Endkunden-USt ab → KU ändert 3,99-€-Preis nicht. **TODO: Apple Small Business Program anmelden** (30%→15%, vor echten Verkäufen); Google-Abos eh 15 %.
 - **NOCH OFFEN (nach den laufenden Store-Prüfungen, in einem Rutsch):** RevenueCat-Android (Google-Cloud-Service-Account + Play-API + `goog_`-Key), Play-Produkt ans Entitlement/Offering, `VITE_REVENUECAT_ANDROID_KEY`, `PURCHASE_ENABLED.*=true`, ASC-Abo-Review-Screenshot, **Weg-A-Build iOS+Android** (neuer Build ersetzt jeweils die laufende Einreichung → erst nach deren Freigabe), Sandbox-/Lizenz-Tester-Kauf testen.
 
