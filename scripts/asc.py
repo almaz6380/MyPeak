@@ -712,22 +712,32 @@ def preise(tok, sub_id):
     punkte = {i['id']: i.get('attributes', {})
               for i in res.get('included', [])
               if i.get('type') == 'subscriptionPricePoints'}
+    # Auch ein aufgeloester Betrag beweist noch nicht, dass ASC den Preis als
+    # gesetzt ansieht: am 14.08. meldete diese Funktion "Preis: 4.49 (DEU)",
+    # waehrend die Oberflaeche gleichzeitig "Fuege einen Abopreis hinzu"
+    # anzeigte. Deshalb hier die Rohattribute jedes Eintrags mitschreiben
+    # (startDate, preserved) — die Vermutung ist ein Eintrag, der erst in der
+    # Zukunft greift oder nur ein Vorschlag ist. Lieber zu viel zeigen als
+    # noch einmal "alles da" melden und in eine Ablehnung laufen.
+    zeilen = []
     gefunden = []
     for p in res.get('data', []):
         bez = p.get('relationships', {})
         pp = (bez.get('subscriptionPricePoint') or {}).get('data') or {}
         terr = (bez.get('territory') or {}).get('data') or {}
         betrag = punkte.get(pp.get('id'), {}).get('customerPrice')
+        land = terr.get('id') or '?'
+        zeilen.append(f'  Preiseintrag {land}: betrag={betrag!r} '
+                      f'attr={json.dumps(p.get("attributes", {}), sort_keys=True)}')
         if betrag:
-            gefunden.append((terr.get('id') or '?', betrag))
+            gefunden.append((land, betrag))
     if not gefunden:
-        return [f'Preis: FEHLT — {len(res.get("data", []))} Eintrag/Eintraege '
-                f'ohne aufloesbaren Betrag. Genau das meldet ASC in der '
-                f'Oberflaeche als "Fuege einen Abopreis hinzu".']
-    zeilen = [f'Preis: {betrag} ({land})' for land, betrag in gefunden[:3]]
-    if len(gefunden) > 3:
-        zeilen.append(f'... und {len(gefunden) - 3} weitere Laender')
-    return zeilen
+        zeilen.insert(0, f'Preis: FEHLT — {len(res.get("data", []))} Eintrag/'
+                         f'Eintraege ohne aufloesbaren Betrag.')
+    else:
+        zeilen.insert(0, 'Preis laut API: ' + ', '.join(
+            f'{b} ({l})' for l, b in gefunden[:3]))
+    return zeilen[:8]
 
 
 def abo_namen(tok):
