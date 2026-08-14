@@ -37,7 +37,26 @@ Erschwerend: die Prüfnotiz für Build 4 behauptete „The auto-renewable subscr
 submitted together with this version". Der Prüfer hat danach gesucht und nichts gefunden.
 **Nie in die Prüfnotiz schreiben, was man erst noch vorhat.**
 
-**Stand 14.08., 15:25 UTC — alles vorbereitet, es fehlen vier Klicks in ASC:**
+### ✅ Version 1.0 / Build 6 samt beider Abos eingereicht — 14.08.2026, 15:38 UTC
+Einreichung **`8ae50391-e042-4e1c-aae8-e65a55917e60`**, Zustand `WAITING_FOR_REVIEW`,
+**vier Elemente, alle `READY_FOR_REVIEW`**: `mypeak_premium_monthly`,
+`mypeak_premium_annual`, die Abo-Gruppe und die App-Version 1.0 mit Build 6.
+Am Endpunkt nachgezählt, nicht bloß gemeldet. Damit ist erfüllt, woran 2.1(b) zweimal
+gescheitert ist: die IAP-Produkte fahren **mit** der Version.
+
+⚠️ **Beim nächsten Mal nicht wieder in diese Reihenfolge geraten:** erst die Preise
+vollständig setzen, dann bauen, dann sammeln, dann übermitteln. Am 14.08. ging um 17:16
+eine komplette Einreichung mit Build 5 raus, dessen Paywall noch die falschen Preise trug,
+und musste zurückgezogen werden — das kostete den zweiten Durchlauf. **Vor dem Sammeln
+prüfen, ob der zugewiesene Build der ist, den man meint.**
+
+⚠️ **Nach einem Zurückziehen zeigt ASC an allen Elementen „Vom Entwickler abgelehnt" und
+graue Knöpfe.** Das ist die Altmarkierung der zurückgezogenen Einreichung, kein aktueller
+Zustand — die API meldete parallel `READY_TO_SUBMIT` bzw. `PREPARE_FOR_SUBMISSION`. Hilft:
+harter Reload und **mit der App-Version beginnen**; sie eröffnet den neuen Entwurf, an dem
+die Abos andocken.
+
+**Der Weg dorthin, Schritt für Schritt:**
 
 | # | Schritt | Wo | Stand |
 |---|---|---|---|
@@ -45,8 +64,8 @@ submitted together with this version". Der Prüfer hat danach gesucht und nichts
 | 2 | Abopreise gesetzt → beide Abos **`READY_TO_SUBMIT`** | ASC-Oberfläche | ✅ |
 | 3 | Paywall-Preise an den Store angeglichen, Build 6 gebaut + zugewiesen | `ios-release.yml` #5 | ✅ `VALID` |
 | 4 | Prüfnotiz (2133 Zeichen, mit 4,99/44,99) | asc.yml | ✅ |
-| 5 | Je **Zur Prüfung hinzufügen**: beide Abos, **Abo-Gruppe**, **App-Version** | **ASC-Oberfläche** | ⏳ offen |
-| 6 | **Zur Prüfung übermitteln** | **ASC-Oberfläche** | ⏳ offen |
+| 5 | Je **Zur Prüfung hinzufügen**: beide Abos, **Abo-Gruppe**, **App-Version** | **ASC-Oberfläche** | ✅ |
+| 6 | **Zur Prüfung übermitteln** | **ASC-Oberfläche** | ✅ |
 
 **⚠️ Der eigentliche Blocker war der Abopreis — und zwar wirklich, nicht nur laut Meldung.**
 Die Oberfläche sagte an beiden Abos rot: „Kann nicht zur Prüfung hinzugefügt werden ·
