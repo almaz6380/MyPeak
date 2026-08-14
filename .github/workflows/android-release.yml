@@ -54,6 +54,21 @@ jobs:
           fi
           echo "ok — echte Anzeigen-IDs"
 
+      - name: Kauf angekuendigt, Schluessel vorhanden?
+        # Gleiche Logik wie bei iOS: steht PURCHASE_ENABLED.android auf true, muss
+        # der goog_-Schluessel gesetzt sein, sonst baut das eine App, die zwar das
+        # Abo bewirbt, aber keinen Kauf anbietet. Kein stiller Teilzustand.
+        env:
+          VITE_REVENUECAT_ANDROID_KEY: ${{ secrets.VITE_REVENUECAT_ANDROID_KEY }}
+        run: |
+          if grep -q 'android: true' src/pages/PaywallPage.jsx && [ -z "${VITE_REVENUECAT_ANDROID_KEY:-}" ]; then
+            echo "::error::PURCHASE_ENABLED.android ist true, aber VITE_REVENUECAT_ANDROID_KEY fehlt."
+            echo "Setze das Secret in GitHub -> Settings -> Secrets and variables -> Actions,"
+            echo "oder setze android in PaywallPage.jsx wieder auf false."
+            exit 1
+          fi
+          echo "ok — Kauf-Flagge und Schluessel passen zusammen"
+
       - name: Versionsnummer anzeigen
         run: |
           VC=$(grep -m1 versionCode android/app/build.gradle | tr -dc '0-9')

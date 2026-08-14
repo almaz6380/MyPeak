@@ -292,6 +292,55 @@ def setze_listing(tok, datei, lang, dry_run=False):
     commit_edit(tok, eid)
 
 
+def zeige_abos(tok):
+    """Play-Abos lesen: Produkt, Basis-Tarife, Zustand, Preise.
+
+    Liest nur. Gedacht als Gegenprobe vor der RevenueCat-Einrichtung: ein Abo
+    nuetzt nichts, solange sein Basis-Tarif nicht ACTIVE ist, und der Preis in
+    Play muss zu dem passen, den die Paywall anzeigt.
+
+    ⚠️ Bei den iOS-Abos hat am 14.08. zweimal eine API-Antwort „Preis
+    vorhanden" gemeldet, waehrend die Oberflaeche „Fuege einen Abopreis hinzu"
+    anzeigte. Deshalb hier Betrag UND Region ausschreiben und die Anzahl der
+    Regionen dazu — wer nur eine Region sieht, wo 175 stehen sollten, erkennt
+    das dann selbst.
+    """
+    res = call(tok, 'GET', f'{API}/applications/{PKG}/subscriptions?pageSize=50')
+    abos = res.get('subscriptions', [])
+    if not abos:
+        print('  KEINE Abos in Play angelegt.')
+        return
+    for s in abos:
+        print(f'\n  {s.get("productId")}')
+        for lst in s.get('listings', []):
+            print(f'      {lst.get("languageCode"):8} {lst.get("title")!r}')
+        for bp in s.get('basePlans', []):
+            art = ('auto-renew' if bp.get('autoRenewingBasePlanType')
+                   else 'prepaid' if bp.get('prepaidBasePlanType') else '?')
+            dauer = ((bp.get('autoRenewingBasePlanType')
+                      or bp.get('prepaidBasePlanType') or {}).get('billingPeriodDuration'))
+            zustand = bp.get('state', '?')
+            marke = '' if zustand == 'ACTIVE' else '   ⚠ nicht ACTIVE — nicht kaufbar'
+            print(f'      Tarif {bp.get("basePlanId")}  {art} {dauer}  '
+                  f'{zustand}{marke}')
+            regionen = bp.get('regionalConfigs', [])
+            preise = []
+            for rc in regionen:
+                pr = rc.get('price') or {}
+                if pr.get('units') is None and pr.get('nanos') is None:
+                    continue
+                betrag = int(pr.get('units') or 0) + int(pr.get('nanos') or 0) / 1e9
+                preise.append(f'{betrag:.2f} {pr.get("currencyCode")} ({rc.get("regionCode")})')
+            if not preise:
+                print(f'        Preis: FEHLT (Regionen konfiguriert: {len(regionen)})')
+            else:
+                print(f'        Preis: {", ".join(preise[:3])}'
+                      + (f' … +{len(preise) - 3} weitere' if len(preise) > 3 else ''))
+                print(f'        Regionen mit Preis: {len(preise)} von {len(regionen)}')
+            if bp.get('offerTags'):
+                print(f'        offerTags: {[t.get("tag") for t in bp["offerTags"]]}')
+
+
 def zeige_status(tok, track='production'):
     eid = call(tok, 'POST', f'{API}/applications/{PKG}/edits')['id']
     tr = call(tok, 'GET', f'{API}/applications/{PKG}/edits/{eid}/tracks/{track}')
@@ -308,6 +357,8 @@ def main():
     p.add_argument('--complete', action='store_true', help='an alle ausrollen')
     p.add_argument('--notes', default='', help='Was-ist-neu-Text (de-DE)')
     p.add_argument('--status', action='store_true', help='nur den Track anzeigen')
+    p.add_argument('--abos', action='store_true',
+                   help='Play-Abos anzeigen: Basis-Tarife, Zustand, Preise (liest nur)')
     p.add_argument('--screenshots', metavar='VERZEICHNIS',
                    help='Store-Eintrag-Screenshots ersetzen (z. B. store-assets/android)')
     p.add_argument('--listing', metavar='JSON',
@@ -324,14 +375,16 @@ def main():
                    help='Play-Track (Standard: production)')
     a = p.parse_args()
 
-    if not (a.aab or a.promote or a.status or a.screenshots or a.listing
+    if not (a.aab or a.promote or a.status or a.abos or a.screenshots or a.listing
             or a.icon or a.feature):
-        p.error('--aab, --promote, --status, --screenshots, --listing, '
+        p.error('--aab, --promote, --status, --abos, --screenshots, --listing, '
                 '--icon oder --feature angeben')
     if a.aab and not a.complete and a.fraction is None:
         p.error('--fraction 0.2 oder --complete angeben')
 
     tok = token()
+    if a.abos:
+        return zeige_abos(tok)
     if a.status:
         return zeige_status(tok, a.track)
     if a.screenshots:

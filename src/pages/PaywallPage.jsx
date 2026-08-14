@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Capacitor } from '@capacitor/core';
 import { X, Check, Crown, Sparkles } from 'lucide-react';
 import { purchasePremium, restorePurchases, getPremiumPrices, TRIAL_DAYS } from '../data/subscriptionStorage';
+import { isConfigured as revenueCatConfigured } from '../lib/revenuecat';
 import { useAuth } from '../context/AuthContext';
 import Toast from '../components/Toast';
 
@@ -18,12 +19,23 @@ import Toast from '../components/Toast';
 // Pruefung ab, solange die App aufs Abo verweist, das IAP-Produkt aber nicht mit
 // eingereicht wird. Das Produkt wird jetzt mitgeschickt — der Kauf muss also sichtbar sein.
 //
-// ANDROID BLEIBT AUS, bis RevenueCat-Android eingerichtet ist. Ohne
-// VITE_REVENUECAT_ANDROID_KEY meldet isConfigured() false, der Kauf endet also in
-// „bald verfuegbar" — ein sichtbarer Preis mit totem Knopf. Erst einschalten, wenn
-// der goog_-Key gesetzt und das Play-Produkt am Entitlement haengt.
-const PURCHASE_ENABLED = { ios: true, android: false, web: false };
-const canPurchase = PURCHASE_ENABLED[Capacitor.getPlatform()] ?? false;
+// Android steht seit 14.08.2026 auf true. Das ist gefahrlos, weil canPurchase
+// zusaetzlich verlangt, dass fuer die laufende Plattform wirklich ein
+// RevenueCat-Schluessel im Binary steckt — siehe unten. Vorher war das eine reine
+// Absichtserklaerung: stand die Flagge auf true und fehlte der Schluessel, sah der
+// Nutzer Preise und einen Knopf, der in „bald verfuegbar" endete.
+const PURCHASE_ENABLED = { ios: true, android: true, web: false };
+
+// Zwei Bedingungen, nicht eine:
+//   1. die Plattform ist freigeschaltet (Store-Produkt existiert, Vertrag steht)
+//   2. der Schluessel dieser Plattform ist beim Bauen wirklich gesetzt
+// Fehlt (2), zeigen wir gar keinen Kauf — nur die kostenlose Testphase. Damit kann
+// ein vergessenes Secret keine Paywall mit totem Knopf mehr ausliefern.
+// ⚠️ Umgekehrt heisst das: ein iOS-Build OHNE VITE_REVENUECAT_IOS_KEY haette keinen
+// sichtbaren Kauf — und genau dafuer hat Apple 2.1(b) vergeben. Deshalb bricht
+// ios-release.yml ab, wenn das Secret fehlt, statt still etwas anderes zu bauen.
+const canPurchase = (PURCHASE_ENABLED[Capacitor.getPlatform()] ?? false)
+  && revenueCatConfigured();
 
 // ── Preis-Konfiguration (Fallback-Anzeige) ────────────────────────
 // Sobald ein RevenueCat-Offering geladen ist, werden die echten, lokalisierten
