@@ -37,18 +37,28 @@ Erschwerend: die Prüfnotiz für Build 4 behauptete „The auto-renewable subscr
 submitted together with this version". Der Prüfer hat danach gesucht und nichts gefunden.
 **Nie in die Prüfnotiz schreiben, was man erst noch vorhat.**
 
-**Reihenfolge zum Heilen — die ersten beiden Schritte sind Handarbeit in ASC:**
+**Reihenfolge zum Heilen — Stand 14.08., 14:15 UTC:**
 
-| # | Schritt | Wo |
-|---|---|---|
-| 1 | `--aufraeumen` (Einreichung vom 31.07. zurückziehen), dann `--warum` | asc.yml |
-| 2 | Je Abo den gelben Hinweis lesen und leeren Punkt füllen, bis `READY_TO_SUBMIT` | ASC-Oberfläche |
-| 3 | Je Abo **„Zur Prüfung hinzufügen"** | ASC-Oberfläche, **API kann das nicht** |
-| 4 | Build 5 bauen + hochladen | `ios-release.yml` |
-| 5 | `--build 5`, `--pruefnotiz`, dann `--einreichen` **ohne** `--trotzdem` | asc.yml |
+| # | Schritt | Wo | Stand |
+|---|---|---|---|
+| 1 | `--aufraeumen`: Einreichung `41324499…` (31.07., `UNRESOLVED_ISSUES`) zurückgezogen | asc.yml | ✅ alle Einreichungen `COMPLETE` |
+| 2 | Build 5 gebaut, signiert, hochgeladen | `ios-release.yml` #4 | ✅ in ASC, `VALID` |
+| 3 | Build 5 der Version 1.0 zugewiesen | asc.yml | ✅ |
+| 4 | Je Abo den gelben Hinweis lesen, leeres Feld füllen bis `READY_TO_SUBMIT` | **ASC-Oberfläche** | ⏳ offen |
+| 5 | Je Abo **„Zur Prüfung hinzufügen"** | **ASC-Oberfläche**, API kann das nicht | ⏳ offen |
+| 6 | `--pruefnotiz`, dann `--einreichen` **ohne** `--trotzdem` | asc.yml | ⏳ wartet auf 4+5 |
 
-⚠️ Schritt 5 muss ohne `--trotzdem` durchlaufen. Bricht er ab, ist Schritt 2/3 nicht
-fertig — dann dort weitermachen, nicht die Sperre überbrücken.
+⚠️ Schritt 6 muss ohne `--trotzdem` durchlaufen. Bricht er ab, sind 4/5 nicht fertig —
+dann dort weitermachen, nicht die Sperre überbrücken. Genau diese Abkürzung hat am 31.07.
+die Ablehnung erzeugt.
+
+**Was `--warum` am 14.08. an beiden Abos meldet — alles vorhanden, Zustand trotzdem
+`MISSING_METADATA`:** Name + Beschreibung DE/EN, Preis (4,49 € bzw. **44,90 €**, DEU),
+Verfügbarkeit 175 Länder, Review-Screenshot `COMPLETE`, Prüfhinweis gesetzt.
+**Der fehlende Punkt steht nur im gelben Kasten der Oberfläche** —
+`appstoreconnect.apple.com/apps/6788461300/distribution/subscriptions`.
+Der Preis beim Jahresabo ist diesmal wirklich hinterlegt; der Blocker vom 31.07. ist es
+also nicht mehr.
 
 **Code-Seite vorbereitet (14.08.):**
 - `CURRENT_PROJECT_VERSION` 4 → **5** im pbxproj (Apple verlangt ausdrücklich ein neues
