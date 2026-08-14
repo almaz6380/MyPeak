@@ -6,7 +6,7 @@ name: App Store Connect
 #
 #   status          liest nur
 #   name            Anzeigename + Untertitel auf FullRep
-#   build           Build 4 der offenen Version zuweisen
+#   build           den Build aus "build_nr" der offenen Version zuweisen
 #   screenshots     iPhone- + iPad-Bilder ersetzen
 #   abo-screenshot  Paywall-Bild an alle Abos (gegen "Missing Metadata")
 #   abo-namen       Abo-Anzeigenamen MyPeak -> FullRep
@@ -46,8 +46,12 @@ on:
         description: 'Nur zeigen, nichts an Apple senden'
         type: boolean
         default: true
+      build_nr:
+        description: 'Build-Nummer fuer "build" und "alles" (muss in ASC VALID sein)'
+        type: string
+        default: '5'
       trotzdem:
-        description: 'Einreichen, auch wenn die Abos nicht mitkoennen (2.1b-Risiko)'
+        description: 'Einreichen, obwohl die Abos nicht mitkoennen — hat am 14.08. die Ablehnung 2.1(b) verursacht'
         type: boolean
         default: false
 
@@ -67,6 +71,7 @@ jobs:
           ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
           MODE: ${{ inputs.mode }}
           DRY: ${{ inputs.dry_run }}
+          BUILD_NR: ${{ inputs.build_nr }}
           TROTZDEM: ${{ inputs.trotzdem }}
         run: |
           set -euo pipefail
@@ -77,13 +82,16 @@ jobs:
           fi
           export ASC_KEY_P8
 
-          # --build braucht eine Nummer, die uebrigen nicht. Der Trockenlauf
-          # gilt nur fuer die schreibenden Befehle; --status kennt ihn nicht.
-          if [ "$MODE" = "build" ]; then
-            ARGS="--build 4"
-          else
-            ARGS="--$MODE"
-          fi
+          # --build und --alles brauchen eine Nummer, die uebrigen nicht. Sie
+          # stand hier fest auf 4 — nach der Ablehnung vom 14.08. verlangt
+          # Apple einen neuen Build, also kommt sie jetzt aus der Eingabe.
+          # Der Trockenlauf gilt nur fuer die schreibenden Befehle;
+          # --status kennt ihn nicht.
+          case "$MODE" in
+            build) ARGS="--build $BUILD_NR" ;;
+            alles) ARGS="--alles --build $BUILD_NR" ;;
+            *)     ARGS="--$MODE" ;;
+          esac
           # warum liest nur, kennt --dry-run also nicht.
           if [ "$MODE" != "status" ] && [ "$MODE" != "warum" ] && [ "$MODE" != "einreichungen" ] && [ "$DRY" = "true" ]; then
             ARGS="$ARGS --dry-run"

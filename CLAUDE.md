@@ -16,6 +16,53 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### iOS-Ablehnung 14.08.2026 — 2.1(b) erneut, weil die Abos NICHT mitgingen
+Apple hat Build **1.0 (4)** abgelehnt (Prüfgerät iPad Air 11″ (M3), 15:32).
+**1.4.1 ist weg** — die Quellenangaben haben getragen. Übrig bleibt allein:
+
+> **Guideline 2.1(b) – Performance – App Completeness.** „We are unable to complete the
+> review of the app because one or more of the In-App Purchase products have not been
+> submitted for review. Specifically, the app includes references to Premium subscription
+> but the associated In-App Purchase products have not been submitted for review."
+> Nächste Schritte laut Apple: **die IAP-Produkte einreichen UND einen neuen Build
+> hochladen.**
+
+⚠️ **Das ist keine Überraschung, sondern die angekündigte Folge von `--trotzdem`.** Am
+31.07. ging Version 1.0/Build 4 bewusst ohne die Abos raus (beide `MISSING_METADATA`),
+und im CLAUDE.md stand schon damals: „2.1(b) kann sich dadurch wiederholen." Genau das
+ist passiert. **Lehre: die harte Sperre in `einreichen()` hat recht — `--trotzdem` ist
+kein Abkürzer, sondern kauft eine Ablehnung samt zwei Wochen Wartezeit.**
+
+Erschwerend: die Prüfnotiz für Build 4 behauptete „The auto-renewable subscriptions are
+submitted together with this version". Der Prüfer hat danach gesucht und nichts gefunden.
+**Nie in die Prüfnotiz schreiben, was man erst noch vorhat.**
+
+**Reihenfolge zum Heilen — die ersten beiden Schritte sind Handarbeit in ASC:**
+
+| # | Schritt | Wo |
+|---|---|---|
+| 1 | `--aufraeumen` (Einreichung vom 31.07. zurückziehen), dann `--warum` | asc.yml |
+| 2 | Je Abo den gelben Hinweis lesen und leeren Punkt füllen, bis `READY_TO_SUBMIT` | ASC-Oberfläche |
+| 3 | Je Abo **„Zur Prüfung hinzufügen"** | ASC-Oberfläche, **API kann das nicht** |
+| 4 | Build 5 bauen + hochladen | `ios-release.yml` |
+| 5 | `--build 5`, `--pruefnotiz`, dann `--einreichen` **ohne** `--trotzdem` | asc.yml |
+
+⚠️ Schritt 5 muss ohne `--trotzdem` durchlaufen. Bricht er ab, ist Schritt 2/3 nicht
+fertig — dann dort weitermachen, nicht die Sperre überbrücken.
+
+**Code-Seite vorbereitet (14.08.):**
+- `CURRENT_PROJECT_VERSION` 4 → **5** im pbxproj (Apple verlangt ausdrücklich ein neues
+  Binary; `ios-release.yml` liest die Nummer von dort).
+- Die Build-Nummer stand in `asc.yml` **fest auf 4** und in `--alles` ebenfalls. Beides
+  hätte still den abgelehnten Build wieder zugewiesen, ohne zu scheitern. Jetzt Eingabe
+  `build_nr` im Workflow, `--alles` verlangt `--build`.
+- `--warum` zeigt bei Preisen jetzt **Betrag + Land statt der Anzahl** (der Messfehler vom
+  31.07., der Stunden gekostet hat — ein Eintrag ohne auflösbaren Preispunkt ist kein Preis
+  und wird als `Preis: FEHLT` gemeldet).
+- Prüfnotiz neu: nennt beide Produkt-IDs samt Preis, den Klickweg zur Paywall und den Grund
+  für die `mypeak`-Präfixe. Der Satz „die Abos sind Teil dieser Einreichung" darf erst
+  gesetzt werden, wenn sie es tatsächlich sind.
+
 ### iOS-Ablehnung 29.07.2026 behoben — Quellenangaben + IAP (30.07.2026)
 **Gute Nachricht zuerst: 4.3(a) „Spam" taucht in dieser Ablehnung NICHT mehr auf.** Apple hat
 Build 1.0 (3) inhaltlich geprüft (Prüfgerät iPad Air 11"). Zwei Punkte blieben:
@@ -102,7 +149,9 @@ eine Fehlmessung meinerseits, siehe „Eigener Fehler" weiter unten.
 (`--trotzdem` überbrückt). Ginge die Version allein durch, wäre das exakt der Zustand, für
 den Apple 2.1(b) vergeben hat.
 
-### Version 1.0 / Build 4 eingereicht — 31.07.2026, 17:56 UTC, `WAITING_FOR_REVIEW`
+### Version 1.0 / Build 4 eingereicht — 31.07.2026 → am 14.08. abgelehnt (2.1(b))
+**Ausgang steht oben.** Der Abschnitt bleibt, weil er zeigt, wie es dazu kam.
+
 Auf Josefs ausdrückliche Anweisung mit `--trotzdem` abgesendet, obwohl beide Abos noch auf
 `MISSING_METADATA` stehen. ⚠️ **Die Abos sind also NICHT mitgegangen** — 2.1(b) kann sich
 dadurch wiederholen. Zum Heilen: `--aufraeumen`, dann in ASC je Abo den blauen Knopf

@@ -13,7 +13,7 @@ zu — deshalb kurz halten, nicht zwischenspeichern.
 
     python3 scripts/asc.py --status
     python3 scripts/asc.py --name          # Anzeigename + Untertitel setzen
-    python3 scripts/asc.py --build 4       # Build der offenen Version zuweisen
+    python3 scripts/asc.py --build 5       # Build der offenen Version zuweisen
     python3 scripts/asc.py --screenshots   # iPhone- + iPad-Bilder ersetzen
     python3 scripts/asc.py --abo-screenshot
     python3 scripts/asc.py --einreichen
@@ -307,30 +307,47 @@ def setze_abo_screenshot(tok):
                                           'id': s['id']}}})
 
 
-# Antwort auf die Ablehnung vom 29.07. Der Pruefer sieht sonst nur, DASS
-# sich etwas geaendert hat, nicht wo. Englisch, weil das App Review liest.
-PRUEFNOTIZ = """What changed since the rejected build (1.0 build 3)
+# Antwort auf die Ablehnung vom 14.08. (2.1(b), Build 4). Der Pruefer sieht
+# sonst nur, DASS sich etwas geaendert hat, nicht wo. Englisch, weil das App
+# Review liest.
+#
+# WICHTIG: Der Satz zu den Abos muss stimmen. Die Fassung fuer Build 4 sagte
+# "submitted together with this version", die Abos standen aber auf
+# MISSING_METADATA und fuhren nicht mit — genau dafuer kam 2.1(b) ein zweites
+# Mal. Diesen Absatz erst schreiben, wenn beide Abos READY_TO_SUBMIT sind.
+PRUEFNOTIZ = """What changed since the rejected build (1.0 build 4)
 
-Guideline 1.4.1 - Safety, Physical Harm (missing sources)
-Every article that touches health now ends with a permanently visible
-"Sources" list - not collapsed, no tap required. Links open in Safari.
-Coverage is complete: 24 knowledge articles (training, nutrition,
-supplements, blood markers), 20 peptide articles and 8 diet articles.
-Where to look, starting from the app's Library tab:
+Guideline 2.1(b) - Performance, App Completeness (subscription)
+The previous build was rejected because the In-App Purchase products had
+not been submitted for review. Both auto-renewable subscriptions are now
+part of this submission:
+  mypeak_premium_monthly - EUR 4.49 / month
+  mypeak_premium_annual  - EUR 44.90 / year
+Both carry an App Review screenshot of the paywall and complete German and
+English metadata. The annual subscription was missing its price, which is
+why it could not be attached to the previous submission; the price is set.
+The product identifiers still start with "mypeak" because identifiers
+cannot be changed after creation - the app itself is called FullRep.
+
+How to reach the purchase screen
+  Profile tab > "FullRep Premium" card
+A 7-day free trial is offered first; the purchase buttons and the restore
+link are on the same screen. Purchases use StoreKit through RevenueCat -
+there is no external payment path on iOS.
+
+Guideline 1.4.1 - Safety, Physical Harm (addressed in build 4, unchanged)
+Every health-related article ends with a permanently visible "Sources"
+list - not collapsed, no tap required. Links open in Safari. Coverage is
+complete: 24 knowledge articles (training, nutrition, supplements, blood
+markers), 20 peptide articles and 8 diet articles. Starting from Library:
   Library > Training / Nutrition / Supplements / Blood values > any topic
   Library > Peptides > any substance
   Library > Diets > any diet
-The TDEE calculator cites Mifflin-St Jeor (1990) next to its result.
-Sources are real, verified references (PubMed, NIH, WHO, NEJM and similar).
-Entries without a stable public link are listed bibliographically without a
-URL rather than linked to an unreliable page.
-The AI coach is instructed to name its sources and never to invent one.
-
-Guideline 2.1(b) - Performance, App Completeness (subscription)
-The auto-renewable subscriptions are submitted together with this version.
-Both now carry a review screenshot of the paywall.
-To reach the paywall in the app: Profile tab > "FullRep Premium" card.
-A 7-day free trial is offered before any purchase.
+The TDEE calculator cites Mifflin-St Jeor (1990) next to its result. All
+references are real and verified (PubMed, NIH, WHO, NEJM and similar).
+Entries without a stable public link are listed bibliographically without
+a URL rather than linked to an unreliable page. The AI coach is instructed
+to name its sources and never to invent one.
 
 Medical disclaimer
 FullRep does not replace medical advice. A disclaimer appears on every
@@ -641,8 +658,8 @@ def diagnose(tok):
                       f'beschreibung={"ja" if la.get("description") else "FEHLT"}')
             if not sl.get('data'):
                 print('      Lokalisierungen: KEINE')
-            pr = api(tok, f'subscriptions/{s["id"]}/prices?limit=3', fatal=False)
-            print(f'      Preise hinterlegt: {len(pr.get("data", []))}')
+            for zeile in preise(tok, s['id']):
+                print(f'      {zeile}')
             av = api(tok, f'subscriptions/{s["id"]}/subscriptionAvailability',
                      fatal=False)
             if av.get('data'):
@@ -675,6 +692,42 @@ def diagnose(tok):
                     dd = r.get('data')
                     anz = len(dd) if isinstance(dd, list) else (1 if dd else 0)
                     print(f'      {bez}: {anz}')
+
+
+def preise(tok, sub_id):
+    """Abopreise als lesbare Zeilen — Betrag und Land, nicht die Anzahl.
+
+    Am 31.07. hat genau hier eine Anzahl-Messung Stunden gekostet: die
+    Beziehung 'prices' lieferte auch fuer das Jahresabo OHNE Preis einen
+    Eintrag, das Skript meldete "Preise hinterlegt: 1", und ASC sperrte die
+    Einreichung trotzdem mit "Fuege einen Abopreis hinzu". Ein Eintrag ohne
+    aufgeloesten Preispunkt ist kein Preis. Deshalb wird der Betrag selbst
+    gelesen; laesst sich keiner aufloesen, ist das ein FEHLT, kein Treffer.
+    """
+    res = api(tok, f'subscriptions/{sub_id}/prices'
+                   f'?include=subscriptionPricePoint,territory&limit=200',
+              fatal=False)
+    if res.get('_fehler'):
+        return [f'Preise: nicht lesbar ({fehler_text(res)})']
+    punkte = {i['id']: i.get('attributes', {})
+              for i in res.get('included', [])
+              if i.get('type') == 'subscriptionPricePoints'}
+    gefunden = []
+    for p in res.get('data', []):
+        bez = p.get('relationships', {})
+        pp = (bez.get('subscriptionPricePoint') or {}).get('data') or {}
+        terr = (bez.get('territory') or {}).get('data') or {}
+        betrag = punkte.get(pp.get('id'), {}).get('customerPrice')
+        if betrag:
+            gefunden.append((terr.get('id') or '?', betrag))
+    if not gefunden:
+        return [f'Preis: FEHLT — {len(res.get("data", []))} Eintrag/Eintraege '
+                f'ohne aufloesbaren Betrag. Genau das meldet ASC in der '
+                f'Oberflaeche als "Fuege einen Abopreis hinzu".']
+    zeilen = [f'Preis: {betrag} ({land})' for land, betrag in gefunden[:3]]
+    if len(gefunden) > 3:
+        zeilen.append(f'... und {len(gefunden) - 3} weitere Laender')
+    return zeilen
 
 
 def abo_namen(tok):
@@ -918,8 +971,8 @@ def main():
     p.add_argument('--einreichen', action='store_true',
                    help='Version samt Abos zur Pruefung schicken')
     p.add_argument('--alles', action='store_true',
-                   help='name, build 4, screenshots, abo-screenshot, '
-                        'pruefnotiz, einreichen')
+                   help='name, build (Nummer aus --build), screenshots, '
+                        'abo-screenshot, pruefnotiz, einreichen')
     p.add_argument('--trotzdem', action='store_true',
                    help='einreichen, auch wenn Abos nicht mitkoennen')
     p.add_argument('--dry-run', action='store_true',
@@ -935,12 +988,19 @@ def main():
     if not any(tat):
         p.error('Einen Befehl angeben, z. B. --status')
 
+    # --alles hatte die Build-Nummer fest verdrahtet. Nach der Ablehnung vom
+    # 14.08. verlangt Apple ausdruecklich einen NEUEN Build — eine feste 4 im
+    # Code haette beim naechsten Durchlauf still den alten, abgelehnten Build
+    # wieder zugewiesen, ohne dass der Lauf gescheitert waere.
+    if a.alles and not a.build:
+        p.error('--alles braucht die Build-Nummer: --alles --build 5')
+
     tok = token()
     if a.status:
         zeige_status(tok)
     if a.alles:
         for titel, fn in (('Anzeigename', lambda: setze_namen(tok)),
-                          ('Build 4', lambda: setze_build(tok, '4')),
+                          (f'Build {a.build}', lambda: setze_build(tok, a.build)),
                           ('Screenshots', lambda: setze_screenshots(tok)),
                           ('Abo-Screenshot', lambda: setze_abo_screenshot(tok)),
                           ('Abo-Namen', lambda: abo_namen(tok)),
