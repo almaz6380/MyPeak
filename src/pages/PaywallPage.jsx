@@ -28,13 +28,23 @@ const canPurchase = PURCHASE_ENABLED[Capacitor.getPlatform()] ?? false;
 // ── Preis-Konfiguration (Fallback-Anzeige) ────────────────────────
 // Sobald ein RevenueCat-Offering geladen ist, werden die echten, lokalisierten
 // Store-Preise angezeigt; diese Konstanten sind nur der Fallback davor.
-// Struktur: Monat 4,49 € · Jahr 44,90 € (= 3,74 €/Monat, ~17 % / „2 Monate gratis").
+// ⚠️ Diese Zahlen MUESSEN den Preisen in App Store Connect entsprechen. Der
+// Live-Preis ersetzt nur die grossen Betraege — perMonth und ANNUAL_SAVINGS
+// stehen fest im Binary und lassen sich nur mit einem neuen Build aendern.
+// Stand 14.08.2026, in ASC nachgesehen: Monat 4,99 € · Jahr 44,99 €
+//   44,99 / 12       = 3,7491  -> 3,75 €/Monat (aufgerundet, nie abgerundet:
+//                                 ein zu niedrig angezeigter Preis waere
+//                                 irrefuehrend, ein zu hoher nicht)
+//   12 x 4,99        = 59,88
+//   59,88 - 44,99    = 14,89   -> 24,9 % gespart, also -25 %
+// Die frueheren Werte (4,49 / 44,90 / 3,74 / 17 %) stammten aus einer
+// Preisplanung, die so nie im Store stand.
 const CURRENCY = '€';
 const PRICES = {
-  monthly: { amount: '4,49' },
-  annual: { amount: '44,90', perMonth: '3,74' },
+  monthly: { amount: '4,99' },
+  annual: { amount: '44,99', perMonth: '3,75' },
 };
-const ANNUAL_SAVINGS = '17'; // Prozent gespart ggü. 12× Monatspreis
+const ANNUAL_SAVINGS = '25'; // Prozent gespart ggue. 12x Monatspreis (genau 24,9)
 
 // Präsentationale Paywall. Trial-Steuerung über Props (kein Zugriff auf den
 // SubscriptionContext → kein Zirkelimport). Kauf/Restore laufen über den
@@ -196,9 +206,12 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
               <div>
                 <p className="font-semibold text-sm">{lang === 'de' ? 'Jährlich' : 'Yearly'}</p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {/* Frueher stand hier zusaetzlich „2 Monate gratis". Bei
+                      4,99/44,99 waeren es 2,98 Monate — „3" waere knapp zu
+                      viel, „2" deutlich zu wenig. Die Ersparnis steht ohnehin
+                      als −{ANNUAL_SAVINGS} % daneben; eine zweite, nur
+                      ungefaehr richtige Angabe braucht die Paywall nicht. */}
                   {CURRENCY}{PRICES.annual.perMonth} / {lang === 'de' ? 'Monat' : 'month'}
-                  {' · '}
-                  {lang === 'de' ? '2 Monate gratis' : '2 months free'}
                 </p>
               </div>
               <div className="text-right shrink-0">

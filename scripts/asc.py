@@ -321,8 +321,8 @@ Guideline 2.1(b) - Performance, App Completeness (subscription)
 The previous build was rejected because the In-App Purchase products had
 not been submitted for review. Both auto-renewable subscriptions are now
 part of this submission:
-  mypeak_premium_monthly - EUR 4.49 / month
-  mypeak_premium_annual  - EUR 44.90 / year
+  mypeak_premium_monthly - EUR 4.99 / month
+  mypeak_premium_annual  - EUR 44.99 / year
 Both carry an App Review screenshot of the paywall and complete German and
 English metadata. The annual subscription was missing its price, which is
 why it could not be attached to the previous submission; the price is set.
