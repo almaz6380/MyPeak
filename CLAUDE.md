@@ -37,31 +37,62 @@ Erschwerend: die Prüfnotiz für Build 4 behauptete „The auto-renewable subscr
 submitted together with this version". Der Prüfer hat danach gesucht und nichts gefunden.
 **Nie in die Prüfnotiz schreiben, was man erst noch vorhat.**
 
-**Reihenfolge zum Heilen — Stand 14.08., 14:15 UTC:**
+**Stand 14.08., 15:25 UTC — alles vorbereitet, es fehlen vier Klicks in ASC:**
 
 | # | Schritt | Wo | Stand |
 |---|---|---|---|
-| 1 | `--aufraeumen`: Einreichung `41324499…` (31.07., `UNRESOLVED_ISSUES`) zurückgezogen | asc.yml | ✅ alle Einreichungen `COMPLETE` |
-| 2 | Build 5 gebaut, signiert, hochgeladen | `ios-release.yml` #4 | ✅ in ASC, `VALID` |
-| 3 | Build 5 der Version 1.0 zugewiesen | asc.yml | ✅ |
-| 4 | Je Abo den gelben Hinweis lesen, leeres Feld füllen bis `READY_TO_SUBMIT` | **ASC-Oberfläche** | ⏳ offen |
-| 5 | Je Abo **„Zur Prüfung hinzufügen"** | **ASC-Oberfläche**, API kann das nicht | ⏳ offen |
-| 6 | `--pruefnotiz`, dann `--einreichen` **ohne** `--trotzdem` | asc.yml | ⏳ wartet auf 4+5 |
+| 1 | `--aufraeumen`: Einreichung `41324499…` (31.07.) zurückgezogen | asc.yml | ✅ |
+| 2 | Abopreise gesetzt → beide Abos **`READY_TO_SUBMIT`** | ASC-Oberfläche | ✅ |
+| 3 | Paywall-Preise an den Store angeglichen, Build 6 gebaut + zugewiesen | `ios-release.yml` #5 | ✅ `VALID` |
+| 4 | Prüfnotiz (2133 Zeichen, mit 4,99/44,99) | asc.yml | ✅ |
+| 5 | Je **Zur Prüfung hinzufügen**: beide Abos, **Abo-Gruppe**, **App-Version** | **ASC-Oberfläche** | ⏳ offen |
+| 6 | **Zur Prüfung übermitteln** | **ASC-Oberfläche** | ⏳ offen |
 
-⚠️ Schritt 6 muss ohne `--trotzdem` durchlaufen. Bricht er ab, sind 4/5 nicht fertig —
-dann dort weitermachen, nicht die Sperre überbrücken. Genau diese Abkürzung hat am 31.07.
-die Ablehnung erzeugt.
+**⚠️ Der eigentliche Blocker war der Abopreis — und zwar wirklich, nicht nur laut Meldung.**
+Die Oberfläche sagte an beiden Abos rot: „Kann nicht zur Prüfung hinzugefügt werden ·
+**Füge einen Abopreis hinzu**". In der Preistabelle hatte **nur Österreich** einen Betrag,
+die übrigen **174 Länder standen auf „–"**.
 
-**Was `--warum` am 14.08. an beiden Abos meldet — alles vorhanden, Zustand trotzdem
-`MISSING_METADATA`:** Name + Beschreibung DE/EN, Preis (4,49 € bzw. **44,90 €**, DEU),
-Verfügbarkeit 175 Länder, Review-Screenshot `COMPLETE`, Prüfhinweis gesetzt.
-**Der fehlende Punkt steht nur im gelben Kasten der Oberfläche** —
-`appstoreconnect.apple.com/apps/6788461300/distribution/subscriptions`.
-Der Preis beim Jahresabo ist diesmal wirklich hinterlegt; der Blocker vom 31.07. ist es
-also nicht mehr.
+⚠️ **Und die API hat das zweimal falsch gemeldet.** Erst zählte `--warum` nur die Einträge
+(„Preise hinterlegt: 1"), dann löste die Korrektur vom 14.08. den Betrag auf und meldete
+„Preis: 4.49 (DEU)" — mit vollständig unverdächtigen Rohattributen
+(`planType=UPFRONT, preserved=false, startDate=null`). **Beides war falsch.**
+Lehre, endgültig: **`subscriptions/{id}/prices` taugt nicht als Nachweis, dass ein Abopreis
+gesetzt ist.** Wer das prüfen will, sieht in der Oberfläche nach, ob die Preistabelle für
+alle Verkaufsgebiete Beträge zeigt — oder gar nicht. `--warum` schreibt die Rohattribute
+inzwischen mit, aber nur zur Diagnose, nicht als Freigabe.
+
+**Wo der Preis gesetzt wird** (zwei Sackgassen liegen davor):
+Abo öffnen → Abschnitt **„Abo-Preise"** → rechts **„Alle Preise und Währungen"** →
+Land + Preis wählen → sichern. **Nicht** das blaue **„+"** neben „Abo-Preise" — das bietet
+nur Einführungsangebote, Angebotscodes und Aktionsangebote. Die Seite wirft dabei
+gelegentlich „Es ist ein Fehler aufgetreten. Versuche es später erneut."; dann neu laden
+und wiederholen, sie speichert sonst stillschweigend nichts.
+
+**⚠️ Eine Einreichung braucht VIER Elemente, nicht zwei:**
+beide Abos **plus die Abo-Gruppe** („Dein Abo mit automatischer Verlängerung muss mit seiner
+Abo-Gruppe übermittelt werden") **plus die App-Version**. Jedes wird einzeln über
+**„Zur Prüfung hinzufügen"** gesammelt; erst dann wird **„Zur Prüfung übermitteln"** aktiv.
+**Die API kann keines der drei IAP-Elemente anhängen** — das bleibt Handarbeit.
+
+**Zwischenstand 17:16 (Ortszeit): einmal übermittelt und wieder zurückgezogen.**
+Einreichung `44f5d426-93b0-40cb-bb77-d36e441756b1` ging mit allen vier Elementen raus —
+aber mit **Build 5**, dessen Paywall noch die alten Preise trug. Josef hat sie
+zurückgezogen (Version steht seither auf `DEVELOPER_REJECTED`, die Build-Zuweisung holt
+sie da wieder heraus). **Die Abos blieben dabei `READY_TO_SUBMIT`** — ein Zurückziehen
+beschädigt die Preisarbeit nicht.
+
+**Preise: die App rechnete mit Zahlen, die nie im Store standen.**
+In ASC stehen **4,99 €/Monat** und **44,99 €/Jahr**, in `PaywallPage.jsx` standen
+4,49 / 44,90. Der Live-Preis von RevenueCat ersetzt nur die großen Beträge —
+**`perMonth`, `ANNUAL_SAVINGS` und „2 Monate gratis" stehen fest im Binary** und waren
+damit schlicht falsch. Korrigiert auf 4,99 / 44,99 / 3,75 / **−25 %** (genau 24,9 %);
+die Angabe „2 Monate gratis" ist entfernt, weil es real 2,98 Monate sind — „3" wäre knapp
+zu viel, „2" deutlich zu wenig. ⚠️ **Wer den Preis in ASC ändert, muss diese Konstanten
+mitziehen und neu bauen.**
 
 **Code-Seite vorbereitet (14.08.):**
-- `CURRENT_PROJECT_VERSION` 4 → **5** im pbxproj (Apple verlangt ausdrücklich ein neues
+- `CURRENT_PROJECT_VERSION` 4 → 5 → **6** im pbxproj (Apple verlangt ausdrücklich ein neues
   Binary; `ios-release.yml` liest die Nummer von dort).
 - Die Build-Nummer stand in `asc.yml` **fest auf 4** und in `--alles` ebenfalls. Beides
   hätte still den abgelehnten Build wieder zugewiesen, ohne zu scheitern. Jetzt Eingabe
