@@ -360,6 +360,11 @@ def setze_abo(tok, produkt, preise=None, titel=None, lang='de-DE', dry_run=False
     Basis-Tarif-IDs.
     """
     url = f'{API}/applications/{PKG}/subscriptions/{produkt}'
+    # regionsVersion ist bei JEDEM schreibenden Aufruf am Abo Pflicht, nicht nur
+    # bei Regionalpreisen — am 15.08. quittierte Google den reinen Titel-PATCH
+    # mit "Regions Version must be specified." Die Version bezeichnet Googles
+    # Regionskatalog, nicht unsere Daten.
+    REG = 'regionsVersion.version=2022/02'
     abo = call(tok, 'GET', url)
 
     if titel:
@@ -371,7 +376,7 @@ def setze_abo(tok, produkt, preise=None, titel=None, lang='de-DE', dry_run=False
         print(f'  Titel {lang}: {alt!r} -> {titel!r}')
         treffer[0]['title'] = titel
         if not dry_run:
-            call(tok, 'PATCH', f'{url}?updateMask=listings', data=abo)
+            call(tok, 'PATCH', f'{url}?updateMask=listings&{REG}', data=abo)
             print('    gesetzt')
 
     if preise:
@@ -392,9 +397,7 @@ def setze_abo(tok, produkt, preise=None, titel=None, lang='de-DE', dry_run=False
             if geaendert == 0:
                 print('    ⚠ keine EUR-Region gefunden — nichts geaendert')
         if not dry_run:
-            # regionsVersion ist bei jedem Schreiben mit Regionalpreisen Pflicht.
-            res = call(tok, 'PATCH',
-                       f'{url}?updateMask=basePlans&regionsVersion.version=2022/02',
+            res = call(tok, 'PATCH', f'{url}?updateMask=basePlans&{REG}',
                        data=abo, fatal=False)
             if isinstance(res, dict) and not res.get('_fehler'):
                 print('    gesetzt')
