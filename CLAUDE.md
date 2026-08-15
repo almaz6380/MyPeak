@@ -45,7 +45,12 @@ beim ersten echten Kauf zusehen, ob der Webhook `premium_until` setzt.
 **Abo-Anzeigename** in Play auf `FullRep Premium` gezogen (per API, am Endpunkt
 bestätigt).
 
-⚠️ **Play-Preise bleiben bei 4,49 / 44,90 — die API kann sie nicht ändern.**
+✅ **Preise am 15.08. in der Console auf 4,99 / 44,99 gesetzt** (173 von 173 Regionen,
+am Endpunkt gegengeprüft). Damit rechnen Play, App Store und die Paywall dieselben
+Zahlen. ⚠️ Zwischendurch standen dort kurz 5,99 / 54,99 — beim Setzen also darauf achten,
+ob Play das Feld brutto oder netto meint, und danach mit `mode = abos` nachzählen.
+
+⚠️ **Über die API gehen die Preise NICHT.**
 Zwei Anläufe, zwei Absagen, beide lehrreich:
 1. `Regions Version must be specified.` — `regionsVersion` ist bei **jedem**
    schreibenden Aufruf am Abo Pflicht, nicht nur bei Preisen (auch beim reinen Titel).
@@ -54,9 +59,7 @@ Zwei Anläufe, zwei Absagen, beide lehrreich:
    gespeichert, Googles Katalog `2022/02` erwartet dort BGN. Eine Altlast, die den
    Aufruf blockiert, obwohl sie gar nicht angefasst wird.
 **Folge: Preise nur in der Play Console ändern** — sie rechnet die übrigen Währungen
-automatisch um, die API müsste 173 Beträge selbst hinschreiben. Solange Play bei
-4,49/44,90 steht, zeigt die Android-Paywall zwar die richtigen Live-Beträge, aber
-„−25 %" und „3,75 €/Monat" sind dort falsch (richtig: −17 % und 3,74 €).
+automatisch um, die API müsste 173 Beträge selbst hinschreiben.
 
 ### Play-Abos: gemessener Stand 14.08.2026 (`play-listing.yml` → `abos`)
 ```
