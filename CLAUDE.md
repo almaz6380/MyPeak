@@ -37,9 +37,26 @@ Android-Produkt nebeneinander. Gefehlt hat nur der SDK-Key.
 - AAB `versionCode 15` / `versionName 1.3.0` gebaut und signiert
   (`android-release.yml` #7, Upload bewusst aus, liegt als Artefakt).
 
-**Offen:** AAB zu Play hochladen (bezahlte Abos gingen damit an echte Nutzer, und ein
-Android-Kauf wurde noch nie getestet — erst Lizenz-Tester), Play-Preise angleichen,
-Play-Abo-Anzeigename auf FullRep ziehen.
+**Ausgeliefert 15.08., 14:36 UTC:** AAB 20,7 MB als `versionCode 15` hochgeladen,
+Produktions-Track an alle Nutzer, validiert und committet. Damit ist Premium auf
+Android zum ersten Mal wirklich kaufbar. ⚠️ **Ein Android-Kauf wurde nie getestet** —
+beim ersten echten Kauf zusehen, ob der Webhook `premium_until` setzt.
+
+**Abo-Anzeigename** in Play auf `FullRep Premium` gezogen (per API, am Endpunkt
+bestätigt).
+
+⚠️ **Play-Preise bleiben bei 4,49 / 44,90 — die API kann sie nicht ändern.**
+Zwei Anläufe, zwei Absagen, beide lehrreich:
+1. `Regions Version must be specified.` — `regionsVersion` ist bei **jedem**
+   schreibenden Aufruf am Abo Pflicht, nicht nur bei Preisen (auch beim reinen Titel).
+2. `Invalid currency for region code BG … Expected BGN but got EUR.` — der PATCH
+   validiert die **komplette** Regionstabelle mit. Bulgarien hat einen EUR-Preis
+   gespeichert, Googles Katalog `2022/02` erwartet dort BGN. Eine Altlast, die den
+   Aufruf blockiert, obwohl sie gar nicht angefasst wird.
+**Folge: Preise nur in der Play Console ändern** — sie rechnet die übrigen Währungen
+automatisch um, die API müsste 173 Beträge selbst hinschreiben. Solange Play bei
+4,49/44,90 steht, zeigt die Android-Paywall zwar die richtigen Live-Beträge, aber
+„−25 %" und „3,75 €/Monat" sind dort falsch (richtig: −17 % und 3,74 €).
 
 ### Play-Abos: gemessener Stand 14.08.2026 (`play-listing.yml` → `abos`)
 ```
