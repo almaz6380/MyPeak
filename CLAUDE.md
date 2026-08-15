@@ -16,6 +16,31 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### ✅ RevenueCat-Android fertig (15.08.2026) — AAB 15/1.3.0 gebaut, Upload offen
+In der RevenueCat-Konsole war das meiste längst da; nachgesehen statt neu gebaut:
+Play-App verbunden („Valid credentials", „Connected to Google", Topic-ID
+`projects/wellbooked-501311/topics/Play-Store…`), beide Produkte
+`mypeak_premium_monthly:monthly` und `:annual` **Published** mit je 1 Entitlement,
+im Default-Offering als `$rc_monthly` bzw. `$rc_annual` — dort liegen Apple- **und**
+Android-Produkt nebeneinander. Gefehlt hat nur der SDK-Key.
+
+- `VITE_REVENUECAT_ANDROID_KEY` (`goog_…`) als Repo-Secret gesetzt (15.08.).
+- `PURCHASE_ENABLED.android = true`.
+- **`canPurchase` verlangt jetzt zwei Dinge:** Plattform-Flagge **und** einen
+  RevenueCat-Schlüssel im Binary (`isConfigured()`). Damit kann kein Build mehr eine
+  Paywall mit Preisen und totem Knopf ausliefern — der alte Grund, warum Android auf
+  `false` stehen musste, ist strukturell weg.
+- ⚠️ **Kehrseite:** ein Build ohne Schlüssel hätte gar keinen sichtbaren Kauf — genau
+  der Zustand, für den Apple 2.1(b) vergeben hat. Deshalb brechen `ios-release.yml`
+  und `android-release.yml` jetzt ab, wenn die Flagge einer Plattform `true` ist, ihr
+  Secret aber leer.
+- AAB `versionCode 15` / `versionName 1.3.0` gebaut und signiert
+  (`android-release.yml` #7, Upload bewusst aus, liegt als Artefakt).
+
+**Offen:** AAB zu Play hochladen (bezahlte Abos gingen damit an echte Nutzer, und ein
+Android-Kauf wurde noch nie getestet — erst Lizenz-Tester), Play-Preise angleichen,
+Play-Abo-Anzeigename auf FullRep ziehen.
+
 ### Play-Abos: gemessener Stand 14.08.2026 (`play-listing.yml` → `abos`)
 ```
 mypeak_premium_monthly        Listing de-DE: 'MyPeak Premium'   ⚠ alter Name
