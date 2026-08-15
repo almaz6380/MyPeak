@@ -341,6 +341,68 @@ def zeige_abos(tok):
                 print(f'        offerTags: {[t.get("tag") for t in bp["offerTags"]]}')
 
 
+def _betrag(text):
+    """'4,99' oder '4.99' -> (units, nanos) wie Play sie erwartet."""
+    ganz, _, rest = text.replace(',', '.').partition('.')
+    return str(int(ganz)), int((rest + '000000000')[:9])
+
+
+def setze_abo(tok, produkt, preise=None, titel=None, lang='de-DE', dry_run=False):
+    """Abopreise (nur EUR-Regionen) und/oder den Anzeigenamen setzen.
+
+    ⚠️ Nur die EUR-Regionen. Play rechnet die uebrigen Waehrungen NUR in der
+    Console automatisch um — ueber die API muesste man fuer jede der 173
+    Regionen einen Betrag selbst erfinden. Das waere geraten, nicht gerechnet,
+    deshalb bleiben Nicht-EUR-Regionen unangetastet und behalten ihre bisherige
+    Umrechnung. Wer sie mitziehen will, macht das in der Console.
+
+    preise: {'monthly': '4,99', 'annual': '44,99'} — Schluessel sind die
+    Basis-Tarif-IDs.
+    """
+    url = f'{API}/applications/{PKG}/subscriptions/{produkt}'
+    abo = call(tok, 'GET', url)
+
+    if titel:
+        listings = abo.get('listings', [])
+        treffer = [l for l in listings if l.get('languageCode') == lang]
+        if not treffer:
+            sys.exit(f'Keine Lokalisierung {lang} an {produkt}.')
+        alt = treffer[0].get('title')
+        print(f'  Titel {lang}: {alt!r} -> {titel!r}')
+        treffer[0]['title'] = titel
+        if not dry_run:
+            call(tok, 'PATCH', f'{url}?updateMask=listings', data=abo)
+            print('    gesetzt')
+
+    if preise:
+        for bp in abo.get('basePlans', []):
+            neu = preise.get(bp.get('basePlanId'))
+            if not neu:
+                continue
+            units, nanos = _betrag(neu)
+            geaendert = 0
+            for rc in bp.get('regionalConfigs', []):
+                pr = rc.get('price') or {}
+                if pr.get('currencyCode') != 'EUR':
+                    continue
+                rc['price'] = {'currencyCode': 'EUR', 'units': units, 'nanos': nanos}
+                geaendert += 1
+            print(f'  Tarif {bp.get("basePlanId")}: {geaendert} EUR-Region(en) '
+                  f'-> {neu} EUR')
+            if geaendert == 0:
+                print('    ⚠ keine EUR-Region gefunden — nichts geaendert')
+        if not dry_run:
+            # regionsVersion ist bei jedem Schreiben mit Regionalpreisen Pflicht.
+            res = call(tok, 'PATCH',
+                       f'{url}?updateMask=basePlans&regionsVersion.version=2022/02',
+                       data=abo, fatal=False)
+            if isinstance(res, dict) and not res.get('_fehler'):
+                print('    gesetzt')
+
+    if dry_run:
+        print('\n--dry-run: nichts an Play gesendet.')
+
+
 def zeige_status(tok, track='production'):
     eid = call(tok, 'POST', f'{API}/applications/{PKG}/edits')['id']
     tr = call(tok, 'GET', f'{API}/applications/{PKG}/edits/{eid}/tracks/{track}')
@@ -359,6 +421,12 @@ def main():
     p.add_argument('--status', action='store_true', help='nur den Track anzeigen')
     p.add_argument('--abos', action='store_true',
                    help='Play-Abos anzeigen: Basis-Tarife, Zustand, Preise (liest nur)')
+    p.add_argument('--abo-setzen', metavar='PRODUKT',
+                   help='Abo aendern, z. B. mypeak_premium_monthly')
+    p.add_argument('--abo-preise', metavar='TARIF=BETRAG,...',
+                   help='EUR-Preise je Basis-Tarif, z. B. monthly=4,99;annual=44,99')
+    p.add_argument('--abo-titel', metavar='TEXT',
+                   help='Anzeigename des Abos in --lang')
     p.add_argument('--screenshots', metavar='VERZEICHNIS',
                    help='Store-Eintrag-Screenshots ersetzen (z. B. store-assets/android)')
     p.add_argument('--listing', metavar='JSON',
@@ -375,8 +443,8 @@ def main():
                    help='Play-Track (Standard: production)')
     a = p.parse_args()
 
-    if not (a.aab or a.promote or a.status or a.abos or a.screenshots or a.listing
-            or a.icon or a.feature):
+    if not (a.aab or a.promote or a.status or a.abos or a.abo_setzen or a.screenshots
+            or a.listing or a.icon or a.feature):
         p.error('--aab, --promote, --status, --abos, --screenshots, --listing, '
                 '--icon oder --feature angeben')
     if a.aab and not a.complete and a.fraction is None:
@@ -385,6 +453,12 @@ def main():
     tok = token()
     if a.abos:
         return zeige_abos(tok)
+    if a.abo_setzen:
+        preise = None
+        if a.abo_preise:
+            preise = dict(teil.split('=', 1)
+                          for teil in a.abo_preise.split(';') if teil)
+        return setze_abo(tok, a.abo_setzen, preise, a.abo_titel, a.lang, a.dry_run)
     if a.status:
         return zeige_status(tok, a.track)
     if a.screenshots:

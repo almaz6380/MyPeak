@@ -8,7 +8,7 @@ on:
       mode:
         description: 'Was aktualisiert wird'
         type: choice
-        options: [screenshots, texte, grafiken, abos]
+        options: [screenshots, texte, grafiken, abos, abo-setzen]
         default: screenshots
       lang:
         description: 'Sprache des Store-Eintrags'
@@ -54,6 +54,15 @@ jobs:
           fi
 
           case "$MODE" in
+            abo-setzen)
+              # Preis nur fuer die EUR-Regionen und den Anzeigenamen. Play
+              # rechnet andere Waehrungen nur in der Console um; ueber die API
+              # muesste man 173 Betraege selbst erfinden.
+              python3 scripts/play-upload.py \
+                --abo-setzen mypeak_premium_monthly \
+                --abo-preise 'monthly=4,99;annual=44,99' \
+                --abo-titel 'FullRep Premium' "${GEMEINSAM[@]}"
+              ;;
             abos)
               # Liest nur — Basis-Tarife, Zustand und Preise der Play-Abos.
               # Kennt weder --lang noch --dry-run, deshalb ohne GEMEINSAM.
