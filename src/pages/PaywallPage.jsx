@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Capacitor } from '@capacitor/core';
 import { X, Check, Crown, Sparkles } from 'lucide-react';
 import { purchasePremium, restorePurchases, getPremiumPrices, TRIAL_DAYS } from '../data/subscriptionStorage';
+import { isConfigured as revenueCatConfigured } from '../lib/revenuecat';
 import { useAuth } from '../context/AuthContext';
 import Toast from '../components/Toast';
 
@@ -18,23 +19,44 @@ import Toast from '../components/Toast';
 // Pruefung ab, solange die App aufs Abo verweist, das IAP-Produkt aber nicht mit
 // eingereicht wird. Das Produkt wird jetzt mitgeschickt — der Kauf muss also sichtbar sein.
 //
-// ANDROID BLEIBT AUS, bis RevenueCat-Android eingerichtet ist. Ohne
-// VITE_REVENUECAT_ANDROID_KEY meldet isConfigured() false, der Kauf endet also in
-// „bald verfuegbar" — ein sichtbarer Preis mit totem Knopf. Erst einschalten, wenn
-// der goog_-Key gesetzt und das Play-Produkt am Entitlement haengt.
-const PURCHASE_ENABLED = { ios: true, android: false, web: false };
-const canPurchase = PURCHASE_ENABLED[Capacitor.getPlatform()] ?? false;
+// Android steht seit 14.08.2026 auf true. Das ist gefahrlos, weil canPurchase
+// zusaetzlich verlangt, dass fuer die laufende Plattform wirklich ein
+// RevenueCat-Schluessel im Binary steckt — siehe unten. Vorher war das eine reine
+// Absichtserklaerung: stand die Flagge auf true und fehlte der Schluessel, sah der
+// Nutzer Preise und einen Knopf, der in „bald verfuegbar" endete.
+const PURCHASE_ENABLED = { ios: true, android: true, web: false };
+
+// Zwei Bedingungen, nicht eine:
+//   1. die Plattform ist freigeschaltet (Store-Produkt existiert, Vertrag steht)
+//   2. der Schluessel dieser Plattform ist beim Bauen wirklich gesetzt
+// Fehlt (2), zeigen wir gar keinen Kauf — nur die kostenlose Testphase. Damit kann
+// ein vergessenes Secret keine Paywall mit totem Knopf mehr ausliefern.
+// ⚠️ Umgekehrt heisst das: ein iOS-Build OHNE VITE_REVENUECAT_IOS_KEY haette keinen
+// sichtbaren Kauf — und genau dafuer hat Apple 2.1(b) vergeben. Deshalb bricht
+// ios-release.yml ab, wenn das Secret fehlt, statt still etwas anderes zu bauen.
+const canPurchase = (PURCHASE_ENABLED[Capacitor.getPlatform()] ?? false)
+  && revenueCatConfigured();
 
 // ── Preis-Konfiguration (Fallback-Anzeige) ────────────────────────
 // Sobald ein RevenueCat-Offering geladen ist, werden die echten, lokalisierten
 // Store-Preise angezeigt; diese Konstanten sind nur der Fallback davor.
-// Struktur: Monat 4,49 € · Jahr 44,90 € (= 3,74 €/Monat, ~17 % / „2 Monate gratis").
+// ⚠️ Diese Zahlen MUESSEN den Preisen in App Store Connect entsprechen. Der
+// Live-Preis ersetzt nur die grossen Betraege — perMonth und ANNUAL_SAVINGS
+// stehen fest im Binary und lassen sich nur mit einem neuen Build aendern.
+// Stand 14.08.2026, in ASC nachgesehen: Monat 4,99 € · Jahr 44,99 €
+//   44,99 / 12       = 3,7491  -> 3,75 €/Monat (aufgerundet, nie abgerundet:
+//                                 ein zu niedrig angezeigter Preis waere
+//                                 irrefuehrend, ein zu hoher nicht)
+//   12 x 4,99        = 59,88
+//   59,88 - 44,99    = 14,89   -> 24,9 % gespart, also -25 %
+// Die frueheren Werte (4,49 / 44,90 / 3,74 / 17 %) stammten aus einer
+// Preisplanung, die so nie im Store stand.
 const CURRENCY = '€';
 const PRICES = {
-  monthly: { amount: '4,49' },
-  annual: { amount: '44,90', perMonth: '3,74' },
+  monthly: { amount: '4,99' },
+  annual: { amount: '44,99', perMonth: '3,75' },
 };
-const ANNUAL_SAVINGS = '17'; // Prozent gespart ggü. 12× Monatspreis
+const ANNUAL_SAVINGS = '25'; // Prozent gespart ggue. 12x Monatspreis (genau 24,9)
 
 // Präsentationale Paywall. Trial-Steuerung über Props (kein Zugriff auf den
 // SubscriptionContext → kein Zirkelimport). Kauf/Restore laufen über den
@@ -196,9 +218,12 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
               <div>
                 <p className="font-semibold text-sm">{lang === 'de' ? 'Jährlich' : 'Yearly'}</p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {/* Frueher stand hier zusaetzlich „2 Monate gratis". Bei
+                      4,99/44,99 waeren es 2,98 Monate — „3" waere knapp zu
+                      viel, „2" deutlich zu wenig. Die Ersparnis steht ohnehin
+                      als −{ANNUAL_SAVINGS} % daneben; eine zweite, nur
+                      ungefaehr richtige Angabe braucht die Paywall nicht. */}
                   {CURRENCY}{PRICES.annual.perMonth} / {lang === 'de' ? 'Monat' : 'month'}
-                  {' · '}
-                  {lang === 'de' ? '2 Monate gratis' : '2 months free'}
                 </p>
               </div>
               <div className="text-right shrink-0">

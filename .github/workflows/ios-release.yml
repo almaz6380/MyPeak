@@ -45,6 +45,21 @@ jobs:
           fi
           echo "ok — echte Anzeigen-IDs"
 
+      - name: Kauf angekuendigt, Schluessel vorhanden?
+        # canPurchase verlangt beides: die Plattform-Flagge UND einen Schluessel im
+        # Binary. Fehlt das Secret, baut das still eine App ohne sichtbaren Kauf —
+        # genau der Zustand, fuer den Apple am 14.08.2026 2.1(b) vergeben hat.
+        # Lieber hier abbrechen als 20 Minuten spaeter etwas Falsches hochladen.
+        env:
+          VITE_REVENUECAT_IOS_KEY: ${{ secrets.VITE_REVENUECAT_IOS_KEY }}
+        run: |
+          if grep -q 'ios: true' src/pages/PaywallPage.jsx && [ -z "${VITE_REVENUECAT_IOS_KEY:-}" ]; then
+            echo "::error::PURCHASE_ENABLED.ios ist true, aber VITE_REVENUECAT_IOS_KEY fehlt."
+            echo "Der Build haette eine Paywall ohne Kauf-Button — Guideline 2.1(b)."
+            exit 1
+          fi
+          echo "ok — Kauf-Flagge und Schluessel passen zusammen"
+
       - name: Build-Nummer anzeigen
         run: |
           B=$(grep -m1 CURRENT_PROJECT_VERSION ios/App/App.xcodeproj/project.pbxproj | tr -dc '0-9')

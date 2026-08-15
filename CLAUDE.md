@@ -16,6 +16,183 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### ✅ RevenueCat-Android fertig (15.08.2026) — AAB 15/1.3.0 gebaut, Upload offen
+In der RevenueCat-Konsole war das meiste längst da; nachgesehen statt neu gebaut:
+Play-App verbunden („Valid credentials", „Connected to Google", Topic-ID
+`projects/wellbooked-501311/topics/Play-Store…`), beide Produkte
+`mypeak_premium_monthly:monthly` und `:annual` **Published** mit je 1 Entitlement,
+im Default-Offering als `$rc_monthly` bzw. `$rc_annual` — dort liegen Apple- **und**
+Android-Produkt nebeneinander. Gefehlt hat nur der SDK-Key.
+
+- `VITE_REVENUECAT_ANDROID_KEY` (`goog_…`) als Repo-Secret gesetzt (15.08.).
+- `PURCHASE_ENABLED.android = true`.
+- **`canPurchase` verlangt jetzt zwei Dinge:** Plattform-Flagge **und** einen
+  RevenueCat-Schlüssel im Binary (`isConfigured()`). Damit kann kein Build mehr eine
+  Paywall mit Preisen und totem Knopf ausliefern — der alte Grund, warum Android auf
+  `false` stehen musste, ist strukturell weg.
+- ⚠️ **Kehrseite:** ein Build ohne Schlüssel hätte gar keinen sichtbaren Kauf — genau
+  der Zustand, für den Apple 2.1(b) vergeben hat. Deshalb brechen `ios-release.yml`
+  und `android-release.yml` jetzt ab, wenn die Flagge einer Plattform `true` ist, ihr
+  Secret aber leer.
+- AAB `versionCode 15` / `versionName 1.3.0` gebaut und signiert
+  (`android-release.yml` #7, Upload bewusst aus, liegt als Artefakt).
+
+**Ausgeliefert 15.08., 14:36 UTC:** AAB 20,7 MB als `versionCode 15` hochgeladen,
+Produktions-Track an alle Nutzer, validiert und committet. Damit ist Premium auf
+Android zum ersten Mal wirklich kaufbar. ⚠️ **Ein Android-Kauf wurde nie getestet** —
+beim ersten echten Kauf zusehen, ob der Webhook `premium_until` setzt.
+
+**Abo-Anzeigename** in Play auf `FullRep Premium` gezogen (per API, am Endpunkt
+bestätigt).
+
+✅ **Preise am 15.08. in der Console auf 4,99 / 44,99 gesetzt** (173 von 173 Regionen,
+am Endpunkt gegengeprüft). Damit rechnen Play, App Store und die Paywall dieselben
+Zahlen. ⚠️ Zwischendurch standen dort kurz 5,99 / 54,99 — beim Setzen also darauf achten,
+ob Play das Feld brutto oder netto meint, und danach mit `mode = abos` nachzählen.
+
+⚠️ **Über die API gehen die Preise NICHT.**
+Zwei Anläufe, zwei Absagen, beide lehrreich:
+1. `Regions Version must be specified.` — `regionsVersion` ist bei **jedem**
+   schreibenden Aufruf am Abo Pflicht, nicht nur bei Preisen (auch beim reinen Titel).
+2. `Invalid currency for region code BG … Expected BGN but got EUR.` — der PATCH
+   validiert die **komplette** Regionstabelle mit. Bulgarien hat einen EUR-Preis
+   gespeichert, Googles Katalog `2022/02` erwartet dort BGN. Eine Altlast, die den
+   Aufruf blockiert, obwohl sie gar nicht angefasst wird.
+**Folge: Preise nur in der Play Console ändern** — sie rechnet die übrigen Währungen
+automatisch um, die API müsste 173 Beträge selbst hinschreiben.
+
+### Play-Abos: gemessener Stand 14.08.2026 (`play-listing.yml` → `abos`)
+```
+mypeak_premium_monthly        Listing de-DE: 'MyPeak Premium'   ⚠ alter Name
+  Tarif monthly  auto-renew P1M  ACTIVE   4,49 EUR (AT)   173 von 173 Regionen
+  Tarif annual   auto-renew P1Y  ACTIVE  44,90 EUR (AT)   173 von 173 Regionen
+```
+
+⚠️ **Play ist anders gebaut als der App Store — das ist für RevenueCat entscheidend.**
+Play hat **ein Produkt mit zwei Basis-Tarifen**, Apple hat **zwei getrennte Produkte**.
+In RevenueCat heißen die Play-Produkte deshalb `mypeak_premium_monthly:monthly` und
+`mypeak_premium_monthly:annual` (Produkt-ID **plus** Basis-Tarif-ID). Beide ans
+`premium`-Entitlement und ins Default-Offering als Monthly- bzw. Annual-Package.
+
+⚠️ **Drei Abweichungen zum App Store, Stand 14.08.:**
+1. **Preis:** Play 4,49 / 44,90 — Apple und die Paywall 4,99 / 44,99. Die Paywall zeigt
+   zwar den Live-Store-Preis, aber `perMonth` und `ANNUAL_SAVINGS` stehen fest im Binary
+   und rechnen mit 4,99/44,99. Auf Android stimmten sie damit nicht.
+2. **Anzeigename** im Play-Listing ist noch `MyPeak Premium`, in ASC längst
+   `FullRep Premium`.
+3. Die Tarif-IDs heißen `monthly`/`annual` — sie tauchen im RevenueCat-Produktnamen auf.
+
+**Gegenprobe jederzeit:** `play-listing.yml` mit `mode = abos` (liest nur). Es zeigt
+Betrag **und** „Regionen mit Preis: n von m" — ein Tarif mit Preis in nur einer Region
+oder ohne `ACTIVE` ist nicht kaufbar.
+
+### iOS-Ablehnung 14.08.2026 — 2.1(b) erneut, weil die Abos NICHT mitgingen
+Apple hat Build **1.0 (4)** abgelehnt (Prüfgerät iPad Air 11″ (M3), 15:32).
+**1.4.1 ist weg** — die Quellenangaben haben getragen. Übrig bleibt allein:
+
+> **Guideline 2.1(b) – Performance – App Completeness.** „We are unable to complete the
+> review of the app because one or more of the In-App Purchase products have not been
+> submitted for review. Specifically, the app includes references to Premium subscription
+> but the associated In-App Purchase products have not been submitted for review."
+> Nächste Schritte laut Apple: **die IAP-Produkte einreichen UND einen neuen Build
+> hochladen.**
+
+⚠️ **Das ist keine Überraschung, sondern die angekündigte Folge von `--trotzdem`.** Am
+31.07. ging Version 1.0/Build 4 bewusst ohne die Abos raus (beide `MISSING_METADATA`),
+und im CLAUDE.md stand schon damals: „2.1(b) kann sich dadurch wiederholen." Genau das
+ist passiert. **Lehre: die harte Sperre in `einreichen()` hat recht — `--trotzdem` ist
+kein Abkürzer, sondern kauft eine Ablehnung samt zwei Wochen Wartezeit.**
+
+Erschwerend: die Prüfnotiz für Build 4 behauptete „The auto-renewable subscriptions are
+submitted together with this version". Der Prüfer hat danach gesucht und nichts gefunden.
+**Nie in die Prüfnotiz schreiben, was man erst noch vorhat.**
+
+### ✅ Version 1.0 / Build 6 samt beider Abos eingereicht — 14.08.2026, 15:38 UTC
+Einreichung **`8ae50391-e042-4e1c-aae8-e65a55917e60`**, Zustand `WAITING_FOR_REVIEW`,
+**vier Elemente, alle `READY_FOR_REVIEW`**: `mypeak_premium_monthly`,
+`mypeak_premium_annual`, die Abo-Gruppe und die App-Version 1.0 mit Build 6.
+Am Endpunkt nachgezählt, nicht bloß gemeldet. Damit ist erfüllt, woran 2.1(b) zweimal
+gescheitert ist: die IAP-Produkte fahren **mit** der Version.
+
+⚠️ **Beim nächsten Mal nicht wieder in diese Reihenfolge geraten:** erst die Preise
+vollständig setzen, dann bauen, dann sammeln, dann übermitteln. Am 14.08. ging um 17:16
+eine komplette Einreichung mit Build 5 raus, dessen Paywall noch die falschen Preise trug,
+und musste zurückgezogen werden — das kostete den zweiten Durchlauf. **Vor dem Sammeln
+prüfen, ob der zugewiesene Build der ist, den man meint.**
+
+⚠️ **Nach einem Zurückziehen zeigt ASC an allen Elementen „Vom Entwickler abgelehnt" und
+graue Knöpfe.** Das ist die Altmarkierung der zurückgezogenen Einreichung, kein aktueller
+Zustand — die API meldete parallel `READY_TO_SUBMIT` bzw. `PREPARE_FOR_SUBMISSION`. Hilft:
+harter Reload und **mit der App-Version beginnen**; sie eröffnet den neuen Entwurf, an dem
+die Abos andocken.
+
+**Der Weg dorthin, Schritt für Schritt:**
+
+| # | Schritt | Wo | Stand |
+|---|---|---|---|
+| 1 | `--aufraeumen`: Einreichung `41324499…` (31.07.) zurückgezogen | asc.yml | ✅ |
+| 2 | Abopreise gesetzt → beide Abos **`READY_TO_SUBMIT`** | ASC-Oberfläche | ✅ |
+| 3 | Paywall-Preise an den Store angeglichen, Build 6 gebaut + zugewiesen | `ios-release.yml` #5 | ✅ `VALID` |
+| 4 | Prüfnotiz (2133 Zeichen, mit 4,99/44,99) | asc.yml | ✅ |
+| 5 | Je **Zur Prüfung hinzufügen**: beide Abos, **Abo-Gruppe**, **App-Version** | **ASC-Oberfläche** | ✅ |
+| 6 | **Zur Prüfung übermitteln** | **ASC-Oberfläche** | ✅ |
+
+**⚠️ Der eigentliche Blocker war der Abopreis — und zwar wirklich, nicht nur laut Meldung.**
+Die Oberfläche sagte an beiden Abos rot: „Kann nicht zur Prüfung hinzugefügt werden ·
+**Füge einen Abopreis hinzu**". In der Preistabelle hatte **nur Österreich** einen Betrag,
+die übrigen **174 Länder standen auf „–"**.
+
+⚠️ **Und die API hat das zweimal falsch gemeldet.** Erst zählte `--warum` nur die Einträge
+(„Preise hinterlegt: 1"), dann löste die Korrektur vom 14.08. den Betrag auf und meldete
+„Preis: 4.49 (DEU)" — mit vollständig unverdächtigen Rohattributen
+(`planType=UPFRONT, preserved=false, startDate=null`). **Beides war falsch.**
+Lehre, endgültig: **`subscriptions/{id}/prices` taugt nicht als Nachweis, dass ein Abopreis
+gesetzt ist.** Wer das prüfen will, sieht in der Oberfläche nach, ob die Preistabelle für
+alle Verkaufsgebiete Beträge zeigt — oder gar nicht. `--warum` schreibt die Rohattribute
+inzwischen mit, aber nur zur Diagnose, nicht als Freigabe.
+
+**Wo der Preis gesetzt wird** (zwei Sackgassen liegen davor):
+Abo öffnen → Abschnitt **„Abo-Preise"** → rechts **„Alle Preise und Währungen"** →
+Land + Preis wählen → sichern. **Nicht** das blaue **„+"** neben „Abo-Preise" — das bietet
+nur Einführungsangebote, Angebotscodes und Aktionsangebote. Die Seite wirft dabei
+gelegentlich „Es ist ein Fehler aufgetreten. Versuche es später erneut."; dann neu laden
+und wiederholen, sie speichert sonst stillschweigend nichts.
+
+**⚠️ Eine Einreichung braucht VIER Elemente, nicht zwei:**
+beide Abos **plus die Abo-Gruppe** („Dein Abo mit automatischer Verlängerung muss mit seiner
+Abo-Gruppe übermittelt werden") **plus die App-Version**. Jedes wird einzeln über
+**„Zur Prüfung hinzufügen"** gesammelt; erst dann wird **„Zur Prüfung übermitteln"** aktiv.
+**Die API kann keines der drei IAP-Elemente anhängen** — das bleibt Handarbeit.
+
+**Zwischenstand 17:16 (Ortszeit): einmal übermittelt und wieder zurückgezogen.**
+Einreichung `44f5d426-93b0-40cb-bb77-d36e441756b1` ging mit allen vier Elementen raus —
+aber mit **Build 5**, dessen Paywall noch die alten Preise trug. Josef hat sie
+zurückgezogen (Version steht seither auf `DEVELOPER_REJECTED`, die Build-Zuweisung holt
+sie da wieder heraus). **Die Abos blieben dabei `READY_TO_SUBMIT`** — ein Zurückziehen
+beschädigt die Preisarbeit nicht.
+
+**Preise: die App rechnete mit Zahlen, die nie im Store standen.**
+In ASC stehen **4,99 €/Monat** und **44,99 €/Jahr**, in `PaywallPage.jsx` standen
+4,49 / 44,90. Der Live-Preis von RevenueCat ersetzt nur die großen Beträge —
+**`perMonth`, `ANNUAL_SAVINGS` und „2 Monate gratis" stehen fest im Binary** und waren
+damit schlicht falsch. Korrigiert auf 4,99 / 44,99 / 3,75 / **−25 %** (genau 24,9 %);
+die Angabe „2 Monate gratis" ist entfernt, weil es real 2,98 Monate sind — „3" wäre knapp
+zu viel, „2" deutlich zu wenig. ⚠️ **Wer den Preis in ASC ändert, muss diese Konstanten
+mitziehen und neu bauen.**
+
+**Code-Seite vorbereitet (14.08.):**
+- `CURRENT_PROJECT_VERSION` 4 → 5 → **6** im pbxproj (Apple verlangt ausdrücklich ein neues
+  Binary; `ios-release.yml` liest die Nummer von dort).
+- Die Build-Nummer stand in `asc.yml` **fest auf 4** und in `--alles` ebenfalls. Beides
+  hätte still den abgelehnten Build wieder zugewiesen, ohne zu scheitern. Jetzt Eingabe
+  `build_nr` im Workflow, `--alles` verlangt `--build`.
+- `--warum` zeigt bei Preisen jetzt **Betrag + Land statt der Anzahl** (der Messfehler vom
+  31.07., der Stunden gekostet hat — ein Eintrag ohne auflösbaren Preispunkt ist kein Preis
+  und wird als `Preis: FEHLT` gemeldet).
+- Prüfnotiz neu: nennt beide Produkt-IDs samt Preis, den Klickweg zur Paywall und den Grund
+  für die `mypeak`-Präfixe. Der Satz „die Abos sind Teil dieser Einreichung" darf erst
+  gesetzt werden, wenn sie es tatsächlich sind.
+
 ### iOS-Ablehnung 29.07.2026 behoben — Quellenangaben + IAP (30.07.2026)
 **Gute Nachricht zuerst: 4.3(a) „Spam" taucht in dieser Ablehnung NICHT mehr auf.** Apple hat
 Build 1.0 (3) inhaltlich geprüft (Prüfgerät iPad Air 11"). Zwei Punkte blieben:
@@ -102,7 +279,9 @@ eine Fehlmessung meinerseits, siehe „Eigener Fehler" weiter unten.
 (`--trotzdem` überbrückt). Ginge die Version allein durch, wäre das exakt der Zustand, für
 den Apple 2.1(b) vergeben hat.
 
-### Version 1.0 / Build 4 eingereicht — 31.07.2026, 17:56 UTC, `WAITING_FOR_REVIEW`
+### Version 1.0 / Build 4 eingereicht — 31.07.2026 → am 14.08. abgelehnt (2.1(b))
+**Ausgang steht oben.** Der Abschnitt bleibt, weil er zeigt, wie es dazu kam.
+
 Auf Josefs ausdrückliche Anweisung mit `--trotzdem` abgesendet, obwohl beide Abos noch auf
 `MISSING_METADATA` stehen. ⚠️ **Die Abos sind also NICHT mitgegangen** — 2.1(b) kann sich
 dadurch wiederholen. Zum Heilen: `--aufraeumen`, dann in ASC je Abo den blauen Knopf
@@ -323,7 +502,7 @@ nutzt `.splash-circle` / `.splash-parts`. Die alten Klassen `ptr-line-animate`, 
 - **Web-Kauf geparkt (live, Commit b380b1e):** `PaywallPage.jsx` → `PURCHASE_ENABLED = { ios:false, android:false, web:false }`, `canPurchase = PURCHASE_ENABLED[Capacitor.getPlatform()]`. Aktuell zeigt die Paywall ÜBERALL nur die Gratis-Testphase (kein Kauf/Preis/Restore) — Web-Billing hing nur an Stripe-Sandbox, so läuft niemand in einen Sandbox-Checkout. Je Store mit `PURCHASE_ENABLED.<platform>=true` freischaltbar. **iOS/Android-Käufe laufen über Apple IAP bzw. Google Play Billing — NICHT Stripe** (das ist nur der Web-Weg).
 - **AdMob-DSGVO veröffentlicht:** eigene UMP-Einwilligungsnachricht „MyPeak GDPR" für iOS+Android (Consent + Optionen-verwalten, Datenschutz-URL /legal/privacy). Offen: AdMob-App↔Store verknüpfen nach Launch.
 - **iOS-Abo fertig aufgesetzt:** ASC-Abo `mypeak_premium_monthly` (3,99 €/Monat, alle Territorien, DE/EN) per API angelegt (Status Missing-Metadata, fehlt nur Review-Screenshot → kommt mit dem Build). **RevenueCat iOS komplett:** App verbunden (In-App-Purchase-Key gültig), Produkt → `premium`-Entitlement → Monthly-Package. iOS-SDK-Key als `VITE_REVENUECAT_IOS_KEY` in lokaler `.env` (gitignored; nativer Build liest .env). Apple „Paid Apps"-Vertrag + N26-Bank aktiv.
-- **Android-Abo aufgesetzt:** Play-Zahlungsprofil (Österreich, Organisation) verknüpft + N26-Bank hinterlegt („Bestätigung steht aus", normal). Abo `mypeak_premium_monthly`, Basis-Tarif `monthly` (auto-renew, 3,99 € — Österreich manuell auf 3,99 € gesetzt; ⚠️ prüfen, ob DE + übrige €-Länder auch 3,99 zeigen).
+- **Android-Abo aufgesetzt:** Play-Zahlungsprofil (Österreich, Organisation) verknüpft + N26-Bank hinterlegt („Bestätigung steht aus", normal). ⚠️ Hier stand „3,99 €" — **überholt**, am 14.08. per `--abos` am Endpunkt gemessen (siehe unten).
 - **⚠️ Steuer/KU:** Josef ist **Kleinunternehmer (AT)**. EU-B2C: Apple/Google = deemed supplier, führen Endkunden-USt ab → KU ändert 3,99-€-Preis nicht. **TODO: Apple Small Business Program anmelden** (30%→15%, vor echten Verkäufen); Google-Abos eh 15 %.
 - **NOCH OFFEN (nach den laufenden Store-Prüfungen, in einem Rutsch):** RevenueCat-Android (Google-Cloud-Service-Account + Play-API + `goog_`-Key), Play-Produkt ans Entitlement/Offering, `VITE_REVENUECAT_ANDROID_KEY`, `PURCHASE_ENABLED.*=true`, ASC-Abo-Review-Screenshot, **Weg-A-Build iOS+Android** (neuer Build ersetzt jeweils die laufende Einreichung → erst nach deren Freigabe), Sandbox-/Lizenz-Tester-Kauf testen.
 
