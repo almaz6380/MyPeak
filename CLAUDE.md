@@ -16,6 +16,47 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### Endpunkt-Tests (28.08.2026) — `npm test`
+122 Tests über **alle sieben** Funktionen in `api/`, je einmal für **Gast**
+(ohne Token) und **eingeloggt**. Vitest, `environment: 'node'`, Prüfstand in
+`tests/helpers/apiHarness.js`. Läuft in unter einer Sekunde, **ohne Netz, ohne
+Supabase, ohne Secrets** — global `fetch` ist ersetzt, alle Env-Vars sind
+Attrappen. CI: `.github/workflows/tests.yml` bei jedem Push.
+
+**Der Kniff im Prüfstand:** der `fetch`-Ersatz **wirft** bei jedem nicht
+eingeplanten Aufruf. Damit fällt auf, wenn ein Endpunkt Gemini oder Claude ruft,
+*bevor* er Anmeldung, Premium oder Kontingent geprüft hat — der Fehler, den man
+sonst erst auf der Rechnung sieht. `expectNoModelCall()` sichert das zusätzlich
+an jedem Abweis-Pfad zu.
+
+`tests/api/endpoint-contract.test.js` liest `api/` selbst aus: ein **neuer**
+Endpunkt wird automatisch mitgeprüft (gibt ohne Anmeldung nichts heraus, wirft
+nicht bei Netzausfall) und die Liste der erwarteten Dateien bricht absichtlich,
+sobald einer dazukommt. `health.js` steht als einziges auf der Öffentlich-Liste.
+
+⚠️ **`npm run lint` über das ganze Projekt ist rot** — 106 Fehler, 24 Warnungen,
+alle vorbestehend in `src/` (ungenutzte Importe, `react-hooks`-Regeln). Die CI
+lintet deshalb nur `api/` + `tests/`. Wird der Altbestand aufgeräumt, kann im
+Workflow wieder `npm run lint` stehen.
+
+**Zwei echte Bugs, die beim Schreiben der Tests aufgefallen sind:**
+1. `analyze-meal.js` meldete einen **Netzausfall als „429 Rate-Limit"**, wenn ein
+   früherer Versuch ein echtes 429 war: `last429` wurde nur zurückgesetzt, wenn
+   der `fetch` *antwortete*, nicht wenn er warf. Der Nutzer wartete auf ein
+   Kontingent, das nie das Problem war. Jetzt wird die Flagge zu Beginn **jedes**
+   Versuchs zurückgesetzt.
+2. `delete-account.js` fing **Netzwerkfehler gar nicht ab** — als einziger
+   Endpunkt. Ein Aussetzer bei Supabase warf aus dem Handler heraus und kam als
+   undurchsichtiger Plattform-Fehler an. Jetzt try/catch (503 bzw. 502) plus
+   `AbortSignal.timeout`, wie überall sonst.
+
+⚠️ **Was diese Tests NICHT abdecken:** den Gastmodus, wie ihn der Nutzer erlebt.
+Gäste sprechen die Endpunkte gar nicht an — ihre Daten liegen rein lokal, die
+Weiche ist `isGuest()` in den `src/data/*Storage.js`. Diese Guards sind
+ungetestet; dort lauert die zweite Hälfte der Gast-Bugs (der DSGVO-Fund vom
+15.07. — Fotos blieben beim Logout liegen — war genau so einer).
+
+
 ### Vier Konten dauerhaft auf Premium gesetzt (28.08.2026)
 Drei Neuregistrierungen vom 28.08. plus Josefs eigenes Konto wurden von Hand
 freigeschaltet: `status = 'premium'`, `premium_until = 2099-01-01`,
