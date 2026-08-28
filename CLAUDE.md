@@ -50,11 +50,44 @@ Workflow wieder `npm run lint` stehen.
    undurchsichtiger Plattform-Fehler an. Jetzt try/catch (503 bzw. 502) plus
    `AbortSignal.timeout`, wie überall sonst.
 
-⚠️ **Was diese Tests NICHT abdecken:** den Gastmodus, wie ihn der Nutzer erlebt.
-Gäste sprechen die Endpunkte gar nicht an — ihre Daten liegen rein lokal, die
-Weiche ist `isGuest()` in den `src/data/*Storage.js`. Diese Guards sind
-ungetestet; dort lauert die zweite Hälfte der Gast-Bugs (der DSGVO-Fund vom
-15.07. — Fotos blieben beim Logout liegen — war genau so einer).
+### Gastmodus-Tests der Storage-Schicht (28.08.2026)
+89 weitere Tests über `src/data/` — Übungen, Trainingspläne, Wochenpläne,
+Workouts, Übungsnotizen und Standardpläne, **je einmal als Gast und als
+eingeloggtes Konto**. Zusammen mit den Endpunkt-Tests: **211 Tests, `npm test`,
+unter 2 Sekunden.**
+
+Prüfstand: `tests/helpers/browserStubs.js` (localStorage-Attrappe, kein jsdom
+nötig) + `tests/helpers/supabaseMock.js` (thenable Query-Builder, der jeden
+`from(...)`-Aufruf mitschreibt). Damit lautet die Gast-Zusicherung schlicht
+`expect(supabase.__calls).toHaveLength(0)`.
+
+`tests/data/guest-contract.test.js` ruft **jede** Funktion der zehn
+Storage-Module mit `userId = 'guest'` auf und prüft, dass weder Supabase noch
+`fetch` angesprochen wird. Er wertet nur Funktionen, deren erster Parameter
+`userId` heißt (sonst wäre `'guest'` z. B. bei `lookupFriendCode(code)` ein
+Freundescode); die übersprungenen stehen als **sortierte Liste im Test** — kommt
+eine dazu, bricht er und zwingt zur Entscheidung.
+
+**Drei echte Bugs, die dabei aufgefallen sind:**
+1. **`local_${Date.now()}` kollidiert.** Zwei Pläne (oder Workouts, oder
+   Wochenpläne) in derselben Millisekunde bekamen **dieselbe Kennung** —
+   Löschen des einen entfernte beide, Ändern traf den falschen. Neu:
+   **`src/data/localId.js`** mit Sitzungszähler. ⚠️ **Dasselbe Muster steht
+   noch in `supplementStorage.js` (2×), `weightStorage.js`, `nutritionStorage.js`
+   (3×) und `SupplementsOverview.jsx`** — dort ungetestet und ungefixt.
+2. **Papierkorb ohne Gast-Weiche.** `getDeletedCustomPlans`, `restoreCustomPlan`
+   und `permanentDeleteCustomPlan` riefen Supabase auch im Gastmodus (mit
+   `userId = 'guest'`). `DeletedPlans.jsx` reicht `user.id` ungeprüft durch →
+   ein Gast wartete beim Öffnen des Papierkorbs bis zu 8 s auf eine Abfrage,
+   die nie etwas finden kann. Jetzt `isGuest`-Weiche wie überall sonst.
+3. **`deleteWeeklySchedule` löschte allein über die `id`**, ohne `user_id`.
+   Dank RLS nicht ausnutzbar, aber die einzige Ausnahme in der Datei —
+   angeglichen.
+
+⚠️ **Was weiterhin NICHT abgedeckt ist:** `nutritionStorage`, `supplementStorage`,
+`cycleStorage`, `weightStorage`, `dietStorage`, `socialStorage` haben **nur** den
+übergreifenden Gast-Vertrag, keine eigenen Tests für ihre Fachlogik. Ebenso
+ungetestet: die React-Komponenten und `resync.js` (Gast → Konto).
 
 
 ### Vier Konten dauerhaft auf Premium gesetzt (28.08.2026)
