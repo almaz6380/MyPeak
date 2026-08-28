@@ -16,6 +16,35 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### Vier Konten dauerhaft auf Premium gesetzt (28.08.2026)
+Drei Neuregistrierungen vom 28.08. plus Josefs eigenes Konto wurden von Hand
+freigeschaltet: `status = 'premium'`, `premium_until = 2099-01-01`,
+**`provider = 'promo'`**. Der Apple-Prüfaccount `appreview@wellbooked.at` blieb
+bewusst außen vor. Gemacht im Supabase SQL Editor, am Ergebnis gegengeprüft
+(4 Zeilen, Datum gesetzt).
+
+⚠️ **`provider = 'promo'` heißt: nie bezahlt.** Wer Umsätze zählt oder Käufe
+sucht, muss diese vier Zeilen ausschließen — sonst tauchen sie als Kunden auf,
+für die nie Geld geflossen ist.
+
+Der Weg dafür liegt jetzt als **`supabase/grant-premium.sql`** im Repo
+(nachsehen → freischalten → gegenprüfen → zurücknehmen). Die Datei führt
+absichtlich **Platzhalter statt echter Adressen** — Nutzer-E-Mails gehören nicht
+in die Versionsgeschichte.
+
+⚠️ **Der Management-API-Weg ist aus der Claude-Umgebung zu:** `api.supabase.com`
+antwortet auch ohne Token mit `403, error code: 1010` (Cloudflare blockt nach
+Signatur). Die Tokens `SUPABASE_ACCESS_ALMAZ` / `_ANIGOSHA` in der Umgebung sind
+damit für Datenbankarbeit wertlos — **solche Änderungen laufen über den SQL
+Editor**, nicht über ein Skript. Nicht erneut daran hängenbleiben.
+
+⚠️ **Am Handy frisst die iOS-Autokorrektur SQL.** Beim Einfügen wurde aus
+`holztechnikum.at` still ein `holztechnikum.-at`; die Abfrage wäre
+durchgelaufen und hätte nur 3 statt 4 Zeilen geschrieben. Deshalb gehört an
+jedes schreibende Statement ein **`RETURNING`** — die Zeilenzahl ist die
+einzige Kontrolle, die auffällt.
+
+
 ### ✅ RevenueCat-Android fertig (15.08.2026) — AAB 15/1.3.0 gebaut, Upload offen
 In der RevenueCat-Konsole war das meiste längst da; nachgesehen statt neu gebaut:
 Play-App verbunden („Valid credentials", „Connected to Google", Topic-ID
