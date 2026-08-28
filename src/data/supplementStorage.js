@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase';
 import { isGuest } from '../context/AuthContext';
 import { parseLocalDate } from '../lib/dateUtils';
+import { localId } from './localId';
 
 function guestSkip(userId) { return isGuest(userId); }
 
@@ -70,7 +71,7 @@ export async function saveSupplement(userId, supplement) {
 
   // localStorage first
   const cached = JSON.parse(localStorage.getItem(SUPPLEMENTS_KEY) || '[]');
-  const localEntry = { ...entry, id: `local_${Date.now()}`, created_at: new Date().toISOString() };
+  const localEntry = { ...entry, id: localId(), created_at: new Date().toISOString() };
   cached.push(localEntry);
   localStorage.setItem(SUPPLEMENTS_KEY, JSON.stringify(cached));
 
@@ -210,7 +211,7 @@ export async function logSupplementTaken(userId, supplementId, date, timeSlot) {
   if (existing) return { data: existing, error: null };
 
   const localLog = {
-    id: `local_${Date.now()}`,
+    id: localId(),
     user_id: userId,
     supplement_id: supplementId,
     date,

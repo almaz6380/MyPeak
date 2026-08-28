@@ -34,6 +34,24 @@ Endpunkt wird automatisch mitgeprüft (gibt ohne Anmeldung nichts heraus, wirft
 nicht bei Netzausfall) und die Liste der erwarteten Dateien bricht absichtlich,
 sobald einer dazukommt. `health.js` steht als einziges auf der Öffentlich-Liste.
 
+### ⚠️ GitHub Actions führt keine Jobs mehr aus (28.08.2026)
+`tests.yml` schlägt fehl — **nicht wegen der Tests**. Gemessen an drei Läufen
+(zwei per Push, einer von Hand): Abbruch nach 4 Sekunden, **0 ms abgerechnete
+Rechenzeit**, kein Protokoll (HTTP 404). Der Job wird gar nicht erst auf einen
+Runner gelegt. Ein Fehler im Workflow oder in den Tests würde Rechenzeit
+verbrauchen und ein Protokoll hinterlassen.
+
+Der Handstart schließt den Push-Auslöser als Ursache aus. Alle 28 früheren
+Läufe des Repos waren `workflow_dispatch` und liefen zuletzt am **15.08.**
+erfolgreich — dazwischen ist die Ausführung kontoweit weggefallen.
+
+**Wahrscheinlichste Ursache, nicht belegt:** Actions-Minuten oder ein
+Ausgabenlimit erschöpft. Das Repo ist privat, und die macOS-Läufe
+(`iOS Release`) zählen **zehnfach**. Nachsehen unter
+**github.com/settings/billing** → „Actions". Über die API ist die Abrechnung
+nicht einsehbar. **Bis das geklärt ist: `npm test` vor jedem Push lokal laufen
+lassen** — die CI fängt derzeit nichts ab.
+
 ⚠️ **`npm run lint` über das ganze Projekt ist rot** — 106 Fehler, 24 Warnungen,
 alle vorbestehend in `src/` (ungenutzte Importe, `react-hooks`-Regeln). Die CI
 lintet deshalb nur `api/` + `tests/`. Wird der Altbestand aufgeräumt, kann im
@@ -69,12 +87,12 @@ Freundescode); die übersprungenen stehen als **sortierte Liste im Test** — ko
 eine dazu, bricht er und zwingt zur Entscheidung.
 
 **Drei echte Bugs, die dabei aufgefallen sind:**
-1. **`local_${Date.now()}` kollidiert.** Zwei Pläne (oder Workouts, oder
-   Wochenpläne) in derselben Millisekunde bekamen **dieselbe Kennung** —
-   Löschen des einen entfernte beide, Ändern traf den falschen. Neu:
-   **`src/data/localId.js`** mit Sitzungszähler. ⚠️ **Dasselbe Muster steht
-   noch in `supplementStorage.js` (2×), `weightStorage.js`, `nutritionStorage.js`
-   (3×) und `SupplementsOverview.jsx`** — dort ungetestet und ungefixt.
+1. **`local_${Date.now()}` kollidiert.** Zwei Einträge in derselben
+   Millisekunde bekamen **dieselbe Kennung** — Löschen des einen entfernte
+   beide, Ändern traf den falschen. Neu: **`src/data/localId.js`** mit
+   Sitzungszähler, inzwischen an **allen 11 Stellen** eingesetzt
+   (workoutStorage 3×, nutritionStorage 4×, supplementStorage 2×,
+   weightStorage, SupplementsOverview). Siehe „Der schlimmste Fall" unten.
 2. **Papierkorb ohne Gast-Weiche.** `getDeletedCustomPlans`, `restoreCustomPlan`
    und `permanentDeleteCustomPlan` riefen Supabase auch im Gastmodus (mit
    `userId = 'guest'`). `DeletedPlans.jsx` reicht `user.id` ungeprüft durch →
@@ -84,10 +102,27 @@ eine dazu, bricht er und zwingt zur Entscheidung.
    Dank RLS nicht ausnutzbar, aber die einzige Ausnahme in der Datei —
    angeglichen.
 
-⚠️ **Was weiterhin NICHT abgedeckt ist:** `nutritionStorage`, `supplementStorage`,
-`cycleStorage`, `weightStorage`, `dietStorage`, `socialStorage` haben **nur** den
-übergreifenden Gast-Vertrag, keine eigenen Tests für ihre Fachlogik. Ebenso
-ungetestet: die React-Komponenten und `resync.js` (Gast → Konto).
+**Der schlimmste Fall der Kennungs-Kollision — im Gastmodus erreichbar:**
+`AddFoodEntry.handleSaveAll` speichert die Mehrfachauswahl in einer Schleife
+(`AddFoodEntry.jsx:55`). Als Gast läuft die **ohne Netz**, also mehrere
+Durchläufe in derselben Millisekunde → alle Einträge bekamen dieselbe Kennung.
+Wer danach **einen** Eintrag löschte, verlor **alle**. Im Test nachgestellt
+(`tests/data/nutrition.test.js`), vor dem Fix rot.
+
+### Fachlogik-Tests Ernährung, Supplemente, Gewicht (28.08.2026)
+49 weitere Tests, damit die `localId()`-Umstellung nicht blind erfolgt:
+Ernährungseinträge inkl. Mehrfachauswahl und Nachholliste für fehlgeschlagene
+Cloud-Löschungen, eigene Mahlzeiten, Ziele (auch ein bewusstes Ziel **0**),
+Wasser-Tracking (Summe wird nach dem Abziehen neu berechnet), Supplement-Plan
+und Einnahme-Haken, Gewichtsverlauf (ein Eintrag pro Tag, aufsteigend sortiert).
+**Gesamt: 260 Tests, `npm test`, gut 2 Sekunden.**
+
+⚠️ **Was weiterhin NICHT abgedeckt ist:** `cycleStorage`, `dietStorage` und
+`socialStorage` haben **nur** den übergreifenden Gast-Vertrag, keine eigenen
+Tests für ihre Fachlogik. Ebenso ungetestet: die React-Komponenten und
+`resync.js` (Gast → Konto).
+
+⚠️ **Die CI läuft nicht** — siehe eigenen Abschnitt unten.
 
 
 ### Vier Konten dauerhaft auf Premium gesetzt (28.08.2026)

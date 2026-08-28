@@ -13,6 +13,7 @@ import {
   getTodayScheduledSupplements,
   getSupplementProgress,
 } from '../../data/supplementStorage';
+import { localId } from '../../data/localId';
 
 const TIME_SLOTS = ['morning', 'midday', 'pre_workout', 'post_workout', 'evening'];
 
@@ -72,7 +73,7 @@ export default function SupplementsOverview({ onBack, onManage, onAdd }) {
       setLogs((prev) => prev.filter((l) => !(l.supplement_id === supplementId && l.time_slot === timeSlot)));
       unlogSupplementTaken(user.id, supplementId, today, timeSlot);
     } else {
-      const newLog = { supplement_id: supplementId, time_slot: timeSlot, id: `local_${Date.now()}` };
+      const newLog = { supplement_id: supplementId, time_slot: timeSlot, id: localId() };
       setLogs((prev) => [...prev, newLog]);
       logSupplementTaken(user.id, supplementId, today, timeSlot);
     }

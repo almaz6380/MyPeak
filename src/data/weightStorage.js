@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { isGuest } from '../context/AuthContext';
+import { localId } from './localId';
 
 function guestSkip(userId) { return isGuest(userId); }
 
@@ -57,7 +58,7 @@ export async function saveWeightEntry(userId, date, weightKg) {
   // localStorage first
   const cached = JSON.parse(localStorage.getItem(WEIGHT_KEY) || '[]');
   const existing = cached.findIndex((e) => e.date === date);
-  const entry = { id: `local_${Date.now()}`, user_id: userId, date, weight_kg: weightKg, created_at: new Date().toISOString() };
+  const entry = { id: localId(), user_id: userId, date, weight_kg: weightKg, created_at: new Date().toISOString() };
 
   if (existing >= 0) {
     cached[existing] = { ...cached[existing], weight_kg: weightKg };
