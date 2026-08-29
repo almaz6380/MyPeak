@@ -16,6 +16,34 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### ✅ iOS ist LIVE — freigegeben am 28.08.2026, 08:55 UTC
+Version **1.0 ist im App Store veröffentlicht**. Damit ist 2.1(b) endgültig
+ausgestanden: die Einreichung vom 14.08. mit Build 6 **samt beider Abos** ist
+durchgegangen. Gemessen über die öffentliche iTunes-Lookup-API (AT und DE),
+nicht über ASC.
+
+**Der öffentliche Link ist bereits sauber** — Apple bildet ihn aus dem
+App-Namen, deshalb steht dort FullRep statt MyPeak:
+`https://apps.apple.com/at/app/fullrep-training-ernährung/id6788461300`
+Zum Teilen besser die kurze, namensunabhängige Form:
+**`https://apps.apple.com/app/id6788461300`**
+
+⚠️ **Der Play-Link enthält dauerhaft `mypeak`** und das lässt sich nicht ändern:
+`https://play.google.com/store/apps/details?id=at.gallab.mypeak` — der
+`id=`-Parameter **ist** die Paket-ID, und Google kennt keinen zweiten Adressweg
+zu einer App. Nicht daran herumbasteln; eine neue Paket-ID hieße neue App ohne
+Update-Pfad. Auf der Store-Seite selbst steht durchgehend FullRep (geprüft).
+
+**Was jetzt zuerst zu beobachten ist:** Premium ist auf iOS erstmals mit echtem
+Geld kaufbar. Beim **ersten echten Kauf** nachsehen, ob der RevenueCat-Webhook
+`premium_until` setzt — dieselbe Kette wurde nur im Sandbox verifiziert. Ebenso
+offen: die AdMob-iOS-App mit dem Store-Eintrag verknüpfen (für Android am 29.07.
+erledigt, für iOS stand es unter „offen nach Launch").
+
+⚠️ **Die drei Neuregistrierungen vom 28.08., 09:05–09:06** kamen zehn Minuten
+nach der Freigabe — das waren die ersten Nutzer aus dem App Store.
+
+
 ### Endpunkt-Tests (28.08.2026) — `npm test`
 122 Tests über **alle sieben** Funktionen in `api/`, je einmal für **Gast**
 (ohne Token) und **eingeloggt**. Vitest, `environment: 'node'`, Prüfstand in
