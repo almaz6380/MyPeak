@@ -22,7 +22,7 @@ export const legalDocs = {
         },
         {
           heading: 'Unternehmensgegenstand',
-          body: 'Betrieb der Fitness- und Ernährungs-Web-App „FullRep" (my-peak.vercel.app).',
+          body: 'Betrieb der Fitness- und Ernährungs-Web-App „FullRep" (fullrep.vercel.app).',
         },
         {
           heading: 'Gewerbe- und berufsrechtliche Angaben',
@@ -48,7 +48,7 @@ export const legalDocs = {
         },
         {
           heading: 'Business purpose',
-          body: 'Operation of the fitness and nutrition web app "FullRep" (my-peak.vercel.app).',
+          body: 'Operation of the fitness and nutrition web app "FullRep" (fullrep.vercel.app).',
         },
         {
           heading: 'Trade and professional information',
@@ -152,7 +152,7 @@ export const legalDocs = {
       sections: [
         {
           heading: '1. Geltungsbereich',
-          body: `Diese Nutzungsbedingungen gelten für die Nutzung der Web-App „FullRep" (my-peak.vercel.app), betrieben von:\n\n${operatorBlockDE}`,
+          body: `Diese Nutzungsbedingungen gelten für die Nutzung der Web-App „FullRep" (fullrep.vercel.app), betrieben von:\n\n${operatorBlockDE}`,
         },
         {
           heading: '2. Leistungsbeschreibung',
@@ -186,7 +186,7 @@ export const legalDocs = {
       sections: [
         {
           heading: '1. Scope',
-          body: `These terms of use apply to the use of the web app "FullRep" (my-peak.vercel.app), operated by:\n\n${operatorBlockEN}`,
+          body: `These terms of use apply to the use of the web app "FullRep" (fullrep.vercel.app), operated by:\n\n${operatorBlockEN}`,
         },
         {
           heading: '2. Service description',
