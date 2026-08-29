@@ -5,7 +5,8 @@
 Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Tracking in einer einzigen, übersichtlichen App vereint. Die App soll trotz vieler Features einfach zu bedienen und nicht überfüllt sein.
 
 **App-Name:** FullRep (bis 30.07.2026: MyPeak — siehe „Umbenennung" unten)
-**Live-URL:** https://my-peak.vercel.app (Domain noch nicht umgezogen)
+**Live-URL:** https://fullrep.vercel.app (seit 29.08.2026; `my-peak.vercel.app`
+leitet mit 307 dorthin weiter — bewusst behalten, solange irgendwo alte Links stehen)
 **Git-Repository:** https://github.com/almaz6380/MyPeak (Repo-Name unverändert)
 **Zielplattform:** Web-App → PWA → später App Store (iOS + Android)
 **Sprachen:** Mehrsprachig (Deutsch + Englisch)
@@ -786,7 +787,7 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
   nicht — sichtbar nur an niedrigerem eCPM, nie als Fehlermeldung. Die Publisher-ID gilt
   **kontoweit**, dieselbe Zeile liegt bei Mahjong Royale und Swaply.
 - **Wo Google sie sucht:** an der Website aus dem Play-Eintrag (`contactWebsite`, aktuell
-  `https://my-peak.vercel.app`) + `/app-ads.txt`. Ändert sich die Domain im Store, muss die Datei
+  `https://fullrep.vercel.app`) + `/app-ads.txt`. Ändert sich die Domain im Store, muss die Datei
   mitwandern, sonst ist sie wirkungslos.
 - **Achtung, SPA-Falle:** `vercel.json` hat einen Catch-all `"/(.*)" → "/index.html"`, d. h. **jeder**
   unbekannte Pfad antwortet mit `200` und HTML statt mit `404`. Für app-ads.txt ist das entschärft,
@@ -794,7 +795,7 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
   Deploy-Wurzel und schlägt den Catch-all (an `favicon.svg`/`icon-192.png` verifiziert). **Eine
   Änderung an `vercel.json` war deshalb NICHT nötig.** Beim Prüfen aber nicht auf den Statuscode
   hereinfallen: `200` allein beweist nichts, es zählt `Content-Type: text/plain` plus Inhalt.
-- **Prüfen:** `curl -sD- https://my-peak.vercel.app/app-ads.txt | head -3` — muss `text/plain` und
+- **Prüfen:** `curl -sD- https://fullrep.vercel.app/app-ads.txt | head -3` — muss `text/plain` und
   die Zeile zeigen. Googles Bestätigung in AdMob läuft als täglicher Crawl, nicht sofort; die
   Meldung „konnte nicht bestätigt werden" direkt nach dem Verknüpfen ist normal.
 
