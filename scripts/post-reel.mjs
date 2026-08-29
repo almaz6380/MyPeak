@@ -24,17 +24,21 @@
 // bei WELLbooked! geregelt, und ein Fremdsound waere kommerziell ohnehin
 // nicht lizenziert.
 //
-// Store-Regel wie ueberall: Der Abspann nennt nur, was in STORES steht.
-// iOS ist Stand 15.08.2026 nicht freigegeben.
+// Der Fuss traegt die offiziellen Download-Badges, nicht einen Satz. Gezeigt
+// wird nur, was in STORES steht — beide Plattformen sind seit 29.08.2026 live.
+//
+// Der aerztliche Haftungshinweis steht hier bewusst NICHT (Josefs
+// Entscheidung): Er ist eine Auflage fuer den Store-Eintrag, nicht fuer
+// Social-Media-Beitraege. Die Quellenangabe bleibt.
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { chromium } from 'playwright';
 
 import {
-  WURZEL, HINWEIS, uebungenMitFotos, uebungTexte, wissensthemen, quelleKurz,
+  WURZEL, uebungenMitFotos, uebungTexte, wissensthemen, quelleKurz,
 } from './social-daten.mjs';
 
 const require = createRequire(import.meta.url);
@@ -48,13 +52,18 @@ const NAME = arg('name', null);
 const OUT = join(WURZEL, arg('out', 'out/social'));
 
 const B = 1080, H = 1920, FPS = 30;
-const STORES = { ios: false, android: true };
+const STORES = { ios: true, android: true };
 
-const storeSatz = (lang) => (lang === 'de'
-  ? (STORES.ios && STORES.android ? 'Gratis im App Store und bei Google Play'
-    : STORES.android ? 'Gratis bei Google Play' : 'Im Browser nutzen')
-  : (STORES.ios && STORES.android ? 'Free on the App Store and Google Play'
-    : STORES.android ? 'Free on Google Play' : 'Use it in your browser'));
+/** Badges statt Satz. Nur fuer Plattformen, die es wirklich gibt. */
+function storeBadges() {
+  const dateien = [];
+  if (STORES.ios) dateien.push('appstore-en.png');
+  if (STORES.android) dateien.push('googleplay-en.png');
+  return dateien
+    .map((f) => join(WURZEL, 'scripts', 'badges', f))
+    .filter((f) => existsSync(f))
+    .map((f) => `data:image/png;base64,${b64(f)}`);
+}
 
 function mulberry32(s) {
   return function () {
@@ -85,7 +94,7 @@ if (FORMAT === 'uebung-loop') {
     art: 'uebung', schluessel: u.id, titel: t.name, unter: `${t.muskel} · ${t.geraet}`,
     beschreibung: t.beschreibung,
     fotos: u.fotos.map((f) => `data:image/jpeg;base64,${b64(f)}`),
-    hinweis: null, quelle: null,
+    quelle: null,
   };
 } else {
   const th = zieh(wissensthemen());
@@ -94,7 +103,7 @@ if (FORMAT === 'uebung-loop') {
   daten = {
     art: 'wissen', schluessel: th.id, titel: th.titel[LANG] ?? th.titel.de,
     unter: q.label, beschreibung: q.text, fotos: null,
-    hinweis: HINWEIS[LANG] ?? HINWEIS.de, quelle: quelleKurz(th.quellen[0]),
+    quelle: quelleKurz(th.quellen[0]),
   };
 }
 
@@ -118,7 +127,7 @@ function baueHtml() {
   const font700 = b64(join(WURZEL, 'node_modules/@fontsource/inter/files/inter-latin-700-normal.woff2'));
   const logo = b64(join(WURZEL, 'public/favicon.svg'));
   const zustand = JSON.stringify({
-    ...daten, AUFTAKT, ZYKLUS, ZYKLEN, ABSPANN, GESAMT, storeSatz: storeSatz(LANG), T,
+    ...daten, AUFTAKT, ZYKLUS, ZYKLEN, ABSPANN, GESAMT, T,
   }).replace(/</g, '\\u003c');
 
   return `<!doctype html><meta charset="utf-8"><style>
@@ -145,16 +154,19 @@ body{font-family:'Inter',system-ui,sans-serif;color:#fef3c7;
 .quelle{font-size:24px;color:#a8a29e;border-left:3px solid rgba(251,191,36,.45);padding-left:18px}
 .quelle b{display:block;font-size:20px;letter-spacing:.16em;text-transform:uppercase;color:#fbbf24}
 .hinweis{font-size:22px;color:#a8a29e;line-height:1.4}
-.fuss{display:flex;justify-content:space-between;align-items:baseline;font-size:25px;
+.fuss{display:flex;justify-content:space-between;align-items:center;gap:20px;font-size:25px;
   color:#78716c;position:relative;z-index:3}
-.fuss .store{color:#fbbf24;font-weight:700}
+/* Badges nie verzerren — feste Hoehe, Breite folgt dem 3:1-Verhaeltnis. */
+.badges{display:flex;gap:14px;align-items:center;flex:0 0 auto}
+.badges img{height:62px;width:auto;display:block}
 .balken{position:absolute;left:0;top:0;height:6px;background:#fbbf24;z-index:5}
 </style>
 <div class="balken" id="balken"></div>
 <div class="ring"></div>
 <div class="kopf"><img src="data:image/svg+xml;base64,${logo}"><span>FULLREP</span></div>
 <div class="mitte" id="mitte"></div>
-<div class="fuss"><span>${esc(T.fuss)}</span><span class="store">${esc(storeSatz(LANG))}</span></div>
+<div class="fuss"><span>${esc(T.fuss)}</span>
+  <span class="badges">${storeBadges().map((b) => `<img src="${b}" alt="">`).join('')}</span></div>
 <script>
 const Z = ${zustand};
 const el = document.getElementById('mitte');
@@ -168,8 +180,7 @@ el.innerHTML = Z.fotos
     + '<div class="text">' + esc(Z.beschreibung) + '</div>'
   : '<div class="unter">' + esc(Z.unter) + '</div>'
     + '<div class="titel">' + esc(Z.beschreibung) + '</div>'
-    + '<div class="quelle"><b>' + esc(Z.T.quelle) + '</b>' + esc(Z.quelle) + '</div>'
-    + '<div class="hinweis">' + esc(Z.hinweis) + '</div>';
+    + '<div class="quelle"><b>' + esc(Z.T.quelle) + '</b>' + esc(Z.quelle) + '</div>';
 
 const f0 = document.getElementById('f0');
 const f1 = document.getElementById('f1');
@@ -241,8 +252,7 @@ writeFileSync(join(OUT, `${basis}.txt`),
 ## Caption (kopieren)
 
 ${daten.titel}${daten.beschreibung ? `\n\n${daten.beschreibung}` : ''}${
-  daten.quelle ? `\n\n${T.quelle}: ${daten.quelle}` : ''}${
-  daten.hinweis ? `\n\n${daten.hinweis}` : ''}
+  daten.quelle ? `\n\n${T.quelle}: ${daten.quelle}` : ''}
 
 ## Hashtags
 
@@ -255,9 +265,8 @@ ${(daten.art === 'uebung'
 
 - Das Video ist STUMM. Ton legst du selbst darueber.
 - Kein Store-Link in der Caption, nur „Link in der Bio".
-- ⚠ iOS ist noch nicht freigegeben: nirgends den App Store nennen.
-  Im Video steht „${storeSatz(LANG)}".
-${daten.hinweis ? '- Haftungshinweis steht im Video UND in der Caption. Nicht kuerzen.\n' : ''}
+- Im Video stehen die Download-Badges fuer App Store und Google Play.
+
 ## Inhalt
 
 - Format: ${FORMAT} (${daten.art})

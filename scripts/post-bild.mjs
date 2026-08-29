@@ -10,28 +10,29 @@
 // Muster: scripts/store-screenshots.mjs — Playwright, ohne Netz, ohne
 // Zugangsdaten. Kostet nichts.
 //
-// ⚠ DREI REGELN, DIE AUS STORE-ABLEHNUNGEN STAMMEN:
+// ⚠ ZWEI REGELN:
 //
-// 1. Jede Gesundheitsaussage traegt den Hinweis mit ALLEN DREI Woertern
-//    Rat, Diagnose, Behandlung. Googles Pruefung sucht danach — daran ist die
-//    App am 30.07.2026 gescheitert. Der Satz steht in social-daten.mjs und
-//    wird hier nie umformuliert.
-// 2. Die Quelle steht SICHTBAR im Bild, nie eingeklappt. Apple hat die App am
+// 1. Die Quelle steht SICHTBAR im Bild, nie eingeklappt. Apple hat die App am
 //    29.07.2026 unter 1.4.1 abgelehnt, weil medizinische Inhalte ohne Belege
-//    dastanden.
-// 3. Der CTA nennt NUR Google Play, solange iOS nicht freigegeben ist. Der
-//    Wert kommt aus STORES unten, nicht aus dem Satz.
+//    dastanden — und eine belegte Aussage ist ohnehin der Unterschied zu
+//    jedem anderen Fitnesskanal.
+// 2. Gezeigt werden nur Store-Badges fuer Plattformen, die es wirklich gibt.
+//    Die Wahrheit steht in STORES unten, nie im Text.
+//
+// Der aerztliche Haftungshinweis steht hier bewusst NICHT MEHR (Josefs
+// Entscheidung). Er ist eine Auflage fuer den STORE-EINTRAG — dort hat Google
+// am 30.07.2026 nachgesehen —, nicht fuer Social-Media-Beitraege. In der App
+// und im Play-Text bleibt er unveraendert.
 //
 // Keine Dosierungen, keine Diagnosen, keine Therapieempfehlungen — die
 // Inhalte kommen unveraendert aus src/data/, wo genau das schon gilt.
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { chromium } from 'playwright';
 
 import {
-  WURZEL, HINWEIS, hinweisVollstaendig, uebungenMitFotos, uebungTexte,
-  wissensthemen, quelleKurz, rezepteMitMakros,
+  WURZEL, uebungenMitFotos, uebungTexte, wissensthemen, quelleKurz, rezepteMitMakros,
 } from './social-daten.mjs';
 
 const arg = (n, s) => { const i = process.argv.indexOf(`--${n}`); return i === -1 ? s : process.argv[i + 1]; };
@@ -43,18 +44,21 @@ const OUT = join(WURZEL, arg('out', 'out/social'));
 
 const B = 1080, H = 1350;
 
-// ⚠ Store-Verfuegbarkeit steht HIER, nicht im Text. iOS wartet Stand 15.08.2026
-// noch auf die Freigabe; bis dahin darf kein Post den App Store nennen.
-const STORES = { ios: false, android: true };
-const storeSatz = (lang) => {
-  const { ios, android } = STORES;
-  if (lang === 'de') {
-    if (ios && android) return 'Gratis im App Store und bei Google Play';
-    return android ? 'Gratis bei Google Play' : 'Im Browser nutzen';
-  }
-  if (ios && android) return 'Free on the App Store and Google Play';
-  return android ? 'Free on Google Play' : 'Use it in your browser';
-};
+// ⚠ Store-Verfuegbarkeit steht HIER, nicht im Text. Beide Plattformen sind
+// seit 29.08.2026 live — steht eine spaeter wieder nicht bereit, wird hier
+// umgeschaltet und der zugehoerige Badge verschwindet von selbst.
+const STORES = { ios: true, android: true };
+
+/** Badges statt Satz. Nur fuer Plattformen, die es wirklich gibt. */
+function storeBadges() {
+  const dateien = [];
+  if (STORES.ios) dateien.push('appstore-en.png');
+  if (STORES.android) dateien.push('googleplay-en.png');
+  return dateien
+    .map((f) => join(WURZEL, 'scripts', 'badges', f))
+    .filter((f) => existsSync(f))
+    .map((f) => `data:image/png;base64,${b64(f)}`);
+}
 
 function mulberry32(s) {
   return function () {
@@ -88,7 +92,7 @@ function inhalt(format, w) {
       fotos: u.fotos, zusatz: t.geraet,
       // Uebungsbeschreibungen sind Technik, keine Gesundheitsaussage —
       // der Hinweis waere hier Ballast und wird nicht erzwungen.
-      hinweisNoetig: false, quelle: null,
+      quelle: null,
     };
   }
 
@@ -103,7 +107,7 @@ function inhalt(format, w) {
         [`${n.calories}`, 'kcal'], [`${n.protein} g`, LANG === 'de' ? 'Eiweiß' : 'protein'],
         [`${n.carbs} g`, LANG === 'de' ? 'Kohlenhydrate' : 'carbs'], [`${n.fat} g`, LANG === 'de' ? 'Fett' : 'fat'],
       ],
-      hinweisNoetig: false, quelle: null,
+      quelle: null,
     };
   }
 
@@ -122,7 +126,7 @@ function inhalt(format, w) {
     marke: th.titel[LANG] ?? th.titel.de,
     augenbraue: q.label || T.wissen,
     haken: q.text, text: null,
-    hinweisNoetig: true, quelle: quelleKurz(th.quellen[0]),
+    quelle: quelleKurz(th.quellen[0]),
   };
 }
 
@@ -147,8 +151,7 @@ function baueHtml(o) {
   const quelle = o.quelle
     ? `<div class="quelle"><span>${T.quelle}</span>${esc(o.quelle)}</div>` : '';
 
-  const hinweis = o.hinweisNoetig
-    ? `<div class="hinweis">${esc(HINWEIS[LANG] ?? HINWEIS.de)}</div>` : '';
+
 
   return `<!doctype html><meta charset="utf-8"><style>
 @font-face{font-family:'Inter';font-weight:400;src:url(data:font/woff2;base64,${font400}) format('woff2')}
@@ -189,8 +192,11 @@ p.text{font-size:34px;line-height:1.38;color:#e7e5e4;font-weight:400}
   padding-left:18px}
 .quelle span{display:block;font-size:19px;letter-spacing:.16em;text-transform:uppercase;color:#fbbf24;font-weight:700}
 .hinweis{font-size:21px;line-height:1.4;color:#a8a29e}
-.fuss{display:flex;justify-content:space-between;align-items:baseline;font-size:23px;color:#78716c}
-.fuss .store{color:#fbbf24;font-weight:700}
+.fuss{display:flex;justify-content:space-between;align-items:center;gap:20px;font-size:23px;color:#78716c}
+/* Badges nie verzerren — Apple und Google geben die Form vor. Feste Hoehe,
+   Breite folgt dem 3:1-Verhaeltnis von selbst. */
+.badges{display:flex;gap:14px;align-items:center;flex:0 0 auto}
+.badges img{height:58px;width:auto;display:block}
 </style>
 <div class="ring"></div><div class="ring2"></div>
 <div class="kopf"><img src="data:image/svg+xml;base64,${logo}"><span>FULLREP</span></div>
@@ -202,9 +208,10 @@ p.text{font-size:34px;line-height:1.38;color:#e7e5e4;font-weight:400}
   ${o.text ? `<p class="text">${esc(o.text)}</p>` : ''}
   ${makros}
   ${quelle}
-  ${hinweis}
 </div>
-<div class="fuss"><span>${T.fuss}</span><span class="store">${esc(storeSatz(LANG))}</span></div>`;
+<div class="fuss"><span>${T.fuss}</span>
+  <span class="badges">${storeBadges().map((b) =>
+    `<img src="${b}" alt="">`).join('')}</span></div>`;
 }
 
 // --- Lauf -------------------------------------------------------------------
@@ -213,11 +220,7 @@ const o = inhalt(FORMAT, mulberry32(SEED));
 // Selbstpruefung vor dem Rendern. Die Leitplanke im Orchestrator prueft das
 // ebenfalls — ein Generator, der einen ungueltigen Post erzeugt, soll aber
 // gar nicht erst eine Datei hinterlassen.
-if (o.hinweisNoetig && !hinweisVollstaendig(HINWEIS[LANG] ?? HINWEIS.de, LANG)) {
-  console.error('✗ Haftungshinweis unvollstaendig.');
-  process.exit(1);
-}
-if (o.hinweisNoetig && !o.quelle) {
+if (o.art === 'wissen' && !o.quelle) {
   console.error(`✗ Belegte Aussage ohne Quelle (${o.schluessel}). Apple 1.4.1.`);
   process.exit(1);
 }
@@ -246,8 +249,7 @@ writeFileSync(join(OUT, `${basis}.txt`),
 
 ## Caption (kopieren)
 
-${o.haken}${o.text ? `\n\n${o.text}` : ''}${o.quelle ? `\n\n${T.quelle}: ${o.quelle}` : ''}${
-  o.hinweisNoetig ? `\n\n${HINWEIS[LANG] ?? HINWEIS.de}` : ''}
+${o.haken}${o.text ? `\n\n${o.text}` : ''}${o.quelle ? `\n\n${T.quelle}: ${o.quelle}` : ''}
 
 ## Hashtags
 
@@ -256,10 +258,8 @@ ${tags.map((h) => `#${h}`).join(' ')}
 ## Beim Hochladen
 
 - Kein Store-Link in der Caption, nur „Link in der Bio".
-- ⚠ iOS ist noch nicht freigegeben: nirgends den App Store nennen.
-  Im Bild steht „${storeSatz(LANG)}".
-${o.hinweisNoetig ? '- Der Haftungshinweis steht im Bild UND in der Caption. Nicht kuerzen —\n'
-  + '  Googles Pruefung sucht nach Rat, Diagnose und Behandlung.\n' : ''}
+- Im Bild stehen die Download-Badges fuer App Store und Google Play.
+
 ## Inhalt
 
 - Format: ${FORMAT} (${o.art})

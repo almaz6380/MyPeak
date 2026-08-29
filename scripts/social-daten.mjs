@@ -37,22 +37,20 @@ export function text(schluessel, sprache = 'de') {
   return typeof wert === 'string' ? wert : null;
 }
 
-// --- Der Haftungshinweis ----------------------------------------------------
-// Google hat die App am 30.07.2026 abgelehnt, weil dieser Hinweis fehlte. Die
-// Pruefung sucht nach den drei Woertern Rat, Diagnose und Behandlung — deshalb
-// steht der Satz hier EINMAL und wird nirgends umformuliert oder gekuerzt.
-export const HINWEIS = {
-  de: 'Kein Ersatz für ärztlichen Rat, keine Diagnose, keine Behandlung.',
-  en: 'Not a substitute for medical advice, diagnosis or treatment.',
-};
-
-/** Prueft den Hinweis so, wie es die Leitplanke im Orchestrator tut. */
-export function hinweisVollstaendig(text_, sprache = 'de') {
-  const woerter = sprache === 'de'
-    ? ['Rat', 'Diagnose', 'Behandlung']
-    : ['advice', 'diagnosis', 'treatment'];
-  return woerter.every((w) => new RegExp(`\\b${w}\\b`, 'i').test(text_));
-}
+// --- Kein Haftungshinweis in Social-Media-Beitraegen -------------------------
+// Hier stand bis zum 29.08.2026 der Satz „Kein Ersatz fuer aerztlichen Rat …".
+// Er ist ABSICHTLICH entfernt (Josefs Entscheidung), nicht vergessen.
+//
+// Der Hinweis ist eine Auflage fuer den STORE-EINTRAG: Google hat die App am
+// 30.07.2026 abgelehnt, weil er in der de-DE-Beschreibung fehlte, und die
+// Pruefung sucht dort nach den drei Woertern Rat, Diagnose und Behandlung.
+// Ein Instagram- oder TikTok-Beitrag ist kein Store-Listing.
+//
+// ⚠ In der App (MedicalDisclaimer.jsx), im Play-Text
+// (store-assets/play-listing.de-DE.json) und unter /legal/health bleibt er
+// unveraendert. Wer ihn DORT entfernt, holt die Ablehnung zurueck.
+//
+// Die Quellenangabe bleibt dagegen Pflicht — siehe quelleKurz() weiter unten.
 
 // --- Uebungen ---------------------------------------------------------------
 // ⚠ Zwei Uebungen tragen in src/data/exerciseDemos.js eine Zuordnung, die dem
