@@ -506,7 +506,7 @@ export default function TrainingPage() {
         {t('training.startWorkout')}
       </button>
 
-      {/* Two-tab layout: Meine Pläne / Peak-Programme */}
+      {/* Two-tab layout: Meine Pläne / Programme */}
       <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 mb-4">
         <button
           onClick={() => setView('myPlans')}
@@ -518,7 +518,7 @@ export default function TrainingPage() {
           onClick={() => setView('peakPrograms')}
           className="flex-1 py-2.5 rounded-lg text-sm font-semibold text-slate-500 dark:text-slate-400"
         >
-          Peak-{lang === 'de' ? 'Programme' : 'Programs'}
+          {lang === 'de' ? 'Programme' : 'Programs'}
         </button>
       </div>
 
