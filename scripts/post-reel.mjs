@@ -27,9 +27,10 @@
 // Der Fuss traegt die offiziellen Download-Badges, nicht einen Satz. Gezeigt
 // wird nur, was in STORES steht — beide Plattformen sind seit 29.08.2026 live.
 //
-// Der aerztliche Haftungshinweis steht hier bewusst NICHT (Josefs
-// Entscheidung): Er ist eine Auflage fuer den Store-Eintrag, nicht fuer
-// Social-Media-Beitraege. Die Quellenangabe bleibt.
+// Der aerztliche Haftungshinweis UND die Quellenangabe stehen hier bewusst
+// NICHT (Josefs Entscheidungen vom 29.08.2026). Beide sind Auflagen fuer den
+// STORE-EINTRAG, nicht fuer Social-Media-Beitraege. In der App, im Play-Text
+// und unter /legal/health bleiben sie unveraendert.
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
@@ -38,7 +39,7 @@ import { join } from 'node:path';
 import { chromium } from 'playwright';
 
 import {
-  WURZEL, uebungenMitFotos, uebungTexte, wissensthemen, quelleKurz,
+  WURZEL, uebungenMitFotos, uebungTexte, wissensthemen,
   WASSERZEICHEN_CSS, WASSERZEICHEN_HTML, trainingsFoto, FOTO_BEREICHE,
 } from './social-daten.mjs';
 
@@ -80,8 +81,8 @@ function mulberry32(s) {
 }
 
 const T = {
-  de: { quelle: 'Quelle', wiederholung: 'Wiederholung', fuss: 'FullRep · Training & Ernährung' },
-  en: { quelle: 'Source', wiederholung: 'Repetition', fuss: 'FullRep · Workout & Nutrition' },
+  de: { wiederholung: 'Wiederholung', fuss: 'FullRep · Training & Ernährung' },
+  en: { wiederholung: 'Repetition', fuss: 'FullRep · Workout & Nutrition' },
 }[LANG];
 
 const esc = (s) => String(s ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
@@ -99,7 +100,6 @@ if (FORMAT === 'uebung-loop') {
     art: 'uebung', schluessel: u.id, titel: t.name, unter: `${t.muskel} · ${t.geraet}`,
     beschreibung: t.beschreibung,
     fotos: u.fotos.map((f) => `data:image/jpeg;base64,${b64(f)}`),
-    quelle: null,
   };
 } else {
   const th = zieh(wissensthemen());
@@ -108,16 +108,10 @@ if (FORMAT === 'uebung-loop') {
   daten = {
     art: 'wissen', schluessel: th.id, titel: th.titel[LANG] ?? th.titel.de,
     unter: q.label, beschreibung: q.text, fotos: null,
-    quelle: quelleKurz(th.quellen[0]),
     // Wie bei der Karte: Trainings- und Supplementthemen bekommen ein echtes
     // Uebungsfoto dahinter, Ernaehrung und Blutwerte bleiben typografisch.
     autoFoto: FOTO_BEREICHE.has(th.bereich) ? trainingsFoto(w) : null,
   };
-}
-
-if (daten.art === 'wissen' && !daten.quelle) {
-  console.error(`✗ Belegte Aussage ohne Quelle (${daten.schluessel}). Apple 1.4.1.`);
-  process.exit(1);
 }
 
 // Uebungs-Loop: 4 Durchlaeufe à 1,6 s plus 1,2 s Auftakt und 2,4 s Abspann.
@@ -174,8 +168,6 @@ ${WASSERZEICHEN_CSS}
   border:1px solid rgba(251,191,36,.22);background:#141414}
 .buehne img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .text{font-size:34px;line-height:1.36;color:#e7e5e4}
-.quelle{font-size:24px;color:#a8a29e;border-left:3px solid rgba(251,191,36,.45);padding-left:18px}
-.quelle b{display:block;font-size:20px;letter-spacing:.16em;text-transform:uppercase;color:#fbbf24}
 .hinweis{font-size:22px;color:#a8a29e;line-height:1.4}
 .fuss{display:flex;justify-content:space-between;align-items:center;gap:20px;font-size:25px;
   color:#78716c;position:relative;z-index:3}
@@ -207,7 +199,7 @@ el.innerHTML = Z.fotos
     + '<div class="text">' + esc(Z.beschreibung) + '</div>'
   : '<div class="unter">' + esc(Z.unter) + '</div>'
     + '<div class="titel">' + esc(Z.beschreibung) + '</div>'
-    + '<div class="quelle"><b>' + esc(Z.T.quelle) + '</b>' + esc(Z.quelle) + '</div>';
+    + '';
 
 const f0 = document.getElementById('f0');
 const f1 = document.getElementById('f1');
@@ -278,8 +270,7 @@ writeFileSync(join(OUT, `${basis}.txt`),
 
 ## Caption (kopieren)
 
-${daten.titel}${daten.beschreibung ? `\n\n${daten.beschreibung}` : ''}${
-  daten.quelle ? `\n\n${T.quelle}: ${daten.quelle}` : ''}
+${daten.titel}${daten.beschreibung ? `\n\n${daten.beschreibung}` : ''}
 
 ## Hashtags
 
@@ -302,7 +293,6 @@ ${(daten.art === 'uebung'
 - Format: ${FORMAT} (${daten.art})
 - Inhaltsschluessel: ${daten.schluessel}
 - Laenge ${(GESAMT / FPS).toFixed(1)} s, Sprache ${LANG}
-${daten.quelle ? `- Quelle: ${daten.quelle}` : ''}
 `);
 
 console.log(`\n✓ ${ziel}`);
