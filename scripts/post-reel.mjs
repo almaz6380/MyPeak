@@ -39,6 +39,7 @@ import { chromium } from 'playwright';
 
 import {
   WURZEL, uebungenMitFotos, uebungTexte, wissensthemen, quelleKurz,
+  WASSERZEICHEN_CSS, WASSERZEICHEN_HTML, trainingsFoto, FOTO_BEREICHE,
 } from './social-daten.mjs';
 
 const require = createRequire(import.meta.url);
@@ -50,6 +51,10 @@ const LANG = arg('lang', 'de');
 const SEED = Number(arg('seed', 1));
 const NAME = arg('name', null);
 const OUT = join(WURZEL, arg('out', 'out/social'));
+const HINTERGRUND = arg('hintergrund', null);
+// KI-erzeugte Menschen im Bild → Wasserzeichen unten rechts. Echte Fotos
+// bekommen keines; das waere genauso falsch wie ein ungekennzeichnetes KI-Bild.
+const KI_MENSCHEN = process.argv.includes('--ki');
 
 const B = 1080, H = 1920, FPS = 30;
 const STORES = { ios: true, android: true };
@@ -104,6 +109,9 @@ if (FORMAT === 'uebung-loop') {
     art: 'wissen', schluessel: th.id, titel: th.titel[LANG] ?? th.titel.de,
     unter: q.label, beschreibung: q.text, fotos: null,
     quelle: quelleKurz(th.quellen[0]),
+    // Wie bei der Karte: Trainings- und Supplementthemen bekommen ein echtes
+    // Uebungsfoto dahinter, Ernaehrung und Blutwerte bleiben typografisch.
+    autoFoto: FOTO_BEREICHE.has(th.bereich) ? trainingsFoto(w) : null,
   };
 }
 
@@ -130,7 +138,14 @@ function baueHtml() {
     ...daten, AUFTAKT, ZYKLUS, ZYKLEN, ABSPANN, GESAMT, T,
   }).replace(/</g, '\\u003c');
 
-  return `<!doctype html><meta charset="utf-8"><style>
+  const hgPfad = HINTERGRUND ?? daten.autoFoto ?? null;
+  const hg = hgPfad && existsSync(hgPfad)
+    ? `<div class="hgFoto" style="background-image:url(data:image/jpeg;base64,${b64(hgPfad)})"></div>
+       <div class="hgSchleier"></div>`
+    : '';
+  const kiMarke = KI_MENSCHEN ? (WASSERZEICHEN_HTML[LANG] ?? WASSERZEICHEN_HTML.de) : '';
+
+  return `<!doctype html><meta charset="utf-8"><body class="${KI_MENSCHEN ? 'mitKi' : ''}"><style>
 @font-face{font-family:'Inter';font-weight:400;src:url(data:font/woff2;base64,${font400}) format('woff2')}
 @font-face{font-family:'Inter';font-weight:700;src:url(data:font/woff2;base64,${font700}) format('woff2')}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -138,6 +153,14 @@ html,body{width:${B}px;height:${H}px;overflow:hidden}
 body{font-family:'Inter',system-ui,sans-serif;color:#fef3c7;
   background:radial-gradient(120% 70% at 20% 0%,#1a1a1a 0%,#0a0a0a 60%);
   display:flex;flex-direction:column;padding:70px 64px;position:relative}
+/* Foto ganz hinten, darueber ein Schleier — sonst ist der Text ueber einem
+   hellen Bild nicht lesbar. */
+.hgFoto{position:absolute;inset:0;background-size:cover;background-position:center;
+  filter:saturate(.86)}
+.hgSchleier{position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(10,10,10,.80) 0%,rgba(10,10,10,.60) 40%,
+    rgba(10,10,10,.88) 80%,rgba(10,10,10,.95) 100%)}
+${WASSERZEICHEN_CSS}
 .ring{position:absolute;width:900px;height:900px;border-radius:50%;
   border:1px solid rgba(251,191,36,.1);right:-320px;top:-240px}
 .kopf{display:flex;align-items:center;gap:16px;z-index:3;position:relative}
@@ -156,17 +179,21 @@ body{font-family:'Inter',system-ui,sans-serif;color:#fef3c7;
 .hinweis{font-size:22px;color:#a8a29e;line-height:1.4}
 .fuss{display:flex;justify-content:space-between;align-items:center;gap:20px;font-size:25px;
   color:#78716c;position:relative;z-index:3}
+/* Traegt der Post ein KI-Wasserzeichen, rueckt der Fuss hoch — sonst stossen
+   Store-Badge und Plaettchen in der Ecke aneinander. */
+body.mitKi .fuss{margin-bottom:40px}
 /* Badges nie verzerren — feste Hoehe, Breite folgt dem 3:1-Verhaeltnis. */
 .badges{display:flex;gap:14px;align-items:center;flex:0 0 auto}
 .badges img{height:62px;width:auto;display:block}
 .balken{position:absolute;left:0;top:0;height:6px;background:#fbbf24;z-index:5}
 </style>
 <div class="balken" id="balken"></div>
-<div class="ring"></div>
+${hg}<div class="ring"></div>
 <div class="kopf"><img src="data:image/svg+xml;base64,${logo}"><span>FULLREP</span></div>
 <div class="mitte" id="mitte"></div>
 <div class="fuss"><span>${esc(T.fuss)}</span>
   <span class="badges">${storeBadges().map((b) => `<img src="${b}" alt="">`).join('')}</span></div>
+${kiMarke}
 <script>
 const Z = ${zustand};
 const el = document.getElementById('mitte');
@@ -269,6 +296,9 @@ ${(daten.art === 'uebung'
 
 ## Inhalt
 
+- Medienherkunft: ${KI_MENSCHEN ? 'ki-menschen (Wasserzeichen gesetzt)'
+  : (HINTERGRUND ?? daten.autoFoto) ? 'echtes Foto (free-exercise-db, Public Domain)'
+  : 'nur Typografie'}
 - Format: ${FORMAT} (${daten.art})
 - Inhaltsschluessel: ${daten.schluessel}
 - Laenge ${(GESAMT / FPS).toFixed(1)} s, Sprache ${LANG}

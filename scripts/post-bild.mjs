@@ -33,6 +33,7 @@ import { chromium } from 'playwright';
 
 import {
   WURZEL, uebungenMitFotos, uebungTexte, wissensthemen, quelleKurz, rezepteMitMakros,
+  WASSERZEICHEN_CSS, WASSERZEICHEN_HTML, trainingsFoto, FOTO_BEREICHE,
 } from './social-daten.mjs';
 
 const arg = (n, s) => { const i = process.argv.indexOf(`--${n}`); return i === -1 ? s : process.argv[i + 1]; };
@@ -41,6 +42,11 @@ const LANG = arg('lang', 'de');
 const SEED = Number(arg('seed', 1));
 const NAME = arg('name', null);
 const OUT = join(WURZEL, arg('out', 'out/social'));
+// Hintergrundfoto. --ki sagt: darauf sind KI-erzeugte Menschen — dann traegt
+// der Post das AI-Wasserzeichen. Ohne --ki bleibt es weg; ein echtes Foto
+// faelschlich zu kennzeichnen waere genauso falsch wie ein KI-Bild nicht.
+const HINTERGRUND = arg('hintergrund', null);
+const KI_MENSCHEN = process.argv.includes('--ki');
 
 const B = 1080, H = 1350;
 
@@ -127,6 +133,12 @@ function inhalt(format, w) {
     augenbraue: q.label || T.wissen,
     haken: q.text, text: null,
     quelle: quelleKurz(th.quellen[0]),
+    // Trainingsthemen bekommen ein echtes Uebungsfoto in den Hintergrund —
+    // sonst sieht der Kanal aus wie eine Folge schwarzer Textkacheln.
+    // Ernaehrung, Supplemente und Blutwerte bleiben typografisch: dafuer
+    // gibt es im Repo kein passendes Bild, und ein beliebiges waere schlechter
+    // als keines.
+    autoFoto: FOTO_BEREICHE.has(th.bereich) ? trainingsFoto(w) : null,
   };
 }
 
@@ -153,7 +165,14 @@ function baueHtml(o) {
 
 
 
-  return `<!doctype html><meta charset="utf-8"><style>
+  const hgPfad = HINTERGRUND ?? o.autoFoto ?? null;
+  const hg = hgPfad && existsSync(hgPfad)
+    ? `<div class="hgFoto" style="background-image:url(data:image/jpeg;base64,${b64(hgPfad)})"></div>
+       <div class="hgSchleier"></div>`
+    : '';
+  const kiMarke = KI_MENSCHEN ? (WASSERZEICHEN_HTML[LANG] ?? WASSERZEICHEN_HTML.de) : '';
+
+  return `<!doctype html><meta charset="utf-8"><body class="${KI_MENSCHEN ? 'mitKi' : ''}"><style>
 @font-face{font-family:'Inter';font-weight:400;src:url(data:font/woff2;base64,${font400}) format('woff2')}
 @font-face{font-family:'Inter';font-weight:700;src:url(data:font/woff2;base64,${font700}) format('woff2')}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -162,6 +181,15 @@ body{font-family:'Inter',system-ui,sans-serif;color:#fef3c7;
   /* Dunkelmodus ist bei FullRep der Standard — Gold auf Fast-Schwarz. */
   background:radial-gradient(120% 80% at 15% 0%,#1a1a1a 0%,#0a0a0a 62%);
   display:flex;flex-direction:column;padding:64px;position:relative}
+/* Foto ganz hinten, darueber ein Schleier — sonst ist der Text ueber einem
+   hellen Bild nicht mehr lesbar. Der Verlauf ist unten dichter, weil dort
+   Quelle und Badges stehen. */
+.hgFoto{position:absolute;inset:0;background-size:cover;background-position:center;
+  filter:saturate(.86)}
+.hgSchleier{position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(10,10,10,.80) 0%,rgba(10,10,10,.62) 38%,
+    rgba(10,10,10,.86) 78%,rgba(10,10,10,.94) 100%)}
+${WASSERZEICHEN_CSS}
 .ring{position:absolute;width:760px;height:760px;border-radius:50%;
   border:1px solid rgba(251,191,36,.12);right:-260px;top:-200px}
 .ring2{position:absolute;width:520px;height:520px;border-radius:50%;
@@ -193,12 +221,15 @@ p.text{font-size:34px;line-height:1.38;color:#e7e5e4;font-weight:400}
 .quelle span{display:block;font-size:19px;letter-spacing:.16em;text-transform:uppercase;color:#fbbf24;font-weight:700}
 .hinweis{font-size:21px;line-height:1.4;color:#a8a29e}
 .fuss{display:flex;justify-content:space-between;align-items:center;gap:20px;font-size:23px;color:#78716c}
+/* Traegt der Post ein KI-Wasserzeichen, rueckt der Fuss hoch — sonst stossen
+   Store-Badge und Plaettchen in der Ecke aneinander. */
+body.mitKi .fuss{margin-bottom:40px}
 /* Badges nie verzerren — Apple und Google geben die Form vor. Feste Hoehe,
    Breite folgt dem 3:1-Verhaeltnis von selbst. */
 .badges{display:flex;gap:14px;align-items:center;flex:0 0 auto}
 .badges img{height:58px;width:auto;display:block}
 </style>
-<div class="ring"></div><div class="ring2"></div>
+${hg}<div class="ring"></div><div class="ring2"></div>
 <div class="kopf"><img src="data:image/svg+xml;base64,${logo}"><span>FULLREP</span></div>
 <div class="inhalt">
   <div class="marke">${esc(o.marke)}</div>
@@ -211,7 +242,8 @@ p.text{font-size:34px;line-height:1.38;color:#e7e5e4;font-weight:400}
 </div>
 <div class="fuss"><span>${T.fuss}</span>
   <span class="badges">${storeBadges().map((b) =>
-    `<img src="${b}" alt="">`).join('')}</span></div>`;
+    `<img src="${b}" alt="">`).join('')}</span></div>
+${kiMarke}`;
 }
 
 // --- Lauf -------------------------------------------------------------------
@@ -262,6 +294,9 @@ ${tags.map((h) => `#${h}`).join(' ')}
 
 ## Inhalt
 
+- Medienherkunft: ${KI_MENSCHEN ? 'ki-menschen (Wasserzeichen gesetzt)'
+  : (HINTERGRUND ?? o.autoFoto) ? 'echtes Foto (free-exercise-db, Public Domain)'
+  : 'nur Typografie'}
 - Format: ${FORMAT} (${o.art})
 - Inhaltsschluessel: ${o.schluessel}
 - Sprache: ${LANG}

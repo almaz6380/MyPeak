@@ -52,6 +52,39 @@ export function text(schluessel, sprache = 'de') {
 //
 // Die Quellenangabe bleibt dagegen Pflicht — siehe quelleKurz() weiter unten.
 
+// --- KI-Wasserzeichen -------------------------------------------------------
+// Wo KI-erzeugte MENSCHEN im Bild sind, traegt der Post unten rechts ein
+// kleines „AI". Josefs Regel vom 29.08.2026, und sie ist gut begruendet:
+//
+//   · Meta und TikTok verlangen die Kennzeichnung realistischer KI-Inhalte
+//     ohnehin. Wer sie selbst setzt, bestimmt, wie sie aussieht — sonst
+//     klebt die Plattform ihr eigenes Label darueber.
+//   · Der EU AI Act (Art. 50) verlangt ab 2026 Transparenz bei
+//     KI-erzeugten Bild-, Ton- und Videoinhalten.
+//   · Und es kostet nichts an Wirkung: Wer Trainingswissen mit Belegen
+//     ausspielt, gewinnt durch Ehrlichkeit, nicht durch Verschleierung.
+//
+// ⚠ Es gilt fuer KI-erzeugte MENSCHEN. Echte Fotos brauchen es nicht — die
+// 177 Uebungsfotos stammen aus der free-exercise-db und zeigen echte
+// Personen. Ein Wasserzeichen darauf waere schlicht falsch.
+//
+// Das dunkle, halbdurchsichtige Plaettchen liegt bewusst NICHT auf weissem
+// Grund: Es muss sowohl ueber einem hellen Foto als auch auf dem dunklen
+// Kartenhintergrund lesbar bleiben.
+export const WASSERZEICHEN_CSS = `
+.kiMarke{position:absolute;right:22px;bottom:16px;z-index:9;
+  display:flex;align-items:center;gap:7px;
+  padding:7px 13px;border-radius:9px;
+  background:rgba(10,10,10,.62);border:1px solid rgba(255,255,255,.28);
+  backdrop-filter:blur(6px)}
+.kiMarke b{font-size:21px;font-weight:700;letter-spacing:.1em;color:#fff;line-height:1}
+.kiMarke span{font-size:15px;color:rgba(255,255,255,.72);line-height:1}`;
+
+export const WASSERZEICHEN_HTML = {
+  de: '<div class="kiMarke"><b>AI</b><span>KI-Bild</span></div>',
+  en: '<div class="kiMarke"><b>AI</b><span>AI image</span></div>',
+};
+
 // --- Uebungen ---------------------------------------------------------------
 // ⚠ Zwei Uebungen tragen in src/data/exerciseDemos.js eine Zuordnung, die dem
 // eigenen `equipment`-Feld widerspricht: `step-up-weighted` ist als
@@ -85,6 +118,34 @@ export function uebungTexte(u, sprache = 'de') {
     geraet: text(`equipment.${u.equipment}`, sprache) ?? u.equipment,
   };
 }
+
+/**
+ * Ein Uebungsfoto als Hintergrund — echte Athleten, Public Domain, gratis.
+ *
+ * ⚠ Nur fuer TRAININGS-Inhalte. Ein Kniebeugenfoto hinter einem Rezept oder
+ * einem Blutwert waere beliebige Dekoration; das faellt auf und wirkt billig.
+ * Fuer Ernaehrung und Blutwerte gibt es im Repo (noch) kein passendes
+ * Bildmaterial — diese Karten bleiben deshalb typografisch, bis welches da ist.
+ */
+export function trainingsFoto(wuerfel) {
+  const u = uebungenMitFotos().filter((x) => x.type === 'strength' || x.type === 'hiit');
+  if (!u.length) return null;
+  const gewaehlt = u[Math.floor(wuerfel() * u.length)];
+  // Das zweite Foto ist die Endposition — dort ist die Bewegung sichtbar,
+  // das gibt das bessere Standbild.
+  return gewaehlt.fotos[1] ?? gewaehlt.fotos[0];
+}
+
+/**
+ * Bereiche, in denen ein Trainingsfoto inhaltlich passt.
+ *
+ * `training` und `supplements` drehen sich beide um Leistung im Gym — dort
+ * traegt das Bild den Inhalt. `nutrition` und `bloodwork` nicht: Ein
+ * Kniebeugenfoto hinter einem Blutwert oder einem Rezept ist Dekoration, und
+ * das faellt auf. Die beiden bleiben typografisch, bis passendes Bildmaterial
+ * da ist.
+ */
+export const FOTO_BEREICHE = new Set(['training', 'supplements']);
 
 // --- Wissen -----------------------------------------------------------------
 // quickDE/quickEN sind Arrays aus {label, text} — fertige Zitatkarten.
