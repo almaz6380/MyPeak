@@ -12,6 +12,13 @@ i18n.use(initReactI18next).init({
   },
   lng: savedLanguage,
   fallbackLng: 'de',
+  // Nur ein Namespace — ':' in dynamischen Strings (z. B. Custom-Übungsnamen)
+  // darf nie als Namespace-Trenner interpretiert werden.
+  nsSeparator: false,
+  // Eigene Übungen tragen nameKey '__custom__<Name>'. Der Key existiert nie in
+  // den Locales — statt ihn roh anzuzeigen, überall den Klarnamen liefern.
+  parseMissingKeyHandler: (key) =>
+    typeof key === 'string' && key.startsWith('__custom__') ? key.slice('__custom__'.length) : key,
   interpolation: {
     escapeValue: false,
   },

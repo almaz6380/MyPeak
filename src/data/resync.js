@@ -19,6 +19,7 @@ export async function syncLocalDataToCloud(userId) {
   try {
     await syncWorkouts(userId);
     await syncCustomPlans(userId);
+    await syncWeeklySchedules(userId);
     await syncCustomExercises(userId);
     await syncNutritionEntries(userId);
     await syncCustomMeals(userId);
@@ -78,6 +79,37 @@ async function syncCustomPlans(userId) {
   const current = readJson('customPlans', []).filter((p) => !localIds.has(p.id));
   const cloudRows = data.map((row) => ({ id: row.id, name: row.name, days: row.days }));
   localStorage.setItem('customPlans', JSON.stringify([...cloudRows, ...current]));
+}
+
+async function syncWeeklySchedules(userId) {
+  const cached = readJson('weekly_schedules', []);
+  const locals = cached.filter((s) => isLocal(s.id));
+  if (!locals.length) return;
+
+  // Bringt ein lokaler Plan is_active mit, zuerst die Cloud-Pläne des Kontos
+  // deaktivieren — sonst stehen nach dem Merge zwei aktive Zeilen in der Tabelle
+  // und getActiveSchedule wird nichtdeterministisch.
+  if (locals.some((s) => s.is_active)) {
+    const { error } = await supabase
+      .from('weekly_schedules')
+      .update({ is_active: false })
+      .eq('user_id', userId);
+    if (error) return;
+  }
+
+  const rows = locals.map((s) => ({
+    user_id: userId,
+    name: s.name,
+    sessions_per_week: s.sessions_per_week,
+    days: s.days,
+    is_active: !!s.is_active,
+  }));
+  const { data, error } = await supabase.from('weekly_schedules').insert(rows).select();
+  if (error || !data) return;
+
+  const localIds = new Set(locals.map((s) => s.id));
+  const current = readJson('weekly_schedules', []).filter((s) => !localIds.has(s.id));
+  localStorage.setItem('weekly_schedules', JSON.stringify([...data, ...current]));
 }
 
 async function syncCustomExercises(userId) {

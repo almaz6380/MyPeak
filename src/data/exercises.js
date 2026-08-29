@@ -308,10 +308,51 @@ export function getExercisesByType(type) {
   return exercises.filter((e) => (e.type || 'strength') === type);
 }
 
+// Eigene Übungen (localStorage 'custom_exercises') als Exercise-Objekte.
+// Raw-String-Cache: getExerciseById läuft in Hot-Loops (useMuscleHeatmap,
+// achievements) — nur bei geändertem localStorage-Inhalt neu parsen.
+let _customRaw = null;
+let _customParsed = [];
+
+export function getCustomExercisesAsExercises() {
+  try {
+    const raw = localStorage.getItem('custom_exercises');
+    if (raw !== _customRaw) {
+      _customRaw = raw;
+      const list = raw ? JSON.parse(raw) : [];
+      _customParsed = list.map((ce) => ({
+        id: ce.exercise_id || ce.id,
+        type: 'strength',
+        muscleGroup: ce.muscle_group || 'chest',
+        equipment: ce.equipment || 'bodyweight',
+        nameKey: `__custom__${ce.name}`,
+        descKey: '',
+        _customName: ce.name,
+        _isCustom: true,
+      }));
+    }
+  } catch {
+    _customParsed = [];
+  }
+  return _customParsed;
+}
+
 export function getExerciseById(id) {
-  const found = exercises.find((e) => e.id === id);
+  const found = exercises.find((e) => e.id === id)
+    || getCustomExercisesAsExercises().find((e) => e.id === id);
   if (!found && import.meta.env.DEV) {
     console.warn(`[exercises] Unbekannte Übungs-ID: "${id}"`);
   }
   return found;
+}
+
+// Anzeigename an einer Stelle: Katalog-Übungen via t(nameKey),
+// eigene Übungen über ihren Klarnamen (nie den '__custom__'-Key übersetzen).
+export function getExerciseDisplayName(ex, t) {
+  if (!ex) return '';
+  if (ex._customName) return ex._customName;
+  if (typeof ex.nameKey === 'string' && ex.nameKey.startsWith('__custom__')) {
+    return ex.nameKey.slice('__custom__'.length);
+  }
+  return ex.nameKey ? t(ex.nameKey) : (ex.name || ex.id || '');
 }

@@ -567,28 +567,30 @@ export async function getActiveSchedule(userId) {
   return schedules.find((s) => s.is_active) || null;
 }
 
-export async function saveWeeklySchedule(userId, schedule) {
+export async function saveWeeklySchedule(userId, schedule, { activate = true } = {}) {
   const entry = {
     user_id: userId,
     name: schedule.name,
     sessions_per_week: schedule.sessions_per_week,
     days: schedule.days,
-    is_active: true,
+    is_active: activate,
   };
 
-  // Deactivate other schedules in localStorage
-  const cached = JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]').map((s) => ({ ...s, is_active: false }));
+  // Andere Pläne nur deaktivieren, wenn der neue aktiv werden soll
+  const cached = JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]')
+    .map((s) => (activate ? { ...s, is_active: false } : s));
   const localEntry = { ...entry, id: `local_${Date.now()}`, created_at: new Date().toISOString() };
   cached.unshift(localEntry);
   localStorage.setItem(SCHEDULE_KEY, JSON.stringify(cached));
 
   if (!isGuest(userId)) {
     try {
-      // Deactivate all existing
-      await supabase
-        .from('weekly_schedules')
-        .update({ is_active: false })
-        .eq('user_id', userId);
+      if (activate) {
+        await supabase
+          .from('weekly_schedules')
+          .update({ is_active: false })
+          .eq('user_id', userId);
+      }
 
       const { data } = await supabase
         .from('weekly_schedules')
@@ -609,6 +611,65 @@ export async function saveWeeklySchedule(userId, schedule) {
   }
 
   return { data: localEntry, error: null };
+}
+
+// In-place-Update eines Wochenplans — erhält id, created_at und is_active
+// (kein delete+reinsert mehr; damit überlebt auch days._meta von Peak-Programmen).
+export async function updateWeeklySchedule(userId, scheduleId, updates) {
+  const fields = {
+    name: updates.name,
+    sessions_per_week: updates.sessions_per_week,
+    days: updates.days,
+  };
+
+  const cached = JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]');
+  const idx = cached.findIndex((s) => s.id === scheduleId);
+  let merged = null;
+  if (idx >= 0) {
+    merged = { ...cached[idx], ...fields };
+    cached[idx] = merged;
+    localStorage.setItem(SCHEDULE_KEY, JSON.stringify(cached));
+  }
+
+  if (!isGuest(userId) && !String(scheduleId).startsWith('local_')) {
+    try {
+      await supabase
+        .from('weekly_schedules')
+        .update(fields)
+        .eq('id', scheduleId)
+        .eq('user_id', userId);
+    } catch (err) {
+      console.error('Failed to update weekly schedule:', err);
+    }
+  }
+
+  return { data: merged, error: null };
+}
+
+// Bestehenden Plan aktivieren: is_active flippen statt neu einzufügen
+// (der alte Weg über saveWeeklySchedule erzeugte bei jedem Aktivieren ein Duplikat).
+export async function setActiveSchedule(userId, scheduleId) {
+  const cached = JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]')
+    .map((s) => ({ ...s, is_active: s.id === scheduleId }));
+  localStorage.setItem(SCHEDULE_KEY, JSON.stringify(cached));
+
+  if (!isGuest(userId)) {
+    try {
+      await supabase
+        .from('weekly_schedules')
+        .update({ is_active: false })
+        .eq('user_id', userId);
+      if (!String(scheduleId).startsWith('local_')) {
+        await supabase
+          .from('weekly_schedules')
+          .update({ is_active: true })
+          .eq('id', scheduleId)
+          .eq('user_id', userId);
+      }
+    } catch (err) {
+      console.error('Failed to activate weekly schedule:', err);
+    }
+  }
 }
 
 // Programm/Plan „beenden": deaktivieren (nicht löschen) — der Plan bleibt in
@@ -635,7 +696,7 @@ export async function deleteWeeklySchedule(userId, scheduleId) {
 
   if (!isGuest(userId) && !scheduleId.startsWith('local_')) {
     try {
-      await supabase.from('weekly_schedules').delete().eq('id', scheduleId);
+      await supabase.from('weekly_schedules').delete().eq('id', scheduleId).eq('user_id', userId);
     } catch (err) {
       console.error('Failed to delete weekly schedule:', err);
     }
