@@ -220,7 +220,16 @@ function baueHtml(o, stil) {
   if (stil === 'mix') {
     // Der Dreiklang. Aufhaenger wechselt nach Seed, Ueberschrift skaliert nach
     // Laenge, der Studienblock faellt weg, wenn es keinen Wert gibt.
-    const auge = AUFHAENGER[SEED % AUFHAENGER.length];
+    //
+    // ⚠ Der wechselnde Aufhaenger gilt NUR fuer Wissen und Studien. Ueber
+    // einer Uebungskarte stand sonst „Was die Forschung sagt" ueber einer
+    // reinen Bewegungsbeschreibung — das behauptet eine Studienaussage, die es
+    // nicht gibt, und beschaedigt genau das Vertrauen, von dem dieser Kanal
+    // lebt. Uebung und Rezept tragen deshalb ihre eigene, sachliche Zeile:
+    // bei der Uebung die Muskelgruppe, beim Rezept das Wort „Rezept".
+    const auge = o.art === 'uebung' ? (o.marke ?? T.uebung)
+      : o.art === 'rezept' ? T.rezept
+      : AUFHAENGER[SEED % AUFHAENGER.length];
     const kurz = o.art === 'wissen' ? o.marke : o.haken;
     const lang = o.art === 'wissen' ? o.haken : o.text;
     const wert = o.studienwert ?? null;
@@ -264,7 +273,9 @@ function baueHtml(o, stil) {
         ${o.haken ? `<p class="text">${esc(o.haken)}</p>` : ''}
       </div>`;
   } else {
-    const fotos = o.fotos
+    // `o.fotos?.length`, nicht `o.fotos`: Das Array ist heute leer, und ein
+    // leeres Array ist wahr — sonst stuende hier ein leerer Rahmen im Layout.
+    const fotos = o.fotos?.length
       ? `<div class="fotos">${o.fotos.map((f, i) => `
           <figure><img src="data:image/jpeg;base64,${b64(f)}">
           <figcaption>${i === 0 ? T.start : T.ende}</figcaption></figure>`).join('')}</div>`
@@ -413,6 +424,15 @@ if (stil === 'zahl' && !o.zahl) {
   stil = 'premium';
 }
 
+// `premium` baut bei einer Uebungskarte ein Raster aus Start- und Endfoto.
+// Seit die Demofotos nicht mehr in Werbung gehen (30.08.2026), ist das Raster
+// leer — und die untere Bildhaelfte bliebe schlicht schwarz. `mix` setzt
+// dieselben Angaben typografisch und fuellt die Flaeche.
+if (stil === 'premium' && o.art === 'uebung' && !o.fotos?.length) {
+  console.log('  (keine Fotos zur Uebung — Stil faellt auf `mix` zurueck)');
+  stil = 'mix';
+}
+
 mkdirSync(OUT, { recursive: true });
 const basis = NAME ?? `fullrep-${FORMAT}-${stil}-${LANG}-s${SEED}`;
 const ziel = join(OUT, `${basis}.jpg`);
@@ -434,7 +454,10 @@ const tags = {
     'muskelaufbau', 'fitnesstips'],
 }[o.art] ?? ['fullrep', 'fitness', 'training', 'gym'];
 
-const hatFoto = Boolean(HINTERGRUND ?? o.autoFoto ?? o.fotos);
+// ⚠ `o.fotos` ist seit dem 30.08.2026 ein LEERES Array, kein null — und ein
+// leeres Array ist wahr. Ohne die Laengenpruefung stuende im Beiblatt „echtes
+// Foto" ueber einer rein typografischen Karte.
+const hatFoto = Boolean(HINTERGRUND ?? o.autoFoto ?? o.fotos?.length);
 
 writeFileSync(join(OUT, `${basis}.txt`),
 `# ${basis}.jpg
@@ -456,7 +479,8 @@ ${tags.map((h) => `#${h}`).join(' ')}
 ## Inhalt
 
 - Medienherkunft: ${KI_MENSCHEN ? 'ki-menschen (Wasserzeichen gesetzt)'
-  : hatFoto ? 'echtes Foto (free-exercise-db, Public Domain)' : 'nur Typografie'}
+  : hatFoto ? 'Foto aus store-assets/social/fotos (Herkunft siehe HERKUNFT.md)'
+  : 'nur Typografie'}
 - Stil: ${stil}${stil !== STIL ? ` (angefordert war ${STIL})` : ''}
 - Format: ${FORMAT} (${o.art})
 - Inhaltsschluessel: ${o.schluessel}

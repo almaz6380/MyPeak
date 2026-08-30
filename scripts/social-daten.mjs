@@ -6,11 +6,34 @@
 // zweiten Zuordnung (exerciseDemos.js → free-exercise-db-Ordner). Beides an
 // einem Ort aufzuloesen ist billiger, als es in jedem Generator zu wiederholen.
 //
-// Die Fotos unter public/exercise-demos/ stammen aus der free-exercise-db
-// (github.com/yuhonas/free-exercise-db) und sind PUBLIC DOMAIN — fuer Social
-// Media unbedenklich. Steht so im Kopf von src/data/exerciseDemos.js.
+// ⚠ ZU DEN FOTOS UNTER public/exercise-demos/ — HIER STAND EINE FALSCHE ZUSAGE.
+//
+// Frueher stand an dieser Stelle: „stammen aus der free-exercise-db und sind
+// PUBLIC DOMAIN — fuer Social Media unbedenklich. Steht so im Kopf von
+// src/data/exerciseDemos.js." Der zweite Satz stimmt, der erste ist damit nicht
+// belegt: exerciseDemos.js ist unsere EIGENE Notiz. Sie als Beleg zu nehmen ist
+// ein Zirkelschluss.
+//
+// Nachgeprueft am 30.08.2026:
+//   yuhonas/free-exercise-db  LICENSE.md = Unlicense, kein Wort zur Herkunft
+//                             der FOTOS.
+//   wrkout/exercises.json     (die Quelle davor) ebenfalls Unlicense, nennt
+//                             ebenfalls keinen Fotografen und keine Quelle.
+//   Die Dateien selbst        480x320, progressives JPEG, EXIF OHNE
+//                             Copyright-Feld — der Fussabdruck eines Scrapes.
+//   Issue #2 „License of Images?" und Issue #12 stellen genau diese Frage.
+//                             Beide sind seit Jahren unbeantwortet.
+//
+// Die Unlicense ist die Erklaerung eines WEITERVERTEILERS, keine dokumentierte
+// Rechtekette — sie uebertraegt keine Rechte, die der Erklaerende nie hatte.
+//
+// In der App bleiben die Fotos (seit dem Launch drin, bestehendes Risiko).
+// In WERBUNG gehen sie nicht: Social Media ist kommerzielle Bewerbung mit
+// Bilderkennung auf der Gegenseite. Deshalb ist FOTO_BEREICHE leer — siehe
+// dort. uebungenMitFotos() bleibt bestehen, weil es die Uebungsauswahl traegt;
+// nur die Fotos daraus landen nicht mehr im Post.
 
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -98,16 +121,25 @@ export const WASSERZEICHEN_HTML = {
 // uebersprungen, statt sie stillschweigend zu posten.
 const FALSCHE_ZUORDNUNG = new Set(['step-up-weighted', 'reverse-wrist-curl']);
 
-/** Nur Uebungen, zu denen wirklich zwei Fotos auf der Platte liegen. */
+/**
+ * Die Uebungen, die sich fuer einen Post eignen.
+ *
+ * Die Demo-Zuordnung dient hier nur noch als QUALITAETSFILTER: Wer ein
+ * Demo-Foto hat, ist eine gaengige, gut beschriebene Uebung — genau die will
+ * man posten. Die BILDPFADE gibt die Funktion bewusst NICHT mehr heraus
+ * (`fotos: []`), weil ihre Rechtekette nicht belegt ist; siehe Dateikopf.
+ *
+ * Der Name bleibt, damit die vier Aufrufstellen in post-bild.mjs und
+ * post-reel.mjs unveraendert weiterlaufen. Die Karten werden dadurch
+ * typografisch statt bebildert — sie fallen nicht aus.
+ */
 export function uebungenMitFotos() {
   return exercises
     .filter((u) => exerciseDemos[u.id] && !FALSCHE_ZUORDNUNG.has(u.id))
-    .map((u) => {
-      const ordner = exerciseDemos[u.id];
-      const fotos = [0, 1].map((n) => join(WURZEL, 'public', 'exercise-demos', ordner, `${n}.jpg`));
-      return { ...u, ordner, fotos };
-    })
-    .filter((u) => u.fotos.every((f) => existsSync(f)));
+    .filter((u) => [0, 1].every((n) => existsSync(
+      join(WURZEL, 'public', 'exercise-demos', exerciseDemos[u.id], `${n}.jpg`),
+    )))
+    .map((u) => ({ ...u, ordner: exerciseDemos[u.id], fotos: [] }));
 }
 
 export function uebungTexte(u, sprache = 'de') {
@@ -120,32 +152,48 @@ export function uebungTexte(u, sprache = 'de') {
 }
 
 /**
- * Ein Uebungsfoto als Hintergrund — echte Athleten, Public Domain, gratis.
+ * Ein Foto als Hintergrund — aus `store-assets/social/fotos/`, NICHT aus
+ * `public/exercise-demos/`.
+ *
+ * Der Ordner ist heute leer, deshalb gibt die Funktion null zurueck und die
+ * Karten laufen typografisch. Das ist Absicht: Lieber kein Foto als eines,
+ * dessen Rechtekette niemand belegen kann (Begruendung im Dateikopf).
+ *
+ * Wer ihn fuellt, legt daneben ein HERKUNFT.md an — je Datei Modell, Prompt,
+ * Datum, Kosten. Zeigt ein Bild KI-erzeugte MENSCHEN, muss der Generator mit
+ * `--ki` laufen; die Leitplanke `ki-wasserzeichen` in
+ * anigosha/tools/social/vorflug.mjs verwirft den Post sonst.
  *
  * ⚠ Nur fuer TRAININGS-Inhalte. Ein Kniebeugenfoto hinter einem Rezept oder
  * einem Blutwert waere beliebige Dekoration; das faellt auf und wirkt billig.
- * Fuer Ernaehrung und Blutwerte gibt es im Repo (noch) kein passendes
- * Bildmaterial — diese Karten bleiben deshalb typografisch, bis welches da ist.
  */
+export const SOCIAL_FOTOS = join(WURZEL, 'store-assets', 'social', 'fotos');
+
 export function trainingsFoto(wuerfel) {
-  const u = uebungenMitFotos().filter((x) => x.type === 'strength' || x.type === 'hiit');
+  if (!existsSync(SOCIAL_FOTOS)) return null;
+  const u = readdirSync(SOCIAL_FOTOS)
+    .filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
+    .sort()
+    .map((f) => ({ fotos: [join(SOCIAL_FOTOS, f)] }));
   if (!u.length) return null;
-  const gewaehlt = u[Math.floor(wuerfel() * u.length)];
-  // Das zweite Foto ist die Endposition — dort ist die Bewegung sichtbar,
-  // das gibt das bessere Standbild.
-  return gewaehlt.fotos[1] ?? gewaehlt.fotos[0];
+  return u[Math.floor(wuerfel() * u.length)].fotos[0];
 }
 
 /**
- * Bereiche, in denen ein Trainingsfoto inhaltlich passt.
+ * Bereiche, in denen ein Foto inhaltlich passt.
  *
- * `training` und `supplements` drehen sich beide um Leistung im Gym — dort
- * traegt das Bild den Inhalt. `nutrition` und `bloodwork` nicht: Ein
- * Kniebeugenfoto hinter einem Blutwert oder einem Rezept ist Dekoration, und
- * das faellt auf. Die beiden bleiben typografisch, bis passendes Bildmaterial
- * da ist.
+ * ⚠ HEUTE LEER, und das ist kein Versehen. Solange in
+ * `store-assets/social/fotos/` nichts liegt, dessen Rechtekette wir belegen
+ * koennen, laufen ALLE Karten typografisch (Stile `mix`, `poster`, `zahl`) —
+ * genau wie bei Anigosha. Es faellt dadurch kein Post aus, es fehlt nur das
+ * Foto. Begruendung im Dateikopf.
+ *
+ * Sobald belegtes Material da ist, kommen `training` und `supplements` zurueck:
+ * Beide drehen sich um Leistung im Gym, dort traegt das Bild den Inhalt.
+ * `nutrition` und `bloodwork` bleiben draussen — ein Kniebeugenfoto hinter
+ * einem Blutwert ist Dekoration, und das faellt auf.
  */
-export const FOTO_BEREICHE = new Set(['training', 'supplements']);
+export const FOTO_BEREICHE = new Set([]);
 
 // --- Wissen -----------------------------------------------------------------
 // quickDE/quickEN sind Arrays aus {label, text} — fertige Zitatkarten.

@@ -99,7 +99,16 @@ if (FORMAT === 'uebung-loop') {
   daten = {
     art: 'uebung', schluessel: u.id, titel: t.name, unter: `${t.muskel} · ${t.geraet}`,
     beschreibung: t.beschreibung,
-    fotos: u.fotos.map((f) => `data:image/jpeg;base64,${b64(f)}`),
+    // ⚠ `u.fotos` ist seit dem 30.08.2026 leer (die Rechtekette der
+    // free-exercise-db-Bilder ist nicht belegt — Begruendung im Kopf von
+    // social-daten.mjs). Ein LEERES Array waere hier falsch: Es ist wahr, und
+    // die Buehne baute dann zwei <img> mit `undefined` als Quelle. Bei null
+    // nimmt die Vorlage den typografischen Zweig; der Reel traegt dann
+    // Uebungsname, Muskelgruppe und Beschreibung. Die Ueberblendung entfaellt,
+    // der Post nicht.
+    fotos: u.fotos.length
+      ? u.fotos.map((f) => `data:image/jpeg;base64,${b64(f)}`)
+      : null,
   };
 } else {
   const th = zieh(wissensthemen());
@@ -288,7 +297,8 @@ ${(daten.art === 'uebung'
 ## Inhalt
 
 - Medienherkunft: ${KI_MENSCHEN ? 'ki-menschen (Wasserzeichen gesetzt)'
-  : (HINTERGRUND ?? daten.autoFoto) ? 'echtes Foto (free-exercise-db, Public Domain)'
+  : (HINTERGRUND ?? daten.autoFoto)
+    ? 'Foto aus store-assets/social/fotos (Herkunft siehe HERKUNFT.md)'
   : 'nur Typografie'}
 - Format: ${FORMAT} (${daten.art})
 - Inhaltsschluessel: ${daten.schluessel}
