@@ -25,4 +25,11 @@ export default defineConfig([
       globals: globals.node,
     },
   },
+  {
+    // Die Endpunkt-Tests laufen ebenfalls in Node (vitest, environment: 'node').
+    files: ['tests/**/*.js', 'vitest.config.js'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
 ])

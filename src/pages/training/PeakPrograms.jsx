@@ -161,7 +161,7 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
         <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-2xl font-bold">Peak-{lang === 'de' ? 'Programme' : 'Programs'}</h1>
+        <h1 className="text-2xl font-bold">{lang === 'de' ? 'FullRep-Programme' : 'FullRep Programs'}</h1>
       </div>
 
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">

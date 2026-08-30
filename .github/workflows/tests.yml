@@ -1,0 +1,33 @@
+# Prüft die api/-Endpunkte bei jedem Push. Die Tests brauchen weder Netz noch
+# Secrets — global fetch ist im Prüfstand ersetzt, alle Umgebungsvariablen sind
+# Attrappen. Der Lauf dauert Sekunden und kostet nichts.
+name: Tests
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      # Bewusst auf api/ + tests/ begrenzt: `npm run lint` über das ganze
+      # Projekt meldet aktuell 106 vorbestehende Fehler in src/ und wäre ab
+      # dem ersten Lauf rot. Eine Pipeline, die immer rot ist, sagt nichts mehr.
+      # Wird der Altbestand aufgeräumt, kann hier `npm run lint` stehen.
+      - name: Lint (api + tests)
+        run: npx eslint api tests vitest.config.js
+
+      - name: Endpunkt-Tests
+        run: npm test

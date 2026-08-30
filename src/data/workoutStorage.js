@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { isGuest } from '../context/AuthContext';
+import { localId } from './localId';
 
 const WORKOUTS_KEY = 'workouts';
 const CUSTOM_EXERCISES_KEY = 'custom_exercises';
@@ -62,7 +63,7 @@ export async function getWorkouts(userId) {
 
 export async function saveWorkout(userId, workout) {
   // Save to localStorage FIRST (always works, even offline)
-  const localEntry = { ...workout, id: `local_${Date.now()}` };
+  const localEntry = { ...workout, id: localId() };
   const cached = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
   cached.unshift(localEntry);
   localStorage.setItem(WORKOUTS_KEY, JSON.stringify(cached));
@@ -379,7 +380,7 @@ export async function saveCustomPlan(userId, plan) {
   }
 
   const cached = JSON.parse(localStorage.getItem('customPlans') || '[]');
-  cached.unshift({ id: data?.id || `local_${Date.now()}`, name: plan.name, days: plan.days });
+  cached.unshift({ id: data?.id || localId(), name: plan.name, days: plan.days });
   localStorage.setItem('customPlans', JSON.stringify(cached));
 
   return { data, error: null };
@@ -405,6 +406,12 @@ export async function deleteCustomPlan(userId, planId) {
 }
 
 export async function getDeletedCustomPlans(userId) {
+  // Ein Gast hat keinen Papierkorb: deleteCustomPlan entfernt seinen Plan
+  // sofort aus dem lokalen Speicher, ein Soft-Delete existiert nur in der
+  // Cloud. Ohne diese Weiche liefe hier ein Netzaufruf mit userId 'guest',
+  // der nichts finden kann und den Bildschirm bis zum Timeout blockiert.
+  if (isGuest(userId)) return [];
+
   const { data, error } = await supabase
     .from('custom_plans')
     .select('*')
@@ -423,6 +430,8 @@ export async function getDeletedCustomPlans(userId) {
 }
 
 export async function restoreCustomPlan(userId, planId) {
+  if (isGuest(userId)) return getCustomPlans(userId);
+
   await supabase
     .from('custom_plans')
     .update({ deleted_at: null })
@@ -435,6 +444,8 @@ export async function restoreCustomPlan(userId, planId) {
 }
 
 export async function permanentDeleteCustomPlan(userId, planId) {
+  if (isGuest(userId)) return;
+
   await supabase
     .from('custom_plans')
     .delete()
@@ -578,7 +589,7 @@ export async function saveWeeklySchedule(userId, schedule) {
 
   // Deactivate other schedules in localStorage
   const cached = JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]').map((s) => ({ ...s, is_active: false }));
-  const localEntry = { ...entry, id: `local_${Date.now()}`, created_at: new Date().toISOString() };
+  const localEntry = { ...entry, id: localId(), created_at: new Date().toISOString() };
   cached.unshift(localEntry);
   localStorage.setItem(SCHEDULE_KEY, JSON.stringify(cached));
 
@@ -635,7 +646,10 @@ export async function deleteWeeklySchedule(userId, scheduleId) {
 
   if (!isGuest(userId) && !scheduleId.startsWith('local_')) {
     try {
-      await supabase.from('weekly_schedules').delete().eq('id', scheduleId);
+      // Auch auf den Nutzer eingrenzen. RLS verhindert Fremdzugriffe zwar
+      // ohnehin, aber alle anderen Löschpfade in dieser Datei tun es —
+      // eine Ausnahme liest sich beim Prüfen wie ein Versehen.
+      await supabase.from('weekly_schedules').delete().eq('id', scheduleId).eq('user_id', userId);
     } catch (err) {
       console.error('Failed to delete weekly schedule:', err);
     }
