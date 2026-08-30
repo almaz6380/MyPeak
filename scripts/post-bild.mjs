@@ -10,13 +10,16 @@
 // Muster: scripts/store-screenshots.mjs — Playwright, ohne Netz, ohne
 // Zugangsdaten. Kostet nichts.
 //
-// DREI STILE, EIN RAHMEN. Kopf, Fuss mit den Store-Badges, das KI-Wasserzeichen
-// und die Foto-Logik sind bei allen dreien gleich; nur die Mitte unterscheidet
-// sich. Sonst zerfaellt die Marke in drei Marken.
+// VIER STILE, EIN RAHMEN. Kopf, Fuss mit den Store-Badges, das KI-Wasserzeichen
+// und die Foto-Logik sind bei allen gleich; nur die Mitte unterscheidet sich.
+// Sonst zerfaellt die Marke in vier Marken.
 //
-//   poster   Foto randlos, Text im unteren Drittel, Schlagzeile in Anton-
-//            Versalien. Am lautesten im Feed.
-//   premium  Ruhig und dunkel, Gold an genau einer Stelle. Fuer Wissen.
+//   mix      VORGABE. Der Dreiklang: wechselnder Aufhaenger, grosse
+//            Ueberschrift, mittelgrosser Erklaertext — und darunter, wo es
+//            einen gibt, der Studienwert. Fehlt der Wert, faellt der Block
+//            weg statt leer dazustehen.
+//   poster   Foto randlos, Text im unteren Drittel. Am lautesten im Feed.
+//   premium  Ruhig und dunkel, Gold an genau einer Stelle.
 //   zahl     Eine grosse Zahl traegt das Bild. Greift nur, wo eine da IST —
 //            sonst faellt der Stil auf `premium` zurueck, statt eine zu erfinden.
 //
@@ -47,10 +50,11 @@ import {
   WURZEL, uebungenMitFotos, uebungTexte, wissensthemen, rezepteMitMakros,
   WASSERZEICHEN_CSS, WASSERZEICHEN_HTML, trainingsFoto, FOTO_BEREICHE,
 } from './social-daten.mjs';
+import { studienPosts } from './studien.mjs';
 
 const arg = (n, s) => { const i = process.argv.indexOf(`--${n}`); return i === -1 ? s : process.argv[i + 1]; };
 const FORMAT = arg('format', 'wissens-karte');
-const STIL = arg('stil', 'premium');
+const STIL = arg('stil', 'mix');
 const LANG = arg('lang', 'de');
 const SEED = Number(arg('seed', 1));
 const NAME = arg('name', null);
@@ -60,8 +64,8 @@ const KI_MENSCHEN = process.argv.includes('--ki');
 
 const B = 1080, H = 1350;
 
-if (!['poster', 'premium', 'zahl'].includes(STIL)) {
-  console.error(`✗ unbekannter Stil: ${STIL}\n  Bekannt: poster, premium, zahl`);
+if (!['mix', 'poster', 'premium', 'zahl'].includes(STIL)) {
+  console.error(`✗ unbekannter Stil: ${STIL}\n  Bekannt: mix, poster, premium, zahl`);
   process.exit(1);
 }
 
@@ -86,6 +90,15 @@ const T = {
         start: 'Start', ende: 'End', pro: 'per serving', fuss: 'FullRep · Workout & Nutrition' },
 }[LANG];
 
+// Wechselnde Aufhaenger. Ein Kanal, auf dem jeder Post mit demselben Wort
+// anfaengt, wirkt nach zwei Wochen wie eine Vorlage.
+const AUFHAENGER = {
+  de: ['Wusstest du …', 'Mythos oder Wahrheit?', 'Der häufigste Fehler',
+       'Kurz erklärt', 'Zahlen, die zählen', 'Was die Forschung sagt'],
+  en: ['Did you know …', 'Myth or truth?', 'The most common mistake',
+       'Briefly explained', 'Numbers that matter', 'What the research says'],
+}[LANG];
+
 const esc = (s) => String(s ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 const b64 = (p) => readFileSync(p).toString('base64');
 
@@ -100,6 +113,24 @@ function inhalt(format, w) {
       art: 'uebung', schluessel: u.id,
       marke: t.muskel, haken: t.name, text: t.beschreibung,
       fotos: u.fotos, zusatz: t.geraet,
+    };
+  }
+
+  if (format === 'studien-fakt') {
+    const alle = studienPosts();
+    const p = zieh(alle);
+    return {
+      art: 'studie', schluessel: p.id,
+      marke: p.titel[LANG] ?? p.titel.de,
+      haken: p.titel[LANG] ?? p.titel.de,
+      text: p.aussage[LANG] ?? p.aussage.de,
+      studienwert: p.wert ? (p.wert[LANG] ?? p.wert.de) : null,
+      // Der Studienname steht NICHT im Bild (Josefs Entscheidung), sondern nur
+      // im Kontrollteil des Beiblatts — zur Hand, wenn in den Kommentaren
+      // jemand nachfragt.
+      studie: p.studie,
+      autoFoto: FOTO_BEREICHE.has(p.bereich) || p.bereich === 'cardio'
+        ? trainingsFoto(w) : null,
     };
   }
 
@@ -186,7 +217,27 @@ function baueHtml(o, stil) {
 
   // --- Mitte je Stil --------------------------------------------------------
   let mitte = '';
-  if (stil === 'poster') {
+  if (stil === 'mix') {
+    // Der Dreiklang. Aufhaenger wechselt nach Seed, Ueberschrift skaliert nach
+    // Laenge, der Studienblock faellt weg, wenn es keinen Wert gibt.
+    const auge = AUFHAENGER[SEED % AUFHAENGER.length];
+    const kurz = o.art === 'wissen' ? o.marke : o.haken;
+    const lang = o.art === 'wissen' ? o.haken : o.text;
+    const wert = o.studienwert ?? null;
+    const px = kurz.length > 26 ? 60 : kurz.length > 16 ? 74 : 96;
+    mitte = `
+      <div class="mixText">
+        <div class="augenbraue">${esc(auge)}</div>
+        <h1 class="anton" style="font-size:${px}px">${esc(kurz)}</h1>
+        ${lang ? `<p class="text">${esc(lang)}</p>` : ''}
+        ${wert ? `
+        <div class="studie">
+          <div class="kante"></div>
+          <div class="studieLabel">${LANG === 'de' ? 'Laut Studien' : 'Research says'}</div>
+          <div class="studieWert">${esc(wert)}</div>
+        </div>` : ''}
+      </div>`;
+  } else if (stil === 'poster') {
     // ⚠ Ein Plakat traegt EIN kurzes Wort gross, nicht einen ganzen Satz.
     // Beim ersten Versuch stand die komplette Aussage in 104-px-Versalien und
     // verdeckte das halbe Foto. Deshalb: kurzer Name als Schlagzeile, die
@@ -268,6 +319,8 @@ body.mitFoto .markenRing{display:none}
   rgba(10,10,10,.62) 38%,rgba(10,10,10,.86) 78%,rgba(10,10,10,.94) 100%)}
 .stil-zahl .hgSchleier{background:linear-gradient(180deg,rgba(10,10,10,.86) 0%,
   rgba(10,10,10,.74) 45%,rgba(10,10,10,.92) 100%)}
+.stil-mix .hgSchleier{background:linear-gradient(180deg,rgba(10,10,10,.46) 0%,
+  rgba(10,10,10,.24) 22%,rgba(10,10,10,.80) 52%,rgba(10,10,10,.97) 80%)}
 .stil-poster .hgSchleier{background:linear-gradient(180deg,rgba(10,10,10,.34) 0%,
   rgba(10,10,10,.10) 26%,rgba(10,10,10,.72) 58%,rgba(10,10,10,.96) 84%)}
 
@@ -291,6 +344,16 @@ ${WASSERZEICHEN_CSS}
 h1{font-size:58px;line-height:1.1;font-weight:700;letter-spacing:-.025em;color:#fff8e7}
 h1.aussage{font-size:50px;line-height:1.22;letter-spacing:-.015em}
 p.text{font-size:32px;line-height:1.38;color:#e7e5e4}
+
+/* --- mix (Vorgabe) --- */
+.stil-mix .inhalt{justify-content:flex-end;padding-bottom:20px}
+.mixText{display:flex;flex-direction:column;gap:20px}
+.stil-mix h1{line-height:.98;letter-spacing:0;color:#fff}
+.stil-mix p.text{font-size:33px;line-height:1.36;color:#e7e5e4;max-width:94%}
+.studie{display:flex;flex-direction:column;gap:9px;margin-top:6px}
+.studieLabel{font-size:22px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:#fbbf24}
+.studieWert{font-size:44px;line-height:1.16;font-weight:700;color:#fff8e7;letter-spacing:-.015em}
 
 /* --- poster --- */
 .posterText{display:flex;flex-direction:column;gap:20px}
@@ -367,7 +430,9 @@ const tags = {
   uebung: ['fullrep', 'fitness', 'gym', 'training', 'uebung', 'muskelaufbau', 'krafttraining', 'workout'],
   rezept: ['fullrep', 'fitness', 'meal', 'protein', 'rezept', 'ernaehrung', 'mealprep', 'highprotein'],
   wissen: ['fullrep', 'fitness', 'wissen', 'training', 'gym', 'muskelaufbau', 'gymtok', 'fitnesstips'],
-}[o.art];
+  studie: ['fullrep', 'fitness', 'evidenzbasiert', 'training', 'gym', 'wissenschaft',
+    'muskelaufbau', 'fitnesstips'],
+}[o.art] ?? ['fullrep', 'fitness', 'training', 'gym'];
 
 const hatFoto = Boolean(HINTERGRUND ?? o.autoFoto ?? o.fotos);
 
@@ -376,7 +441,8 @@ writeFileSync(join(OUT, `${basis}.txt`),
 
 ## Caption (kopieren)
 
-${o.haken}${o.text ? `\n\n${o.text}` : ''}
+${o.haken}${o.text ? `\n\n${o.text}` : ''}${
+  o.studienwert ? `\n\n${LANG === 'de' ? 'Laut Studien' : 'Research says'}: ${o.studienwert}` : ''}
 
 ## Hashtags
 
@@ -395,7 +461,13 @@ ${tags.map((h) => `#${h}`).join(' ')}
 - Format: ${FORMAT} (${o.art})
 - Inhaltsschluessel: ${o.schluessel}
 - Sprache: ${LANG}
-`);
+${o.studie ? `
+## Falls jemand nachfragt (NICHT posten)
+
+Die Aussage stammt aus: ${o.studie.name}${o.studie.jahr ? ` ${o.studie.jahr}` : ''}.
+Im Bild steht bewusst nur „Laut Studien" — die Angabe hier ist fuer den
+Kommentarbereich gedacht, falls jemand nach der Quelle fragt.
+` : ''}`);
 
 console.log(`✓ ${ziel}`);
 console.log(`  ${B}×${H} · ${stil} · ${o.art} · ${o.schluessel} · ${LANG}`);
