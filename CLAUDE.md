@@ -16,6 +16,68 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 
 ## Aktueller Stand
 
+### ✅ Eigene Trainingspläne repariert + zusammengeführt (30.08.2026)
+Josefs Bruder scheiterte im **Gastmodus** daran, einen eigenen Plan zu erstellen.
+Zwei Ursachen, beide im Code belegt:
+
+**1. Der „Übungen"-Knopf im Wochenplan-Builder war tot.** `WeeklyPlanBuilder`
+rief `onSelectExercises(day, cb)` auf, aber `TrainingPage` hat den Prop **nie
+übergeben** — `if (onSelectExercises)` schluckte den Klick lautlos. Weil der
+Speichern-Knopf gesperrt bleibt, bis jeder Tag konfiguriert ist, war der Weg
+„Tagen echte Übungen zuweisen" eine **Sackgasse**: der Plan ließ sich gar nicht
+speichern.
+
+**2. Hinzugefügte Übungen wurden nie gespeichert.** Der Übungskatalog war ein
+*View-Wechsel derselben Seite* — die Detailansicht wurde dabei abgebaut, das
+`changed`-Flag fiel auf `false`, und danach erschien weder der Speichern-Knopf
+noch speicherte der Workout-Start. ⚠️ **Lehre: In `TrainingPage` ist alles ein
+`view`-State ohne eigene Routen.** Wer dorthin wechselt, verliert den State der
+verlassenen Komponente. Untersichten wie den Katalog deshalb als **Overlay im
+selben Komponentenbaum** rendern, nicht über `setView`.
+
+Weitere behobene Fehler:
+- **Eigene Übungen fielen aus dem Workout.** `handleStartPlan` filterte über
+  `getExerciseById`, das nur den statischen Katalog kennt → `return null` →
+  `.filter(Boolean)` entfernte sie kommentarlos.
+- **Eigene Übungen erschienen als rohe ID.** Neu `getExerciseDisplayName` in
+  `exercises.js`; das `__custom__`-Präfix wird zentral im
+  **`parseMissingKeyHandler`** der i18n-Konfiguration abgezogen — eine Stelle
+  statt 51 Anzeigestellen in 17 Dateien.
+- **Datenverlust beim Bearbeiten:** der Builder machte `delete` + `insert`.
+  Schlug das Speichern fehl, war der Plan weg. Neu `updateWeeklySchedule`.
+- **„Aktivieren" erzeugte ein Duplikat**, weil es über `saveWeeklySchedule` lief
+  — das macht **immer INSERT**, es gab keinen Update-Pfad. Neu
+  `activateWeeklySchedule`.
+- **Übungstage waren nie startbar:** gespeichert wurde `type: 'exercises'`, aber
+  `startTodaySession` erkennt nur `'strength'`. Jetzt `'strength'`; der alte Wert
+  wird beim Lesen weiter akzeptiert.
+- Sätze/Wdh. gingen verloren (Reduktion auf IDs) → werden mitgespeichert und sind
+  in der Detailansicht einstellbar.
+- Stumme `.catch(() => {})` → `try/catch/finally` mit Toast; ohne `finally` blieb
+  der Knopf dauerhaft auf „…". Löschen fragt nach.
+
+**Zusammenführung:** Es gab **zwei Orte**, die beide „Plan" hießen und beide einen
+Erstellen-Knopf hatten — `weekly_schedules` („Meine Pläne") und `custom_plans`
+(„Trainingspläne"). Jetzt ist **„Meine Pläne" der einzige Ort für eigene Pläne**
+(getrennte Abschnitte „Wochenpläne" / „Einzelne Trainingspläne"), der „+"-Knopf
+fragt vorher, was entstehen soll, und **„Trainingspläne" ist die reine
+Vorlagen-Ansicht**. Umgesetzt über die Props `templatesOnly` / `initialView` an
+`TrainingPlans` plus Export der vorhandenen `PlanCard` — die Start-Logik der fünf
+Plantypen wurde **nicht** dupliziert. ⚠️ **Keine Datenmigration:** beide Tabellen
+bleiben bestehen, nur die Oberfläche führt sie zusammen. Bestehende Pläne laufen
+unverändert weiter.
+
+**Verifiziert im Gastmodus** gegen die gebaute App (Playwright gegen
+`vite preview`): Plan anlegen → Übungen aus dem Katalog → eigene Übung erstellen →
+speichern → neu laden → Plan und Übungen erhalten, eigene Übung namentlich im
+Workout. Aktivieren erzeugt kein Duplikat mehr. Lint 129 → 125 Probleme, keine
+neuen; Build grün.
+
+⚠️ **Für lokale Tests braucht es eine `.env`** mit `VITE_SUPABASE_URL` und
+`VITE_SUPABASE_ANON_KEY` — sonst bricht die App beim Start mit
+„supabaseUrl is required" ab und zeigt eine **weiße Seite**. Im Gastmodus genügen
+Platzhalterwerte, es geht kein Netzaufruf raus.
+
 ### ✅ RevenueCat-Android fertig (15.08.2026) — AAB 15/1.3.0 gebaut, Upload offen
 In der RevenueCat-Konsole war das meiste längst da; nachgesehen statt neu gebaut:
 Play-App verbunden („Valid credentials", „Connected to Google", Topic-ID
