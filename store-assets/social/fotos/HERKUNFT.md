@@ -55,8 +55,46 @@ Damit die Sache nicht in zwei Jahren wieder ungeklaert dasteht, gilt:
    ⚠ Ein **echtes** Foto zu kennzeichnen waere genauso falsch wie ein KI-Bild
    nicht zu kennzeichnen.
 
+## ⚠ Jedes Bild muss von Auge auf erfundene Marken geprueft werden
+
+Der Prompt sagt ausdruecklich `no text, no logos, no watermarks`. **Das Modell
+haelt sich nicht daran.** Im Testlauf vom 30.08.2026:
+
+- `probe/probe-langhantel-kniebeuge-dev.jpg` — deutliche **Nike-Swooshes** auf
+  beiden Schuhen.
+- `probe/probe-cardio-lauf-dev.jpg` — ein erfundenes Logo auf dem Trikot und
+  eine Krakelschrift auf dem Laufband.
+
+Ein fremdes Markenzeichen in einem Werbebild ist ein Markenrechtsproblem —
+genau die Sorte Aerger, wegen der die Uebungsfotos ueberhaupt erst aussortiert
+wurden. Es waere absurd, sie durch selbsterzeugte Bilder mit fremden Logos zu
+ersetzen.
+
+**Regel: Vor der Aufnahme in den Bestand jedes Bild in voller Groesse ansehen.**
+Schuhe, Trikots, Geraetefronten und Waende sind die Stellen, an denen Logos und
+Pseudo-Schrift auftauchen. Ein Bild mit fremdem Zeichen wird verworfen, nicht
+retuschiert — ein neuer Seed kostet 2,5 Cent.
+
+## Was der Testlauf sonst ergeben hat
+
+| | `flux/dev` | `flux/schnell` |
+|---|---|---|
+| Koerper und Anatomie | durchweg brauchbar | patzt sichtbar (verschmolzene Hantel am Kopf, verschmierte Nebenfigur) |
+| Licht | trifft das Marken-Amber | harte Fremdfarben (roter Balken quer im Bild) |
+| Preis je Bild | $0,025 | $0,003 |
+
+Der Aufpreis von 2,2 Cent je Bild ist die einzige Zahl, die hier zaehlt — bei
+24 Bildern sind das 53 Cent Unterschied. `dev` ist die Wahl.
+
 ## Tabelle
 
 | Datei | Quelle | Modell / Prompt | Datum | Kosten | KI-Menschen? |
 |---|---|---|---|---|---|
-| — | — | — | — | — | — |
+| `probe/probe-hantel-schulterdruecken-dev.jpg` | fal.ai | `fal-ai/flux/dev`, Seed 4200 | 2026-08-30 | $0.025 | **ja** |
+| `probe/probe-hantel-schulterdruecken-schnell.jpg` | fal.ai | `fal-ai/flux/schnell`, Seed 4200 | 2026-08-30 | $0.003 | **ja** |
+| `probe/probe-langhantel-kniebeuge-dev.jpg` | fal.ai | `fal-ai/flux/dev`, Seed 4201 | 2026-08-30 | $0.025 | **ja** |
+| `probe/probe-langhantel-kniebeuge-schnell.jpg` | fal.ai | `fal-ai/flux/schnell`, Seed 4201 | 2026-08-30 | $0.003 | **ja** |
+| `probe/probe-cardio-lauf-dev.jpg` | fal.ai | `fal-ai/flux/dev`, Seed 4202 | 2026-08-30 | $0.025 | **ja** |
+| `probe/probe-cardio-lauf-schnell.jpg` | fal.ai | `fal-ai/flux/schnell`, Seed 4202 | 2026-08-30 | $0.003 | **ja** |
+| `probe/probe-protein-mahlzeit-dev.jpg` | fal.ai | `fal-ai/flux/dev`, Seed 4203 | 2026-08-30 | $0.025 | nein (Essen) |
+| `probe/probe-protein-mahlzeit-schnell.jpg` | fal.ai | `fal-ai/flux/schnell`, Seed 4203 | 2026-08-30 | $0.003 | nein (Essen) |
