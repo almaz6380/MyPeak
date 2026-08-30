@@ -342,6 +342,8 @@ export default function TrainingPage() {
   if (view === 'plans') {
     return (
       <TrainingPlans
+        // Nur Vorlagen: eigene Plaene entstehen und leben unter „Meine Plaene".
+        templatesOnly
         onBack={() => setView('home')}
         onStartPlan={handleStartPlan}
         onViewPlan={(plan, dayIdx) => { setViewingPlan(plan); setViewingDayIndex(dayIdx); setPlanDetailOrigin('plans'); setView('planDetail'); }}
@@ -366,7 +368,35 @@ export default function TrainingPage() {
   }
 
   if (view === 'myPlans') {
-    return <MyPlans onBack={() => setView('home')} onCreate={() => { setEditingPlan(null); setView('weeklyPlan'); }} onEdit={(plan) => { setEditingPlan(plan); setView('weeklyPlan'); }} onStartFreeWorkout={() => setView('startChoice')} />;
+    return (
+      <MyPlans
+        onBack={() => setView('home')}
+        onCreate={() => { setEditingPlan(null); setView('weeklyPlan'); }}
+        onCreateSinglePlan={() => setView('createSinglePlan')}
+        onEdit={(plan) => { setEditingPlan(plan); setView('weeklyPlan'); }}
+        onStartFreeWorkout={() => setView('startChoice')}
+        onStartPlan={handleStartPlan}
+        onViewPlan={(plan, dayIdx) => { setViewingPlan(plan); setViewingDayIndex(dayIdx); setPlanDetailOrigin('myPlans'); setView('planDetail'); }}
+        onStartHiit={handleStartHiit}
+        onStartCircuit={handleStartCircuit}
+        onStartCardio={handleStartCardio}
+        onStartMartialArts={handleStartMartialArts}
+      />
+    );
+  }
+
+  if (view === 'createSinglePlan') {
+    return (
+      <TrainingPlans
+        initialView="create"
+        onBack={() => setView('myPlans')}
+        onStartPlan={handleStartPlan}
+        onStartHiit={handleStartHiit}
+        onStartCircuit={handleStartCircuit}
+        onStartCardio={handleStartCardio}
+        onStartMartialArts={handleStartMartialArts}
+      />
+    );
   }
 
   if (view === 'weeklyPlan') {
