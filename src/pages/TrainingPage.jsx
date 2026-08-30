@@ -13,8 +13,8 @@ import TrainingPlans, { defaultPlans } from './training/TrainingPlans';
 import FriendsList from './training/FriendsList';
 import Leaderboard from './training/Leaderboard';
 import ChallengesList from './training/ChallengesList';
-import exercises, { getExerciseById, getExercisesByType } from '../data/exercises';
-import { getCustomPlans, getCustomPlansByType, saveCustomPlan, getActiveSchedule, getScheduledDaysForMonth, getWorkouts, deactivateAllSchedules } from '../data/workoutStorage';
+import exercises, { getExerciseById, getExercisesByType, CUSTOM_NAME_PREFIX } from '../data/exercises';
+import { getCustomPlans, getCustomPlansByType, saveCustomPlan, getActiveSchedule, getScheduledDaysForMonth, getWorkouts, deactivateAllSchedules, getCustomExercises } from '../data/workoutStorage';
 import { resolveScheduledDay } from '../data/programResolver';
 import { getHiddenDefaultPlans, getPermanentDeletedDefaultPlans } from '../data/settingsStorage';
 import { useAuth } from '../context/AuthContext';
@@ -53,7 +53,8 @@ export default function TrainingPage() {
   const [editingPlan, setEditingPlan] = useState(null);
   const [viewingPlan, setViewingPlan] = useState(null);
   const [viewingDayIndex, setViewingDayIndex] = useState(0);
-  const [planDetailExercises, setPlanDetailExercises] = useState(null); // persisted exercise list for PlanDetail
+  const [planDetailOrigin, setPlanDetailOrigin] = useState('plans'); // wohin „Zurück" führt
+  const [customExercises, setCustomExercises] = useState([]);
 
   // Diamond Calendar state
   const [selectedDate, setSelectedDate] = useState(todayLocal());
@@ -65,6 +66,12 @@ export default function TrainingPage() {
   useEffect(() => {
     if (user) loadCalendarData();
   }, [user, selectedDate]);
+
+  // Eigene Übungen mitführen: handleStartPlan muss sie auflösen können, sonst
+  // fallen sie beim Start eines Plans stillschweigend aus dem Workout.
+  useEffect(() => {
+    getCustomExercises(user?.id || 'guest').then(setCustomExercises).catch(() => {});
+  }, [user]);
 
   async function loadCalendarData() {
     const [schedule, workouts] = await Promise.all([
@@ -153,12 +160,17 @@ export default function TrainingPage() {
   const handleStartPlan = (planExercises, planId, planName) => {
     const enriched = planExercises
       .map((pe) => {
-        const ex = getExerciseById(pe.id);
-        if (!ex) return null;
+        // Plan-Einträge sind mal eine blanke ID, mal ein Objekt.
+        const id = typeof pe === 'object' && pe !== null ? (pe.id ?? pe.exerciseId) : pe;
+        const ex = getExerciseById(id);
+        // Eigene Übungen stehen nicht im Katalog — früher wurden sie hier
+        // aussortiert und fehlten dann kommentarlos im Workout.
+        const custom = ex ? null : customExercises.find((ce) => (ce.exercise_id || ce.id) === id);
+        if (!ex && !custom) return null;
         return {
-          exerciseId: ex.id,
-          nameKey: ex.nameKey,
-          sets: Array.from({ length: pe.sets || 3 }, () => ({ reps: String(pe.reps || ''), weight: '' })),
+          exerciseId: id,
+          nameKey: ex ? ex.nameKey : `${CUSTOM_NAME_PREFIX}${custom.name}`,
+          sets: Array.from({ length: pe?.sets || 3 }, () => ({ reps: String(pe?.reps || ''), weight: '' })),
         };
       })
       .filter(Boolean);
@@ -238,7 +250,7 @@ export default function TrainingPage() {
       <WorkoutStartChooser
         onBack={() => setView('home')}
         onStartPlan={handleStartPlan}
-        onViewPlan={(plan, dayIdx) => { setViewingPlan(plan); setViewingDayIndex(dayIdx); setView('planDetail'); }}
+        onViewPlan={(plan, dayIdx) => { setViewingPlan(plan); setViewingDayIndex(dayIdx); setPlanDetailOrigin('startChoice'); setView('planDetail'); }}
         onStartEmpty={startEmptyWorkout}
         onStartCardio={handleStartCardio}
         onStartHiit={handleStartHiit}
@@ -332,7 +344,7 @@ export default function TrainingPage() {
       <TrainingPlans
         onBack={() => setView('home')}
         onStartPlan={handleStartPlan}
-        onViewPlan={(plan, dayIdx) => { setViewingPlan(plan); setViewingDayIndex(dayIdx); setView('planDetail'); }}
+        onViewPlan={(plan, dayIdx) => { setViewingPlan(plan); setViewingDayIndex(dayIdx); setPlanDetailOrigin('plans'); setView('planDetail'); }}
         onStartHiit={handleStartHiit}
         onStartCircuit={handleStartCircuit}
         onStartCardio={handleStartCardio}
@@ -361,29 +373,15 @@ export default function TrainingPage() {
     return <WeeklyPlanBuilder editPlan={editingPlan} onBack={() => setView('myPlans')} onSaved={() => { setEditingPlan(null); loadCalendarData(); setView('myPlans'); }} />;
   }
 
-  if (view === 'selectForPlanDetail') {
-    return (
-      <ExerciseLibrary
-        onBack={() => setView('planDetail')}
-        onSelect={(selected) => {
-          setPlanDetailExercises((prev) => [...(prev || []), ...selected.map((ex) => ({ id: ex.id, nameKey: ex.nameKey }))]);
-          setView('planDetail');
-        }}
-        selectionMode
-      />
-    );
-  }
-
   if (view === 'planDetail' && viewingPlan) {
     return (
       <PlanDetail
         plan={viewingPlan}
         dayIndex={viewingDayIndex}
-        exercises={planDetailExercises}
-        onExercisesChange={setPlanDetailExercises}
-        onBack={() => { setPlanDetailExercises(null); setView('plans'); }}
-        onStartWorkout={(exs, planId, planName) => { setPlanDetailExercises(null); handleStartPlan(exs, planId, planName); }}
-        onAddExercise={() => setView('selectForPlanDetail')}
+        // Zurück führt dorthin, wo der Plan geöffnet wurde — nicht pauschal
+        // in die Planliste.
+        onBack={() => setView(planDetailOrigin)}
+        onStartWorkout={handleStartPlan}
       />
     );
   }
