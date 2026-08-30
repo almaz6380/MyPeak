@@ -1,92 +1,199 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Play, Plus, Trash2 } from 'lucide-react';
-import { getExerciseById } from '../../data/exercises';
+import { getExerciseDisplayName } from '../../data/exercises';
 import { useAuth } from '../../context/AuthContext';
-import { updateCustomPlan } from '../../data/workoutStorage';
+import { updateCustomPlan, getCustomExercises } from '../../data/workoutStorage';
+import ExerciseLibrary from './ExerciseLibrary';
+import Toast from '../../components/Toast';
 
-export default function PlanDetail({ plan, dayIndex, exercises: externalExercises, onExercisesChange, onBack, onStartWorkout, onAddExercise }) {
+const DEFAULT_SETS = 3;
+const DEFAULT_REPS = 10;
+
+// Plan-Einträge sind historisch mal eine blanke ID, mal ein Objekt.
+function normalizeEntry(entry) {
+  if (typeof entry === 'object' && entry !== null) {
+    return {
+      id: entry.id ?? entry.exerciseId,
+      sets: entry.sets ?? DEFAULT_SETS,
+      reps: entry.reps ?? DEFAULT_REPS,
+    };
+  }
+  return { id: entry, sets: DEFAULT_SETS, reps: DEFAULT_REPS };
+}
+
+export default function PlanDetail({ plan, dayIndex, onBack, onStartWorkout }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
 
   const day = plan.days?.[dayIndex];
 
+  const [entries, setEntries] = useState(() => (day?.exercises || []).map(normalizeEntry));
   const [changed, setChanged] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
+  const [customExercises, setCustomExercises] = useState([]);
+  const [toast, setToast] = useState(null);
+  const [confirmLeave, setConfirmLeave] = useState(false);
 
-  // Initialize exercises from external state or from plan
+  // Ohne die eigenen Übungen stünde bei ihnen die rohe technische ID.
   useEffect(() => {
-    if (!externalExercises && day) {
-      const initial = (day.exercises || []).map((id) => {
-        const rawId = typeof id === 'object' ? id.id : id;
-        const ex = getExerciseById(rawId);
-        return ex ? { id: ex.id, nameKey: ex.nameKey } : { id: rawId };
-      });
-      onExercisesChange(initial);
-    }
-  }, []);
+    getCustomExercises(user?.id || 'guest').then(setCustomExercises).catch(() => {});
+  }, [user]);
 
   if (!day) return null;
 
-  const exerciseList = (externalExercises || []).map((ex) => {
-    const full = getExerciseById(ex.id);
-    return { ...ex, name: full ? t(full.nameKey || ex.nameKey) : ex.id };
-  });
+  const nameOf = (id) => getExerciseDisplayName(id, customExercises, t);
 
   function removeExercise(index) {
-    const updated = externalExercises.filter((_, i) => i !== index);
-    onExercisesChange(updated);
+    setEntries((prev) => prev.filter((_, i) => i !== index));
     setChanged(true);
   }
 
-  async function saveChanges() {
-    if (!plan.id || !externalExercises) return;
-    const updatedDays = [...plan.days];
-    updatedDays[dayIndex] = { ...updatedDays[dayIndex], exercises: externalExercises.map((ex) => ex.id) };
-    updateCustomPlan(user.id, plan.id, { name: plan.name, days: updatedDays }).catch(() => {});
-    setChanged(false);
+  function updateEntry(index, field, value) {
+    const n = Math.max(1, parseInt(value, 10) || 1);
+    setEntries((prev) => prev.map((e, i) => (i === index ? { ...e, [field]: n } : e)));
+    setChanged(true);
   }
 
-  function handleStart() {
-    if (changed && plan.id) {
-      const updatedDays = [...plan.days];
-      updatedDays[dayIndex] = { ...updatedDays[dayIndex], exercises: externalExercises.map((ex) => ex.id) };
-      updateCustomPlan(user.id, plan.id, { name: plan.name, days: updatedDays }).catch(() => {});
+  function addPicked(picked) {
+    if (!picked?.length) return;
+    setEntries((prev) => [
+      ...prev,
+      ...picked.map((ex) => ({ id: ex.id, sets: DEFAULT_SETS, reps: DEFAULT_REPS })),
+    ]);
+    setChanged(true);
+  }
+
+  function buildDays() {
+    const updatedDays = [...plan.days];
+    // Sätze und Wiederholungen mitschreiben — früher blieben nur die IDs übrig.
+    updatedDays[dayIndex] = { ...updatedDays[dayIndex], exercises: entries };
+    return updatedDays;
+  }
+
+  async function persist() {
+    const { error } = await updateCustomPlan(user.id, plan.id, {
+      name: plan.name,
+      days: buildDays(),
+    });
+    if (error) throw error;
+  }
+
+  async function saveChanges() {
+    if (!plan.id) return;
+    setSaving(true);
+    try {
+      await persist();
+      setChanged(false);
+      setToast({ variant: 'success', message: lang === 'de' ? 'Plan gespeichert.' : 'Plan saved.' });
+    } catch (err) {
+      console.error('Failed to save plan:', err);
+      setToast({
+        variant: 'error',
+        message: lang === 'de'
+          ? 'Der Plan konnte nicht gespeichert werden.'
+          : 'The plan could not be saved.',
+      });
+    } finally {
+      setSaving(false);
     }
-    onStartWorkout(
-      (externalExercises || []).map((ex) => ({ id: ex.id, sets: 3, reps: 10 })),
-      plan.id,
-      plan.name
+  }
+
+  async function handleStart() {
+    if (changed && plan.id) {
+      try {
+        await persist();
+        setChanged(false);
+      } catch (err) {
+        console.error('Failed to save plan before start:', err);
+      }
+    }
+    onStartWorkout(entries, plan.id, plan.name);
+  }
+
+  function handleBack() {
+    // Früher wurden ungespeicherte Änderungen wortlos verworfen.
+    if (changed && plan.id) {
+      setConfirmLeave(true);
+      return;
+    }
+    onBack();
+  }
+
+  // Der Katalog liegt als Overlay über der Seite. Ein Seitenwechsel hätte diese
+  // Komponente abgebaut — die neu gewählten Übungen wären verloren gewesen.
+  if (showPicker) {
+    return (
+      <div className="fixed inset-0 z-[70] bg-surface-light dark:bg-surface-dark overflow-y-auto">
+        <ExerciseLibrary
+          selectionMode
+          onBack={() => setShowPicker(false)}
+          onSelect={(picked) => {
+            addPicked(picked);
+            setShowPicker(false);
+          }}
+        />
+      </div>
     );
   }
 
   return (
     <div className="p-4 pt-16 pb-24">
+      {toast && <Toast variant={toast.variant} message={toast.message} onDismiss={() => setToast(null)} />}
+
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onClick={handleBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
           <h1 className="text-xl font-bold">{plan.name}</h1>
-          <p className="text-xs text-slate-400">{day.name || `Tag ${dayIndex + 1}`}</p>
+          <p className="text-xs text-slate-400">
+            {day.name || `${lang === 'de' ? 'Tag' : 'Day'} ${dayIndex + 1}`}
+          </p>
         </div>
       </div>
 
       {/* Exercise list */}
       <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden mb-4">
-        {exerciseList.length === 0 ? (
+        {entries.length === 0 ? (
           <p className="text-center text-sm text-slate-400 py-8">
-            {lang === 'de' ? 'Keine Übungen' : 'No exercises'}
+            {lang === 'de' ? 'Noch keine Übungen — füge unten welche hinzu.' : 'No exercises yet — add some below.'}
           </p>
         ) : (
-          exerciseList.map((ex, i) => (
-            <div key={`${ex.id}-${i}`} className="flex items-center gap-3 px-4 py-3 border-b border-slate-50 dark:border-slate-700/50 last:border-0">
-              <span className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-500">
+          entries.map((entry, i) => (
+            <div key={`${entry.id}-${i}`} className="flex items-center gap-3 px-4 py-3 border-b border-slate-50 dark:border-slate-700/50 last:border-0">
+              <span className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-500 flex-shrink-0">
                 {i + 1}
               </span>
-              <p className="flex-1 text-sm font-medium text-slate-700 dark:text-slate-200">{ex.name}</p>
-              <button onClick={() => removeExercise(i)} className="p-1.5 text-slate-300 hover:text-red-500 transition-colors">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">{nameOf(entry.id)}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <label className="flex items-center gap-1 text-[11px] text-slate-400">
+                    <input
+                      type="number"
+                      min={1}
+                      value={entry.sets}
+                      onChange={(e) => updateEntry(i, 'sets', e.target.value)}
+                      className="w-11 px-1.5 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center text-slate-700 dark:text-slate-200"
+                    />
+                    {lang === 'de' ? 'Sätze' : 'sets'}
+                  </label>
+                  <label className="flex items-center gap-1 text-[11px] text-slate-400">
+                    <input
+                      type="number"
+                      min={1}
+                      value={entry.reps}
+                      onChange={(e) => updateEntry(i, 'reps', e.target.value)}
+                      className="w-11 px-1.5 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center text-slate-700 dark:text-slate-200"
+                    />
+                    {lang === 'de' ? 'Wdh.' : 'reps'}
+                  </label>
+                </div>
+              </div>
+              <button onClick={() => removeExercise(i)} className="p-1.5 text-slate-300 hover:text-red-500 transition-colors flex-shrink-0">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
@@ -96,7 +203,7 @@ export default function PlanDetail({ plan, dayIndex, exercises: externalExercise
 
       {/* Add exercise */}
       <button
-        onClick={onAddExercise}
+        onClick={() => setShowPicker(true)}
         className="w-full py-3 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl text-sm font-medium text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2 hover:border-primary-400 hover:text-primary-500 transition-colors mb-6"
       >
         <Plus className="w-4 h-4" />
@@ -104,23 +211,57 @@ export default function PlanDetail({ plan, dayIndex, exercises: externalExercise
       </button>
 
       {/* Save changes */}
-      {changed && (
+      {changed && plan.id && (
         <button
           onClick={saveChanges}
-          className="w-full py-3 mb-3 border border-primary-500 text-primary-500 rounded-2xl text-sm font-semibold hover:bg-primary-50 dark:hover:bg-primary-900/10 transition-colors"
+          disabled={saving}
+          className="w-full py-3 mb-3 border border-primary-500 text-primary-500 rounded-2xl text-sm font-semibold hover:bg-primary-50 dark:hover:bg-primary-900/10 disabled:opacity-50 transition-colors"
         >
-          {lang === 'de' ? 'Änderungen speichern' : 'Save changes'}
+          {saving
+            ? (lang === 'de' ? 'Speichern…' : 'Saving…')
+            : (lang === 'de' ? 'Änderungen speichern' : 'Save changes')}
         </button>
       )}
 
       {/* Start workout */}
       <button
         onClick={handleStart}
-        className="w-full py-4 bg-primary-500 hover:bg-primary-600 text-white rounded-2xl font-semibold flex items-center justify-center gap-2 transition-colors"
+        disabled={entries.length === 0}
+        className="w-full py-4 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white rounded-2xl font-semibold flex items-center justify-center gap-2 transition-colors"
       >
         <Play className="w-5 h-5" />
         {lang === 'de' ? 'Workout starten' : 'Start Workout'}
       </button>
+
+      {/* Unsaved changes */}
+      {confirmLeave && (
+        <div className="fixed inset-0 bg-black/50 z-[80] flex items-center justify-center p-6" onClick={() => setConfirmLeave(false)}>
+          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <p className="text-base font-semibold mb-2">
+              {lang === 'de' ? 'Ungespeicherte Änderungen' : 'Unsaved changes'}
+            </p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
+              {lang === 'de'
+                ? 'Du hast den Plan geändert. Sollen die Änderungen gespeichert werden?'
+                : 'You changed the plan. Do you want to save your changes?'}
+            </p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={async () => { await saveChanges(); setConfirmLeave(false); onBack(); }}
+                className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-semibold"
+              >
+                {lang === 'de' ? 'Speichern und zurück' : 'Save and go back'}
+              </button>
+              <button
+                onClick={() => { setConfirmLeave(false); onBack(); }}
+                className="w-full py-3 border border-slate-200 dark:border-slate-700 text-slate-500 rounded-xl text-sm font-medium"
+              >
+                {lang === 'de' ? 'Verwerfen' : 'Discard'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
