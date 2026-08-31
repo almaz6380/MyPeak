@@ -45,7 +45,7 @@ der Server (Trial-Endpoint + RevenueCat-Webhook) den Abo-Status.
 - (Später) **Apple/Google Public SDK Keys** → `VITE_REVENUECAT_IOS_KEY` / `VITE_REVENUECAT_ANDROID_KEY`.
 
 **Webhook** (RevenueCat → Integrations → Webhooks):
-- **URL:** `https://my-peak.vercel.app/api/revenuecat-webhook`
+- **URL:** `https://fullrep.vercel.app/api/revenuecat-webhook`
 - **Authorization header:** einen langen Zufallswert eintragen — denselben als
   `REVENUECAT_WEBHOOK_SECRET` in Vercel setzen. Der Server lehnt jeden Aufruf ohne exakt diesen
   Wert mit 401 ab.
@@ -66,7 +66,7 @@ Nach dem Setzen der `VITE_`-Variablen einmal **neu deployen** (sie werden zur Bu
 
 ## 6. Testkauf (Web)
 
-1. Auf my-peak.vercel.app einloggen, Trial ggf. schon verbraucht → Paywall zeigt „Premium freischalten".
+1. Auf fullrep.vercel.app einloggen, Trial ggf. schon verbraucht → Paywall zeigt „Premium freischalten".
 2. Kauf mit einer Stripe-Testkarte (im Stripe-Testmodus) durchführen.
 3. Erwartung: RevenueCat feuert `INITIAL_PURCHASE` → `/api/revenuecat-webhook` setzt `premium_until`
    → in der App wird `isPremium` true, der Coach ist ohne Trial nutzbar.

@@ -151,6 +151,12 @@ Return ONLY valid JSON in this exact format, no other text:
   let last429 = false;
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    // Zu Beginn JEDES Versuchs zurücksetzen, damit am Ende nur der letzte
+    // Ausgang zählt. Stünde das erst nach dem fetch, bliebe ein 429 aus einem
+    // früheren Versuch stehen, wenn der fetch danach wirft (Netz/Timeout) —
+    // der Nutzer sähe dann „Rate-Limit" und wartete auf ein Kontingent, das
+    // gar nicht das Problem war.
+    last429 = false;
     try {
       const response = await fetch(geminiUrl, {
         method: 'POST',
@@ -167,7 +173,6 @@ Return ONLY valid JSON in this exact format, no other text:
         await new Promise((r) => setTimeout(r, waitSeconds * 1000));
         continue;
       }
-      last429 = false;
 
       if (!response.ok) {
         const errorData = await response.text();

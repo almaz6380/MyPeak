@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { isGuest } from '../context/AuthContext';
+import { localId } from './localId';
 
 // Helper: skip Supabase for guest users
 function guestSkip(userId) { return isGuest(userId); }
@@ -109,7 +110,7 @@ export async function saveNutritionEntry(userId, entry) {
 
   const cacheKey = ENTRIES_PREFIX + entry.date;
   const cached = JSON.parse(localStorage.getItem(cacheKey) || '[]');
-  cached.push(data || { ...entry, id: `local_${Date.now()}` });
+  cached.push(data || { ...entry, id: localId() });
   localStorage.setItem(cacheKey, JSON.stringify(cached));
 
   return { data, error };
@@ -231,7 +232,7 @@ export async function getCustomMeals(userId) {
 export async function saveCustomMeal(userId, meal) {
   // localStorage first
   const cached = JSON.parse(localStorage.getItem(CUSTOM_MEALS_KEY) || '[]');
-  const localEntry = { ...meal, id: `local_${Date.now()}` };
+  const localEntry = { ...meal, id: localId() };
   cached.unshift(localEntry);
   localStorage.setItem(CUSTOM_MEALS_KEY, JSON.stringify(cached));
 
@@ -302,7 +303,7 @@ export async function logCustomMeal(userId, meal, date, mealSlot) {
 
   // localStorage first — funktioniert auch für Gäste und offline
   const cacheKey = ENTRIES_PREFIX + date;
-  const localEntries = entries.map((e, i) => ({ ...e, id: `local_${Date.now()}_${i}` }));
+  const localEntries = entries.map((e) => ({ ...e, id: localId() }));
   const cached = JSON.parse(localStorage.getItem(cacheKey) || '[]');
   cached.push(...localEntries);
   localStorage.setItem(cacheKey, JSON.stringify(cached));
@@ -494,7 +495,7 @@ export async function addWater(userId, date, amountMl) {
   // Save to localStorage FIRST (always works)
   const cacheKey = WATER_PREFIX + date;
   const cached = JSON.parse(localStorage.getItem(cacheKey) || '{"entries":[],"total":0}');
-  const localEntry = { id: `local_${Date.now()}`, amount_ml: amountMl };
+  const localEntry = { id: localId(), amount_ml: amountMl };
   cached.entries.push(localEntry);
   cached.total += amountMl;
   localStorage.setItem(cacheKey, JSON.stringify(cached));

@@ -5,7 +5,8 @@
 Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Tracking in einer einzigen, übersichtlichen App vereint. Die App soll trotz vieler Features einfach zu bedienen und nicht überfüllt sein.
 
 **App-Name:** FullRep (bis 30.07.2026: MyPeak — siehe „Umbenennung" unten)
-**Live-URL:** https://my-peak.vercel.app (Domain noch nicht umgezogen)
+**Live-URL:** https://fullrep.vercel.app (seit 29.08.2026; `my-peak.vercel.app`
+leitet mit 307 dorthin weiter — bewusst behalten, solange irgendwo alte Links stehen)
 **Git-Repository:** https://github.com/almaz6380/MyPeak (Repo-Name unverändert)
 **Zielplattform:** Web-App → PWA → später App Store (iOS + Android)
 **Sprachen:** Mehrsprachig (Deutsch + Englisch)
@@ -15,6 +16,233 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 ---
 
 ## Aktueller Stand
+
+### ✅ Eigene Trainingspläne repariert + zusammengeführt (30.08.2026)
+Josefs Bruder scheiterte im **Gastmodus** daran, einen eigenen Plan zu erstellen.
+Zwei Ursachen, beide im Code belegt:
+
+**1. Der „Übungen"-Knopf im Wochenplan-Builder war tot.** `WeeklyPlanBuilder`
+rief `onSelectExercises(day, cb)` auf, aber `TrainingPage` hat den Prop **nie
+übergeben** — `if (onSelectExercises)` schluckte den Klick lautlos. Weil der
+Speichern-Knopf gesperrt bleibt, bis jeder Tag konfiguriert ist, war der Weg
+„Tagen echte Übungen zuweisen" eine **Sackgasse**: der Plan ließ sich gar nicht
+speichern.
+
+**2. Hinzugefügte Übungen wurden nie gespeichert.** Der Übungskatalog war ein
+*View-Wechsel derselben Seite* — die Detailansicht wurde dabei abgebaut, das
+`changed`-Flag fiel auf `false`, und danach erschien weder der Speichern-Knopf
+noch speicherte der Workout-Start. ⚠️ **Lehre: In `TrainingPage` ist alles ein
+`view`-State ohne eigene Routen.** Wer dorthin wechselt, verliert den State der
+verlassenen Komponente. Untersichten wie den Katalog deshalb als **Overlay im
+selben Komponentenbaum** rendern, nicht über `setView`.
+
+Weitere behobene Fehler:
+- **Eigene Übungen fielen aus dem Workout.** `handleStartPlan` filterte über
+  `getExerciseById`, das nur den statischen Katalog kennt → `return null` →
+  `.filter(Boolean)` entfernte sie kommentarlos.
+- **Eigene Übungen erschienen als rohe ID.** Neu `getExerciseDisplayName` in
+  `exercises.js`; das `__custom__`-Präfix wird zentral im
+  **`parseMissingKeyHandler`** der i18n-Konfiguration abgezogen — eine Stelle
+  statt 51 Anzeigestellen in 17 Dateien.
+- **Datenverlust beim Bearbeiten:** der Builder machte `delete` + `insert`.
+  Schlug das Speichern fehl, war der Plan weg. Neu `updateWeeklySchedule`.
+- **„Aktivieren" erzeugte ein Duplikat**, weil es über `saveWeeklySchedule` lief
+  — das macht **immer INSERT**, es gab keinen Update-Pfad. Neu
+  `activateWeeklySchedule`.
+- **Übungstage waren nie startbar:** gespeichert wurde `type: 'exercises'`, aber
+  `startTodaySession` erkennt nur `'strength'`. Jetzt `'strength'`; der alte Wert
+  wird beim Lesen weiter akzeptiert.
+- Sätze/Wdh. gingen verloren (Reduktion auf IDs) → werden mitgespeichert und sind
+  in der Detailansicht einstellbar.
+- Stumme `.catch(() => {})` → `try/catch/finally` mit Toast; ohne `finally` blieb
+  der Knopf dauerhaft auf „…". Löschen fragt nach.
+
+**Zusammenführung:** Es gab **zwei Orte**, die beide „Plan" hießen und beide einen
+Erstellen-Knopf hatten — `weekly_schedules` („Meine Pläne") und `custom_plans`
+(„Trainingspläne"). Jetzt ist **„Meine Pläne" der einzige Ort für eigene Pläne**
+(getrennte Abschnitte „Wochenpläne" / „Einzelne Trainingspläne"), der „+"-Knopf
+fragt vorher, was entstehen soll, und **„Trainingspläne" ist die reine
+Vorlagen-Ansicht**. Umgesetzt über die Props `templatesOnly` / `initialView` an
+`TrainingPlans` plus Export der vorhandenen `PlanCard` — die Start-Logik der fünf
+Plantypen wurde **nicht** dupliziert. ⚠️ **Keine Datenmigration:** beide Tabellen
+bleiben bestehen, nur die Oberfläche führt sie zusammen. Bestehende Pläne laufen
+unverändert weiter.
+
+**Verifiziert im Gastmodus** gegen die gebaute App (Playwright gegen
+`vite preview`): Plan anlegen → Übungen aus dem Katalog → eigene Übung erstellen →
+speichern → neu laden → Plan und Übungen erhalten, eigene Übung namentlich im
+Workout. Aktivieren erzeugt kein Duplikat mehr. Lint 129 → 125 Probleme, keine
+neuen; Build grün.
+
+⚠️ **Für lokale Tests braucht es eine `.env`** mit `VITE_SUPABASE_URL` und
+`VITE_SUPABASE_ANON_KEY` — sonst bricht die App beim Start mit
+„supabaseUrl is required" ab und zeigt eine **weiße Seite**. Im Gastmodus genügen
+Platzhalterwerte, es geht kein Netzaufruf raus.
+### ✅ iOS ist LIVE — freigegeben am 28.08.2026, 08:55 UTC
+Version **1.0 ist im App Store veröffentlicht**. Damit ist 2.1(b) endgültig
+ausgestanden: die Einreichung vom 14.08. mit Build 6 **samt beider Abos** ist
+durchgegangen. Gemessen über die öffentliche iTunes-Lookup-API (AT und DE),
+nicht über ASC.
+
+**Der öffentliche Link ist bereits sauber** — Apple bildet ihn aus dem
+App-Namen, deshalb steht dort FullRep statt MyPeak:
+`https://apps.apple.com/at/app/fullrep-training-ernährung/id6788461300`
+Zum Teilen besser die kurze, namensunabhängige Form:
+**`https://apps.apple.com/app/id6788461300`**
+
+⚠️ **Der Play-Link enthält dauerhaft `mypeak`** und das lässt sich nicht ändern:
+`https://play.google.com/store/apps/details?id=at.gallab.mypeak` — der
+`id=`-Parameter **ist** die Paket-ID, und Google kennt keinen zweiten Adressweg
+zu einer App. Nicht daran herumbasteln; eine neue Paket-ID hieße neue App ohne
+Update-Pfad. Auf der Store-Seite selbst steht durchgehend FullRep (geprüft).
+
+**Was jetzt zuerst zu beobachten ist:** Premium ist auf iOS erstmals mit echtem
+Geld kaufbar. Beim **ersten echten Kauf** nachsehen, ob der RevenueCat-Webhook
+`premium_until` setzt — dieselbe Kette wurde nur im Sandbox verifiziert. Ebenso
+offen: die AdMob-iOS-App mit dem Store-Eintrag verknüpfen (für Android am 29.07.
+erledigt, für iOS stand es unter „offen nach Launch").
+
+⚠️ **Die drei Neuregistrierungen vom 28.08., 09:05–09:06** kamen zehn Minuten
+nach der Freigabe — das waren die ersten Nutzer aus dem App Store.
+
+
+### Endpunkt-Tests (28.08.2026) — `npm test`
+122 Tests über **alle sieben** Funktionen in `api/`, je einmal für **Gast**
+(ohne Token) und **eingeloggt**. Vitest, `environment: 'node'`, Prüfstand in
+`tests/helpers/apiHarness.js`. Läuft in unter einer Sekunde, **ohne Netz, ohne
+Supabase, ohne Secrets** — global `fetch` ist ersetzt, alle Env-Vars sind
+Attrappen. CI: `.github/workflows/tests.yml` bei jedem Push.
+
+**Der Kniff im Prüfstand:** der `fetch`-Ersatz **wirft** bei jedem nicht
+eingeplanten Aufruf. Damit fällt auf, wenn ein Endpunkt Gemini oder Claude ruft,
+*bevor* er Anmeldung, Premium oder Kontingent geprüft hat — der Fehler, den man
+sonst erst auf der Rechnung sieht. `expectNoModelCall()` sichert das zusätzlich
+an jedem Abweis-Pfad zu.
+
+`tests/api/endpoint-contract.test.js` liest `api/` selbst aus: ein **neuer**
+Endpunkt wird automatisch mitgeprüft (gibt ohne Anmeldung nichts heraus, wirft
+nicht bei Netzausfall) und die Liste der erwarteten Dateien bricht absichtlich,
+sobald einer dazukommt. `health.js` steht als einziges auf der Öffentlich-Liste.
+
+### ⚠️ GitHub Actions führt keine Jobs mehr aus (28.08.2026)
+`tests.yml` schlägt fehl — **nicht wegen der Tests**. Gemessen an drei Läufen
+(zwei per Push, einer von Hand): Abbruch nach 4 Sekunden, **0 ms abgerechnete
+Rechenzeit**, kein Protokoll (HTTP 404). Der Job wird gar nicht erst auf einen
+Runner gelegt. Ein Fehler im Workflow oder in den Tests würde Rechenzeit
+verbrauchen und ein Protokoll hinterlassen.
+
+Der Handstart schließt den Push-Auslöser als Ursache aus. Alle 28 früheren
+Läufe des Repos waren `workflow_dispatch` und liefen zuletzt am **15.08.**
+erfolgreich — dazwischen ist die Ausführung kontoweit weggefallen.
+
+**Wahrscheinlichste Ursache, nicht belegt:** Actions-Minuten oder ein
+Ausgabenlimit erschöpft. Das Repo ist privat, und die macOS-Läufe
+(`iOS Release`) zählen **zehnfach**. Nachsehen unter
+**github.com/settings/billing** → „Actions". Über die API ist die Abrechnung
+nicht einsehbar. **Bis das geklärt ist: `npm test` vor jedem Push lokal laufen
+lassen** — die CI fängt derzeit nichts ab.
+
+⚠️ **`npm run lint` über das ganze Projekt ist rot** — 106 Fehler, 24 Warnungen,
+alle vorbestehend in `src/` (ungenutzte Importe, `react-hooks`-Regeln). Die CI
+lintet deshalb nur `api/` + `tests/`. Wird der Altbestand aufgeräumt, kann im
+Workflow wieder `npm run lint` stehen.
+
+**Zwei echte Bugs, die beim Schreiben der Tests aufgefallen sind:**
+1. `analyze-meal.js` meldete einen **Netzausfall als „429 Rate-Limit"**, wenn ein
+   früherer Versuch ein echtes 429 war: `last429` wurde nur zurückgesetzt, wenn
+   der `fetch` *antwortete*, nicht wenn er warf. Der Nutzer wartete auf ein
+   Kontingent, das nie das Problem war. Jetzt wird die Flagge zu Beginn **jedes**
+   Versuchs zurückgesetzt.
+2. `delete-account.js` fing **Netzwerkfehler gar nicht ab** — als einziger
+   Endpunkt. Ein Aussetzer bei Supabase warf aus dem Handler heraus und kam als
+   undurchsichtiger Plattform-Fehler an. Jetzt try/catch (503 bzw. 502) plus
+   `AbortSignal.timeout`, wie überall sonst.
+
+### Gastmodus-Tests der Storage-Schicht (28.08.2026)
+89 weitere Tests über `src/data/` — Übungen, Trainingspläne, Wochenpläne,
+Workouts, Übungsnotizen und Standardpläne, **je einmal als Gast und als
+eingeloggtes Konto**. Zusammen mit den Endpunkt-Tests: **211 Tests, `npm test`,
+unter 2 Sekunden.**
+
+Prüfstand: `tests/helpers/browserStubs.js` (localStorage-Attrappe, kein jsdom
+nötig) + `tests/helpers/supabaseMock.js` (thenable Query-Builder, der jeden
+`from(...)`-Aufruf mitschreibt). Damit lautet die Gast-Zusicherung schlicht
+`expect(supabase.__calls).toHaveLength(0)`.
+
+`tests/data/guest-contract.test.js` ruft **jede** Funktion der zehn
+Storage-Module mit `userId = 'guest'` auf und prüft, dass weder Supabase noch
+`fetch` angesprochen wird. Er wertet nur Funktionen, deren erster Parameter
+`userId` heißt (sonst wäre `'guest'` z. B. bei `lookupFriendCode(code)` ein
+Freundescode); die übersprungenen stehen als **sortierte Liste im Test** — kommt
+eine dazu, bricht er und zwingt zur Entscheidung.
+
+**Drei echte Bugs, die dabei aufgefallen sind:**
+1. **`local_${Date.now()}` kollidiert.** Zwei Einträge in derselben
+   Millisekunde bekamen **dieselbe Kennung** — Löschen des einen entfernte
+   beide, Ändern traf den falschen. Neu: **`src/data/localId.js`** mit
+   Sitzungszähler, inzwischen an **allen 11 Stellen** eingesetzt
+   (workoutStorage 3×, nutritionStorage 4×, supplementStorage 2×,
+   weightStorage, SupplementsOverview). Siehe „Der schlimmste Fall" unten.
+2. **Papierkorb ohne Gast-Weiche.** `getDeletedCustomPlans`, `restoreCustomPlan`
+   und `permanentDeleteCustomPlan` riefen Supabase auch im Gastmodus (mit
+   `userId = 'guest'`). `DeletedPlans.jsx` reicht `user.id` ungeprüft durch →
+   ein Gast wartete beim Öffnen des Papierkorbs bis zu 8 s auf eine Abfrage,
+   die nie etwas finden kann. Jetzt `isGuest`-Weiche wie überall sonst.
+3. **`deleteWeeklySchedule` löschte allein über die `id`**, ohne `user_id`.
+   Dank RLS nicht ausnutzbar, aber die einzige Ausnahme in der Datei —
+   angeglichen.
+
+**Der schlimmste Fall der Kennungs-Kollision — im Gastmodus erreichbar:**
+`AddFoodEntry.handleSaveAll` speichert die Mehrfachauswahl in einer Schleife
+(`AddFoodEntry.jsx:55`). Als Gast läuft die **ohne Netz**, also mehrere
+Durchläufe in derselben Millisekunde → alle Einträge bekamen dieselbe Kennung.
+Wer danach **einen** Eintrag löschte, verlor **alle**. Im Test nachgestellt
+(`tests/data/nutrition.test.js`), vor dem Fix rot.
+
+### Fachlogik-Tests Ernährung, Supplemente, Gewicht (28.08.2026)
+49 weitere Tests, damit die `localId()`-Umstellung nicht blind erfolgt:
+Ernährungseinträge inkl. Mehrfachauswahl und Nachholliste für fehlgeschlagene
+Cloud-Löschungen, eigene Mahlzeiten, Ziele (auch ein bewusstes Ziel **0**),
+Wasser-Tracking (Summe wird nach dem Abziehen neu berechnet), Supplement-Plan
+und Einnahme-Haken, Gewichtsverlauf (ein Eintrag pro Tag, aufsteigend sortiert).
+**Gesamt: 260 Tests, `npm test`, gut 2 Sekunden.**
+
+⚠️ **Was weiterhin NICHT abgedeckt ist:** `cycleStorage`, `dietStorage` und
+`socialStorage` haben **nur** den übergreifenden Gast-Vertrag, keine eigenen
+Tests für ihre Fachlogik. Ebenso ungetestet: die React-Komponenten und
+`resync.js` (Gast → Konto).
+
+⚠️ **Die CI läuft nicht** — siehe eigenen Abschnitt unten.
+
+
+### Vier Konten dauerhaft auf Premium gesetzt (28.08.2026)
+Drei Neuregistrierungen vom 28.08. plus Josefs eigenes Konto wurden von Hand
+freigeschaltet: `status = 'premium'`, `premium_until = 2099-01-01`,
+**`provider = 'promo'`**. Der Apple-Prüfaccount `appreview@wellbooked.at` blieb
+bewusst außen vor. Gemacht im Supabase SQL Editor, am Ergebnis gegengeprüft
+(4 Zeilen, Datum gesetzt).
+
+⚠️ **`provider = 'promo'` heißt: nie bezahlt.** Wer Umsätze zählt oder Käufe
+sucht, muss diese vier Zeilen ausschließen — sonst tauchen sie als Kunden auf,
+für die nie Geld geflossen ist.
+
+Der Weg dafür liegt jetzt als **`supabase/grant-premium.sql`** im Repo
+(nachsehen → freischalten → gegenprüfen → zurücknehmen). Die Datei führt
+absichtlich **Platzhalter statt echter Adressen** — Nutzer-E-Mails gehören nicht
+in die Versionsgeschichte.
+
+⚠️ **Der Management-API-Weg ist aus der Claude-Umgebung zu:** `api.supabase.com`
+antwortet auch ohne Token mit `403, error code: 1010` (Cloudflare blockt nach
+Signatur). Die Tokens `SUPABASE_ACCESS_ALMAZ` / `_ANIGOSHA` in der Umgebung sind
+damit für Datenbankarbeit wertlos — **solche Änderungen laufen über den SQL
+Editor**, nicht über ein Skript. Nicht erneut daran hängenbleiben.
+
+⚠️ **Am Handy frisst die iOS-Autokorrektur SQL.** Beim Einfügen wurde aus
+`holztechnikum.at` still ein `holztechnikum.-at`; die Abfrage wäre
+durchgelaufen und hätte nur 3 statt 4 Zeilen geschrieben. Deshalb gehört an
+jedes schreibende Statement ein **`RETURNING`** — die Zeilenzahl ist die
+einzige Kontrolle, die auffällt.
+
 
 ### ✅ RevenueCat-Android fertig (15.08.2026) — AAB 15/1.3.0 gebaut, Upload offen
 In der RevenueCat-Konsole war das meiste längst da; nachgesehen statt neu gebaut:
@@ -620,7 +848,7 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
   nicht — sichtbar nur an niedrigerem eCPM, nie als Fehlermeldung. Die Publisher-ID gilt
   **kontoweit**, dieselbe Zeile liegt bei Mahjong Royale und Swaply.
 - **Wo Google sie sucht:** an der Website aus dem Play-Eintrag (`contactWebsite`, aktuell
-  `https://my-peak.vercel.app`) + `/app-ads.txt`. Ändert sich die Domain im Store, muss die Datei
+  `https://fullrep.vercel.app`) + `/app-ads.txt`. Ändert sich die Domain im Store, muss die Datei
   mitwandern, sonst ist sie wirkungslos.
 - **Achtung, SPA-Falle:** `vercel.json` hat einen Catch-all `"/(.*)" → "/index.html"`, d. h. **jeder**
   unbekannte Pfad antwortet mit `200` und HTML statt mit `404`. Für app-ads.txt ist das entschärft,
@@ -628,7 +856,7 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
   Deploy-Wurzel und schlägt den Catch-all (an `favicon.svg`/`icon-192.png` verifiziert). **Eine
   Änderung an `vercel.json` war deshalb NICHT nötig.** Beim Prüfen aber nicht auf den Statuscode
   hereinfallen: `200` allein beweist nichts, es zählt `Content-Type: text/plain` plus Inhalt.
-- **Prüfen:** `curl -sD- https://my-peak.vercel.app/app-ads.txt | head -3` — muss `text/plain` und
+- **Prüfen:** `curl -sD- https://fullrep.vercel.app/app-ads.txt | head -3` — muss `text/plain` und
   die Zeile zeigen. Googles Bestätigung in AdMob läuft als täglicher Crawl, nicht sofort; die
   Meldung „konnte nicht bestätigt werden" direkt nach dem Verknüpfen ist normal.
 

@@ -315,3 +315,36 @@ export function getExerciseById(id) {
   }
   return found;
 }
+// Selbst erstellte Übungen haben keinen Übersetzungsschlüssel. Damit sie sich
+// wie Katalog-Übungen anfassen lassen, tragen sie ihren Namen im nameKey mit
+// diesem Präfix. Wer den Namen anzeigt, muss ihn hier wieder abziehen.
+export const CUSTOM_NAME_PREFIX = '__custom__';
+
+function stripCustomPrefix(nameKey, t) {
+  return nameKey.startsWith(CUSTOM_NAME_PREFIX)
+    ? nameKey.slice(CUSTOM_NAME_PREFIX.length)
+    : t(nameKey);
+}
+
+// Anzeigename einer Übung — kennt den Katalog UND selbst erstellte Übungen.
+// Ohne das zeigten Pläne bei eigenen Übungen die rohe technische ID.
+// `exercise` darf eine ID oder ein Übungsobjekt sein.
+export function getExerciseDisplayName(exercise, customExercises, t) {
+  const isObject = typeof exercise === 'object' && exercise !== null;
+  const id = isObject ? exercise.id : exercise;
+
+  const custom = (customExercises || []).find((ce) => (ce.exercise_id || ce.id) === id);
+  if (custom?.name) return custom.name;
+
+  if (isObject) {
+    if (exercise._customName) return exercise._customName;
+    if (exercise.name) return exercise.name;
+  }
+
+  const fromCatalog = exercises.find((e) => e.id === id);
+  if (fromCatalog?.nameKey) return stripCustomPrefix(fromCatalog.nameKey, t);
+
+  if (isObject && exercise.nameKey) return stripCustomPrefix(exercise.nameKey, t);
+
+  return String(id ?? '');
+}

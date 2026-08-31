@@ -11,13 +11,13 @@ import DeletedPlans from './DeletedPlans';
 // Re-export for backward compatibility (WorkoutStartChooser imports this)
 export const defaultPlans = defaultStrengthPlans;
 
-export default function TrainingPlans({ onBack, onStartPlan, onViewPlan, onStartHiit, onStartCircuit, onStartCardio, onStartMartialArts }) {
+export default function TrainingPlans({ onBack, onStartPlan, onViewPlan, onStartHiit, onStartCircuit, onStartCardio, onStartMartialArts, templatesOnly = false, initialView = 'list' }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [allCustomPlans, setAllCustomPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedArea, setSelectedArea] = useState('strength');
-  const [view, setView] = useState('list'); // 'list' | 'create' | 'deleted'
+  const [view, setView] = useState(initialView); // 'list' | 'create' | 'deleted'
   const [hiddenDefaults, setHiddenDefaults] = useState([]);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
@@ -227,7 +227,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onViewPlan, onStart
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => { setView('list'); resetCreateForms(); }} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={() => { resetCreateForms(); if (initialView === 'create') onBack(); else setView('list'); }} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold">{t('plans.createPlan')}</h1>
@@ -334,17 +334,20 @@ export default function TrainingPlans({ onBack, onStartPlan, onViewPlan, onStart
         ))}
       </div>
 
-      {/* Create Button */}
-      <button onClick={() => setView('create')} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:border-primary-400 hover:text-primary-500 transition-colors mb-4">
-        <Plus className="w-5 h-5" /><span className="font-medium">{t('plans.createPlan')}</span>
-      </button>
+      {/* Create Button — in der reinen Vorlagen-Ansicht nicht: eigene Plaene
+          entstehen ausschliesslich unter „Meine Plaene". */}
+      {!templatesOnly && (
+        <button onClick={() => setView('create')} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:border-primary-400 hover:text-primary-500 transition-colors mb-4">
+          <Plus className="w-5 h-5" /><span className="font-medium">{t('plans.createPlan')}</span>
+        </button>
+      )}
 
       {loading ? (
         <div className="text-center py-16"><Loader2 className="w-8 h-8 text-primary-600 animate-spin mx-auto" /></div>
       ) : (
         <>
           {/* Custom Plans */}
-          {customPlans.length > 0 && (
+          {!templatesOnly && customPlans.length > 0 && (
             <div className="mb-6">
               <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">{t('plans.customPlans')}</h2>
               <div className="flex flex-col gap-4">
@@ -381,7 +384,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onViewPlan, onStart
             </div>
           )}
 
-          {customPlans.length === 0 && defaults.length === 0 && (
+          {(templatesOnly ? true : customPlans.length === 0) && defaults.length === 0 && (
             <div className="text-center py-12 text-slate-400 dark:text-slate-500">
               <p>{t('training.noHistory')}</p>
             </div>
@@ -412,7 +415,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onViewPlan, onStart
 }
 
 // ── Plan Card Component ──────────────────────────────────────
-function PlanCard({ plan, type, t, onStart, onView, onDelete, isCustom }) {
+export function PlanCard({ plan, type, t, onStart, onView, onDelete, isCustom }) {
   const weightUnit = localStorage.getItem('weightUnit') || 'kg';
 
   // Strength plans (days array)

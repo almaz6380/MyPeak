@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowRight, Check, Plus, X, Dumbbell } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Dumbbell } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { saveWeeklySchedule } from '../../data/workoutStorage';
-import { getExerciseById } from '../../data/exercises';
+import { saveWeeklySchedule, updateWeeklySchedule } from '../../data/workoutStorage';
+import ExerciseLibrary from './ExerciseLibrary';
+import Toast from '../../components/Toast';
 
 const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -22,7 +23,7 @@ const SPLIT_TYPES = [
   { id: 'cardio', labelDE: 'Cardio', labelEN: 'Cardio' },
 ];
 
-export default function WeeklyPlanBuilder({ onBack, onSaved, onSelectExercises, editPlan }) {
+export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
@@ -49,6 +50,11 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, onSelectExercises, 
   });
   const [configuringDay, setConfiguringDay] = useState(null);
   const [saving, setSaving] = useState(false);
+  // Der Übungskatalog wird als Overlay über dem Builder gezeigt, nicht als
+  // Seitenwechsel — sonst wäre der Builder abgebaut und alle Eingaben (Name,
+  // Tage, bereits konfigurierte Tage) wären beim Zurückkommen verloren.
+  const [pickerDay, setPickerDay] = useState(null);
+  const [toast, setToast] = useState(null);
 
   function toggleDay(day) {
     setSelectedDays((prev) => {
@@ -71,40 +77,63 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, onSelectExercises, 
     }));
   }
 
-  function setDayExercises(day, exercises) {
+  // Tages-Typ ist 'strength': nur diesen Typ erkennt die „Heute"-Karte als
+  // startbares Training (TrainingPage.startTodaySession). Der frühere Wert
+  // 'exercises' wäre nie startbar gewesen.
+  function setDayExercises(day, picked) {
+    const list = picked.map((ex) => ({ id: ex.id, sets: 3, reps: 10 }));
     setDayConfigs((prev) => ({
       ...prev,
-      [day]: { type: 'exercises', label: `${exercises.length} ${lang === 'de' ? 'Übungen' : 'exercises'}`, exercises },
+      [day]: {
+        type: 'strength',
+        label: `${list.length} ${lang === 'de' ? 'Übungen' : 'exercises'}`,
+        exercises: list,
+      },
     }));
   }
 
+  // Tage aus Bestandsplänen können noch den alten Typ 'exercises' tragen.
+  const isExerciseDay = (config) => config?.type === 'strength' || config?.type === 'exercises';
+
   async function handleSave() {
-    if (!planName.trim()) return;
+    if (!planName.trim()) {
+      setToast({ variant: 'error', message: lang === 'de' ? 'Bitte gib dem Plan einen Namen.' : 'Please give the plan a name.' });
+      return;
+    }
     setSaving(true);
 
     const days = {};
     DAY_KEYS.forEach((day) => {
-      if (selectedDays.has(day) && dayConfigs[day]) {
-        days[day] = dayConfigs[day];
-      } else {
-        days[day] = null;
-      }
+      days[day] = selectedDays.has(day) && dayConfigs[day] ? dayConfigs[day] : null;
     });
 
-    if (isEditing && editPlan.id) {
-      // Update existing plan
-      const { deleteWeeklySchedule } = await import('../../data/workoutStorage');
-      await deleteWeeklySchedule(user.id, editPlan.id);
-    }
-
-    await saveWeeklySchedule(user.id, {
+    const payload = {
       name: planName.trim(),
       sessions_per_week: DAY_KEYS.filter((k) => days[k]).length,
       days,
-    });
+    };
 
-    setSaving(false);
-    onSaved();
+    try {
+      // Beim Bearbeiten wurde früher erst gelöscht und dann neu angelegt —
+      // schlug das Speichern fehl, war der Plan unwiderruflich weg.
+      const { error } = isEditing && editPlan.id
+        ? await updateWeeklySchedule(user.id, editPlan.id, payload)
+        : await saveWeeklySchedule(user.id, payload);
+
+      if (error) throw error;
+      onSaved();
+    } catch (err) {
+      console.error('Failed to save weekly plan:', err);
+      setToast({
+        variant: 'error',
+        message: lang === 'de'
+          ? 'Der Plan konnte nicht gespeichert werden. Bitte versuch es nochmal.'
+          : 'The plan could not be saved. Please try again.',
+      });
+    } finally {
+      // Ohne finally blieb der Knopf nach einem Fehler dauerhaft auf „…".
+      setSaving(false);
+    }
   }
 
   const dayLabel = (day) => t(`training.day_${day}`);
@@ -236,9 +265,26 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, onSelectExercises, 
     );
   }
 
+  // Übungskatalog als Overlay — der Builder bleibt darunter montiert.
+  if (pickerDay) {
+    return (
+      <div className="fixed inset-0 z-[70] bg-surface-light dark:bg-surface-dark overflow-y-auto">
+        <ExerciseLibrary
+          selectionMode
+          onBack={() => setPickerDay(null)}
+          onSelect={(picked) => {
+            if (picked?.length) setDayExercises(pickerDay, picked);
+            setPickerDay(null);
+          }}
+        />
+      </div>
+    );
+  }
+
   // ── Step 3: Configure each day ──
   return (
     <div className="p-4 pt-16 pb-24">
+      {toast && <Toast variant={toast.variant} message={toast.message} onDismiss={() => setToast(null)} />}
       <div className="flex items-center gap-3 mb-6">
         <button onClick={() => setStep(2)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
@@ -313,13 +359,9 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, onSelectExercises, 
                   {lang === 'de' ? 'Split-Typ' : 'Split Type'}
                 </button>
                 <button
-                  onClick={() => {
-                    if (onSelectExercises) {
-                      onSelectExercises(day, (exercises) => setDayExercises(day, exercises));
-                    }
-                  }}
+                  onClick={() => setPickerDay(day)}
                   className={`flex-1 py-2.5 rounded-xl text-sm font-medium border-2 transition-all ${
-                    config?.type === 'exercises'
+                    isExerciseDay(config)
                       ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-600'
                       : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
                   }`}
