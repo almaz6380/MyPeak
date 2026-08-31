@@ -10,6 +10,7 @@
 // Optional: ANTHROPIC_API_KEY.
 
 import coachKnowledge from './_coachKnowledge.js';
+import { corsBehandeln } from './_cors.js';
 
 const TRIAL_LIMIT = 5;     // Coach-Fragen/Tag während der Testphase
 const PREMIUM_LIMIT = 30;  // Coach-Fragen/Tag mit bezahltem Premium
@@ -160,6 +161,7 @@ async function sbFetch(supabaseUrl, serviceKey, path, init = {}) {
 }
 
 export default async function handler(req, res) {
+  if (corsBehandeln(req, res)) return; // Preflight der nativen App
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }

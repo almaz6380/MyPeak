@@ -7,6 +7,8 @@
 //
 // Benötigte Env-Vars: SUPABASE_URL(+ANON), SUPABASE_SERVICE_ROLE_KEY.
 
+import { corsBehandeln } from './_cors.js';
+
 const TRIAL_DAYS = 7;
 
 async function sbFetch(supabaseUrl, serviceKey, path, init = {}) {
@@ -22,6 +24,7 @@ async function sbFetch(supabaseUrl, serviceKey, path, init = {}) {
 }
 
 export default async function handler(req, res) {
+  if (corsBehandeln(req, res)) return; // Preflight der nativen App
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }

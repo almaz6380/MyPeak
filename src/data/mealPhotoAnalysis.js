@@ -1,5 +1,6 @@
 import { compressImage } from './exercisePhotos';
 import { supabase } from '../lib/supabase';
+import { API_BASIS } from './apiBasis';
 
 // Oil level adjustment multipliers (applied to fat content)
 const OIL_MULTIPLIERS = {
@@ -47,7 +48,7 @@ export async function analyzeMealPhoto(base64Image, language = 'de') {
       throw new Error('auth_required');
     }
 
-    const response = await fetch('/api/analyze-meal', {
+    const response = await fetch(`${API_BASIS}/api/analyze-meal`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ image: base64Image, language }),

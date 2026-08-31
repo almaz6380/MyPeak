@@ -10,7 +10,10 @@
 // Gibt NUR Modellnamen zurueck (oeffentliche Information), nie den Schluessel.
 // Login-Pflicht wie bei analyze-meal: sonst waere er ein anonymer
 // Lastpfad auf unser Google-Kontingent.
+import { corsBehandeln } from './_cors.js';
+
 export default async function handler(req, res) {
+  if (corsBehandeln(req, res)) return; // Preflight der nativen App
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
@@ -38,29 +41,44 @@ export default async function handler(req, res) {
   const probe = String(req.query?.probe || '').trim();
   if (probe) {
     if (!/^[a-z0-9.-]{3,60}$/.test(probe)) return res.status(400).json({ error: 'bad model name' });
+    // ?art=coach schickt statt der Mini-Probe die EXAKTE Anfrage-Form von
+    // api/coach.js (system_instruction, Temperatur, 800 Tokens). Grund: Die
+    // Mini-Probe war gruen, der Coach trotzdem stumm — ob es an der
+    // Anfrage-Form liegt, kann nur dieselbe Form zeigen.
+    const wieCoach = String(req.query?.art || '') === 'coach';
+    const body = wieCoach
+      ? {
+          system_instruction: { parts: [{ text: 'Du bist der FullRep Fitness-Coach. Antworte kurz auf Deutsch.' }] },
+          contents: [{ role: 'user', parts: [{ text: 'Wie viele Saetze pro Muskelgruppe und Woche sind fuer Anfaenger sinnvoll?' }] }],
+          generationConfig: { temperature: 0.4, maxOutputTokens: 800 },
+        }
+      : { contents: [{ parts: [{ text: 'Sag nur: ok' }] }], generationConfig: { maxOutputTokens: 5 } };
     const ergebnisse = {};
     for (const version of ['v1beta', 'v1']) {
+      const start = Date.now();
       try {
         const r = await fetch(
           `https://generativelanguage.googleapis.com/${version}/models/${probe}:generateContent?key=${apiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: 'Sag nur: ok' }] }], generationConfig: { maxOutputTokens: 5 } }),
-            signal: AbortSignal.timeout(15000),
+            body: JSON.stringify(body),
+            signal: AbortSignal.timeout(20000),
           }
         );
         const data = await r.json().catch(() => ({}));
         ergebnisse[version] = {
           status: r.status,
+          ms: Date.now() - start,
           fehler: data?.error?.message,
-          text: data?.candidates?.[0]?.content?.parts?.[0]?.text,
+          finishReason: data?.candidates?.[0]?.finishReason,
+          text: data?.candidates?.[0]?.content?.parts?.[0]?.text?.slice(0, 200),
         };
       } catch (err) {
-        ergebnisse[version] = { status: 0, fehler: err?.message };
+        ergebnisse[version] = { status: 0, ms: Date.now() - start, fehler: err?.message };
       }
     }
-    return res.status(200).json({ probe, ergebnisse });
+    return res.status(200).json({ probe, art: wieCoach ? 'coach' : 'mini', ergebnisse });
   }
 
   try {

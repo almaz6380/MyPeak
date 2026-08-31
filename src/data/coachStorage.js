@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { API_BASIS } from './apiBasis';
 
 // Fragt den KI-Coach über die Serverless-Funktion. Auth-Token wird
 // mitgeschickt; Kontingent + Themen-Grenzen setzt der Server durch.
@@ -8,7 +9,7 @@ export async function askCoach(messages, lang) {
   if (!token) return { error: 'login_required' };
 
   try {
-    const res = await fetch('/api/coach', {
+    const res = await fetch(`${API_BASIS}/api/coach`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ messages, lang }),

@@ -1,4 +1,7 @@
+import { corsBehandeln } from './_cors.js';
+
 export default async function handler(req, res) {
+  if (corsBehandeln(req, res)) return; // Preflight der nativen App
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
