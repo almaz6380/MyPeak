@@ -5,11 +5,27 @@
     }
   },
   "crons": [
-    { "path": "/api/health", "schedule": "0 6 * * *" },
-    { "path": "/api/backup", "schedule": "30 3 * * *" }
+    {
+      "path": "/api/health",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/backup",
+      "schedule": "30 3 * * *"
+    }
   ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/(get|app|download)",
+      "destination": "/get.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
