@@ -78,11 +78,12 @@ async function callGemini(apiKey, sys, messages, signal) {
     role: m.role === 'assistant' ? 'model' : 'user',
     parts: [{ text: String(m.content || '') }],
   }));
-  // ⚠ 2.0-flash hat Google abgeschaltet — die API antwortete ab dann mit 404,
-  // und weil der Fehler serverseitig blieb, sah der Nutzer nur „Coach nicht
-  // erreichbar" (31.08.2026, gegen die Live-API gemessen). Beim naechsten
-  // Google-Umbau faellt das wieder zuerst hier auf.
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  // ⚠ Modellname NIE raten — mit /api/gemini-modelle?probe=<name> nachmessen.
+  // 31.08.2026: 2.0-flash war abgeschaltet (404), der Nutzer sah nur „Coach
+  // nicht erreichbar". 2.5-flash stand zwar in ListModels, generateContent
+  // meldete aber: „no longer available to new users … use gemini-3.6-flash".
+  // 3.6-flash ist mit dem echten Schluessel geprueft (200).
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
