@@ -121,7 +121,10 @@ Return ONLY valid JSON in this exact format, no other text:
   "meal_description_en": "Short description of the meal"
 }`;
 
-  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  // ⚠ Modellname synchron mit api/coach.js halten — 2.0-flash wurde von Google
+  // abgeschaltet (404), was hier die Foto-Erkennung UND im Coach die Antworten
+  // gleichzeitig lahmlegte (31.08.2026).
+  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
   const geminiBody = JSON.stringify({
     contents: [
       {
