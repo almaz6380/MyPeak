@@ -11,10 +11,15 @@ on:
   workflow_dispatch:
     inputs:
       rollout:
-        description: 'An wie viele Nutzer veroeffentlichen?'
+        description: 'An wie viele Nutzer veroeffentlichen? (nur fuer production relevant)'
         type: choice
         default: 'complete'
         options: ['complete', '0.2', '0.5']
+      track:
+        description: 'Play-Track — internal = interner Test, dort zuerst am Geraet pruefen'
+        type: choice
+        default: 'production'
+        options: ['production', 'internal']
       notes:
         description: 'Was-ist-neu-Text (de-DE)'
         type: string
@@ -173,15 +178,18 @@ jobs:
           PLAY_KEY_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           ROLLOUT: ${{ inputs.rollout }}
           NOTES: ${{ inputs.notes }}
+          TRACK: ${{ inputs.track || 'production' }}
         run: |
           # Eigene venv: Ubuntu-Runner erlauben kein pip3 install ins System-Python.
           python3 -m venv /tmp/venv
           /tmp/venv/bin/pip install --quiet pyjwt cryptography
           printf '%s' "$PLAY_KEY_JSON" > /tmp/play-key.json
-          if [ "$ROLLOUT" = "complete" ]; then ARG="--complete"; else ARG="--fraction $ROLLOUT"; fi
+          # Ein gestaffelter Rollout gilt nur fuer production; im internen Test
+          # gibt es keine Fraktionen — dort immer complete.
+          if [ "$TRACK" != "production" ] || [ "$ROLLOUT" = "complete" ]; then ARG="--complete"; else ARG="--fraction $ROLLOUT"; fi
           PLAY_KEY=/tmp/play-key.json /tmp/venv/bin/python scripts/play-upload.py \
             --aab android/app/build/outputs/bundle/release/app-release.aab \
-            $ARG --notes "$NOTES"
+            --track "$TRACK" $ARG --notes "$NOTES"
           rm -f /tmp/play-key.json
 
       - name: Schluessel aufraeumen
