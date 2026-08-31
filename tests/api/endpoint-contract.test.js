@@ -29,6 +29,10 @@ describe('Vertrag aller api/-Endpunkte', () => {
     // ein Anstoß, ihn auch in die Tests aufzunehmen.
     expect(dateien).toEqual([
       'analyze-meal.js', 'backup.js', 'coach.js', 'delete-account.js',
+      // Diagnose (31.08.2026): listet die Gemini-Modelle des eigenen
+      // Schluessels bzw. probt eines an (?probe=). Login-Pflicht wie
+      // analyze-meal; gibt nur Modellnamen zurueck, nie den Schluessel.
+      'gemini-modelle.js',
       'health.js', 'revenuecat-webhook.js', 'start-trial.js',
     ]);
   });
