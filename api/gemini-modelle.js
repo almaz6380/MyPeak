@@ -30,6 +30,39 @@ export default async function handler(req, res) {
     return res.status(503).json({ error: 'Auth check failed' });
   }
 
+  // Probe: ?probe=<modellname> schickt ein Mini-generateContent an genau dieses
+  // Modell und reicht Googles Antwortstatus samt Fehlertext durch. Noetig
+  // geworden, weil ListModels gemini-2.5-flash LISTETE, generateContent darauf
+  // aber 404 meldete — welcher Teil da log, konnte nur Googles eigener
+  // Fehlertext sagen.
+  const probe = String(req.query?.probe || '').trim();
+  if (probe) {
+    if (!/^[a-z0-9.-]{3,60}$/.test(probe)) return res.status(400).json({ error: 'bad model name' });
+    const ergebnisse = {};
+    for (const version of ['v1beta', 'v1']) {
+      try {
+        const r = await fetch(
+          `https://generativelanguage.googleapis.com/${version}/models/${probe}:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: 'Sag nur: ok' }] }], generationConfig: { maxOutputTokens: 5 } }),
+            signal: AbortSignal.timeout(15000),
+          }
+        );
+        const data = await r.json().catch(() => ({}));
+        ergebnisse[version] = {
+          status: r.status,
+          fehler: data?.error?.message,
+          text: data?.candidates?.[0]?.content?.parts?.[0]?.text,
+        };
+      } catch (err) {
+        ergebnisse[version] = { status: 0, fehler: err?.message };
+      }
+    }
+    return res.status(200).json({ probe, ergebnisse });
+  }
+
   try {
     const r = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models?pageSize=100&key=${apiKey}`,
