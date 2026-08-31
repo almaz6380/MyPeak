@@ -158,13 +158,20 @@ def main():
     shoot(html, 1024, 500, os.path.join(OUT, "feature-graphic.png"), chrome)
 
     # ── Facebook-Titelbild 820x312 ────────────────────────────────────────
-    # ⚠ Der Rahmen ist 820x312, aber Facebook schneidet auf dem Handy die
-    # SEITEN weg — sichtbar bleibt grob die mittlere Spalte. Alles Wichtige
-    # sitzt deshalb zwischen x=90 und x=730; die Raender tragen nur Verlauf.
-    # Gerendert wird doppelt (1640x624), sonst wirkt die Schrift auf
-    # hochaufloesenden Displays weich.
+    # ⚠ Die Geometrie hier ist am echten Handy nachgemessen (31.08.2026), nicht
+    # geschaetzt — der erste Entwurf lag daneben:
+    #
+    #   * Facebook zeigt auf dem Handy nur die MITTLEREN ~507 von 820 px
+    #     (sichtbares Band 1.63:1 statt unserer 2.63:1). Alles links von x=156
+    #     oder rechts von x=664 sieht dort niemand.
+    #   * Das Profilbild liegt MITTIG ueber dem Titelbild (nicht links wie am
+    #     Rechner) und verdeckt x=304..518 ab y=191 abwaerts.
+    #
+    # Daraus folgt der Aufbau: eine zentrierte Spalte im oberen Bereich, die bei
+    # y=159 endet. Das Zeichen ist bewusst NICHT mehr drauf — es steht als
+    # Profilbild direkt darunter, doppelt waere es nur im Weg.
     cover = f"""<style>
-      {kopf([400, 800])}
+      {kopf([800])}
       /* Entworfen in 820x312 (so denkt Facebook), ausgegeben in doppelter
          Groesse: --force-device-scale-factor wirkt in diesem Chromium NICHT
          auf den Screenshot, deshalb die Skalierung im Dokument selbst. */
@@ -173,34 +180,21 @@ def main():
         -webkit-font-smoothing:antialiased}}
       .zoom{{width:820px;height:312px;transform:scale(2);transform-origin:0 0}}
       .wrap{{position:relative;width:820px;height:312px;overflow:hidden;
-        background:radial-gradient(120% 150% at 26% 50%, #2a2113 0%, {BG} 60%)}}
-      /* Zeichen + Text als Flex-Zeile in der handysicheren Spalte (640 breit,
-         mittig). Flex zentriert nach der TATSAECHLICHEN Textbreite — eine fest
-         gesetzte Breite laege daneben, sobald der Text sich aendert. */
-      /* Das Profilbild der Seite ueberlappt das Titelbild unten links. Der
-         Innenabstand unten hebt das Motiv aus dieser Ecke heraus. */
-      .safe{{position:absolute;left:90px;top:0;width:640px;height:312px;
-        padding-bottom:30px;
-        display:flex;align-items:center;justify-content:center;gap:52px}}
-      .mark{{width:150px;height:150px;flex:0 0 auto}}
-      .text{{flex:0 1 auto}}
-      h1{{margin:0;font-weight:800;font-size:48px;letter-spacing:-1.5px;
+        background:radial-gradient(105% 165% at 50% 30%, #2f2415 0%, {BG} 62%)}}
+      /* Oberhalb von y=191 bleiben, sonst verschluckt es das Profilbild. */
+      .text{{position:absolute;left:0;top:0;width:820px;height:191px;
+        display:flex;flex-direction:column;align-items:center;
+        justify-content:center;text-align:center}}
+      h1{{margin:0;font-weight:800;font-size:46px;letter-spacing:-1.5px;
         color:#fef3c7;line-height:1}}
       h1 span{{color:{GOLD}}}
-      h2{{margin:11px 0 0;font-weight:800;font-size:20px;color:#ffffff;
+      h2{{margin:10px 0 0;font-weight:800;font-size:19px;color:#ffffff;
         line-height:1.3;white-space:nowrap}}
-      p{{margin:11px 0 0;font-weight:400;font-size:15px;color:#9a9186;
-        line-height:1.5;white-space:nowrap}}
-      p b{{font-weight:800;color:{GOLD}}}
     </style>
     <div class="zoom"><div class="wrap">
-      <div class="safe">
-      <img class="mark" src="{mark}">
       <div class="text">
         <h1>Full<span>Rep</span></h1>
         <h2>Training &amp; Ernährung in einer App</h2>
-        <p><b>Kostenlos starten</b> · iPhone &amp; Android</p>
-      </div>
       </div>
     </div></div>"""
     social = os.path.join(ROOT, "store-assets", "social")
