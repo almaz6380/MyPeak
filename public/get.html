@@ -57,7 +57,12 @@
     font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
+    align-items: center;
+    /* ⚠ KEIN justify-content: center. Ist der Inhalt hoeher als der Schirm,
+       schneidet ein zentrierter Flex-Container oben ab — und der abgeschnittene
+       Teil laesst sich nicht herunterscrollen. Genau das ist mit dem Screenshot
+       passiert: Icon und Name waren weg. `margin: auto` an main zentriert,
+       solange Platz ist, und gibt ihn sonst frei. */
     text-align: center;
     padding: max(32px, env(safe-area-inset-top)) 22px max(32px, env(safe-area-inset-bottom));
     position: relative; overflow-x: hidden;
@@ -71,19 +76,55 @@
   .glow.g2 { width: 420px; height: 420px; background: var(--amber-tief); opacity: 0.22; bottom: -180px; right: -140px; }
   .glow.g3 { width: 340px; height: 340px; background: var(--amber);      opacity: 0.10; top: 40%; right: -170px; }
 
-  main { position: relative; z-index: 1; width: 100%; max-width: 440px; }
+  main { position: relative; z-index: 1; width: 100%; max-width: 440px; margin: auto 0; }
 
+  /* Icon und Name nebeneinander statt Icon gross obendrueber.
+     ⚠ Das FullRep-Icon hat einen SCHWARZEN Grund. Auf der schwarzen Seite
+     verschwand es bis auf den Amber-Ring — es sah aus wie ein Ladefehler.
+     Der Amber-Rand gibt ihm eine Kante. */
+  .kopf { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 0 0 14px; }
   .icon {
-    width: 112px; height: 112px; border-radius: 25%;
-    display: block; margin: 0 auto 22px;
-    box-shadow: 0 22px 50px -14px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    width: 62px; height: 62px; border-radius: 24%;
+    display: block; flex: none;
+    box-shadow: 0 10px 26px -8px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(251, 191, 36, 0.35);
   }
 
   h1 {
     font-weight: 700;
-    font-size: clamp(2.3rem, 11vw, 3rem);
-    line-height: 1.05; letter-spacing: -0.02em;
-    margin: 0 0 12px;
+    font-size: clamp(2.1rem, 9vw, 2.6rem);
+    line-height: 1; letter-spacing: -0.03em;
+    margin: 0;
+  }
+
+  /* Der Screenshot traegt die Seite. Ohne ihn ist sie Text auf Schwarz — und
+     genau so sah sie aus. */
+  /* ⚠ Die Groesse haengt an der HOEHE (vh), nicht an der Breite. Der Screenshot
+     ist das laengste Element der Seite; waechst er mit der Breite, schiebt er auf
+     kurzen Schirmen den Store-Knopf unter die Falz — und einen Knopf, den man
+     erst scrollen muss, tippt niemand. Gemessen in scripts/pruefe-bio-seite.mjs
+     gegen die SICHTBARE Hoehe (iPhone: ~660 px, nicht 844). */
+  .schirm { position: relative; width: fit-content; margin: 20px auto 24px; }
+  .schirm img {
+    height: min(40vh, 300px); width: auto; display: block;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 30px 60px -18px rgba(0, 0, 0, 0.9);
+  }
+  /* Amber-Schein hinter dem Geraet — hebt es vom schwarzen Grund ab. */
+  .schirm::before {
+    content: ""; position: absolute; z-index: -1;
+    left: 50%; top: 10%; transform: translateX(-50%);
+    width: 132%; height: 78%;
+    background: radial-gradient(closest-side, rgba(251, 191, 36, 0.40), transparent);
+    filter: blur(34px);
+  }
+  /* Der Screenshot ist unten glatt beschnitten (scripts/bio-screenshot.mjs).
+     Die Blende laesst ihn auslaufen, statt ihn hart abbrechen zu lassen. */
+  .schirm::after {
+    content: ""; position: absolute; inset: auto 1px 1px; height: 26%;
+    border-radius: 0 0 20px 20px;
+    background: linear-gradient(to top, var(--grund) 10%, transparent);
+    pointer-events: none;
   }
 
   /* text-wrap: balance verteilt die Zeilen gleichmaessig, statt das letzte Wort
@@ -141,11 +182,19 @@
   <div class="bg"><div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div></div>
 
   <main>
-    <img class="icon" src="/icon-512.png" alt="FullRep App-Icon" width="112" height="112">
+    <div class="kopf">
+      <img class="icon" src="/icon-512.png" alt="FullRep App-Icon" width="62" height="62">
+      <h1>FullRep</h1>
+    </div>
 
-    <h1>FullRep</h1>
     <p class="claim" id="claim">Training und Ernährung in einer App.</p>
     <p class="meta" id="meta">Über 220 Übungen · Barcode-Scanner · Makro-Ringe</p>
+
+    <!-- width/height gesetzt, damit beim Laden kein Sprung entsteht und die
+         Knoepfe nicht unter dem Finger wegrutschen. -->
+    <div class="schirm">
+      <img src="/bilder/dashboard.webp" alt="" width="560" height="1120" fetchpriority="high">
+    </div>
 
     <div id="knoepfe"></div>
 
