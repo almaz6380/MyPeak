@@ -10,7 +10,7 @@
   ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(get|app|download)", "destination": "/get.html" },
+    { "source": "/(get|app|download|instagram|tiktok|facebook)", "destination": "/get.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
