@@ -15,14 +15,16 @@ export function datumsLocale(sprache = i18n.language) {
   return LOCALES[kurz];
 }
 
-// Wochentagskürzel, Montag zuerst — aus Intl, nicht aus einer Handliste.
+// Wochentage, Montag zuerst — aus Intl, nicht aus einer Handliste.
 // Der 5. Januar 2026 ist ein Montag; sieben Tage ab dort ergeben die Woche.
-export function wochentagKuerzel(sprache = i18n.language) {
+function wochentage(sprache, breite) {
   const locale = datumsLocale(sprache);
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(Date.UTC(2026, 0, 5 + i));
-    const s = d.toLocaleDateString(locale, { weekday: 'short', timeZone: 'UTC' });
+    const s = d.toLocaleDateString(locale, { weekday: breite, timeZone: 'UTC' });
     // Spanisch und Englisch hängen je nach Umgebung einen Punkt an („lun.").
     return s.replace(/\.$/, '');
   });
 }
+
+export const wochentagKuerzel = (sprache = i18n.language) => wochentage(sprache, 'short');

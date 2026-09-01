@@ -10,6 +10,8 @@ import { describeSegments } from './ActiveStructuredCardio';
 import Toast from '../../components/Toast';
 
 import { peakPrograms, peakCategories } from '../../data/peakPrograms';
+import { useUebersetzung, uebersetztesProgramm, studienBefund, kategorieName } from '../../data/uebersetzungen';
+import { tagesBeschriftung } from '../../data/tagesbeschriftung';
 
 const CAT_ICONS = { strength: Dumbbell, cardio: Heart, hiit: Zap, martial_arts: Swords };
 const CAT_COLORS = {
@@ -29,6 +31,8 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const lang = appSprache(i18n.language);
+  // Spanisches Programmpaket; null, solange es lädt oder die Sprache keines hat.
+  const paket = useUebersetzung('programs', i18n.language);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [activating, setActivating] = useState(false);
@@ -58,6 +62,7 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
       <ProgramDetail
         program={selectedProgram}
         lang={lang}
+        paket={paket}
         userGoal={userGoal}
         userExperience={userExperience}
         activating={activating}
@@ -65,7 +70,7 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
         onBack={() => setSelectedProgram(null)}
         onActivate={(customDays) => {
           const p = selectedProgram;
-          const name = lang === 'de' ? p.nameDE : p.nameEN;
+          const name = uebersetztesProgramm(p, lang, paket).name;
           setActivating(true);
           // _meta verknüpft den Schedule mit dem Programm → Wochen-Progression
           // wird zur Lesezeit aufgelöst (programResolver); alte Schedules ohne
@@ -115,7 +120,7 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
           <button onClick={() => setSelectedCategory(null)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-bold">{lang === 'de' ? cat?.nameDE : cat?.nameEN}</h1>
+          <h1 className="text-2xl font-bold">{kategorieName(cat, lang, paket)}</h1>
         </div>
 
         <div className="space-y-3">
@@ -135,7 +140,7 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                        {lang === 'de' ? program.nameDE : program.nameEN}
+                        {uebersetztesProgramm(program, lang, paket).name}
                       </p>
                       {isRecommended && <Star className="w-3.5 h-3.5 text-primary-500" />}
                     </div>
@@ -184,7 +189,7 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
                 <CatIcon className="w-6 h-6" />
               </div>
               <div className="flex-1">
-                <p className="text-base font-semibold text-slate-900 dark:text-white">{lang === 'de' ? cat.nameDE : cat.nameEN}</p>
+                <p className="text-base font-semibold text-slate-900 dark:text-white">{kategorieName(cat, lang, paket)}</p>
                 <p className="text-xs text-slate-400 mt-0.5">{count} {t('ui.programs2')}</p>
               </div>
               <ChevronRight className="w-5 h-5 text-slate-300" />
@@ -197,17 +202,15 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
 }
 
 // ── Program Detail with editable days + exercises ──
-function ProgramDetail({ program, lang, userGoal, userExperience, activating, activeScheduleName, onBack, onActivate }) {
+function ProgramDetail({ program, lang, paket, userGoal, userExperience, activating, activeScheduleName, onBack, onActivate }) {
   const { t } = useTranslation();
   const [confirmReplace, setConfirmReplace] = useState(false);
   const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
   const DAY_NAMES_SHORT = wochentagKuerzel(lang);
-  const DAY_NAMES = lang === 'de'
-    ? ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
-    : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   const levelInfo = LEVEL_LABELS[program.level] || LEVEL_LABELS.beginner;
   const isRecommended = (program.goal === userGoal) || (program.level === userExperience);
+  const text = uebersetztesProgramm(program, lang, paket);
 
   // Editable copy of days
   const [customDays, setCustomDays] = useState(() => JSON.parse(JSON.stringify(program.days)));
@@ -279,7 +282,7 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, ac
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
-          <h1 className="text-xl font-bold">{lang === 'de' ? program.nameDE : program.nameEN}</h1>
+          <h1 className="text-xl font-bold">{text.name}</h1>
           <div className="flex items-center gap-2 mt-1">
             <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${levelInfo.color}`}>
               {beschriftung(levelInfo, lang)}
@@ -294,7 +297,7 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, ac
       </div>
 
       <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-        {lang === 'de' ? program.descDE : program.descEN}
+        {text.desc}
       </p>
 
       {/* Warum dieser Plan? — Wirkweise + Studienlage (eingeklappt) */}
@@ -311,7 +314,7 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, ac
             <div className="px-4 pb-4">
               {program.whyDE && (
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
-                  {lang === 'de' ? program.whyDE : program.whyEN}
+                  {text.why}
                 </p>
               )}
               {program.studies?.length > 0 && (
@@ -322,7 +325,7 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, ac
                   {program.studies.map((s, i) => (
                     <p key={i} className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                       <span className="font-semibold text-slate-600 dark:text-slate-300">{s.name} ({s.year}):</span>{' '}
-                      {lang === 'de' ? s.findingDE : s.findingEN}
+                      {studienBefund(s, lang, paket)}
                     </p>
                   ))}
                 </div>
@@ -351,7 +354,7 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, ac
         <div className="bg-white dark:bg-surface-dark-alt rounded-xl p-3 mb-4 flex gap-2 border border-slate-100 dark:border-slate-800/60">
           <TrendingUp className="w-4 h-4 text-primary-500 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            {lang === 'de' ? program.progressionDE : program.progressionEN}
+            {text.progression}
           </p>
         </div>
       )}
@@ -422,7 +425,7 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, ac
                 <span className="text-xs font-semibold text-slate-500 w-8">{DAY_NAMES_SHORT[i]}</span>
                 {day ? (
                   <div className="flex-1 text-left">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">{day.label || day.type || ''}</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">{tagesBeschriftung(day.label, lang) || day.type || ''}</p>
                     {day.exercises && <p className="text-[10px] text-slate-400">{day.exercises.length} {t('ui.exercises')}</p>}
                     {day.type === 'cardio' && day.exerciseId && (
                       <p className="text-[10px] font-medium text-red-500">{exName(day.exerciseId)}</p>
@@ -437,8 +440,8 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, ac
                         {day.rounds} {t('ui.rounds')} · {fmtSec(day.workTime)} / {fmtSec(day.restTime)} {t('ui.rest')}
                       </p>
                     )}
-                    {(lang === 'de' ? day.focusDE : day.focusEN) && (
-                      <p className="text-[10px] text-primary-500 font-medium">{lang === 'de' ? day.focusDE : day.focusEN}</p>
+                    {text.fokus(DAY_KEYS[i], day) && (
+                      <p className="text-[10px] text-primary-500 font-medium">{text.fokus(DAY_KEYS[i], day)}</p>
                     )}
                   </div>
                 ) : (
@@ -508,7 +511,7 @@ function ProgramDetail({ program, lang, userGoal, userExperience, activating, ac
             <p className="text-center text-sm text-slate-500 dark:text-slate-400 mb-4">
               {t('ui.youCurrentlyHaveActiveschedulename', {
                 activeScheduleName,
-                programName: lang === 'de' ? program.nameDE : program.nameEN,
+                programName: uebersetztesProgramm(program, lang, paket).name,
               })}
             </p>
             <div className="flex gap-3">

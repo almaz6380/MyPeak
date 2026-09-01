@@ -135,6 +135,60 @@ for (const [bereich, [datei, exp, katExp, paketDatei]] of Object.entries(BEREICH
   }
 }
 
+// ── Peak-Programme ──
+// Wieder eine eigene Form: name, desc, why, progression und je Kampfsport-Tag
+// ein Schwerpunkt. Zusätzlich geprüft: die Studienbefunde (nach „Name|Jahr")
+// und die Tagesbeschriftungen, die in `tagesbeschriftung.js` liegen, weil sie
+// in der Datendatei nur auf Deutsch existieren.
+{
+  const { peakPrograms, peakCategories } = await laden('peakPrograms.js');
+  const paket = (await laden('es/programme.js')).default || {};
+  const tage = (await laden('tagesbeschriftung.js')).default || {};
+  const fehlend = [];
+  let fertig = 0;
+
+  for (const p of peakPrograms) {
+    const u = paket[p.id];
+    if (!u) { fehlend.push(p.id); continue; }
+    let ok = true;
+    for (const [feld, quelle] of [['name', p.nameDE], ['desc', p.descDE], ['why', p.whyDE], ['progression', p.progressionDE]]) {
+      if (gefuellt(quelle) && !gefuellt(u[feld])) { meckern(`programs/${p.id}: ${feld} fehlt`); ok = false; }
+    }
+    for (const [tag, d] of Object.entries(p.days || {})) {
+      if (!d) continue;
+      if (gefuellt(d.focusDE) && !gefuellt(u.fokus?.[tag])) {
+        meckern(`programs/${p.id}: Schwerpunkt für ${tag} fehlt`); ok = false;
+      }
+      // Jede Beschriftung muss in tagesbeschriftung.js stehen — sonst bliebe
+      // sie auch auf Englisch deutsch, und das fällt hier sonst niemandem auf.
+      if (gefuellt(d.label) && !gefuellt(tage[d.label]?.es)) {
+        meckern(`programs/${p.id}: Tagesbeschriftung „${d.label}" fehlt in tagesbeschriftung.js`); ok = false;
+      }
+    }
+    if (ok) fertig += 1;
+  }
+
+  const studien = new Map();
+  for (const p of peakPrograms) for (const s of p.studies || []) studien.set(`${s.name}|${s.year}`, s);
+  const studienOffen = [...studien.keys()].filter((k) => !gefuellt(paket.studien?.[k]));
+  for (const k of studienOffen) meckern(`programs: Studienbefund fehlt — ${k}`);
+
+  const katOffen = peakCategories.filter((c) => !gefuellt(paket.kategorien?.[c.id])).map((c) => c.id);
+  for (const k of katOffen) meckern(`programs: Kategorie fehlt — ${k}`);
+
+  const bekannt = new Set([...peakPrograms.map((p) => p.id), 'kategorien', 'studien']);
+  for (const k of Object.keys(paket)) if (!bekannt.has(k)) meckern(`programs: unbekannte id „${k}" im Paket`);
+
+  gesamtFertig += fertig;
+  gesamtOffen += fehlend.length;
+  if (!NUR_FEHLEND || fehlend.length) {
+    console.log(`  ${'programs'.padEnd(12)} ${`${fertig}/${peakPrograms.length}`.padStart(6)} Einträge`
+      + `  ·  Kategorien ${peakCategories.length - katOffen.length}/${peakCategories.length}`
+      + `  ·  Studien ${studien.size - studienOffen.length}/${studien.size}`);
+    if (fehlend.length) console.log(`      offen: ${fehlend.join(', ')}`);
+  }
+}
+
 console.log(`\n${gesamtFertig} Einträge übersetzt, ${gesamtOffen} offen.`);
 if (fehler) console.error(`${fehler} Fehler in bereits übersetzten Einträgen.`);
 process.exit(fehler ? 1 : 0);

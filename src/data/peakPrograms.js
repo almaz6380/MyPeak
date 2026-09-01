@@ -788,7 +788,10 @@ export const peakPrograms = [
 
 // ── Dev-Validator: Content-Fehler sofort in der Konsole melden ──
 // (Lehre aus dem Vorfall mit 28 kaputten Übungs-IDs.)
-if (import.meta.env.DEV) {
+// `?.` statt `.`: Ausserhalb von Vite (Pruefskripte in `scripts/`, die diese
+// Datei direkt per node importieren) gibt es `import.meta.env` gar nicht — ohne
+// den Fragezeichen-Punkt bricht schon der Import ab.
+if (import.meta.env?.DEV) {
   import('./exercises').then(({ getExerciseById }) => {
     const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
     peakPrograms.forEach((p) => {

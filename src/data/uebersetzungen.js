@@ -100,6 +100,33 @@ export function uebersetztesRezept(rezept, lang, paket) {
   };
 }
 
+// Peak-Programme. Auch hier eine eigene Form: `why`, `progression` und ein
+// Schwerpunkt je Trainingstag. Die Beschriftungen der Tage stehen NICHT im
+// Sprachpaket, sondern in `src/data/tagesbeschriftung.js` — sie wiederholen
+// sich über die Programme hinweg und fehlten bisher auch auf Englisch.
+export function uebersetztesProgramm(programm, lang, paket) {
+  if (!programm) return {};
+  const es = paket?.[programm.id];
+  const w = (feld, deFeld, enFeld) => es?.[feld] ?? (lang === 'de' ? programm[deFeld] : programm[enFeld]);
+  return {
+    name: w('name', 'nameDE', 'nameEN'),
+    desc: w('desc', 'descDE', 'descEN'),
+    why: w('why', 'whyDE', 'whyEN'),
+    progression: w('progression', 'progressionDE', 'progressionEN'),
+    // Schwerpunkt eines Tages, nachgeschlagen über den Wochentag-Schlüssel.
+    fokus: (tag, tagesDaten) =>
+      es?.fokus?.[tag] ?? (lang === 'de' ? tagesDaten?.focusDE : tagesDaten?.focusEN),
+  };
+}
+
+// Studienbefunde. Verschlüsselt nach „Name|Jahr", weil dieselbe Studie in
+// mehreren Programmen zitiert wird; Name und Jahr bleiben unübersetzt.
+export function studienBefund(studie, lang, paket) {
+  if (!studie) return '';
+  return paket?.studien?.[`${studie.name}|${studie.year}`]
+    ?? (lang === 'de' ? studie.findingDE : studie.findingEN);
+}
+
 // Kategorienamen — flache { id: 'Nombre' }-Tabelle unter dem Schlüssel
 // `kategorien` im jeweiligen Sprachpaket.
 export function kategorieName(kategorie, lang, paket) {
