@@ -157,6 +157,7 @@ const exercises = [
   { id: 'leg-extension', type: 'strength', muscleGroup: 'legs', equipment: 'machine', nameKey: 'exercises.legExtension', descKey: 'exercises.legExtensionDesc' },
   { id: 'leg-curl', type: 'strength', muscleGroup: 'legs', equipment: 'machine', nameKey: 'exercises.legCurl', descKey: 'exercises.legCurlDesc' },
   { id: 'lunges', type: 'strength', muscleGroup: 'legs', equipment: 'dumbbell', nameKey: 'exercises.lunges', descKey: 'exercises.lungesDesc' },
+  { id: 'hip-hinge', type: 'strength', muscleGroup: 'legs', equipment: 'dumbbell', nameKey: 'exercises.hipHinge', descKey: 'exercises.hipHingeDesc' },
   { id: 'romanian-deadlift', type: 'strength', muscleGroup: 'legs', equipment: 'barbell', nameKey: 'exercises.romanianDeadlift', descKey: 'exercises.romanianDeadliftDesc' },
   { id: 'hack-squat', type: 'strength', muscleGroup: 'legs', equipment: 'machine', nameKey: 'exercises.hackSquat', descKey: 'exercises.hackSquatDesc' },
   { id: 'pendulum-squat', type: 'strength', muscleGroup: 'legs', equipment: 'machine', nameKey: 'exercises.pendulumSquat', descKey: 'exercises.pendulumSquatDesc' },
@@ -224,6 +225,11 @@ const exercises = [
   { id: 'elliptical', type: 'cardio', cardioType: 'elliptical', nameKey: 'exercises.elliptical', descKey: 'exercises.ellipticalDesc' },
   { id: 'rowing-machine', type: 'cardio', cardioType: 'rowing', nameKey: 'exercises.rowingMachine', descKey: 'exercises.rowingMachineDesc' },
   { id: 'swimming', type: 'cardio', cardioType: 'swimming', nameKey: 'exercises.swimming', descKey: 'exercises.swimmingDesc' },
+  // Ergaenzt 01.09.2026: Geraete, fuer die wir aus dem Vital-Animations-
+  // Gratispaket eine Animation haben und die im Studio ueberall stehen.
+  { id: 'air-bike', type: 'cardio', cardioType: 'cycling', nameKey: 'exercises.airBike', descKey: 'exercises.airBikeDesc' },
+  { id: 'stepmill', type: 'cardio', cardioType: 'stepmill', nameKey: 'exercises.stepmill', descKey: 'exercises.stepmillDesc' },
+  { id: 'treadmill-walk', type: 'cardio', cardioType: 'walking', nameKey: 'exercises.treadmillWalk', descKey: 'exercises.treadmillWalkDesc' },
   { id: 'jump-rope', type: 'cardio', cardioType: 'jumprope', nameKey: 'exercises.jumpRope', descKey: 'exercises.jumpRopeDesc' },
 
   // === HIIT ===

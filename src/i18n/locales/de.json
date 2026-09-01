@@ -837,7 +837,15 @@
     "kneeStrikes": "Kniestöße",
     "kneeStrikesDesc": "Explosive Kniestöße aus dem Clinch oder der Distanz. Trainiert Hüftkraft und Balance.",
     "elbowStrikes": "Ellbogenschläge",
-    "elbowStrikesDesc": "Kurze, harte Ellbogentechniken aus der Nahdistanz. Präzision vor Kraft."
+    "elbowStrikesDesc": "Kurze, harte Ellbogentechniken aus der Nahdistanz. Präzision vor Kraft.",
+    "airBike": "Air Bike",
+    "airBikeDesc": "Ergometer mit Windrad und Armhebeln. Arme und Beine arbeiten zusammen — hohe Belastung bei geringer Gelenkbelastung.",
+    "stepmill": "Stepper",
+    "stepmillDesc": "Endlose Treppe. Sehr intensives Ausdauertraining fuer Beine und Gesaess.",
+    "treadmillWalk": "Gehen am Laufband",
+    "treadmillWalkDesc": "Zuegiges Gehen, gern mit Steigung. Schont die Gelenke und eignet sich gut zum Aufwaermen oder als lockere Einheit.",
+    "hipHinge": "Hueftscharnier",
+    "hipHingeDesc": "Grundbewegung fuer Kreuzheben und Rudern: Huefte nach hinten schieben, Ruecken gerade. Mit leichter Kurzhantel lernen, bevor Gewicht dazukommt."
   },
   "auth": {
     "login": "Anmelden",

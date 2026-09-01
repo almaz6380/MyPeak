@@ -1237,6 +1237,14 @@
     "kneeStrikes": "Rodillazos",
     "kneeStrikesDesc": "Rodillazos explosivos desde el clinch o a distancia. Trabaja la potencia de cadera y el equilibrio.",
     "elbowStrikes": "Codazos",
-    "elbowStrikesDesc": "Técnicas de codo cortas y contundentes en la distancia corta. Precisión antes que potencia."
+    "elbowStrikesDesc": "Técnicas de codo cortas y contundentes en la distancia corta. Precisión antes que potencia.",
+    "airBike": "Air Bike",
+    "airBikeDesc": "Bicicleta de ventilador con palancas para los brazos. Brazos y piernas trabajan juntos: muy exigente y suave para las articulaciones.",
+    "stepmill": "Escaladora",
+    "stepmillDesc": "Una escalera sin fin. Cardio muy intenso para piernas y glúteos.",
+    "treadmillWalk": "Caminar en cinta",
+    "treadmillWalkDesc": "Caminar a buen ritmo, mejor con inclinación. Cuida las articulaciones y va bien para calentar o para sesiones suaves.",
+    "hipHinge": "Bisagra de cadera",
+    "hipHingeDesc": "El movimiento base del peso muerto y el remo: lleva la cadera atrás y mantén la espalda recta. Apréndelo con una mancuerna ligera antes de añadir peso."
   }
 }

@@ -62,20 +62,41 @@ export const zuordnung = {
   '0078': 'Running_Treadmill',                          // run on treadmill
 };
 
+// Uebungen OHNE Fotoordner. Zwei davon gibt es bei uns laengst, sie zeigten
+// bisher nur nichts an — die Animation ist dort reiner Gewinn. Die uebrigen
+// sind neu angelegt (siehe src/data/exercises.js).
+export const direkt = {
+  '0062': 'cycling',                // Ergometer — Uebung existierte, ohne Bild
+  '0097': 'machine-lateral-raise',  // Seitheben Maschine — dito
+  '0053': 'air-bike',               // NEU
+  '0083': 'stepmill',               // NEU (0082 ist dieselbe Uebung, anderer Blickwinkel)
+  '0086': 'treadmill-walk',         // NEU
+  '0065': 'hip-hinge',              // NEU
+};
+
+// Uebungen, die sich einen Fotoordner mit einer animierten Uebung teilen, die
+// Animation aber NICHT bekommen duerfen: Dort zeigt sie ein anderes Geraet
+// oder eine andere Ausfuehrung.
+//
+// ⚠ Diese Liste ist noetig, weil mehrere Uebungs-IDs auf denselben Fotoordner
+// zeigen. Ohne sie bekaeme „einbeinige Beinpresse" die beidbeinige Animation.
+// Bei blossem Unterschied in der Last (Step-Ups mit/ohne Gewicht) bleibt sie
+// drin — die Bewegung ist dieselbe.
+export const ausnahmen = new Set([
+  'machine-hip-thrust',    // Animation zeigt Langhantel, nicht die Maschine
+  'single-leg-press',      // Animation zeigt BEIDE Beine
+  'leg-press-wide',        // weiter Stand ist der Kern der Uebung, Animation zeigt Standard
+  'rear-delt-fly-machine', // Animation zeigt Kabelzug, nicht die Maschine
+]);
+
 // Bewusst OHNE Entsprechung — hier zur Nachvollziehbarkeit, damit niemand
 // spaeter denkt, sie seien vergessen worden:
 //
-//   0053 air bike sprint          — wir haben kein Air Bike
 //   0055 barbell bulgarian split  — 0063 (Kurzhantel) passt besser zu unserer Uebung
 //   0058 barbell march            — haben wir nicht
-//   0062 cycling                  — wir haben kein Fahrrad-Ergometer
-//   0065 dumbbell hip hinge       — Bewegungsmuster, keine unserer Uebungen
 //   0070 kettlebell hold march    — haben wir nicht
 //   0071 kettlebell lift up       — haben wir nicht
 //   0080 seated overhead press    — Maschine; unsere Varianten sind Lang-/Kurzhantel
-//   0082 stepmill machine v1      — haben wir nicht
-//   0083 stepmill machine         — haben wir nicht
-//   0086 walk on treadmill        — wir haben nur „Running"
+//   0082 stepmill machine v1      — dieselbe Uebung wie 0083, anderer Blickwinkel
 //   0091 dumbbell upright row     — unsere Varianten sind Langhantel und Kabel
 //   0094 kettlebell overhead press— unsere Varianten sind Lang-/Kurzhantel
-//   0097 lateral raise machine    — unsere Varianten sind Kurzhantel und Kabel

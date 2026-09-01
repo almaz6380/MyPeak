@@ -150,3 +150,32 @@ Lag dem ZIP eine Lizenz- oder Copyright-Datei bei, gehoert sie nach § 5
 mitgefuehrt und in diesen Ordner. Josef hat nur die JSON und die MP4s
 geschickt — falls im ZIP noch eine `LICENSE`/`README` steckt, bitte
 nachreichen.
+
+## Nachtrag: sechs weitere Uebungen (01.09.2026)
+
+Von den 14 zunaechst ungenutzten Dateien liessen sich sechs verwerten:
+
+**Zwei Uebungen gab es bei uns laengst — sie zeigten nur nichts an:**
+`cycling` (Ergometer) und `machine-lateral-raise` (Seitheben an der Maschine).
+Reiner Gewinn, kein neuer Eintrag noetig.
+
+**Vier neu angelegt**, mit Namen und Beschreibung in DE, EN und ES:
+Air Bike, Stepper, Gehen am Laufband, Hueftscharnier. Letzteres ist die
+Lehruebung fuers Kreuzheben und fehlte bisher ganz.
+
+⚠ **Die Weiche laeuft seither ueber die UEBUNGS-ID, nicht ueber den
+Fotoordner.** Diese sechs haben gar kein Foto und waeren sonst leer geblieben.
+
+⚠ **`ausnahmen` in der Zuordnung ist kein Beiwerk.** Mehrere Uebungs-IDs
+zeigen auf denselben Fotoordner; ohne die Liste haette „einbeinige
+Beinpresse" die beidbeinige Animation bekommen, „Maschinen-Hip-Thrust" die
+Langhantel-Fassung. Vier Uebungen sind deshalb ausgenommen. Bei blossem
+Unterschied in der Last (Step-Ups mit/ohne Gewicht) bleibt die Animation.
+
+**Stand: 46 Uebungen mit Animation, 3,2 MB.**
+
+**Acht Dateien bleiben ungenutzt** — Uebungen, die wir nicht haben (Barbell
+March, Kettlebell March/Lift) oder reine Geraetevarianten schon vorhandener
+Uebungen (Kurzhantel-Rudern aufrecht, Kettlebell-Ueberkopfdruecken,
+Schulterdruecken sitzend, Bulgarian Split mit Langhantel, zweite
+Stepmill-Ansicht). Die Liste aufzublaehen macht die Uebungswahl schlechter.
