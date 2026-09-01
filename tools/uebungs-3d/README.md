@@ -92,3 +92,37 @@ einer zweiten Liste — sonst gaebe es zwei Wahrheiten.
 alten Fotos zurueck, wenn es nicht laedt. **Die Fotos bleiben deshalb im Repo,
 bis jede Animation von Auge geprueft ist.** `muted` + `playsInline` sind
 Pflicht, sonst verweigert iOS die automatische Wiedergabe.
+
+---
+
+## ⚠ VERWORFEN am 01.09.2026 — und was schon geprueft ist
+
+Zwei Anlaeufe, beide von Josef abgelehnt („Katastrophe"). Der Renderer bleibt
+im Repo, damit niemand dieselben Wege noch einmal geht. **Die 162 erzeugten
+Videos wurden geloescht** — 15 MB, die sonst in jedem App-Bundle mitgefahren
+waeren.
+
+**Anlauf 1** — Figur aus Kapseln, Bewegung aus geratenen Gelenkwinkeln.
+Ergebnis: Wurstkette mit falschen Bewegungen.
+
+**Anlauf 2** (im Code) — durchgehende Haut ueber einem Skelett, Bewegung ueber
+Hand-/Fussziele mit Zwei-Knochen-IK. Die BEWEGUNG war damit geloest
+(Bankdruecken sass), die FIGUR blieb ein glatter Mannequin ohne Anatomie.
+Gerechnete Schlaeuche werden kein modellierter Mensch — dafuer braucht es
+Modellierarbeit, keine Parameter.
+
+### Freie Quellen, konkret geprueft — alle unbrauchbar
+
+| Quelle | Warum nicht |
+|---|---|
+| **wger** (offene Fitness-Datenbank, API abgefragt) | nur **78 Videos fuer 46 Uebungen** — wir haben 162. Echte Personen statt einheitlichem Stil, im Schnitt **46 MB** je Datei, Lizenz **CC-BY-SA 4.0**: Namensnennung je Video, und Umkodieren waere ein Bearbeitungswerk mit Share-Alike-Pflicht |
+| **exercises-dataset** (GitHub, 1.324 Uebungen mit GIFs) | Medien sind **© Gym visual, „mit Erlaubnis weiterverteilt"** — die Erlaubnis gilt deren Projekt, nicht unserem. Exakt dieselbe Rechtefalle wie bei den heutigen Fotos |
+| **LottieFiles „free exercise animations"** | Symbolgrafiken, keine Uebungsdarstellungen |
+| **KI-Videoerzeugung** (fal.ai Kling/Wan) | nicht kostenlos (~80 $ fuer 162 Clips) und bei Bewegungsablaeufen unzuverlaessig |
+| **Mixamo** | Adobe-Konto noetig, und die Bibliothek enthaelt Alltagsbewegungen, keine Kraftuebungen |
+
+### Was es kostet, wenn es doch sein soll
+
+Fertige 3D-Bibliotheken mit ausdruecklicher App-Lizenz (geprueft 01.09.2026):
+**MoveKit** 220 Uebungen 199 $ / 412 fuer 299 $ (anatomische Puppe, roter
+Muskel — der Stil aus Josefs Referenzvideo) und **Gym Animations** ab 199 $.
