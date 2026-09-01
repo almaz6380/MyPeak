@@ -7,13 +7,15 @@ import { saveSetting } from '../data/settingsStorage';
 import FullRepLogo from '../components/FullRepLogo';
 import CardPhotoMotif from '../components/CardPhotoMotif';
 import { supabase } from '../lib/supabase';
-import { Moon, Sun, Globe, Weight, LogOut, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2, ShieldCheck, Crown } from 'lucide-react';
+import { Moon, Sun, Globe, Weight, LogOut, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2, ShieldCheck, Crown, HeartPulse } from 'lucide-react';
 import { useSubscription } from '../context/SubscriptionContext';
 import { getOrCreateFriendCode, getXP, getLevelTitle, calculateLevel, hasGoldenFrame } from '../data/socialStorage';
 import AchievementGallery from '../components/progress/AchievementGallery';
 import { canChangeAdConsent, changeAdConsent } from '../lib/ads';
 import { clearAllLocalPhotos } from '../data/exercisePhotos';
 import { API_BASIS } from '../data/apiBasis';
+import { Capacitor } from '@capacitor/core';
+import { healthVerfuegbar, istVerbunden, verbinden, trennen, gewichtImportieren } from '../lib/health';
 
 // Sichtbare Build-Kennung — muss bei jedem neuen Store-Build mitgezogen werden (siehe android/app/build.gradle)
 const APP_VERSION = '1.1.8 (13)';
@@ -37,6 +39,11 @@ export default function ProfilePage() {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(null);
   const [deletePassword, setDeletePassword] = useState('');
+  const [healthOn, setHealthOn] = useState(() => istVerbunden(user?.id));
+
+  useEffect(() => {
+    setHealthOn(istVerbunden(user?.id));
+  }, [user?.id]);
 
   useEffect(() => {
     if (user && !isGuestMode) {
@@ -360,8 +367,38 @@ export default function ProfilePage() {
               {weightUnit === 'kg' ? t('profile.kg') : t('profile.lbs')}
             </button>
           }
-          last
+          last={!healthVerfuegbar()}
         />
+
+        {/* Apple Health / Health Connect — Opt-in, nur nativ sichtbar.
+            Markennamen bleiben unuebersetzt. Beim Einschalten laeuft sofort
+            ein Gewichts-Import, damit der Effekt sichtbar ist. */}
+        {healthVerfuegbar() && (
+          <SettingRow
+            icon={<HeartPulse className="w-5 h-5" />}
+            label={Capacitor.getPlatform() === 'ios' ? 'Apple Health' : 'Health Connect'}
+            action={
+              <button
+                onClick={async () => {
+                  if (healthOn) {
+                    trennen(user?.id);
+                    setHealthOn(false);
+                    return;
+                  }
+                  const res = await verbinden(user?.id);
+                  if (res.ok) {
+                    setHealthOn(true);
+                    gewichtImportieren(user?.id);
+                  }
+                }}
+                className={`relative w-12 h-7 rounded-full transition-colors ${healthOn ? 'bg-primary-500' : 'bg-slate-300'}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${healthOn ? 'translate-x-5' : ''}`} />
+              </button>
+            }
+            last
+          />
+        )}
       </div>
 
       {/* Legal */}

@@ -8,4 +8,21 @@ import com.getcapacitor.BridgeActivity;
  * --safe-area-inset-bottom (die die BottomNav liest). KEIN eigener WindowInsets-Listener
  * hier — ein konkurrierender Listener macht Capacitors Safe-Area-Neuberechnung kaputt.
  */
-public class MainActivity extends BridgeActivity {}
+public class MainActivity extends BridgeActivity {
+
+    /**
+     * Beim Verlassen der App das Homescreen-Widget auffrischen. Die WebView hat
+     * bis hierher die aktuellen Zahlen in die SharedPreferences geschrieben
+     * (src/lib/widgetDaten.js); ohne diesen Anstoß sähe das Widget sie erst
+     * beim nächsten 30-Minuten-Tick.
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        try {
+            FullRepWidget.aktualisieren(this);
+        } catch (Exception ignored) {
+            // Widget-Refresh darf die App nie stören.
+        }
+    }
+}

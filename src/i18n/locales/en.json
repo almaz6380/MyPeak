@@ -23,7 +23,8 @@
     "weightAll": "All",
     "today": "Today",
     "yesterday": "Yesterday",
-    "tomorrow": "Tomorrow"
+    "tomorrow": "Tomorrow",
+    "steps": "Steps"
   },
   "training": {
     "title": "Training",

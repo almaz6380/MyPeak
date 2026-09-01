@@ -8,6 +8,8 @@ import { useAuth } from '../context/AuthContext';
 import { getNutritionEntries, getNutritionGoals, getWaterTotal } from '../data/nutritionStorage';
 import { getWorkouts } from '../data/workoutStorage';
 import { getXP } from '../data/socialStorage';
+import { widgetDatenAktualisieren } from '../lib/widgetDaten';
+import { istVerbunden, schritteHeute, gewichtImportieren } from '../lib/health';
 import { getSupplements, getSupplementLogs, getTodayScheduledSupplements, getSupplementProgress } from '../data/supplementStorage';
 import { getCycleSettings, getCyclePhase, getPhaseRecommendations } from '../data/cycleStorage';
 import { getWeightEntries, saveWeightEntry } from '../data/weightStorage';
@@ -76,6 +78,27 @@ export default function HomePage() {
     loadDashboard(() => alive);
     return () => { alive = false; };
   }, [user, selectedDate]);
+
+  // Homescreen-Widget mit frischen Zahlen versorgen — beim App-Start reicht
+  // einmal je Nutzer (nach Workouts schreibt ActiveWorkout selbst).
+  useEffect(() => {
+    if (user?.id) widgetDatenAktualisieren(user.id);
+  }, [user?.id]);
+
+  // Health (Opt-in): Schritte fuer die Trainings-Karte lesen und neue
+  // Gewichtseintraege aus Health uebernehmen. Beides still — schlaegt es
+  // fehl, sieht die Seite aus wie ohne Verbindung.
+  const [healthSteps, setHealthSteps] = useState(null);
+  useEffect(() => {
+    if (!user?.id || !istVerbunden(user.id)) { setHealthSteps(null); return; }
+    let alive = true;
+    schritteHeute(user.id).then((s) => { if (alive) setHealthSteps(s); });
+    gewichtImportieren(user.id).then((n) => {
+      // Frisch importierte Eintraege sollen den Verlauf sofort zeigen.
+      if (alive && n > 0) loadDashboard(() => alive);
+    });
+    return () => { alive = false; };
+  }, [user?.id]);
 
   async function loadDashboard(isAlive = () => true) {
     try {
@@ -344,6 +367,17 @@ export default function HomePage() {
                   <p className="text-xs text-slate-400">{t('home.streak')} ({t('home.days')})</p>
                 </div>
               </div>
+              {/* Schritte aus Apple Health / Health Connect — nur wenn die
+                  Verbindung im Profil aktiv ist und ein Wert lesbar war. */}
+              {healthSteps !== null && (
+                <>
+                  <div className="w-px h-8 bg-slate-200 dark:bg-slate-700" />
+                  <div>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{healthSteps.toLocaleString(i18n.language)}</p>
+                    <p className="text-xs text-slate-400">{t('home.steps')}</p>
+                  </div>
+                </>
+              )}
             </div>
           </button>
           {/* Weight Chart Card */}

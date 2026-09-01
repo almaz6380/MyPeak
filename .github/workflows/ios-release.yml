@@ -81,7 +81,6 @@ jobs:
         env:
           CERT_B64: ${{ secrets.IOS_CERT_P12_BASE64 }}
           CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
-          PROFILE_B64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
         run: |
           set -euo pipefail
           KEYCHAIN="$RUNNER_TEMP/build.keychain-db"
@@ -98,36 +97,67 @@ jobs:
             -s -k "$KEYCHAIN_PW" "$KEYCHAIN" >/dev/null
           security list-keychains -d user -s "$KEYCHAIN" \
             $(security list-keychains -d user | sed s/\"//g)
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          printf '%s' "$PROFILE_B64" | tr -cd 'A-Za-z0-9+/=' | base64 -d \
-            > ~/Library/MobileDevice/Provisioning\ Profiles/app.mobileprovision
           rm -f "$RUNNER_TEMP/cert.p12"
+
+      # ⚠ Die Provisioning-Profile kommen seit 01.09.2026 FRISCH von der
+      # ASC-API (scripts/ios-profile.py), nicht mehr aus dem Secret
+      # IOS_PROVISIONING_PROFILE_BASE64. Grund: Mit der Widget-Extension
+      # traegt die App eine App Group, und jede Faehigkeits-Aenderung an einer
+      # Bundle-ID macht deren bestehende Profile INVALID — ein statisches
+      # Secret waere ab da bei jedem Lauf tot, und aus einer Claude-Sitzung
+      # kann niemand Secrets erneuern. Das Skript ersetzt ungueltige Profile
+      # selbst (loeschen + neu anlegen, gleicher Name) und legt die
+      # Widget-Bundle-ID bei Bedarf an.
+      # ⚠ App Group anlegen/zuordnen kann die API NICHT — das ist Josefs
+      # einmaliger Handgriff im Developer-Portal (siehe CLAUDE.md, Widget).
+      - name: Provisioning-Profile von der API holen
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: |
+          set -euo pipefail
+          python3 -m venv /tmp/venv
+          /tmp/venv/bin/pip install --quiet pyjwt cryptography
+          ASC_KEY_P8=$(printf '%s' "$ASC_KEY_P8_BASE64" | tr -cd 'A-Za-z0-9+/=' | base64 -d)
+          export ASC_KEY_P8
+          PROFDIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$PROFDIR"
+          /tmp/venv/bin/python scripts/ios-profile.py \
+            --bundle at.gallab.mypeak --name "MyPeak AppStore" \
+            --faehigkeit HEALTHKIT --faehigkeit APP_GROUPS \
+            --out "$PROFDIR/app.mobileprovision"
+          /tmp/venv/bin/python scripts/ios-profile.py \
+            --bundle at.gallab.mypeak.widget --name "FullRep Widget AppStore" \
+            --bundle-anlegen "FullRep Widget" --faehigkeit APP_GROUPS \
+            --out "$PROFDIR/widget.mobileprovision"
 
       - name: ExportOptions schreiben
         run: |
           set -euo pipefail
-          PROFILE=~/Library/MobileDevice/Provisioning\ Profiles/app.mobileprovision
+          PROFDIR="$HOME/Library/MobileDevice/Provisioning Profiles"
 
           # Bei signingStyle=manual verlangt xcodebuild eine Zuordnung
-          # Bundle-ID -> Profilname; ohne sie bricht der Export ab mit
-          # "App.app requires a provisioning profile" — und zwar erst NACH dem
-          # Archivieren, also nach drei Minuten.
+          # Bundle-ID -> Profilname JE TARGET (App + Widget); ohne sie bricht
+          # der Export ab mit "requires a provisioning profile" — und zwar
+          # erst NACH dem Archivieren, also nach drei Minuten.
           #
-          # Name und Bundle-ID kommen aus dem Profil selbst statt aus einer
-          # Konstante: wird das Profil bei Apple neu erzeugt oder umbenannt,
+          # Namen und Bundle-IDs kommen aus den Profilen selbst statt aus
+          # Konstanten: wird ein Profil bei Apple neu erzeugt oder umbenannt,
           # stimmt es hier automatisch weiter.
-          security cms -D -i "$PROFILE" > /tmp/profile.plist
-          NAME=$(/usr/libexec/PlistBuddy -c "Print :Name" /tmp/profile.plist)
-          APPID=$(/usr/libexec/PlistBuddy -c "Print :Entitlements:application-identifier" /tmp/profile.plist)
-          BUNDLE=${APPID#*.}          # fuehrende Team-ID abschneiden
-          echo "Profil \"$NAME\" fuer $BUNDLE"
-
-          ERWARTET=$(grep -m1 PRODUCT_BUNDLE_IDENTIFIER ios/App/App.xcodeproj/project.pbxproj \
-                     | cut -d'=' -f2 | tr -d ' ;')
-          if [ "$BUNDLE" != "$ERWARTET" ]; then
-            echo "::error::Profil gilt fuer $BUNDLE, die App ist $ERWARTET."
-            exit 1
-          fi
+          ZUORDNUNG=""
+          for P in "$PROFDIR"/app.mobileprovision "$PROFDIR"/widget.mobileprovision; do
+            security cms -D -i "$P" > /tmp/profile.plist
+            NAME=$(/usr/libexec/PlistBuddy -c "Print :Name" /tmp/profile.plist)
+            APPID=$(/usr/libexec/PlistBuddy -c "Print :Entitlements:application-identifier" /tmp/profile.plist)
+            BUNDLE=${APPID#*.}          # fuehrende Team-ID abschneiden
+            echo "Profil \"$NAME\" fuer $BUNDLE"
+            if ! grep -q "PRODUCT_BUNDLE_IDENTIFIER = $BUNDLE;" ios/App/App.xcodeproj/project.pbxproj; then
+              echo "::error::Profil gilt fuer $BUNDLE, aber keine Target-Konfiguration traegt diese Bundle-ID."
+              exit 1
+            fi
+            ZUORDNUNG="$ZUORDNUNG    <key>$BUNDLE</key><string>$NAME</string>\n"
+          done
 
           cat > /tmp/ExportOptions.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
@@ -140,11 +170,12 @@ jobs:
             <key>signingStyle</key><string>manual</string>
             <key>provisioningProfiles</key>
             <dict>
-              <key>$BUNDLE</key><string>$NAME</string>
+          $(printf "$ZUORDNUNG")
             </dict>
           </dict>
           </plist>
           EOF
+          plutil -lint /tmp/ExportOptions.plist
           rm -f /tmp/profile.plist
 
       - name: Archivieren
