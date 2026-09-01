@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useUebersetzung, uebersetzt } from '../../data/uebersetzungen';
 import { ArrowLeft, ChevronDown, ChevronUp, FlaskConical, Brain, Flame, Heart, ShieldCheck, BookOpen, ChevronRight, Stethoscope } from 'lucide-react';
 import peptides from '../../data/peptidesData';
 import References from '../../components/References';
@@ -31,6 +32,8 @@ const categoryNames = {
 export default function PeptidesPage({ onBack }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language || 'de';
+  // Spanisches Inhaltspaket; null, solange es lädt oder die Sprache keines hat.
+  const paket = useUebersetzung('peptides', i18n.language);
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedPeptide, setSelectedPeptide] = useState(null);
   const [showEbook, setShowEbook] = useState(false);
@@ -49,18 +52,18 @@ export default function PeptidesPage({ onBack }) {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-xl font-bold">{lang === 'de' ? p.nameDE : p.nameEN}</h1>
+            <h1 className="text-xl font-bold">{uebersetzt(p, lang, paket).name}</h1>
             <p className="text-xs text-primary-400">{t('ui.detailedEBook')}</p>
           </div>
         </div>
 
         {p.sections && p.sections.length > 0 ? (
           <div className="space-y-3">
-            {p.sections.map((section, i) => (
+            {uebersetzt(p, lang, paket).sections.map((section, i) => (
               <EbookSection
                 key={i}
-                title={lang === 'de' ? section.titleDE : section.titleEN}
-                content={lang === 'de' ? section.contentDE : section.contentEN}
+                title={section.title}
+                content={section.content}
                 colorClass={SECTION_COLORS[i % SECTION_COLORS.length]}
                 defaultOpen={i === 0}
               />
@@ -85,7 +88,7 @@ export default function PeptidesPage({ onBack }) {
   if (selectedPeptide) {
     const p = selectedPeptide;
     const cat = CATEGORIES.find((c) => c.id === p.category);
-    const quick = lang === 'de' ? p.quickDE : p.quickEN;
+    const quick = uebersetzt(p, lang, paket).quick;
     const hasEbook = p.sections && p.sections.length > 0;
 
     return (
@@ -95,7 +98,7 @@ export default function PeptidesPage({ onBack }) {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold">{lang === 'de' ? p.nameDE : p.nameEN}</h1>
+            <h1 className="text-xl font-bold">{uebersetzt(p, lang, paket).name}</h1>
             <p className="text-xs text-slate-400 dark:text-slate-500">{categoryNames[p.category]?.[lang]}</p>
           </div>
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${cat?.color}`}>
@@ -107,7 +110,7 @@ export default function PeptidesPage({ onBack }) {
 
         {/* Summary */}
         <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-          {lang === 'de' ? p.summaryDE : p.summaryEN}
+          {uebersetzt(p, lang, paket).summary}
         </p>
 
         {/* Quick Info Cards */}
@@ -212,7 +215,7 @@ export default function PeptidesPage({ onBack }) {
                 <img src={`/bg-photos/pep-${peptide.category}-icon.png`} alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold truncate">{lang === 'de' ? peptide.nameDE : peptide.nameEN}</p>
+                <p className="font-semibold truncate">{uebersetzt(peptide, lang, paket).name}</p>
                 <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{categoryNames[peptide.category]?.[lang]}</p>
               </div>
               <div className="flex items-center gap-1.5 flex-shrink-0">
