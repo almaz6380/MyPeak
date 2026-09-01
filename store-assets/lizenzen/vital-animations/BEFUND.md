@@ -1,0 +1,64 @@
+# Beleg: Gratis-Animationspaket von Vital Animations
+
+**Gesichert am 01.09.2026, 11:55 UTC** auf Josefs Wunsch („speicher für mich
+dieses bild zum beweiszweck ab"). Das Bildschirmfoto selbst liess sich nicht
+ablegen — es kam als eingebettetes Bild in den Chat und lag nie als Datei im
+Container. Gesichert ist stattdessen die QUELLE, die es zeigt; das ist
+belastbarer als ein Foto, weil jeder es nachpruefen kann.
+
+## Was gesichert ist
+
+`README-github-2026-09-01.md` — wortgleiche Kopie des README aus
+
+    https://github.com/exercisedb-pro/exercisedb-dataset
+
+| | |
+|---|---|
+| Commit | `36525388e100765cf4a1341fb2ea2ec057c1299b` |
+| Kurzform | `3652538` — **stimmt mit dem Bildschirmfoto ueberein** |
+| Groesse | 12.126 Bytes |
+| SHA-256 | `d63272fe7acc99c22799599f92aa6a07b915dc2ec03772cce4c9265e2349591f` |
+| Abgerufen | 01.09.2026, 11:55 UTC, ueber raw.githubusercontent.com |
+
+## Die entscheidenden Saetze (Abschnitt „🎁 Free Exercise Animations for Developers")
+
+> **Free HD workout animations** for developers building fitness apps — no
+> trial, no signup, no strings attached.
+
+> A starter set of **HD 1080p exercise animations + structured JSON metadata**,
+> using the same schema as the full Vital Animations dataset. **Free to use in
+> your own projects under the same commercial license terms as the paid
+> packages.**
+
+Enthalten laut README: HD-MP4-Animationen, JSON-Daten (`exerciseId`, Muskeln,
+Geraet, Schwierigkeit, Anleitung), Sofort-Download als ZIP.
+Bezugsstelle: https://vitalanimations.com/free-pack
+
+## Warum das zaehlt
+
+Der Satz verknuepft das Gratis-Paket ausdruecklich mit **denselben
+kommerziellen Lizenzbedingungen wie die Kaufpakete**. Die EULA (Fassung
+2026.1) erlaubt darunter in § 4 unter anderem: Nutzung in mobilen
+Anwendungen, Ablegen der Dateien IN der App („store the Assets offline inside
+your application"), Selbst-Hosten, Umkodieren und Verkleinern, Herausziehen
+von Einzelbildern — und ausdruecklich auch Marketing- und Social-Media-Nutzung.
+
+⚠ Die EULA selbst knuepft den Lizenzgewaehr-Satz in § 3 an „successful
+payment". Der Widerspruch dazu wird durch dieses README aufgeloest, das der
+Anbieter selbst veroeffentlicht. **Deshalb ist genau dieser Beleg wichtig** —
+und deshalb liegt er hier statt nur im Chatverlauf.
+
+## Auflagen, die auch fuer das Gratis-Paket gelten (EULA § 5)
+
+- Assets duerfen **nicht absichtlich als einzelne Dateien zum Download**
+  angeboten werden → kein Download-Knopf, keine Verzeichnisauflistung, nirgends
+  direkt verlinken. Auslieferung durch die App selbst ist erlaubt.
+- Kein Weiterverkauf, keine Weitergabe der Rohdateien, kein Hochladen auf
+  Asset-Marktplaetze.
+- Mitgelieferte Copyright- oder Lizenzhinweise muessen erhalten bleiben.
+- Kein Eigentumsanspruch.
+
+## Offen
+
+Wie viele Uebungen im Gratis-Paket stecken, steht nirgends — das README sagt
+nur „a starter set". Die Zahl klaert sich erst mit der ZIP.
