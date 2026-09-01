@@ -98,6 +98,43 @@ for (const [bereich, [datei, exp, katExp, paketDatei]] of Object.entries(BEREICH
   if (katFehlend.length) console.log(`      Kategorien offen: ${katFehlend.join(', ')}`);
 }
 
+// ── Rezepte ──
+// Andere Form als die Wissensbereiche: name, desc und zwei Listen. Die Listen
+// werden zwar nicht nach Index gemischt, aber eine abweichende Länge heißt
+// immer, dass beim Übersetzen eine Zeile verlorenging oder doppelt steht.
+{
+  const rezepte = (await laden('recipesData.js')).default;
+  const paket = (await laden('es/rezepte.js')).default || {};
+  const fehlend = [];
+  let fertig = 0;
+  for (const r of rezepte) {
+    const u = paket[r.id];
+    if (!u) { fehlend.push(r.id); continue; }
+    let ok = true;
+    for (const [feld, soll] of [['name', r.nameDE], ['desc', r.descDE]]) {
+      if (gefuellt(soll) && !gefuellt(u[feld])) { meckern(`recipes/${r.id}: ${feld} fehlt`); ok = false; }
+    }
+    for (const [feld, quelle] of [['ingredients', r.ingredientsDE], ['steps', r.stepsDE]]) {
+      const liste = u[feld];
+      if (!Array.isArray(liste) || liste.length !== (quelle || []).length) {
+        meckern(`recipes/${r.id}: ${feld} — ${liste?.length ?? 0} statt ${(quelle || []).length} Zeilen`);
+        ok = false;
+      } else if (!liste.every(gefuellt)) {
+        meckern(`recipes/${r.id}: ${feld} enthält leere Zeilen`); ok = false;
+      }
+    }
+    if (ok) fertig += 1;
+  }
+  const bekannt = new Set(rezepte.map((r) => r.id));
+  for (const k of Object.keys(paket)) if (!bekannt.has(k)) meckern(`recipes: unbekannte id „${k}" im Paket`);
+  gesamtFertig += fertig;
+  gesamtOffen += fehlend.length;
+  if (!NUR_FEHLEND || fehlend.length) {
+    console.log(`  ${'recipes'.padEnd(12)} ${`${fertig}/${rezepte.length}`.padStart(6)} Einträge`);
+    if (fehlend.length) console.log(`      offen: ${fehlend.join(', ')}`);
+  }
+}
+
 console.log(`\n${gesamtFertig} Einträge übersetzt, ${gesamtOffen} offen.`);
 if (fehler) console.error(`${fehler} Fehler in bereits übersetzten Einträgen.`);
 process.exit(fehler ? 1 : 0);

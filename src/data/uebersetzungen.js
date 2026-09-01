@@ -86,6 +86,20 @@ export function uebersetzt(eintrag, lang, paket) {
   };
 }
 
+// Rezepte haben eine andere Form als die Wissensbereiche: statt `sections`
+// zwei Listen. Deshalb ein eigener Leser statt eines Sonderfalls oben.
+export function uebersetztesRezept(rezept, lang, paket) {
+  if (!rezept) return { ingredients: [], steps: [] };
+  const es = paket?.[rezept.id];
+  const w = (feld) => es?.[feld] ?? (lang === 'de' ? rezept[`${feld}DE`] : rezept[`${feld}EN`]);
+  return {
+    name: w('name') || '',
+    desc: w('desc') || '',
+    ingredients: es?.ingredients ?? (lang === 'de' ? rezept.ingredientsDE : rezept.ingredientsEN) ?? [],
+    steps: es?.steps ?? (lang === 'de' ? rezept.stepsDE : rezept.stepsEN) ?? [],
+  };
+}
+
 // Kategorienamen — flache { id: 'Nombre' }-Tabelle unter dem Schlüssel
 // `kategorien` im jeweiligen Sprachpaket.
 export function kategorieName(kategorie, lang, paket) {

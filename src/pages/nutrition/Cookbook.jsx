@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { beschriftung } from '../../lib/sprache';
 import { ArrowLeft, Search, Clock, ChefHat, Heart } from 'lucide-react';
 import recipes from '../../data/recipesData';
+import { useUebersetzung, uebersetztesRezept } from '../../data/uebersetzungen';
 
 const MEAL_FILTERS = [
   { key: 'all', de: 'Alle', en: 'All', es: 'Todas' },
@@ -34,6 +35,8 @@ const DIFFICULTY = {
 export default function Cookbook({ onBack, onSelectRecipe }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language || 'de';
+  // Spanisches Rezeptpaket; null, solange es lädt oder die Sprache keines hat.
+  const paket = useUebersetzung('recipes', i18n.language);
   const [search, setSearch] = useState('');
   const [mealFilter, setMealFilter] = useState('all');
   const [tagFilter, setTagFilter] = useState('all');
@@ -42,7 +45,7 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
   });
 
   const filtered = (recipes || []).filter((r) => {
-    const name = (lang === 'de' ? r.nameDE : r.nameEN).toLowerCase();
+    const name = uebersetztesRezept(r, lang, paket).name.toLowerCase();
     const matchesMeal = mealFilter === 'all' || r.meal === mealFilter;
     const matchesTag = tagFilter === 'all' || r.tags.includes(tagFilter);
     const matchesSearch = !search || name.includes(search.toLowerCase());
@@ -111,6 +114,7 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
         {filtered.map((recipe) => {
           const diff = DIFFICULTY[recipe.difficulty] || DIFFICULTY.easy;
           const isFav = favorites.includes(recipe.id);
+          const text = uebersetztesRezept(recipe, lang, paket);
 
           return (
             <div
@@ -122,9 +126,9 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold truncate">{lang === 'de' ? recipe.nameDE : recipe.nameEN}</p>
+                  <p className="font-semibold truncate">{text.name}</p>
                   <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-                    {lang === 'de' ? recipe.descDE : recipe.descEN}
+                    {text.desc}
                   </p>
                 </div>
                 <button

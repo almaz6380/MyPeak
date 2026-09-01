@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { beschriftung } from '../../lib/sprache';
+import { useUebersetzung, uebersetztesRezept } from '../../data/uebersetzungen';
+import { skaliereMenge } from '../../lib/mengenSkalierung';
 import { ArrowLeft, Clock, Heart, Minus, Plus, Check, ChefHat, UtensilsCrossed } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { saveNutritionEntry } from '../../data/nutritionStorage';
@@ -34,6 +36,8 @@ export default function RecipeDetail({ recipe, onBack, onSaved }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const lang = i18n.language || 'de';
+  // Spanisches Rezeptpaket; null, solange es lädt oder die Sprache keines hat.
+  const paket = useUebersetzung('recipes', i18n.language);
   const [servings, setServings] = useState(recipe.servings || 2);
   const [showMealPicker, setShowMealPicker] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -52,17 +56,8 @@ export default function RecipeDetail({ recipe, onBack, onSaved }) {
   };
 
   const diff = DIFFICULTY[recipe.difficulty] || DIFFICULTY.easy;
-  const name = lang === 'de' ? recipe.nameDE : recipe.nameEN;
-  const ingredients = lang === 'de' ? recipe.ingredientsDE : recipe.ingredientsEN;
-  const steps = lang === 'de' ? recipe.stepsDE : recipe.stepsEN;
+  const { name, ingredients, steps } = uebersetztesRezept(recipe, lang, paket);
 
-  function scaleIngredient(text) {
-    if (scale === 1) return text;
-    return text.replace(/(\d+(?:[.,]\d+)?)\s*(g|ml|kg|l|EL|TL|Stk|Stück|tbsp|tsp|cups?|pcs?)/gi, (match, num, unit) => {
-      const scaled = Math.round(parseFloat(num.replace(',', '.')) * scale * 10) / 10;
-      return `${scaled} ${unit}`;
-    });
-  }
 
   function toggleFav() {
     const favs = JSON.parse(localStorage.getItem('recipeFavorites') || '[]');
@@ -158,7 +153,7 @@ export default function RecipeDetail({ recipe, onBack, onSaved }) {
           {(ingredients || []).map((item, i) => (
             <li key={i} className="text-sm text-slate-600 dark:text-slate-300 flex items-start gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-primary-400 mt-1.5 flex-shrink-0" />
-              {scaleIngredient(item)}
+              {skaliereMenge(item, scale)}
             </li>
           ))}
         </ul>
