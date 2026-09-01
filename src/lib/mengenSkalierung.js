@@ -4,20 +4,42 @@
 // Bildschirm leicht übersieht: Der alte Ausdruck kannte nur ganze und
 // Dezimalzahlen. Bei „1/2 TL Knoblauchpulver" griff er auf die **2** hinter dem
 // Schrägstrich — verdoppeln machte daraus „1/4 TL", also die Hälfte statt des
-// Doppelten. Deshalb werden Brüche jetzt zuerst und als Ganzes behandelt, und
-// der Ausdruck für einfache Zahlen darf nicht mehr mitten in einem Bruch
-// zugreifen.
+// Doppelten. Deshalb werden Brüche jetzt als Ganzes behandelt.
 //
-// Die Einheitenliste ist dreisprachig: EL/TL (de), tbsp/tsp (en),
-// cda/cdta (es, cucharada/cucharadita). Ohne die spanischen Kürzel bliebe
-// „1 cda de miel" beim Verdoppeln unverändert stehen.
-const EINHEIT = 'g|ml|kg|l|EL|TL|Stk|Stück|tbsp|tsp|cups?|pcs?|cdas?|cdtas?|uds?';
+// Die Einheitenliste ist sechssprachig. Fehlt ein Kürzel, passiert etwas
+// Unauffälliges und trotzdem Falsches: Beim Verdoppeln wachsen die Gramm, die
+// Löffel bleiben stehen — das Rezept stimmt dann nicht mehr in sich.
+//
+//   de  EL, TL, Stk, Stück
+//   en  tbsp, tsp, cup, pcs
+//   es  cda, cdta (cucharada/cucharadita), ud
+//   fr  c. à s., c. à c. (cuillère à soupe/café)
+//   pt  col. sopa, col. chá
+//   ar  م.ك, م.ص (ملعقة كبيرة/صغيرة)
+//
+// Die Kürzel mit Punkten und Leerzeichen sind der Grund für `\s*` mitten in den
+// Mustern: „c.à.s.", „c. à s." und „c. a s." sollen alle greifen.
+const EINHEITEN = [
+  'g', 'ml', 'kg', 'l',
+  'EL', 'TL', 'Stk', 'Stück',
+  'tbsp', 'tsp', 'cups?', 'pcs?',
+  'cdas?', 'cdtas?', 'uds?',
+  String.raw`c\.?\s*à\s*s\.?`, String.raw`c\.?\s*à\s*c\.?`,
+  String.raw`col\.?\s*sopa`, String.raw`col\.?\s*chá`,
+  String.raw`م\.\s*ك`, String.raw`م\.\s*ص`,
+].join('|');
 
-// Ein einziger Ausdruck für beide Fälle, der Nenner ist optional. Zwei
-// getrennte Durchläufe wären falsch: Der erste macht aus „1/2 TL" ein „1 TL",
-// und der zweite fände darin wieder eine Menge und verdoppelte sie erneut.
-// `\b` hinter der Einheit verhindert, dass „150 gramos" als „150 g" gelesen wird.
-const MENGE = new RegExp(String.raw`(\d+(?:[.,]\d+)?)(?:\s*/\s*(\d+))?\s*(${EINHEIT})\b`, 'gi');
+// Ein einziger Ausdruck für ganze Zahlen und Brüche, der Nenner ist optional.
+// Zwei getrennte Durchläufe wären falsch: Der erste macht aus „1/2 TL" ein
+// „1 TL", und der zweite fände darin wieder eine Menge und verdoppelte erneut.
+//
+// `(?![\p{L}\p{N}])` statt `\b`: Es verhindert weiterhin, dass „150 gramos" als
+// „150 g" gelesen wird — aber anders als `\b` funktioniert es auch hinter einem
+// Punkt („c. à s.") und hinter arabischen Buchstaben, wo `\b` gar nicht greift.
+const MENGE = new RegExp(
+  String.raw`(\d+(?:[.,]\d+)?)(?:\s*/\s*(\d+))?\s*(${EINHEITEN})(?![\p{L}\p{N}])`,
+  'giu',
+);
 
 // Eine Nachkommastelle, aber ohne „,0" am Ende.
 const runden = (n) => String(Math.round(n * 10) / 10);

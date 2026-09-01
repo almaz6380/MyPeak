@@ -24,11 +24,24 @@ describe('Mengen in Zutatenzeilen skalieren', () => {
     expect(skaliereMenge('1/4 TL Salz', 2)).toBe('0.5 TL Salz');
   });
 
-  it('kennt die Einheiten aller drei Sprachen', () => {
+  it('kennt die Einheiten aller sechs Sprachen', () => {
     expect(skaliereMenge('1 EL Honig', 3)).toBe('3 EL Honig');
     expect(skaliereMenge('1 tbsp honey', 3)).toBe('3 tbsp honey');
     expect(skaliereMenge('1 cda de miel', 3)).toBe('3 cda de miel');
     expect(skaliereMenge('1 cdta de canela', 2)).toBe('2 cdta de canela');
+    expect(skaliereMenge('1 c. à s. de miel', 3)).toBe('3 c. à s. de miel');
+    expect(skaliereMenge('1 c. à c. de cannelle', 2)).toBe('2 c. à c. de cannelle');
+    expect(skaliereMenge('1 col. sopa de mel', 3)).toBe('3 col. sopa de mel');
+    expect(skaliereMenge('1 col. chá de canela', 2)).toBe('2 col. chá de canela');
+    expect(skaliereMenge('1 م.ك عسل', 3)).toBe('3 م.ك عسل');
+    expect(skaliereMenge('1 م.ص قرفة', 2)).toBe('2 م.ص قرفة');
+  });
+
+  // Ohne diese Einheiten waere der Fehler unauffaellig und trotzdem falsch:
+  // Die Gramm wachsen, die Loeffel bleiben stehen.
+  it('skaliert Gramm und Löffel in derselben Sprache gleich', () => {
+    expect(skaliereMenge('80 g de flocons d’avoine', 2)).toBe('160 g de flocons d’avoine');
+    expect(skaliereMenge('1/2 c. à c. d’ail en poudre', 2)).toBe('1 c. à c. d’ail en poudre');
   });
 
   it('rührt Zahlen ohne Einheit nicht an', () => {

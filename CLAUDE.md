@@ -120,6 +120,38 @@ jetzt 244 `ui.*`-Schlüssel in allen drei Sprachdateien.
 - **Nachgeprüft im echten Browser:** Gastmodus, alle vier Reiter, Spanisch —
   keine rohen Schlüssel, keine deutschen Reste, keine Seitenfehler.
 
+**4d. Rechtstexte in allen sechs Sprachen (01.09.2026).** Auf Josefs
+ausdrückliche Anweisung — ich hatte davon abgeraten, er hat entschieden.
+
+Impressum, Datenschutz, AGB und Gesundheitshinweis liegen jetzt auch auf ES,
+FR, PT und AR (`src/pages/legal/uebersetzungen/`). Drei Dinge daran sind
+Absicht und dürfen nicht „aufgeräumt" werden:
+
+- **Jedes übersetzte Dokument beginnt mit „Vorrang der deutschen Fassung".**
+  Das ist der Grund, warum man Rechtstexte überhaupt übersetzen darf: Man
+  übersetzt, damit der Nutzer versteht — nicht, damit eine zweite Fassung mit
+  eigener Geltung entsteht. Ohne diesen Absatz stünden vier weitere
+  rechtsverbindliche Texte im Raum, die niemand geprüft hat.
+- **Name, Anschrift und die österreichischen Fundstellen (§ 5 ECG, GISA,
+  GewO, § 6 UStG) bleiben deutsch.** Eigennamen und Gesetzeszitate übersetzt
+  man nicht; „Bezirkshauptmannschaft Kitzbühel" auf Arabisch fände niemand
+  wieder.
+- **Nachgeladen, nicht fest eingebunden.** `LegalPage` ist NICHT lazy (die
+  Routen liegen vor dem Anmelde-Gate, Apple und Google rufen die
+  Datenschutz-URL ohne Konto auf). Fest importiert lägen ~35 kB Rechtstext in
+  jedem App-Start. Solange das Paket lädt — und wenn es scheitert — zeigt die
+  Seite Deutsch bzw. Englisch. **Eine Rechtsseite darf nie leer sein**, und ein
+  Spinner, der nie verschwindet, ist schlimmer als ein Text in der falschen
+  Sprache.
+
+Die Notrufnummern sind je Sprache angepasst (PT nennt 192 für Brasilien, AR
+nennt 997/998 neben der 112) — eine falsche Notrufnummer ist der einzige
+Fehler in diesen Texten, der jemanden unmittelbar gefährden kann.
+
+⚠ **Das ersetzt keine anwaltliche Prüfung.** Die deutschen Originale sind laut
+Notiz vom Launch selbst Entwürfe. Was hier steht, ist eine sorgfältige
+Übersetzung von Entwürfen — nicht mehr.
+
 **4c. Die Inhaltsbibliotheken sind übersetzt (01.09.2026).** Josef hat den
 früheren Vorbehalt („kein Vergessen, sondern eine Entscheidung") ausdrücklich
 überstimmt: *„peptide etc (alles!!!!) auf spanisch übersetzen"*. Die rund

@@ -3,13 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import FullRepLogo from '../../components/FullRepLogo';
 import { legalDocs } from './legalContent';
+import { useRechtstexte } from './uebersetzungen';
+import { appSprache } from '../../lib/sprache';
 
 // Eigenständige Rechtsseite — auch ohne Login erreichbar (Routen: /legal/imprint|privacy|terms)
 export default function LegalPage({ doc }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const lang = i18n.language === 'de' ? 'de' : 'en';
-  const content = legalDocs[doc]?.[lang];
+  // Die vier Uebersetzungen kommen nachgeladen; bis dahin — und wenn das
+  // Nachladen scheitert — steht Deutsch bzw. Englisch da. Eine Rechtsseite
+  // darf nie leer sein: Apple und Google rufen die Datenschutz-URL ohne Konto
+  // auf, und ein Nutzer, der seine Rechte nachlesen will, braucht Text, keinen
+  // Spinner.
+  const sprache = appSprache(i18n.language);
+  const uebersetzt = useRechtstexte(i18n.language);
+  const content = uebersetzt?.[doc] || legalDocs[doc]?.[sprache === 'de' ? 'de' : 'en'];
 
   if (!content) return null;
 
