@@ -13,6 +13,7 @@ import { getOrCreateFriendCode, getXP, getLevelTitle, calculateLevel, hasGoldenF
 import AchievementGallery from '../components/progress/AchievementGallery';
 import { canChangeAdConsent, changeAdConsent } from '../lib/ads';
 import { clearAllLocalPhotos } from '../data/exercisePhotos';
+import { API_BASIS } from '../data/apiBasis';
 
 // Sichtbare Build-Kennung — muss bei jedem neuen Store-Build mitgezogen werden (siehe android/app/build.gradle)
 const APP_VERSION = '1.1.8 (13)';
@@ -79,7 +80,7 @@ export default function ProfilePage() {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
       if (!token) throw new Error('no session');
-      const res = await fetch('/api/delete-account', {
+      const res = await fetch(`${API_BASIS}/api/delete-account`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });

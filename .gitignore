@@ -29,3 +29,17 @@ dist-ssr
 # Python-Zwischenstaende gehoeren nicht ins Repo
 __pycache__/
 *.pyc
+
+# Die taeglich erzeugten Social-Media-Posts.
+#
+# ⚠ Bewusst NICHT im Repo, anders als die Kanal-Ausstattung unter
+# store-assets/social/. Zwei Videos am Tag sind rund 4,4 GB im Jahr — ein
+# Git-Verlauf, aus dem sich nichts mehr loeschen laesst. Im Repo steht das
+# REZEPT (Winkel, Seed, Format im Ledger), nicht das Ergebnis: Aus einem Seed
+# entsteht derselbe Post jederzeit neu.
+#
+# Die anderen drei Repos hatten diese Zeile von Anfang an; hier fehlte sie und
+# ist am 30.08.2026 nachgetragen worden — zusammen mit vier Post-Dateien, die
+# sich unter home/user/anigosha/... verirrt hatten (Reste aus der Zeit vor dem
+# Pfad-Fix in tools/social/motoren.mjs).
+out/

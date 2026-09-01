@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { isGuest } from '../context/AuthContext';
+import { API_BASIS } from './apiBasis';
 
 // Abo-/Premium-Status pro Nutzer. localStorage-first (sofort verfügbar,
 // offline & Gastmodus), Supabase als Cloud-Sync. Provider-agnostisch:
@@ -108,7 +109,7 @@ export async function startTrial(userId) {
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData?.session?.access_token;
     if (token) {
-      const res = await fetch('/api/start-trial', {
+      const res = await fetch(`${API_BASIS}/api/start-trial`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       });
