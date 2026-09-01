@@ -225,6 +225,50 @@ es. Die gesundheitsnahen Texte (Peptide, Blutwerte, Diäten) sind mit derselben
 Vorsicht übersetzt wie sie geschrieben wurden — Dosierungen stehen nirgends,
 der Verweis auf ärztlichen Rat überall.
 
+**4e. Dasselbe für FR, PT und AR — sechs Sprachen komplett (01.09.2026).**
+Nach demselben Muster wie Spanisch, mit denselben Prüfungen: `pruefe-inhalte.mjs`
+meldet **je Sprache 222 Einträge, 0 offen — zusammen 888**.
+
+Neue Ordner `src/data/fr/`, `src/data/pt/`, `src/data/ar/`, je acht Dateien,
+je ein Eintrag mehr in `PAKETE`. Sonst nichts — genau der Aufwand, den Punkt 3
+oben versprochen hat.
+
+**Portugiesisch ist pt-BR** unter dem Code `pt`, dieselbe Begründung wie bei
+Anigosha: Brasilien ist der weitaus größte Markt, Portugal versteht pt-BR, ein
+zweiter Code wäre doppelte Pflege.
+
+**Zwei Lücken, die dieser Durchgang aufgedeckt hat — beide älter als er:**
+
+- **`MedicalDisclaimer` kannte nur de/en/es.** Der von Google Play verlangte
+  Arzt-Hinweis erschien französischen, portugiesischen und arabischen Nutzern
+  auf ENGLISCH. Steht jetzt in beiden Tabellen (`medical`, `general`)
+  sechssprachig.
+- **`cycleStorage.getPhaseRecommendations` kannte nur de/en** und las obendrein
+  den ROHEN Sprachcode. `HomePage` reicht `i18n.language` ungefiltert durch —
+  ein Nutzer mit `pt-BR` lief also ins Leere. Jetzt sechssprachig und über
+  `beschriftung()`, das den Code normalisiert und sauber auf Englisch
+  zurückfällt.
+
+**Warum beide unsichtbar waren, ist die eigentliche Lehre:** `pruefe-sprachen.mjs`
+suchte `de:` und `en:` in DERSELBEN Zeile (`[^\n]*` hört am Zeilenende auf).
+Jede umgebrochene Beschriftungstabelle — und das sind die langen, also gerade
+die mit ganzen Sätzen — war für die Prüfung unsichtbar. Der Scanner arbeitet
+jetzt zeilenweise über Blöcke und findet **134 statt 122** Tabellen. Die Blöcke
+enden bewusst an der ersten Zeile, die mit `}` oder `]` beginnt, und nicht an
+der nächsten Klammer irgendwo im Text: Platzhalter wie `{{name}}` bringen
+eigene Klammern mit und hätten den Block zu früh abgeschnitten.
+
+**Merksatz:** Ein Prüfskript, das nichts meldet, ist erst dann eine gute
+Nachricht, wenn man weiß, wonach es sucht. Hier hat es lange nichts gemeldet,
+weil es die Hälfte gar nicht angesehen hat.
+
+**Nachgeprüft im echten Browser** (Gastmodus, ohne Supabase): Peptid-Liste und
+ein vollständiger Eintrag in FR, PT und AR — keine Seitenfehler, keine rohen
+Schlüssel, `dir="rtl"` nur bei Arabisch, und die farbigen Wirkungs-Kästen dort
+korrekt gespiegelt. Der Build wirft weiterhin **vier getrennte
+`peptide-*.js`-Chunks** aus (240–316 kB): Ein französischer Nutzer lädt das
+arabische Paket nicht.
+
 **5. Übungs-Demos: eigene 3D-Animationen statt Fotos** (`tools/uebungs-3d/`).
 
 Josefs Vorgabe nach einem Instagram-Video von `fitonomy.coach`: „erstelle es
