@@ -6,9 +6,6 @@ mitwandern — sie liegen als eigene Uploads im Store-Eintrag:
 
   store-assets/android/icon-512.png        512x512, quadratisch, ohne Alpha
   store-assets/android/feature-graphic.png 1024x500
-  store-assets/social/facebook-cover.png   1640x624 (= 820x312 in doppelter
-                                           Aufloesung, fuer das Titelbild der
-                                           Facebook-Seite)
 
 Quelle ist dasselbe public/favicon.svg wie fuer alle App-Icons, gerendert mit
 headless Chromium; die Schrift ist das im Projekt liegende Inter. Damit sehen
@@ -156,59 +153,6 @@ def main():
       <img class="mark" src="{mark}">
     </div>"""
     shoot(html, 1024, 500, os.path.join(OUT, "feature-graphic.png"), chrome)
-
-    # ── Facebook-Titelbild 820x312 ────────────────────────────────────────
-    # Aufbau wie die Play-Vorstellungsgrafik: Zeichen und Text nebeneinander.
-    #
-    # ⚠ Die Masse sind am echten Handy nachgemessen (31.08.2026), nicht
-    # geschaetzt — ein Entwurf in voller Breite wurde dort angeschnitten:
-    #
-    #   * Facebook zeigt auf dem Handy nur die MITTLEREN 508 von 820 px
-    #     (sichtbares Band 1.63:1 statt unserer 2.63:1) ⇒ alles muss zwischen
-    #     x=156 und x=664 liegen.
-    #   * Das Profilbild liegt dort MITTIG ueber dem Titelbild (am Rechner
-    #     unten links) und verdeckt ab y=191 abwaerts.
-    #
-    # Deshalb sitzt die ganze Gruppe in einem Kasten 156..664 x 0..191 und ist
-    # darin zentriert. Die Schriftgrade sind so gewaehlt, dass die laengste
-    # Zeile (Untertitel) mit dem Zeichen zusammen unter 508 px bleibt.
-    cover = f"""<style>
-      {kopf([400, 800])}
-      /* Entworfen in 820x312 (so denkt Facebook), ausgegeben in doppelter
-         Groesse: --force-device-scale-factor wirkt in diesem Chromium NICHT
-         auf den Screenshot, deshalb die Skalierung im Dokument selbst. */
-      html,body{{margin:0;padding:0;overflow:hidden;width:1640px;height:624px;
-        background:{BG};font-family:Inter,sans-serif;
-        -webkit-font-smoothing:antialiased}}
-      .zoom{{width:820px;height:312px;transform:scale(2);transform-origin:0 0}}
-      .wrap{{position:relative;width:820px;height:312px;overflow:hidden;
-        background:radial-gradient(105% 150% at 50% 34%, #2f2415 0%, {BG} 62%)}}
-      .safe{{position:absolute;left:156px;top:0;width:508px;height:191px;
-        display:flex;align-items:center;justify-content:center;gap:30px}}
-      .mark{{width:104px;height:104px;flex:0 0 auto}}
-      .text{{flex:0 1 auto}}
-      h1{{margin:0;font-weight:800;font-size:40px;letter-spacing:-1.2px;
-        color:#fef3c7;line-height:1}}
-      h1 span{{color:{GOLD}}}
-      h2{{margin:9px 0 0;font-weight:800;font-size:18px;color:#ffffff;
-        line-height:1.25;white-space:nowrap}}
-      p{{margin:9px 0 0;font-weight:400;font-size:14px;color:#9a9186;
-        line-height:1.4;white-space:nowrap}}
-      p b{{font-weight:800;color:{GOLD}}}
-    </style>
-    <div class="zoom"><div class="wrap">
-      <div class="safe">
-        <img class="mark" src="{mark}">
-        <div class="text">
-          <h1>Full<span>Rep</span></h1>
-          <h2>Training &amp; Ernährung in einer App</h2>
-          <p><b>Kostenlos starten</b> · iPhone &amp; Android</p>
-        </div>
-      </div>
-    </div></div>"""
-    social = os.path.join(ROOT, "store-assets", "social")
-    os.makedirs(social, exist_ok=True)
-    shoot(cover, 1640, 624, os.path.join(social, "facebook-cover.png"), chrome)
 
 
 if __name__ == "__main__":
