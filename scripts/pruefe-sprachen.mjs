@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 const WURZEL = join(dirname(fileURLToPath(import.meta.url)), '..');
-const SPRACHEN = ['de', 'en', 'es'];
+const SPRACHEN = ['de', 'en', 'es', 'fr', 'pt', 'ar'];
 
 const flach = (o, p = '') => Object.entries(o).flatMap(([k, v]) =>
   (v && typeof v === 'object' ? flach(v, `${p}${k}.`) : [[p + k, v]]));
@@ -25,7 +25,15 @@ let fehler = 0;
 const meckern = (...t) => { fehler += 1; console.error('  ✗', ...t); };
 
 console.log('Sprachdateien:');
-for (const s of SPRACHEN) console.log(`  ${s}: ${tabellen[s].size} Schlüssel`);
+for (const s of SPRACHEN) {
+  // „noch englisch" ist der ehrliche Fortschrittsbalken: Gleiche Schlüsselzahl
+  // heißt nur, dass die Datei vollständig ist — nicht, dass sie übersetzt ist.
+  // Eine aus en.json kopierte Datei besteht jede andere Prüfung hier.
+  const roh = s === 'en' ? 0 : [...tabellen[s]].filter(([k, v]) =>
+    typeof v === 'string' && v === tabellen.en.get(k) && v !== tabellen.de.get(k)).length;
+  console.log(`  ${s}: ${tabellen[s].size} Schlüssel`
+    + (roh ? `  ·  ${roh} noch wörtlich Englisch` : ''));
+}
 
 for (const s of SPRACHEN.filter((x) => x !== 'de')) {
   for (const k of tabellen.de.keys()) if (!tabellen[s].has(k)) meckern(`${s}: Schlüssel fehlt — ${k}`);
@@ -76,9 +84,11 @@ for (const d of dateien) {
     const zeile = m[0];
     if (!/\ben:\s*'/.test(zeile)) continue; // keine Sprachtabelle
     tabellenGeprueft += 1;
-    if (!/\bes:\s*'/.test(zeile)) {
+    const fehlt = SPRACHEN.filter((sp) => sp !== 'de' && sp !== 'en'
+      && !new RegExp(`\\b${sp}:\\s*'`).test(zeile));
+    if (fehlt.length) {
       const nr = src.slice(0, m.index).split('\n').length;
-      meckern(`es fehlt in Beschriftungstabelle — ${d.slice(WURZEL.length + 1)}:${nr}`);
+      meckern(`${fehlt.join('/')} fehlt in Beschriftungstabelle — ${d.slice(WURZEL.length + 1)}:${nr}`);
     }
   }
 }

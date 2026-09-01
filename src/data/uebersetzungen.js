@@ -10,14 +10,29 @@ import { appSprache } from '../lib/sprache';
 //    `peptidesData.js` verdoppelte den Brocken für ALLE — auch für die
 //    deutschen Nutzer, die ihn nie brauchen. Als eigener dynamischer Import
 //    landet er in einem separaten Chunk und wird nur geladen, wenn jemand
-//    Spanisch eingestellt hat.
+//    diese Sprache eingestellt hat.
 // 2. **Risiko.** Die Datendateien bleiben unangetastet. Ein Fehler im
 //    Sprachpaket kann DE/EN nicht kaputt machen.
-// 3. **Nächste Sprache.** Ein Ordner mehr unter `es/`, ein Eintrag mehr in
-//    `PAKETE`. Sonst nichts.
+// 3. **Nächste Sprache.** Ein Ordner mehr, ein Block mehr in `PAKETE`.
+//    Sonst nichts — genau so kamen fr, pt und ar dazu.
 //
 // Fehlt ein Eintrag oder ein Feld, fällt es sauber auf DE/EN zurück — eine
 // halb fertige Übersetzung zeigt also gemischt, nie leer.
+const BEREICHE = {
+  peptides: 'peptide',
+  diets: 'diaeten',
+  training: 'training',
+  nutrition: 'ernaehrung',
+  supplements: 'supplemente',
+  bloodwork: 'blutwerte',
+  recipes: 'rezepte',
+  programs: 'programme',
+  foods: 'lebensmittel',
+};
+
+// Die Lader stehen ausgeschrieben da, weil Vite die Pfade beim Bauen sehen
+// muss. `import(`./${sprache}/${datei}.js`)` würde zwar laufen, zöge aber
+// jede Sprache in JEDEN Chunk — genau das, was die Aufteilung vermeiden soll.
 const PAKETE = {
   es: {
     peptides: () => import('./es/peptide.js'),
@@ -30,7 +45,42 @@ const PAKETE = {
     programs: () => import('./es/programme.js'),
     foods: () => import('./es/lebensmittel.js'),
   },
+  fr: {
+    peptides: () => import('./fr/peptide.js'),
+    diets: () => import('./fr/diaeten.js'),
+    training: () => import('./fr/training.js'),
+    nutrition: () => import('./fr/ernaehrung.js'),
+    supplements: () => import('./fr/supplemente.js'),
+    bloodwork: () => import('./fr/blutwerte.js'),
+    recipes: () => import('./fr/rezepte.js'),
+    programs: () => import('./fr/programme.js'),
+    foods: () => import('./fr/lebensmittel.js'),
+  },
+  pt: {
+    peptides: () => import('./pt/peptide.js'),
+    diets: () => import('./pt/diaeten.js'),
+    training: () => import('./pt/training.js'),
+    nutrition: () => import('./pt/ernaehrung.js'),
+    supplements: () => import('./pt/supplemente.js'),
+    bloodwork: () => import('./pt/blutwerte.js'),
+    recipes: () => import('./pt/rezepte.js'),
+    programs: () => import('./pt/programme.js'),
+    foods: () => import('./pt/lebensmittel.js'),
+  },
+  ar: {
+    peptides: () => import('./ar/peptide.js'),
+    diets: () => import('./ar/diaeten.js'),
+    training: () => import('./ar/training.js'),
+    nutrition: () => import('./ar/ernaehrung.js'),
+    supplements: () => import('./ar/supplemente.js'),
+    bloodwork: () => import('./ar/blutwerte.js'),
+    recipes: () => import('./ar/rezepte.js'),
+    programs: () => import('./ar/programme.js'),
+    foods: () => import('./ar/lebensmittel.js'),
+  },
 };
+
+export { BEREICHE };
 
 // Bereits geladene Pakete — sonst lädt jeder Seitenwechsel neu.
 const zwischenspeicher = new Map();

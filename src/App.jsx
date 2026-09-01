@@ -22,10 +22,16 @@ import AuthPage from './pages/auth/AuthPage';
 import UpdatePasswordPage from './pages/auth/UpdatePasswordPage';
 import OnboardingPage from './pages/onboarding/OnboardingPage';
 import LegalPage from './pages/legal/LegalPage';
+import { useTextrichtung } from './hooks/useTextrichtung';
 
 export default function App() {
   const { user, profile, loading } = useAuth();
   const { t } = useTranslation();
+  // Setzt lang/dir am <html>. Steht bewusst hier oben und nicht in `AppShell`:
+  // Dort griffe es erst NACH dem Login, Splash, Anmeldung und Onboarding
+  // blieben also links-nach-rechts. Und bewusst vor den frühen `return`s —
+  // ein Hook nach einem `return` läuft in genau den Fällen nicht.
+  useTextrichtung();
   // Skip splash for returning users — show instantly
   const [showSplash, setShowSplash] = useState(() => {
     if (localStorage.getItem('splashSeen')) return false;

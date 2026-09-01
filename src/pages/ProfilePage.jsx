@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { appSprache, beschriftung } from '../lib/sprache';
+import { appSprache, beschriftung, SPRACHEN, SPRACHNAMEN } from '../lib/sprache';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -53,14 +53,18 @@ export default function ProfilePage() {
     }
   }, [user, isGuestMode, profile?.name]);
 
-  const toggleLanguage = () => {
-    // Reihum statt binaer, seit es drei Sprachen gibt.
-    const reihe = ['de', 'en', 'es'];
-    const aktuell = reihe.indexOf((i18n.language || 'de').slice(0, 2));
-    const newLang = reihe[(aktuell + 1) % reihe.length];
-    i18n.changeLanguage(newLang);
-    localStorage.setItem('language', newLang);
-    if (user) saveSetting(user.id, 'language', newLang);
+  // Auswahl statt Durchtippen. Bis zu drei Sprachen war ein Knopf, der
+  // reihum schaltet, vertretbar; bei sechs müsste man fünfmal tippen, um von
+  // Deutsch nach Arabisch zu kommen — und käme man einmal zu weit, nochmal
+  // fünfmal. Die Liste zeigt jede Sprache in sich selbst („Français", nicht
+  // „Französisch"): Wer sie sucht, kennt nur diesen Namen.
+  const [spracheOffen, setSpracheOffen] = useState(false);
+
+  const spracheWaehlen = (neueSprache) => {
+    setSpracheOffen(false);
+    i18n.changeLanguage(neueSprache);
+    localStorage.setItem('language', neueSprache);
+    if (user) saveSetting(user.id, 'language', neueSprache);
   };
 
   const toggleWeightUnit = () => {
@@ -352,10 +356,10 @@ export default function ProfilePage() {
           label={t('profile.language')}
           action={
             <button
-              onClick={toggleLanguage}
+              onClick={() => setSpracheOffen(true)}
               className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-sm font-medium"
             >
-              {{ de: 'Deutsch', en: 'English', es: 'Español' }[(i18n.language || 'de').slice(0, 2)] || 'Deutsch'}
+              {SPRACHNAMEN[appSprache(i18n.language)]}
             </button>
           }
         />
@@ -532,6 +536,15 @@ export default function ProfilePage() {
           t={t}
         />
       )}
+
+      {spracheOffen && (
+        <SprachAuswahl
+          aktuell={appSprache(i18n.language)}
+          onWaehlen={spracheWaehlen}
+          onClose={() => setSpracheOffen(false)}
+          titel={t('profile.language')}
+        />
+      )}
     </div>
   );
 }
@@ -563,6 +576,44 @@ function ProfileDataRow({ label, value, onClick, last = false }) {
         <Pencil className="w-3.5 h-3.5 text-slate-400" />
       </div>
     </button>
+  );
+}
+
+function SprachAuswahl({ aktuell, onWaehlen, onClose, titel }) {
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+      role="presentation"
+    >
+      <div
+        className="bg-white dark:bg-surface-dark-alt rounded-2xl w-full max-w-xs overflow-hidden shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={titel}
+      >
+        <p className="px-4 py-3 text-sm font-semibold border-b border-slate-100 dark:border-slate-700">
+          {titel}
+        </p>
+        {SPRACHEN.map((code, i) => (
+          <button
+            key={code}
+            onClick={() => onWaehlen(code)}
+            // `dir` je Zeile: Sonst zieht die Textrichtung der Oberfläche den
+            // arabischen Namen in einer deutschen Liste an den rechten Rand
+            // und umgekehrt. Jede Zeile ist ein eigener Sprachraum.
+            dir={code === 'ar' ? 'rtl' : 'ltr'}
+            className={`w-full flex items-center justify-between px-4 py-3 text-start hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${
+              i === SPRACHEN.length - 1 ? '' : 'border-b border-slate-100 dark:border-slate-700'
+            } ${code === aktuell ? 'text-primary-600 dark:text-primary-400 font-semibold' : 'text-slate-700 dark:text-slate-200'}`}
+          >
+            <span className="text-sm">{SPRACHNAMEN[code]}</span>
+            {code === aktuell && <Check className="w-4 h-4" />}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 

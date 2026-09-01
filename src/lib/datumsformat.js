@@ -7,7 +7,19 @@ import i18n from '../i18n';
 // zwangsläufig englische Datumsangaben — und jede neue Sprache hätte elf
 // Stellen gebraucht. Genau derselbe Fehler, den Anigosha mit `appSprache()`
 // schon einmal zentral behoben hat.
-const LOCALES = { de: 'de-DE', en: 'en-US', es: 'es-ES' };
+// `ar-…-u-nu-latn` erzwingt westliche Ziffern. Ohne das liefert Intl für
+// Arabisch die arabisch-indischen Ziffern (٠١٢٣) — in einer Fitness-App stünden
+// dann „٧٥ kg" und „١٢ Wdh." nebeneinander, was auch arabische Nutzer als
+// Bruch lesen. Wochentags- und Monatsnamen bleiben arabisch, nur die Zahlen
+// nicht. Ägyptisch als Basis, weil das der verbreitetste Standard-Locale ist.
+const LOCALES = {
+  de: 'de-DE',
+  en: 'en-US',
+  es: 'es-ES',
+  fr: 'fr-FR',
+  pt: 'pt-BR',
+  ar: 'ar-EG-u-nu-latn',
+};
 
 // BCP-47-Locale zur aktuellen Oberflächensprache.
 export function datumsLocale(sprache = i18n.language) {
