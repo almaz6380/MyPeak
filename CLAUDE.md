@@ -74,15 +74,50 @@ Datenschutzerklärung DE+EN um Health-Absatz ergänzt.
 488 Übungsnamen (vier parallele Subagents, Schlüsselgleichheit mit de.json
 skriptgeprüft), eigener spanischer Coach-System-Prompt in `api/coach.js`,
 Sprachwechsler de→en→es. Inline-de/en-Ternaries fallen für es auf Englisch
-zurück — bewusst, bis alles auf i18n-Schlüssel umzieht. `analyze-meal` hat
-noch KEINEN spanischen Prompt (fällt auf Englisch zurück).
+zurück — bewusst, bis alles auf i18n-Schlüssel umzieht. **Auch `analyze-meal`
+spricht Spanisch** (`name_es`/`meal_description_es` zusätzlich zu de/en; die
+Client-Weichen fallen auf Englisch zurück, wenn ein Feld fehlt, damit alte
+App-Versionen unberührt bleiben).
 
-**5. Übungsfoto-Ersatz vorbereitet:** `scripts/uebungs-illustrationen.mjs`
-ersetzt die 162×2 Fotos unklarer Herkunft durch eigene fal.ai-Illustrationen
-(flux/dev, 832×1152, Seeds reproduzierbar, HERKUNFT.md-Protokoll, Ziel
-`public/exercise-demos-neu/` zur Sichtprüfung). Ohne `--los` reiner
-Trockenlauf mit Kostenrechnung: 324 Bilder ≈ **$8,10**. ⚠ Geldregel gilt:
-Lauf NUR nach Josefs ausdrücklichem „ja".
+**5. Übungs-Demos: eigene 3D-Animationen statt Fotos** (`tools/uebungs-3d/`).
+
+Josefs Vorgabe nach einem Instagram-Video von `fitonomy.coach`: „erstelle es
+selbst kostenlos". Der Renderer zeichnet eine Anatomiefigur mit Gerät, lässt
+den arbeitenden Muskel rot leuchten und fährt die Kamera mit — Three.js in
+headless Chromium, Frames per ffmpeg zu loopbaren MP4s (720×720, 2 s, ~65 KB).
+Alle 162 Übungen, ~50 Minuten Rechenzeit, Kosten null.
+
+Das löst **zwei** Dinge auf einmal: die nicht belegbare Rechtekette der alten
+Fotos UND die fehlende Bewegung.
+
+- **Muster statt Einzelanimationen:** ~50 Bewegungsfamilien in
+  `bewegungen.mjs`, Zuordnung aller 162 Übungen in `zuordnung.mjs`. Eine
+  Verbesserung am Muster `curl` verbessert alle 16 Curl-Varianten.
+- ⚠ **Die Zuordnung ist eine HANDTABELLE, keine Stichwort-Automatik.**
+  Ordnernamen aus der fremden Datenbank lügen: `Air_Bike` ist der Bicycle
+  Crunch, kein Fahrrad.
+- `ExerciseDemoImage` zeigt das MP4 und fällt auf die alten Fotos zurück —
+  **die Fotos bleiben deshalb im Repo**, bis jede Animation geprüft ist.
+- Sämtliche Fallen aus sechs Renderdurchgängen stehen in
+  `tools/uebungs-3d/README.md`. Die drei teuersten: Kapsellänge muss dem
+  Gelenkabstand entsprechen (sonst fehlen Schienbeine); `wurzelRot.x` negativ
+  = Rückenlage, positiv = Bauchlage (verwechselt lag die Figur beim
+  Liegestütz auf dem Rücken und ruderte); das dunkle Band am Horizont war
+  weder Farbe noch Schattenkamera, sondern der Übergang Boden↔Himmel —
+  behoben durch einen reinen Schattenfänger ohne sichtbaren Boden.
+
+**Verworfen: der KI-Bild-Weg.** `scripts/uebungs-illustrationen.mjs` erzeugte
+über fal.ai Illustrationen; die Probe (6 Bilder, $0,15) zeigte, dass
+Text-zu-Bild weder eine Bewegung noch zwei zusammengehörige Posen derselben
+Person kann. Befund in `public/exercise-demos-neu/HERKUNFT.md`, Skript bleibt
+für anderes Bildmaterial liegen.
+
+**Ebenfalls geprüft und bewusst nicht gekauft** (01.09.2026): fertige
+3D-Bibliotheken mit App-Lizenz — MoveKit (220 Übungen $199, 412 für $299,
+anatomische Puppe, Stil am nächsten am Referenzvideo) und Gym Animations
+(ab $199, 800+ Übungen, graue Figur mit rot leuchtendem Muskel). Beide
+erlauben App-Bundling ausdrücklich. Falls der eigene Renderer je an Grenzen
+stößt, ist das der Ausweg.
 
 **6. Ausserdem in 1.4.0 (Commits ff9df6d/88247b4):** Rest-Timer überlebt den
 Sperrbildschirm (Wanduhr `endsAt` statt Tick-Zählung + LocalNotification),
