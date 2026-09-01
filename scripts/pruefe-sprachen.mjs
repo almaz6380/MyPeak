@@ -19,6 +19,7 @@ const flach = (o, p = '') => Object.entries(o).flatMap(([k, v]) =>
 const tabellen = Object.fromEntries(SPRACHEN.map((s) =>
   [s, new Map(flach(JSON.parse(readFileSync(join(WURZEL, `src/i18n/locales/${s}.json`), 'utf8'))))]));
 
+const zeilen = (s) => (String(s).match(/\n/g) || []).length;
 const platzhalter = (s) => [...String(s).matchAll(/\{\{(\w+)\}\}/g)].map((m) => m[1]).sort().join(',');
 
 let fehler = 0;
@@ -43,6 +44,15 @@ for (const s of SPRACHEN.filter((x) => x !== 'de')) {
     const d = tabellen.de.get(k);
     if (typeof d === 'string' && typeof v === 'string' && platzhalter(d) !== platzhalter(v)) {
       meckern(`${s}: Platzhalter weichen ab — ${k} (de: ${platzhalter(d)}, ${s}: ${platzhalter(v)})`);
+    }
+    // Absätze zählen. Ein Text mit zwei Absätzen, von dem nur der erste
+    // übersetzt wurde, sieht fertig aus — der zweite fehlt lautlos. Genau so
+    // ist der Forschungsstand-Hinweis bei den Peptiden einmal untergegangen.
+    // Nur prüfen, was schon übersetzt ist: Ein aus en.json kopierter Text
+    // hat naturgemäß die englische Absatzzahl.
+    if (typeof d === 'string' && typeof v === 'string' && v !== tabellen.en.get(k)
+        && zeilen(d) !== zeilen(v)) {
+      meckern(`${s}: Absätze weichen ab — ${k} (de: ${zeilen(d) + 1}, ${s}: ${zeilen(v) + 1})`);
     }
   }
 }

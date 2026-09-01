@@ -61,6 +61,15 @@ for (const [schluessel, wert] of Object.entries(eingabe)) {
     fehler.push(`Platzhalter weichen ab bei ${schluessel} (de: ${platzhalter(k) || '—'}, ${sprache}: ${platzhalter(wert) || '—'})`);
     continue;
   }
+  // Mehrzeilige Texte: gleiche Zahl an Zeilenumbrüchen. Ein Schlüssel wie
+  // `ui.peptidesArePrescriptionOnlyOrUnapp` trägt ZWEI Absätze — beim Auslesen
+  // sieht man sie als zwei Zeilen und übersetzt versehentlich nur die erste.
+  // Der zweite Absatz verschwindet dann lautlos, und der Text sieht vollständig
+  // aus. Genau so ist hier der Forschungsstand-Absatz einmal untergegangen.
+  if ((String(k).match(/\n/g) || []).length !== (String(wert).match(/\n/g) || []).length) {
+    fehler.push(`Zeilen weichen ab bei ${schluessel} (de: ${(String(k).match(/\n/g) || []).length + 1}, ${sprache}: ${(String(wert).match(/\n/g) || []).length + 1}) — fehlt ein Absatz?`);
+    continue;
+  }
   setzen(ziel, teile, wert);
   gesetzt += 1;
 }
