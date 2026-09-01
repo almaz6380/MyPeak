@@ -37,7 +37,7 @@ TRAINING
 • Über 220 Übungen mit Beschreibung: Krafttraining, Cardio, HIIT, Zirkel & Kampfsport
 • Sätze, Wiederholungen und Gewicht loggen — mit Rest-Timer
 • Persönliche Rekorde werden automatisch erkannt („Neuer PR!")
-• 21 fertige Peak-Programme: Push/Pull/Legs, Oberkörper/Unterkörper, 5er-Split, HIIT u.v.m.
+• 21 fertige Trainingsprogramme: Push/Pull/Legs, Oberkörper/Unterkörper, 5er-Split, HIIT u.v.m.
 • Eigene Trainingspläne und Wochenpläne mit Kalender
 • Workout-Verlauf mit allen Details, nachträglich bearbeitbar
 • Notizen und Geräte-Einstellungen pro Übung
@@ -64,7 +64,7 @@ AUSSERDEM
 • Gastmodus: Erst ausprobieren, dann registrieren
 • Funktioniert auch offline — deine Daten synchronisieren sich automatisch
 
-Lade FullRep herunter und erreiche deinen Peak.
+Lade FullRep herunter und komm deinem Ziel jede Woche näher.
 
 WICHTIGER GESUNDHEITSHINWEIS
 FullRep ersetzt keine ärztliche Beratung. Wende dich bei gesundheitlichen Fragen, für eine Diagnose oder eine Behandlung immer an eine Ärztin oder einen Arzt. Sprich insbesondere vor Beginn eines Trainings- oder Ernährungsprogramms, vor einer Diät und vor der Einnahme von Nahrungsergänzungsmitteln mit einer Ärztin oder einem Arzt — vor allem bei Vorerkrankungen, Beschwerden, Schwangerschaft oder wenn du Medikamente einnimmst. Alle Inhalte der App dienen der allgemeinen Information und sind kein Medizinprodukt.
@@ -80,7 +80,7 @@ TRAINING
 • 220+ exercises with descriptions: strength, cardio, HIIT, circuit & martial arts
 • Log sets, reps and weight — with rest timer
 • Personal records detected automatically ("New PR!")
-• 21 ready-made Peak programs: Push/Pull/Legs, Upper/Lower, 5-day split, HIIT and more
+• 21 ready-made training programs: Push/Pull/Legs, Upper/Lower, 5-day split, HIIT and more
 • Custom training plans and weekly schedules with calendar
 • Full workout history, editable afterwards
 • Notes and machine settings per exercise
@@ -107,7 +107,7 @@ ALSO INCLUDED
 • Guest mode: try everything before signing up
 • Works offline — your data syncs automatically
 
-Download FullRep and reach your peak.
+Download FullRep and get closer to your goal every week.
 
 IMPORTANT HEALTH NOTICE
 FullRep does not replace medical advice. For any health concern, diagnosis or treatment, always consult a doctor. In particular, talk to a doctor before starting a training or nutrition programme, before a diet and before taking any supplement — especially if you have a pre-existing condition or symptoms, are pregnant, or take medication. All content in the app is for general information and is not a medical device.
@@ -116,9 +116,9 @@ FullRep does not replace medical advice. For any health concern, diagnosis or tr
 ### URLs
 | Feld | Wert |
 |---|---|
-| Support-URL | https://my-peak.vercel.app/legal/imprint |
-| Marketing-URL (optional) | https://my-peak.vercel.app |
-| Datenschutz-URL | https://my-peak.vercel.app/legal/privacy |
+| Support-URL | https://fullrep.vercel.app/legal/imprint |
+| Marketing-URL (optional) | https://fullrep.vercel.app |
+| Datenschutz-URL | https://fullrep.vercel.app/legal/privacy |
 
 ### Kategorie
 - Primär: **Gesundheit & Fitness**

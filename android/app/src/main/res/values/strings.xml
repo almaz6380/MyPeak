@@ -4,4 +4,10 @@
     <string name="title_activity_main">FullRep</string>
     <string name="package_name">at.gallab.mypeak</string>
     <string name="custom_url_scheme">at.gallab.mypeak</string>
+    <!-- Homescreen-Widget. Nur DE: RemoteViews zieht Systemsprache aus res/,
+         nicht aus der App-i18n — fuer EN kaeme values-en/ dazu. -->
+    <string name="widget_streak">Streak</string>
+    <string name="widget_woche">Woche</string>
+    <string name="widget_level">Level</string>
+    <string name="widget_beschreibung">Streak, Workouts diese Woche und Level auf einen Blick.</string>
 </resources>

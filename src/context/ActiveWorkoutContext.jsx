@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { pausenSignalPlanen, pausenSignalAbbrechen } from '../lib/restNotification';
 
 const ActiveWorkoutContext = createContext(null);
 const STORAGE_KEY = 'activeWorkout';
@@ -22,31 +23,49 @@ export function ActiveWorkoutProvider({ children }) {
     return null;
   });
 
-  // Rest timer state
-  const [restTimer, setRestTimer] = useState(null); // { remaining, duration, exIdx, setIdx }
+  // Rest timer state — { remaining, duration, endsAt, exIdx, setIdx }
+  //
+  // ⚠ `remaining` wird aus `endsAt` (Wanduhr) ABGELEITET, nicht heruntergezaehlt.
+  // Die alte Fassung zog je Intervall-Tick 1 ab — im Gym liegt das Handy aber
+  // gesperrt auf der Bank, die WebView friert setInterval ein, und aus 90 s
+  // Pause wurden beliebig viele. Mit endsAt korrigiert sich die Anzeige beim
+  // Zurueckkommen von selbst; das Pausenende meldet nativ die geplante
+  // Benachrichtigung (restNotification.js), die vom SYSTEM feuert, egal was
+  // die WebView gerade tut.
+  const [restTimer, setRestTimer] = useState(null);
 
-  // Rest timer countdown
+  // Countdown fuer die Anzeige. 250 ms statt 1 s: Nach der Rueckkehr aus dem
+  // Hintergrund springt die Anzeige binnen eines Wimpernschlags auf den echten
+  // Wert; neu gerendert wird trotzdem nur bei geaenderter Sekunde.
   useEffect(() => {
-    if (!restTimer || restTimer.remaining <= 0) return;
+    if (!restTimer) return;
     const tick = setInterval(() => {
       setRestTimer((prev) => {
-        if (!prev || prev.remaining <= 1) {
-          // Timer finished — vibrate if available
+        if (!prev) return prev;
+        const rest = Math.max(0, Math.round((prev.endsAt - Date.now()) / 1000));
+        if (rest <= 0) {
+          // Vordergrund-Signal. ⚠ navigator.vibrate existiert in iOS-WKWebView
+          // nicht — dort (und bei gesperrtem Schirm ueberall) ist die geplante
+          // Benachrichtigung das eigentliche Signal.
           if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
           return null;
         }
-        return { ...prev, remaining: prev.remaining - 1 };
+        return rest === prev.remaining ? prev : { ...prev, remaining: rest };
       });
-    }, 1000);
+    }, 250);
     return () => clearInterval(tick);
-  }, [restTimer?.remaining > 0]);
+  }, [restTimer !== null]);
 
   const startRestTimer = useCallback((seconds, exIdx = null, setIdx = null) => {
-    setRestTimer({ remaining: seconds, duration: seconds, exIdx, setIdx });
+    setRestTimer({ remaining: seconds, duration: seconds, endsAt: Date.now() + seconds * 1000, exIdx, setIdx });
+    // Feste Benachrichtigungs-ID: ein erneuter Start (auch der +30s-Knopf)
+    // verschiebt die bestehende Meldung, statt eine zweite zu erzeugen.
+    pausenSignalPlanen(seconds);
   }, []);
 
   const stopRestTimer = useCallback(() => {
     setRestTimer(null);
+    pausenSignalAbbrechen();
   }, []);
 
   // Persist to localStorage on every change
@@ -167,11 +186,17 @@ export function ActiveWorkoutProvider({ children }) {
       duration: Date.now() - workout.startTime,
     };
     setWorkout(null);
+    // Laufende Pause raeumen — sonst meldet sich „Pause vorbei" nach einem
+    // Workout, das es nicht mehr gibt.
+    setRestTimer(null);
+    pausenSignalAbbrechen();
     return result;
   }, [workout]);
 
   const discardWorkout = useCallback(() => {
     setWorkout(null);
+    setRestTimer(null);
+    pausenSignalAbbrechen();
   }, []);
 
   const isActive = !!workout?.isActive;

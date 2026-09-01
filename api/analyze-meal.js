@@ -1,4 +1,7 @@
+import { corsBehandeln } from './_cors.js';
+
 export default async function handler(req, res) {
+  if (corsBehandeln(req, res)) return; // Preflight der nativen App
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -49,7 +52,48 @@ export default async function handler(req, res) {
     return res.status(413).json({ error: 'Image too large. Please use a compressed image under 3MB.' });
   }
 
-  const prompt = language === 'de'
+  // Fuer es kommen name_es/meal_description_es ZUSAETZLICH zu de/en mit —
+  // die Client-Weichen fallen auf en zurueck, wenn ein Feld fehlt (alte
+  // App-Versionen schicken weiter nur de/en und bleiben unberuehrt).
+  const prompt = language === 'es'
+    ? `Eres un asistente de análisis nutricional. Analiza esta foto de una comida e identifica cada alimento visible.
+
+Para cada alimento, estima:
+- Nombre en español, alemán e inglés
+- Tamaño de la porción en gramos (según el tamaño visual respecto al plato/bol)
+- Calorías (kcal)
+- Proteínas (g)
+- Carbohidratos (g)
+- Grasas (g)
+- Nivel de confianza (high, medium, low)
+
+Importante:
+- Estima las porciones según el tamaño visual
+- Usa bases de datos nutricionales estándar como referencia
+- Asume una cantidad normal de aceite/grasa en la preparación
+- Si no puedes identificar un alimento, descríbelo y da tu mejor estimación
+- Si la imagen no muestra comida, responde con {"error": "no_food_detected"}
+
+Responde SOLO con JSON válido exactamente en este formato, sin ningún otro texto:
+{
+  "items": [
+    {
+      "name_es": "Pechuga de pollo",
+      "name_de": "Hähnchenbrust",
+      "name_en": "Chicken breast",
+      "portion_g": 150,
+      "calories": 248,
+      "protein": 46.5,
+      "carbs": 0,
+      "fat": 5.4,
+      "confidence": "high"
+    }
+  ],
+  "meal_description_es": "Breve descripción de la comida",
+  "meal_description_de": "Kurze Beschreibung der Mahlzeit",
+  "meal_description_en": "Short description of the meal"
+}`
+    : language === 'de'
     ? `Du bist ein Ernährungsanalyse-Assistent. Analysiere dieses Foto einer Mahlzeit und identifiziere jedes sichtbare Lebensmittel.
 
 Für jedes Lebensmittel schätze:
@@ -121,7 +165,10 @@ Return ONLY valid JSON in this exact format, no other text:
   "meal_description_en": "Short description of the meal"
 }`;
 
-  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  // ⚠ Modellname synchron mit api/coach.js halten und NIE raten — mit
+  // /api/gemini-modelle?probe=<name> nachmessen. 2.0-flash abgeschaltet,
+  // 2.5-flash „not available to new users"; 3.6-flash geprueft (31.08.2026).
+  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
   const geminiBody = JSON.stringify({
     contents: [
       {
@@ -151,6 +198,12 @@ Return ONLY valid JSON in this exact format, no other text:
   let last429 = false;
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    // Zu Beginn JEDES Versuchs zurücksetzen, damit am Ende nur der letzte
+    // Ausgang zählt. Stünde das erst nach dem fetch, bliebe ein 429 aus einem
+    // früheren Versuch stehen, wenn der fetch danach wirft (Netz/Timeout) —
+    // der Nutzer sähe dann „Rate-Limit" und wartete auf ein Kontingent, das
+    // gar nicht das Problem war.
+    last429 = false;
     try {
       const response = await fetch(geminiUrl, {
         method: 'POST',
@@ -167,7 +220,6 @@ Return ONLY valid JSON in this exact format, no other text:
         await new Promise((r) => setTimeout(r, waitSeconds * 1000));
         continue;
       }
-      last429 = false;
 
       if (!response.ok) {
         const errorData = await response.text();

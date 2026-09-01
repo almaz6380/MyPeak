@@ -51,6 +51,8 @@
 	<false/>
 	<key>NSCameraUsageDescription</key>
 	<string>FullRep nutzt die Kamera, um Barcodes von Lebensmitteln zu scannen und Mahlzeiten zu fotografieren.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>FullRep liest Schritte und Gewicht aus Apple Health, um sie in der App anzuzeigen — nur wenn du die Verbindung im Profil einschaltest.</string>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-8860791993288062~8812263899</string>
 	<key>NSUserTrackingUsageDescription</key>

@@ -359,7 +359,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan, activeSch
                 <div className="space-y-2 mb-3">
                   {editingConfig.exercises.map((pe) => {
                     const ex = getExerciseById(pe.id);
-                    const name = ex ? getExerciseDisplayName(ex, t) : pe.id;
+                    const name = getExerciseDisplayName(ex || pe.id, null, t);
                     return (
                       <div key={pe.id} className="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-3">
                         <div className="flex items-center justify-between mb-2">

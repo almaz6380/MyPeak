@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Check, RotateCcw, Sparkles, Info } from 'lucide-react';
 import OilLevelPicker from '../../components/OilLevelPicker';
-import { applyOilAdjustment, itemsToNutritionEntries } from '../../data/mealPhotoAnalysis';
+import { applyOilAdjustment, itemsToNutritionEntries, itemName } from '../../data/mealPhotoAnalysis';
 
 const confidenceColors = {
   high: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400',
@@ -35,7 +35,11 @@ export default function MealAnalysisResult({ result, photo, oilLevel, onOilChang
     onAddAll(entries);
   }
 
-  const description = language === 'de' ? result.meal_description_de : result.meal_description_en;
+  // es liefert die API seit 1.4.0 mit; fehlt das Feld, Englisch statt nichts.
+  const description = (language?.startsWith('de') && result.meal_description_de)
+    || (language?.startsWith('es') && result.meal_description_es)
+    || result.meal_description_en
+    || result.meal_description_de;
 
   return (
     <div className="fixed inset-0 bg-white dark:bg-[#0a0a0a] z-50 overflow-y-auto">
@@ -108,7 +112,7 @@ export default function MealAnalysisResult({ result, photo, oilLevel, onOilChang
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                      {language === 'de' ? item.name_de : item.name_en}
+                      {itemName(item, language)}
                     </p>
                     <p className="text-xs text-slate-400">{item.portion_g}g</p>
                   </div>

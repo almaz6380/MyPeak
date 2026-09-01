@@ -2,6 +2,12 @@
   "functions": {
     "api/analyze-meal.js": {
       "maxDuration": 30
+    },
+    "api/coach.js": {
+      "maxDuration": 30
+    },
+    "api/gemini-modelle.js": {
+      "maxDuration": 30
     }
   },
   "crons": [
@@ -10,6 +16,7 @@
   ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/(get|app|download|instagram|tiktok|facebook|bio)", "destination": "/get.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

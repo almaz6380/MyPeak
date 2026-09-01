@@ -17,6 +17,8 @@ import MiniSparkline from '../../components/progress/MiniSparkline';
 import ProgressRing from '../../components/progress/ProgressRing';
 import PostWorkoutSummary from '../../components/progress/PostWorkoutSummary';
 import { maybeShowInterstitial } from '../../lib/ads';
+import { maybeAskForReview } from '../../lib/review';
+import { widgetDatenAktualisieren } from '../../lib/widgetDaten';
 import useProgressComparison, { getExerciseTarget, setExerciseTarget } from '../../hooks/useProgressComparison';
 import { todayLocal } from '../../lib/dateUtils';
 
@@ -162,6 +164,9 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
         }
       } catch (err) {
         console.error('XP/achievement error:', err);
+      } finally {
+        // NACH updateStreak, damit das Widget den frischen Streak zeigt.
+        widgetDatenAktualisieren(user.id);
       }
     })();
 
@@ -178,6 +183,11 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
     setSavedWorkoutExercises(workout.exercises);
     ctx.discardWorkout();
     setShowPostSummary(true);
+
+    // Bewertungs-Anfrage auf der Zusammenfassung — dem zufriedensten Moment.
+    // Verzoegert, damit erst XP/PRs zu sehen sind, bevor sich das System-Sheet
+    // darueberlegt; drosselt sich selbst (s. lib/review.js), nur nativ.
+    setTimeout(() => { maybeAskForReview(user.id); }, 1500);
   };
 
   const handlePostSummaryDismiss = () => {

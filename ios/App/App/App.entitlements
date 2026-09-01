@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Geteilter Speicher mit der Widget-Extension. Die Gruppe muss im
+	     Developer-Portal existieren und BEIDEN Bundle-IDs zugeordnet sein
+	     (at.gallab.mypeak + at.gallab.mypeak.widget) — das geht NUR im Portal,
+	     die ASC-API kann App Groups weder anlegen noch zuordnen (gepr. 01.09.2026).
+	     Danach sind die Provisioning-Profile neu zu erzeugen; das erledigt der
+	     iOS-Workflow inzwischen selbst ueber die API. -->
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.at.gallab.mypeak</string>
+	</array>
+	<!-- Apple Health (Lesen von Schritten/Gewicht, Opt-in im Profil).
+	     Die HEALTHKIT-Faehigkeit an der Bundle-ID schaltet scripts/ios-profile.py
+	     per API ein — anders als die App Group geht das ohne Portal-Klick. -->
+	<key>com.apple.developer.healthkit</key>
+	<true/>
+</dict>
+</plist>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Homescreen-Widget: drei Zahlen nebeneinander (Streak / Woche / Level),
+     FullRep-Look: Schwarz mit Amber. RemoteViews kann kein CSS — Farben und
+     Radius kommen aus dem drawable-Hintergrund. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_wurzel"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/fullrep_widget_grund"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:gravity="center">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+        <TextView
+            android:id="@+id/widget_streak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FBBF24"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:text="–" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#A8A29E"
+            android:textSize="11sp"
+            android:text="@string/widget_streak" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+        <TextView
+            android:id="@+id/widget_woche"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFF8E7"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:text="–" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#A8A29E"
+            android:textSize="11sp"
+            android:text="@string/widget_woche" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+        <TextView
+            android:id="@+id/widget_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFF8E7"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:text="–" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#A8A29E"
+            android:textSize="11sp"
+            android:text="@string/widget_level" />
+    </LinearLayout>
+</LinearLayout>

@@ -23,7 +23,8 @@
     "weightAll": "All",
     "today": "Today",
     "yesterday": "Yesterday",
-    "tomorrow": "Tomorrow"
+    "tomorrow": "Tomorrow",
+    "steps": "Steps"
   },
   "planBuilder": {
     "title": "Create Weekly Plan",
@@ -201,7 +202,9 @@
     "equipment": "Equipment",
     "customExercise": "Custom",
     "confirmDeleteExercise": "Do you really want to delete this custom exercise?",
-    "demoBadge": "Demo"
+    "demoBadge": "Demo",
+    "restOverTitle": "Rest over",
+    "restOverBody": "Time for your next set."
   },
   "nutrition": {
     "title": "Nutrition",
@@ -902,6 +905,7 @@
     "signOut": "Sign Out",
     "welcomeTitle": "Welcome to FullRep",
     "welcomeSubtitle": "Track your training. Reach your goals.",
+    "getTheApp": "Prefer the app?",
     "guestMode": "Try as guest",
     "guestBanner": "You're in guest mode — sign up to save your data permanently.",
     "emailNotConfirmed": "Your email address is not confirmed yet. Please check your inbox (including spam).",

@@ -32,6 +32,40 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-8860791993288062~3613953701" />
+
+        <!-- Health Connect: Begruendungs-Seite, die der Einwilligungsdialog
+             verlinkt ("Warum will diese App das?"). Die Activity liefert das
+             capacitor-health-Plugin mit; bis Android 13 direkt, ab 14 ueber
+             den Alias. Ohne beide lehnt Health Connect die Anfrage ab. -->
+        <activity
+            android:name="com.fit_up.health.capacitor.PermissionsRationaleActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
+        </activity>
+        <activity-alias
+            android:name="ViewPermissionUsageActivity"
+            android:exported="true"
+            android:targetActivity="com.fit_up.health.capacitor.PermissionsRationaleActivity"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- Homescreen-Widget (Streak / Woche / Level), s. FullRepWidget.java -->
+        <receiver
+            android:name=".FullRepWidget"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/fullrep_widget_info" />
+        </receiver>
     </application>
 
     <!-- Permissions -->
@@ -39,4 +73,20 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Kamera für Barcode-Scanner und Mahlzeiten-Fotos (getUserMedia im WebView) -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Pausenende-Benachrichtigung des Rest-Timers (Android 13+ fragt zur
+         Laufzeit; der Dialog kommt erst beim ersten Timer-Start, s.
+         src/lib/restNotification.js). Das Plugin deklariert die Berechtigung
+         auch selbst — doppelt schadet beim Manifest-Merge nicht, fehlend schon. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Health Connect (Opt-in im Profil, src/lib/health.js). NUR die drei
+         Berechtigungen, die die App wirklich anfragt — Health Connect zeigt
+         jede deklarierte Berechtigung im Einwilligungsdialog an, ungenutzte
+         Eintraege verwirren dort nur. -->
+    <queries>
+        <package android:name="com.google.android.apps.healthdata" />
+    </queries>
+    <uses-permission android:name="android.permission.health.READ_STEPS" />
+    <uses-permission android:name="android.permission.health.READ_WEIGHT" />
+    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" />
 </manifest>

@@ -308,6 +308,12 @@ export function getExercisesByType(type) {
   return exercises.filter((e) => (e.type || 'strength') === type);
 }
 
+// Selbst erstellte Übungen haben keinen Übersetzungsschlüssel. Damit sie sich
+// wie Katalog-Übungen anfassen lassen, tragen sie ihren Namen im nameKey mit
+// diesem Präfix. Wer den Namen anzeigt, muss ihn hier wieder abziehen.
+export const CUSTOM_NAME_PREFIX = '__custom__';
+const CUSTOM_EXERCISES_STORAGE_KEY = 'custom_exercises';
+
 // Eigene Übungen (localStorage 'custom_exercises') als Exercise-Objekte.
 // Raw-String-Cache: getExerciseById läuft in Hot-Loops (useMuscleHeatmap,
 // achievements) — nur bei geändertem localStorage-Inhalt neu parsen.
@@ -316,7 +322,7 @@ let _customParsed = [];
 
 export function getCustomExercisesAsExercises() {
   try {
-    const raw = localStorage.getItem('custom_exercises');
+    const raw = localStorage.getItem(CUSTOM_EXERCISES_STORAGE_KEY);
     if (raw !== _customRaw) {
       _customRaw = raw;
       const list = raw ? JSON.parse(raw) : [];
@@ -325,7 +331,7 @@ export function getCustomExercisesAsExercises() {
         type: 'strength',
         muscleGroup: ce.muscle_group || 'chest',
         equipment: ce.equipment || 'bodyweight',
-        nameKey: `__custom__${ce.name}`,
+        nameKey: `${CUSTOM_NAME_PREFIX}${ce.name}`,
         descKey: '',
         _customName: ce.name,
         _isCustom: true,
@@ -346,13 +352,31 @@ export function getExerciseById(id) {
   return found;
 }
 
-// Anzeigename an einer Stelle: Katalog-Übungen via t(nameKey),
-// eigene Übungen über ihren Klarnamen (nie den '__custom__'-Key übersetzen).
-export function getExerciseDisplayName(ex, t) {
-  if (!ex) return '';
-  if (ex._customName) return ex._customName;
-  if (typeof ex.nameKey === 'string' && ex.nameKey.startsWith('__custom__')) {
-    return ex.nameKey.slice('__custom__'.length);
+function stripCustomPrefix(nameKey, t) {
+  return nameKey.startsWith(CUSTOM_NAME_PREFIX)
+    ? nameKey.slice(CUSTOM_NAME_PREFIX.length)
+    : t(nameKey);
+}
+
+// Anzeigename einer Übung — kennt den Katalog UND selbst erstellte Übungen.
+// Ohne das zeigten Pläne bei eigenen Übungen die rohe technische ID.
+// `exercise` darf eine ID oder ein Übungsobjekt sein.
+export function getExerciseDisplayName(exercise, customExercises, t) {
+  const isObject = typeof exercise === 'object' && exercise !== null;
+  const id = isObject ? exercise.id : exercise;
+
+  const custom = (customExercises || []).find((ce) => (ce.exercise_id || ce.id) === id);
+  if (custom?.name) return custom.name;
+
+  if (isObject) {
+    if (exercise._customName) return exercise._customName;
+    if (exercise.name) return exercise.name;
   }
-  return ex.nameKey ? t(ex.nameKey) : (ex.name || ex.id || '');
+
+  const fromCatalog = exercises.find((e) => e.id === id);
+  if (fromCatalog?.nameKey) return stripCustomPrefix(fromCatalog.nameKey, t);
+
+  if (isObject && exercise.nameKey) return stripCustomPrefix(exercise.nameKey, t);
+
+  return String(id ?? '');
 }

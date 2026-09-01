@@ -1,5 +1,6 @@
 import UIKit
 import Capacitor
+import WidgetKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -11,9 +12,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
+    /// Widget-Daten in die App-Group-Suite spiegeln.
+    ///
+    /// ⚠ Warum kopieren: @capacitor/preferences schreibt auf iOS IMMER in
+    /// UserDefaults.standard — `group` ist dort nur ein Schluessel-Praefix,
+    /// KEINE Suite (nachgelesen in Preferences.swift des Plugins). Die
+    /// Widget-Extension kann aber nur die App-Group-Suite lesen. Gespiegelt
+    /// wird beim Verlassen der App — genau dann, wenn das Widget wieder
+    /// sichtbar wird. Nativ im AppDelegate statt ueber die Bruecke: dieselbe
+    /// Regel wie bei Anigosha (Systemnahes gehoert in den AppDelegate).
+    private func widgetDatenSpiegeln() {
+        let standard = UserDefaults.standard
+        guard let wert = standard.string(forKey: "FullRepWidget.widget.daten"),
+              let suite = UserDefaults(suiteName: "group.at.gallab.mypeak") else { return }
+        suite.set(wert, forKey: "widget.daten")
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
     func applicationWillResignActive(_ application: UIApplication) {
-        // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-        // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+        widgetDatenSpiegeln()
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {

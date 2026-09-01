@@ -22,7 +22,7 @@ export const legalDocs = {
         },
         {
           heading: 'Unternehmensgegenstand',
-          body: 'Betrieb der Fitness- und Ernährungs-Web-App „FullRep" (my-peak.vercel.app).',
+          body: 'Betrieb der Fitness- und Ernährungs-Web-App „FullRep" (fullrep.vercel.app).',
         },
         {
           heading: 'Gewerbe- und berufsrechtliche Angaben',
@@ -48,7 +48,7 @@ export const legalDocs = {
         },
         {
           heading: 'Business purpose',
-          body: 'Operation of the fitness and nutrition web app "FullRep" (my-peak.vercel.app).',
+          body: 'Operation of the fitness and nutrition web app "FullRep" (fullrep.vercel.app).',
         },
         {
           heading: 'Trade and professional information',
@@ -77,7 +77,7 @@ export const legalDocs = {
         },
         {
           heading: '2. Welche Daten wir verarbeiten',
-          body: 'Kontodaten: E-Mail-Adresse und Passwort (verschlüsselt) für die Registrierung.\n\nProfildaten: Name, Alter, Geschlecht, Größe, Gewicht, Trainingsziel, Aktivitätslevel und Erfahrung — von dir im Onboarding angegeben.\n\nNutzungsdaten: deine Trainings (Übungen, Sätze, Gewichte), Ernährungseinträge (Lebensmittel, Kalorien, Makros), Wassereinträge, Supplements, Gewichtsverlauf, Trainingspläne, Freundschaften und Erfahrungspunkte.\n\nGesundheitsdaten (Art. 9 DSGVO): Körpergewicht, Zyklusdaten und Symptomtagebuch (falls du das Zyklustracking aktivierst). Diese Daten verarbeiten wir ausschließlich auf Grundlage deiner ausdrücklichen Einwilligung, die du im Onboarding erteilst und jederzeit durch Löschen deines Kontos widerrufen kannst.\n\nFotos: Übungs- und Produktfotos werden ausschließlich lokal auf deinem Gerät gespeichert (IndexedDB) und nicht an uns übertragen. Mahlzeitenfotos für die KI-Analyse werden an Google (Gemini API) übermittelt — siehe Punkt 4.',
+          body: 'Kontodaten: E-Mail-Adresse und Passwort (verschlüsselt) für die Registrierung.\n\nProfildaten: Name, Alter, Geschlecht, Größe, Gewicht, Trainingsziel, Aktivitätslevel und Erfahrung — von dir im Onboarding angegeben.\n\nNutzungsdaten: deine Trainings (Übungen, Sätze, Gewichte), Ernährungseinträge (Lebensmittel, Kalorien, Makros), Wassereinträge, Supplements, Gewichtsverlauf, Trainingspläne, Freundschaften und Erfahrungspunkte.\n\nGesundheitsdaten (Art. 9 DSGVO): Körpergewicht, Zyklusdaten und Symptomtagebuch (falls du das Zyklustracking aktivierst). Diese Daten verarbeiten wir ausschließlich auf Grundlage deiner ausdrücklichen Einwilligung, die du im Onboarding erteilst und jederzeit durch Löschen deines Kontos widerrufen kannst.\n\nApple Health / Health Connect (optional): Wenn du die Verbindung im Profil einschaltest, liest FullRep Schrittzahl und Gewicht aus Apple Health (iOS) bzw. Google Health Connect (Android), um sie in der App anzuzeigen und in deinen Gewichtsverlauf zu übernehmen. Die Freigabe erteilst du im System-Dialog und kannst sie dort jederzeit entziehen; abschalten kannst du die Verbindung außerdem im Profil. FullRep schreibt keine Daten nach Apple Health oder Health Connect.\n\nFotos: Übungs- und Produktfotos werden ausschließlich lokal auf deinem Gerät gespeichert (IndexedDB) und nicht an uns übertragen. Mahlzeitenfotos für die KI-Analyse werden an Google (Gemini API) übermittelt — siehe Punkt 4.',
         },
         {
           heading: '3. Zwecke und Rechtsgrundlagen',
@@ -115,7 +115,7 @@ export const legalDocs = {
         },
         {
           heading: '2. What data we process',
-          body: 'Account data: email address and password (encrypted) for registration.\n\nProfile data: name, age, gender, height, weight, training goal, activity level and experience — provided by you during onboarding.\n\nUsage data: your workouts (exercises, sets, weights), nutrition entries (foods, calories, macros), water intake, supplements, weight history, training plans, friendships and experience points.\n\nHealth data (Art. 9 GDPR): body weight, cycle data and symptom diary (if you enable cycle tracking). We process this data exclusively based on your explicit consent, which you give during onboarding and can revoke at any time by deleting your account.\n\nPhotos: exercise and product photos are stored exclusively on your device (IndexedDB) and are not transmitted to us. Meal photos for AI analysis are transmitted to Google (Gemini API) — see section 4.',
+          body: 'Account data: email address and password (encrypted) for registration.\n\nProfile data: name, age, gender, height, weight, training goal, activity level and experience — provided by you during onboarding.\n\nUsage data: your workouts (exercises, sets, weights), nutrition entries (foods, calories, macros), water intake, supplements, weight history, training plans, friendships and experience points.\n\nHealth data (Art. 9 GDPR): body weight, cycle data and symptom diary (if you enable cycle tracking). We process this data exclusively based on your explicit consent, which you give during onboarding and can revoke at any time by deleting your account.\n\nApple Health / Health Connect (optional): If you enable the connection in your profile, FullRep reads step count and weight from Apple Health (iOS) or Google Health Connect (Android) to display them in the app and add them to your weight history. You grant access in the system dialog and can revoke it there at any time; you can also switch the connection off in your profile. FullRep does not write any data to Apple Health or Health Connect.\n\nPhotos: exercise and product photos are stored exclusively on your device (IndexedDB) and are not transmitted to us. Meal photos for AI analysis are transmitted to Google (Gemini API) — see section 4.',
         },
         {
           heading: '3. Purposes and legal bases',
@@ -152,7 +152,7 @@ export const legalDocs = {
       sections: [
         {
           heading: '1. Geltungsbereich',
-          body: `Diese Nutzungsbedingungen gelten für die Nutzung der Web-App „FullRep" (my-peak.vercel.app), betrieben von:\n\n${operatorBlockDE}`,
+          body: `Diese Nutzungsbedingungen gelten für die Nutzung der Web-App „FullRep" (fullrep.vercel.app), betrieben von:\n\n${operatorBlockDE}`,
         },
         {
           heading: '2. Leistungsbeschreibung',
@@ -186,7 +186,7 @@ export const legalDocs = {
       sections: [
         {
           heading: '1. Scope',
-          body: `These terms of use apply to the use of the web app "FullRep" (my-peak.vercel.app), operated by:\n\n${operatorBlockEN}`,
+          body: `These terms of use apply to the use of the web app "FullRep" (fullrep.vercel.app), operated by:\n\n${operatorBlockEN}`,
         },
         {
           heading: '2. Service description',

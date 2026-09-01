@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import FullRepLogo from '../../components/FullRepLogo';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
+import StoreButtons from './StoreButtons';
 import ResetPasswordForm from './ResetPasswordForm';
 
 export default function AuthPage() {
@@ -26,6 +27,8 @@ export default function AuthPage() {
             {t('auth.welcomeSubtitle')}
           </p>
         </div>
+
+        <StoreButtons />
 
         <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 p-6">
           {view === 'login' && (
