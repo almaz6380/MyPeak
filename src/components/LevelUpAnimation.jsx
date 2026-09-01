@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getLevelTitle } from '../data/socialStorage';
+import { beschriftung } from '../lib/sprache';
 
 export default function LevelUpAnimation({ level, lang = 'de', onDismiss }) {
   const [phase, setPhase] = useState('entering'); // entering | showing | exiting
@@ -40,7 +41,7 @@ export default function LevelUpAnimation({ level, lang = 'de', onDismiss }) {
         {/* Title */}
         <div className="mt-4 px-6 py-2 rounded-full bg-primary-400/20 border border-primary-400/40 inline-block">
           <p className="text-lg font-bold text-primary-300">
-            {title.emoji} {lang === 'de' ? title.de : title.en}
+            {title.emoji} {beschriftung(title, lang)}
           </p>
         </div>
       </div>

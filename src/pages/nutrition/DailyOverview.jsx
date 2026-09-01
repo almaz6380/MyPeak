@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { datumsLocale, wochentagKuerzel } from '../../lib/datumsformat';
+import i18nInstanz from '../../i18n';
 import { ChevronLeft, ChevronRight, Plus, Trash2, Settings, UtensilsCrossed, Pencil, X, Check, GlassWater, BookOpen } from 'lucide-react';
 import CardPhotoMotif from '../../components/CardPhotoMotif';
 import MacroRing from './MacroRing';
@@ -7,6 +9,7 @@ import FullRepLogo from '../../components/FullRepLogo';
 import { useAuth } from '../../context/AuthContext';
 import { getNutritionEntries, getNutritionGoals, deleteNutritionEntry, saveNutritionGoals, getWaterTotal, addWater, removeWaterAmount } from '../../data/nutritionStorage';
 import { toLocalDateString } from '../../lib/dateUtils';
+import { appSprache } from '../../lib/sprache';
 
 const MEAL_SLOTS = ['breakfast', 'lunch', 'dinner', 'snack'];
 
@@ -19,6 +22,7 @@ function getFoodEmoji(source) {
 
 export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOpenCustomMeals, onOpenCookbook, onOpenSupplements }) {
   const { t, i18n } = useTranslation();
+  const lang = appSprache(i18n.language);
   const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
   const [entries, setEntries] = useState([]);
@@ -98,7 +102,6 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
     setShowGoalEditor(false);
   }
 
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
 
   return (
     <div className="p-4 pt-16 pb-24">
@@ -365,13 +368,10 @@ function CalendarModal({ selectedDate, onSelect, onClose, lang, t }) {
 
   const todayStr = formatDate(new Date());
 
-  const dayNames = lang === 'de'
-    ? ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
-    : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+  const dayNames = wochentagKuerzel(lang);
 
-  const monthNames = lang === 'de'
-    ? ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']
-    : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const monthNames = Array.from({ length: 12 }, (_, m) =>
+    new Date(Date.UTC(2026, m, 15)).toLocaleDateString(datumsLocale(lang), { month: 'long', timeZone: 'UTC' }));
 
   function prevMonth() {
     if (viewMonth === 0) { setViewMonth(11); setViewYear((y) => y - 1); }
@@ -497,8 +497,6 @@ function CalendarModal({ selectedDate, onSelect, onClose, lang, t }) {
 // ── Goal Editor Modal ────────────────────────────────────────
 
 function GoalEditorModal({ goals, onSave, onClose, t }) {
-  const { i18n } = useTranslation();
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
   const [calories, setCalories] = useState(String(Math.round(goals.calories)));
   const [protein, setProtein] = useState(String(Math.round(goals.protein)));
   const [carbs, setCarbs] = useState(String(Math.round(goals.carbs)));
@@ -605,7 +603,7 @@ function GoalEditorModal({ goals, onSave, onClose, t }) {
 
         <div className="overflow-y-auto flex-1 px-6">
           <p className="text-[10px] text-slate-400 dark:text-slate-500 mb-3">
-            {lang === 'de' ? 'Alle Werte sind frei anpassbar. Onboarding-Werte sind nur Empfehlungen.' : 'All values are freely adjustable. Onboarding values are recommendations only.'}
+            {t('ui.allValuesAreFreelyAdjustableOnboar')}
           </p>
 
           <div className="space-y-3">
@@ -657,7 +655,7 @@ function GoalEditorModal({ goals, onSave, onClose, t }) {
                 <span>F: {fatKcal} kcal</span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="font-medium">{lang === 'de' ? 'Makro-Summe' : 'Macro total'}: {macroKcal} kcal</span>
+                <span className="font-medium">{t('ui.macroTotal')}: {macroKcal} kcal</span>
                 {kcalAuto ? (
                   <span className="font-semibold text-green-500">✓ Auto</span>
                 ) : remaining !== 0 ? (
@@ -673,7 +671,7 @@ function GoalEditorModal({ goals, onSave, onClose, t }) {
               </div>
             </div>
 
-            <GoalField label={`${t('nutrition.fiber') || (lang === 'de' ? 'Ballaststoffe' : 'Fiber')} (g)`} value={fiber} onChange={setFiber} color="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 focus:ring-green-500" />
+            <GoalField label={`${t('nutrition.fiber') || (t('ui.fiber2'))} (g)`} value={fiber} onChange={setFiber} color="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 focus:ring-green-500" />
             <GoalField label={`${t('nutrition.water')} (ml)`} value={waterMl} onChange={setWaterMl} color="bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-800 focus:ring-cyan-500" />
           </div>
         </div>
@@ -714,16 +712,17 @@ function formatDate(date) {
   return toLocalDateString(date);
 }
 
+// Keine Komponente, also kein useTranslation — hier übersetzt die Instanz.
 function formatDisplayDate(dateStr, lang) {
   const today = formatDate(new Date());
   const yesterday = formatDate(new Date(Date.now() - 86400000));
   const tomorrow = formatDate(new Date(Date.now() + 86400000));
 
-  if (dateStr === today) return lang === 'de' ? 'Heute' : 'Today';
-  if (dateStr === yesterday) return lang === 'de' ? 'Gestern' : 'Yesterday';
-  if (dateStr === tomorrow) return lang === 'de' ? 'Morgen' : 'Tomorrow';
+  if (dateStr === today) return i18nInstanz.t('ui.today');
+  if (dateStr === yesterday) return i18nInstanz.t('ui.yesterday');
+  if (dateStr === tomorrow) return i18nInstanz.t('ui.tomorrow');
 
   const d = new Date(dateStr);
-  const locale = lang === 'de' ? 'de-DE' : 'en-US';
+  const locale = datumsLocale(lang);
   return d.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' });
 }

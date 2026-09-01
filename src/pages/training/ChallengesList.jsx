@@ -6,9 +6,8 @@ import { getChallenges, respondToChallenge } from '../../data/socialStorage';
 import { getExerciseById } from '../../data/exercises';
 
 export default function ChallengesList({ onBack, onCreateChallenge, onViewChallenge }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user, isGuestMode } = useAuth();
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -36,7 +35,7 @@ export default function ChallengesList({ onBack, onCreateChallenge, onViewChalle
           <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
           <h1 className="text-2xl font-bold">Challenges</h1>
         </div>
-        <p className="text-center text-slate-400 dark:text-slate-500 py-12">{lang === 'de' ? 'Registriere dich für Challenges.' : 'Sign up for challenges.'}</p>
+        <p className="text-center text-slate-400 dark:text-slate-500 py-12">{t('ui.signUpForChallenges')}</p>
       </div>
     );
   }
@@ -60,7 +59,7 @@ export default function ChallengesList({ onBack, onCreateChallenge, onViewChalle
           {/* Pending */}
           {pending.length > 0 && (
             <div className="mb-4">
-              <h2 className="text-xs font-medium text-slate-400 mb-2">{lang === 'de' ? 'Eingehende Challenges' : 'Incoming Challenges'}</h2>
+              <h2 className="text-xs font-medium text-slate-400 mb-2">{t('ui.incomingChallenges')}</h2>
               {pending.map((c) => (
                 <div key={c.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-2">
                   <div className="flex items-center justify-between mb-2">
@@ -75,10 +74,10 @@ export default function ChallengesList({ onBack, onCreateChallenge, onViewChalle
                   </p>
                   <div className="flex gap-2">
                     <button onClick={() => handleRespond(c.id, true)} className="flex-1 py-2 rounded-xl bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-sm font-medium flex items-center justify-center gap-1">
-                      <Check className="w-4 h-4" /> {lang === 'de' ? 'Annehmen' : 'Accept'}
+                      <Check className="w-4 h-4" /> {t('ui.accept')}
                     </button>
                     <button onClick={() => handleRespond(c.id, false)} className="flex-1 py-2 rounded-xl bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm font-medium flex items-center justify-center gap-1">
-                      <X className="w-4 h-4" /> {lang === 'de' ? 'Ablehnen' : 'Decline'}
+                      <X className="w-4 h-4" /> {t('ui.decline')}
                     </button>
                   </div>
                 </div>
@@ -89,7 +88,7 @@ export default function ChallengesList({ onBack, onCreateChallenge, onViewChalle
           {/* Active */}
           {active.length > 0 && (
             <div className="mb-4">
-              <h2 className="text-xs font-medium text-slate-400 mb-2">{lang === 'de' ? 'Aktive Challenges' : 'Active Challenges'}</h2>
+              <h2 className="text-xs font-medium text-slate-400 mb-2">{t('ui.activeChallenges')}</h2>
               {active.map((c) => {
                 const isChallenger = c.challenger_id === user.id;
                 const opponent = isChallenger ? c.opponent : c.challenger;
@@ -100,16 +99,16 @@ export default function ChallengesList({ onBack, onCreateChallenge, onViewChalle
                 return (
                   <button key={c.id} onClick={() => onViewChallenge && onViewChallenge(c)} className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-2 text-left">
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-semibold">{lang === 'de' ? 'vs.' : 'vs.'} {opponent?.name || 'User'}</p>
+                      <p className="text-sm font-semibold">{t('ui.vs')} {opponent?.name || 'User'}</p>
                       <div className="flex items-center gap-1 text-xs text-slate-400">
                         <Clock className="w-3.5 h-3.5" />
-                        {daysLeft} {lang === 'de' ? 'Tage' : 'days'}
+                        {daysLeft} {t('ui.days')}
                       </div>
                     </div>
                     <div className="flex items-center justify-around">
                       <div className="text-center flex-1">
                         <p className="text-lg font-bold text-primary-400">{Math.round(myScore)}</p>
-                        <p className="text-[10px] text-slate-400">{lang === 'de' ? 'Du' : 'You'}</p>
+                        <p className="text-[10px] text-slate-400">{t('ui.you')}</p>
                       </div>
                       <Swords className="w-5 h-5 text-slate-300 dark:text-slate-600 flex-shrink-0" />
                       <div className="text-center flex-1">
@@ -126,7 +125,7 @@ export default function ChallengesList({ onBack, onCreateChallenge, onViewChalle
           {/* Completed */}
           {completed.length > 0 && (
             <div>
-              <h2 className="text-xs font-medium text-slate-400 mb-2">{lang === 'de' ? 'Abgeschlossen' : 'Completed'}</h2>
+              <h2 className="text-xs font-medium text-slate-400 mb-2">{t('ui.completed')}</h2>
               {completed.slice(0, 5).map((c) => {
                 const won = c.winner_id === user.id;
                 const opponent = c.challenger_id === user.id ? c.opponent : c.challenger;
@@ -137,8 +136,8 @@ export default function ChallengesList({ onBack, onCreateChallenge, onViewChalle
                       {won ? <Trophy className="w-4 h-4 text-amber-500" /> : <X className="w-4 h-4 text-slate-400" />}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">{lang === 'de' ? 'vs.' : 'vs.'} {opponent?.name}</p>
-                      <p className="text-xs text-slate-400">{won ? (lang === 'de' ? 'Gewonnen' : 'Won') : (lang === 'de' ? 'Verloren' : 'Lost')} · +{won ? c.xp_reward : 0} XP</p>
+                      <p className="text-sm font-medium">{t('ui.vs')} {opponent?.name}</p>
+                      <p className="text-xs text-slate-400">{won ? (t('ui.won')) : (t('ui.lost'))} · +{won ? c.xp_reward : 0} XP</p>
                     </div>
                   </div>
                 );
@@ -148,7 +147,7 @@ export default function ChallengesList({ onBack, onCreateChallenge, onViewChalle
 
           {challenges.length === 0 && (
             <p className="text-center text-sm text-slate-400 dark:text-slate-500 py-8">
-              {lang === 'de' ? 'Noch keine Challenges. Fordere einen Freund heraus!' : 'No challenges yet. Challenge a friend!'}
+              {t('ui.noChallengesYetChallengeAFriend')}
             </p>
           )}
         </>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { ExternalLink, FileText } from 'lucide-react';
 
 // Quellenangaben für die Wissensinhalte. Apple verlangt (Guideline 1.4.1) bei
@@ -7,14 +8,15 @@ import { ExternalLink, FileText } from 'lucide-react';
 // Eintrag: { authors, year, title, source, url? }
 // `url` ist optional: lieber ohne Link listen als einen erfundenen setzen.
 
-export default function References({ items, lang }) {
+export default function References({ items }) {
+  const { t } = useTranslation();
   if (!Array.isArray(items) || items.length === 0) return null;
 
   return (
     <div className="mt-6 bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
       <div className="flex items-center gap-2 mb-3">
         <FileText className="w-4 h-4 text-primary-500 dark:text-primary-400" />
-        <h3 className="font-semibold text-sm">{lang === 'de' ? 'Quellen' : 'References'}</h3>
+        <h3 className="font-semibold text-sm">{t('ui.references')}</h3>
       </div>
 
       <ol className="space-y-2.5">
@@ -34,7 +36,7 @@ export default function References({ items, lang }) {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-primary-500 dark:text-primary-400 hover:underline break-all"
                   >
-                    {lang === 'de' ? 'Quelle öffnen' : 'View source'}
+                    {t('ui.viewSource')}
                     <ExternalLink className="w-3 h-3 flex-shrink-0" />
                   </a>
                 </>

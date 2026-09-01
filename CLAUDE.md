@@ -9,7 +9,8 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 leitet mit 307 dorthin weiter — bewusst behalten, solange irgendwo alte Links stehen)
 **Git-Repository:** https://github.com/almaz6380/MyPeak (Repo-Name unverändert)
 **Zielplattform:** Web-App → PWA → später App Store (iOS + Android)
-**Sprachen:** Mehrsprachig (Deutsch + Englisch)
+**Sprachen:** Deutsch, Englisch, Spanisch (Oberfläche vollständig; die
+Inhaltsbibliotheken bleiben DE/EN, siehe 4b)
 **Geschäftsmodell:** Freemium mit 7 Tagen kostenloser Testphase
 **Zielgruppe:** Fitnessstudio-Besucher (Geräte + freie Gewichte), Anfänger bis Fortgeschrittene
 
@@ -73,11 +74,75 @@ Datenschutzerklärung DE+EN um Health-Absatz ergänzt.
 **4. Spanisch (es) als dritte Sprache** — `es.json` vollständig inkl. aller
 488 Übungsnamen (vier parallele Subagents, Schlüsselgleichheit mit de.json
 skriptgeprüft), eigener spanischer Coach-System-Prompt in `api/coach.js`,
-Sprachwechsler de→en→es. Inline-de/en-Ternaries fallen für es auf Englisch
-zurück — bewusst, bis alles auf i18n-Schlüssel umzieht. **Auch `analyze-meal`
-spricht Spanisch** (`name_es`/`meal_description_es` zusätzlich zu de/en; die
-Client-Weichen fallen auf Englisch zurück, wenn ein Feld fehlt, damit alte
-App-Versionen unberührt bleiben).
+Sprachwechsler de→en→es. **Auch `analyze-meal` spricht Spanisch**
+(`name_es`/`meal_description_es` zusätzlich zu de/en; die Client-Weichen fallen
+auf Englisch zurück, wenn ein Feld fehlt, damit alte App-Versionen unberührt
+bleiben).
+
+**4b. Die fest verdrahteten de/en-Weichen sind raus (01.09.2026).** Nach dem
+ersten Durchgang war `es.json` zwar vollständig, die Oberfläche aber trotzdem
+zur Hälfte englisch: **306 Ternaries der Form `lang === 'de' ? 'Heute' : 'Today'`
+in 31 Dateien** standen direkt im JSX und kannten nur zwei Sprachen. Sie sind
+jetzt 244 `ui.*`-Schlüssel in allen drei Sprachdateien.
+
+| Was | Vorher | Jetzt |
+|---|---|---|
+| Oberflächentexte | 306 Ternaries im JSX | `t('ui.…')`, 1412 Schlüssel je Sprache |
+| Datumsformat | `lang === 'de' ? 'de-DE' : 'en-US'` an 5 Stellen | `datumsLocale()` in `src/lib/datumsformat.js` |
+| Wochentage/Monate | 6 Handlisten de/en | aus `Intl`, alle Sprachen |
+| Beschriftungstabellen | `{ de, en }` in 9 Komponenten | `{ de, en, es }` + `beschriftung()` |
+| Sprachweiche | `i18n.language?.startsWith('de') ? 'de' : 'en'` (15×) | `appSprache()` in `src/lib/sprache.js` |
+
+**Die Fallen, die dabei zugeschnappt sind:**
+
+- **`startsWith('de') ? 'de' : 'en'` ist eine Zweiwegweiche.** Sie sieht harmlos
+  aus und macht Spanisch stillschweigend zu Englisch. Genau derselbe Fehler wie
+  bei Anigosha, dort mit `appSprache()` behoben — hier jetzt auch. **Jede neue
+  Sprache braucht ab sofort nur noch eine Zeile in `src/lib/sprache.js`.**
+- **Ein fehlender Schlüssel fällt beim Bauen NICHT auf.** i18next liefert dann
+  den Fallback (Deutsch) oder den nackten Schlüssel; der Build bleibt grün.
+  Deshalb `node scripts/pruefe-sprachen.mjs` — es vergleicht die drei
+  Schlüsselmengen, prüft die Platzhalter je Text und findet Schlüssel, die im
+  Code stehen, aber in keiner Sprachdatei. Genau so ist
+  `ui.youCurrentlyHaveActiveschedulename` aufgefallen, der beim Umbau von Hand
+  ersetzt und dabei vergessen worden war. Mit `--browser` fährt es die App
+  zusätzlich in allen drei Sprachen an und sucht nach rohen Schlüsseln.
+- **Nicht jeder de/en-Ternary ist Text.** `lang === 'de' ? 'nameDE' : 'nameEN'`
+  wählt ein *Datenfeld*, `? 'de' : 'en'` einen *Sprachcode*. Wer die mit
+  umschreibt, bricht die Inhaltsbibliotheken. Der Umbau hat sie ausdrücklich
+  ausgenommen; sie bleiben zweisprachig und sind auch richtig so.
+- **`describeSegments()` und `formatDisplayDate()` sind keine Komponenten** —
+  dort geht kein `useTranslation`. Sie übersetzen jetzt über die importierte
+  i18n-Instanz (`i18nInstanz.t(…)`).
+- **Der `lang`-Parameter von `describeSegments` ist weggefallen.** Er kannte nur
+  de/en; wer ihn noch übergibt, dem schadet es nicht — er wird ignoriert.
+- **Nachgeprüft im echten Browser:** Gastmodus, alle vier Reiter, Spanisch —
+  keine rohen Schlüssel, keine deutschen Reste, keine Seitenfehler.
+
+**Was auf Spanisch NICHT übersetzt ist — und warum:**
+
+Die Inhaltsbibliotheken bleiben DE/EN, spanische Nutzer sehen dort Englisch:
+
+| Datei | Deutscher Text |
+|---|---|
+| `peptidesData.js` | 239.245 Zeichen |
+| `dietsData.js` | 104.535 |
+| `trainingKnowledge.js` | 28.363 |
+| `nutritionKnowledge.js` | 26.228 |
+| `supplementsKnowledge.js` | 23.445 |
+| `bloodworkKnowledge.js` | 23.236 |
+| `peakPrograms.js` | 16.839 |
+| `recipesData.js` | 16.615 |
+| `foodDatabase.js` | 1.922 |
+| **Summe** | **rund 480.000 Zeichen** |
+
+Das ist kein Vergessen, sondern eine Entscheidung: Der größte Teil davon ist
+gesundheitsnaher Text (Peptide, Blutwerte, Diäten). Maschinell übersetzt und
+ungeprüft ausgeliefert widerspricht der Sorgfalt, mit der hier sonst jeder
+Arzt-Hinweis gesetzt ist — Google Play hat am 30.07. genau in diesem Bereich
+schon einmal durchgesetzt. Wenn es kommt, dann geprüft und stückweise. Der
+Arzt-Hinweis selbst (`MedicalDisclaimer`) ist **bereits dreisprachig**, damit die
+juristisch verlangte Zeile auf Spanisch nicht fehlt.
 
 **5. Übungs-Demos: eigene 3D-Animationen statt Fotos** (`tools/uebungs-3d/`).
 

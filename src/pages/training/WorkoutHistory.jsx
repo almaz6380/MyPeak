@@ -7,6 +7,7 @@ import allExercisesData, { getExerciseById } from '../../data/exercises';
 import MuscleGroupIcon from '../../components/icons/MuscleGroupIcon';
 import useProgressComparison from '../../hooks/useProgressComparison';
 import ExerciseLineGraph from '../../components/progress/ExerciseLineGraph';
+import { appSprache } from '../../lib/sprache';
 
 export default function WorkoutHistory({ onBack }) {
   const { t, i18n } = useTranslation();
@@ -521,7 +522,7 @@ function EditWorkoutModal({ workout, onSave, onClose, t, weightUnit }) {
   const { i18n } = useTranslation();
   const [exercises, setExercises] = useState(workout.exercises || []);
   const [showAddExercise, setShowAddExercise] = useState(false);
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
+  const lang = appSprache(i18n.language);
 
   function updateSet(exIdx, setIdx, field, value) {
     setExercises((prev) => prev.map((ex, ei) => {
@@ -659,7 +660,7 @@ function EditWorkoutModal({ workout, onSave, onClose, t, weightUnit }) {
   );
 }
 
-function AddExerciseToEdit({ onAdd, onClose, t, lang }) {
+function AddExerciseToEdit({ onAdd, onClose, t }) {
   const [search, setSearch] = useState('');
   const filtered = allExercisesData
     .filter((ex) => (ex.type || 'strength') === 'strength')
@@ -673,7 +674,7 @@ function AddExerciseToEdit({ onAdd, onClose, t, lang }) {
         <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
       </div>
       <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-        placeholder={lang === 'de' ? 'Übung suchen...' : 'Search exercise...'}
+        placeholder={t('ui.searchExercise')}
         className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-primary-400" />
       <div className="max-h-40 overflow-y-auto space-y-1">
         {filtered.map((ex) => (

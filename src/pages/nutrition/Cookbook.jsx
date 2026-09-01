@@ -1,37 +1,38 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { beschriftung } from '../../lib/sprache';
 import { ArrowLeft, Search, Clock, ChefHat, Heart } from 'lucide-react';
 import recipes from '../../data/recipesData';
 
 const MEAL_FILTERS = [
-  { key: 'all', de: 'Alle', en: 'All' },
-  { key: 'breakfast', de: 'Frühstück', en: 'Breakfast' },
-  { key: 'lunch', de: 'Mittagessen', en: 'Lunch' },
-  { key: 'dinner', de: 'Abendessen', en: 'Dinner' },
-  { key: 'snack', de: 'Snack', en: 'Snack' },
-  { key: 'postworkout', de: 'Post-Workout', en: 'Post-Workout' },
+  { key: 'all', de: 'Alle', en: 'All', es: 'Todas' },
+  { key: 'breakfast', de: 'Frühstück', en: 'Breakfast', es: 'Desayuno' },
+  { key: 'lunch', de: 'Mittagessen', en: 'Lunch', es: 'Comida' },
+  { key: 'dinner', de: 'Abendessen', en: 'Dinner', es: 'Cena' },
+  { key: 'snack', de: 'Snack', en: 'Snack', es: 'Tentempié' },
+  { key: 'postworkout', de: 'Post-Workout', en: 'Post-Workout', es: 'Post-entreno' },
 ];
 
 const TAG_FILTERS = [
-  { key: 'all', de: 'Alle', en: 'All' },
-  { key: 'normal', de: 'Normal', en: 'Normal' },
-  { key: 'vegetarian', de: 'Vegetarisch', en: 'Vegetarian' },
-  { key: 'vegan', de: 'Vegan', en: 'Vegan' },
-  { key: 'keto', de: 'Keto', en: 'Keto' },
-  { key: 'lowcarb', de: 'Low Carb', en: 'Low Carb' },
-  { key: 'highcarb', de: 'High Carb', en: 'High Carb' },
-  { key: 'glutenfree', de: 'Glutenfrei', en: 'Gluten-free' },
-  { key: 'lactosefree', de: 'Laktosefrei', en: 'Lactose-free' },
+  { key: 'all', de: 'Alle', en: 'All', es: 'Todas' },
+  { key: 'normal', de: 'Normal', en: 'Normal', es: 'Normal' },
+  { key: 'vegetarian', de: 'Vegetarisch', en: 'Vegetarian', es: 'Vegetariana' },
+  { key: 'vegan', de: 'Vegan', en: 'Vegan', es: 'Vegana' },
+  { key: 'keto', de: 'Keto', en: 'Keto', es: 'Keto' },
+  { key: 'lowcarb', de: 'Low Carb', en: 'Low Carb', es: 'Baja en carbohidratos' },
+  { key: 'highcarb', de: 'High Carb', en: 'High Carb', es: 'Alta en carbohidratos' },
+  { key: 'glutenfree', de: 'Glutenfrei', en: 'Gluten-free', es: 'Sin gluten' },
+  { key: 'lactosefree', de: 'Laktosefrei', en: 'Lactose-free', es: 'Sin lactosa' },
 ];
 
 const DIFFICULTY = {
-  easy: { de: 'Einfach', en: 'Easy', color: 'text-green-500 bg-green-50 dark:bg-green-900/20' },
-  medium: { de: 'Mittel', en: 'Medium', color: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' },
-  hard: { de: 'Schwer', en: 'Hard', color: 'text-red-500 bg-red-50 dark:bg-red-900/20' },
+  easy: { de: 'Einfach', en: 'Easy', es: 'Fácil', color: 'text-green-500 bg-green-50 dark:bg-green-900/20' },
+  medium: { de: 'Mittel', en: 'Medium', es: 'Media', color: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' },
+  hard: { de: 'Schwer', en: 'Hard', es: 'Difícil', color: 'text-red-500 bg-red-50 dark:bg-red-900/20' },
 };
 
 export default function Cookbook({ onBack, onSelectRecipe }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const lang = i18n.language || 'de';
   const [search, setSearch] = useState('');
   const [mealFilter, setMealFilter] = useState('all');
@@ -62,7 +63,7 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
         <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-2xl font-bold">{lang === 'de' ? 'Kochbuch' : 'Cookbook'}</h1>
+        <h1 className="text-2xl font-bold">{t('ui.cookbook')}</h1>
       </div>
 
       {/* Search */}
@@ -72,7 +73,7 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder={lang === 'de' ? 'Rezept suchen...' : 'Search recipes...'}
+          placeholder={t('ui.searchRecipes')}
           className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
         />
       </div>
@@ -84,7 +85,7 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
             className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
               mealFilter === f.key ? 'bg-primary-500 text-white' : 'bg-white dark:bg-surface-dark-alt text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
             }`}>
-            {lang === 'de' ? f.de : f.en}
+            {beschriftung(f, lang)}
           </button>
         ))}
       </div>
@@ -96,13 +97,13 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
             className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
               tagFilter === f.key ? 'bg-primary-500 text-white' : 'bg-white dark:bg-surface-dark-alt text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
             }`}>
-            {lang === 'de' ? f.de : f.en}
+            {beschriftung(f, lang)}
           </button>
         ))}
       </div>
 
       <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
-        {filtered.length} {lang === 'de' ? 'Rezepte' : 'Recipes'}
+        {filtered.length} {t('ui.recipes')}
       </p>
 
       {/* Recipe Cards */}
@@ -141,7 +142,7 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
                 </span>
                 {/* Difficulty */}
                 <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${diff.color}`}>
-                  {lang === 'de' ? diff.de : diff.en}
+                  {beschriftung(diff, lang)}
                 </span>
                 {/* Macros */}
                 <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-primary-50 dark:bg-primary-900/20 text-[10px] font-semibold text-primary-500 dark:text-primary-400">
@@ -158,7 +159,7 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
 
       {filtered.length === 0 && (
         <p className="text-center text-sm text-slate-400 dark:text-slate-500 py-8">
-          {lang === 'de' ? 'Keine Rezepte gefunden.' : 'No recipes found.'}
+          {t('ui.noRecipesFound')}
         </p>
       )}
     </div>

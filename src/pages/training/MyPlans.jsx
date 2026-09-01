@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { wochentagKuerzel } from '../../lib/datumsformat';
 import { ArrowLeft, Plus, Trash2, Check, Dumbbell, Play, Zap, Pencil } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -9,6 +10,7 @@ import {
 import { getExerciseById } from '../../data/exercises';
 import { PlanCard } from './TrainingPlans';
 import Toast from '../../components/Toast';
+import { appSprache } from '../../lib/sprache';
 
 const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -29,7 +31,7 @@ export default function MyPlans({
 }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
+  const lang = appSprache(i18n.language);
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -40,7 +42,7 @@ export default function MyPlans({
   const [deleteSingleConfirm, setDeleteSingleConfirm] = useState(null);
   const [showCreateChoice, setShowCreateChoice] = useState(false);
 
-  const DAY_SHORT = lang === 'de' ? ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const DAY_SHORT = wochentagKuerzel(lang);
 
   useEffect(() => {
     if (user) loadPlans();
@@ -66,7 +68,7 @@ export default function MyPlans({
       console.error('Failed to delete plan:', err);
       setToast({
         variant: 'error',
-        message: lang === 'de' ? 'Der Plan konnte nicht gelöscht werden.' : 'The plan could not be deleted.',
+        message: t('ui.thePlanCouldNotBeDeleted'),
       });
     }
   }
@@ -95,7 +97,7 @@ export default function MyPlans({
       console.error('Failed to delete plan:', err);
       setToast({
         variant: 'error',
-        message: lang === 'de' ? 'Der Plan konnte nicht gelöscht werden.' : 'The plan could not be deleted.',
+        message: t('ui.thePlanCouldNotBeDeleted'),
       });
     }
   }
@@ -111,7 +113,7 @@ export default function MyPlans({
       console.error('Failed to activate plan:', err);
       setToast({
         variant: 'error',
-        message: lang === 'de' ? 'Der Plan konnte nicht aktiviert werden.' : 'The plan could not be activated.',
+        message: t('ui.thePlanCouldNotBeActivated'),
       });
     }
   }
@@ -124,7 +126,7 @@ export default function MyPlans({
           <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-bold">{lang === 'de' ? 'Meine Pläne' : 'My Plans'}</h1>
+          <h1 className="text-2xl font-bold">{t('ui.myPlans')}</h1>
         </div>
         <button onClick={() => setShowCreateChoice(true)} className="p-2 rounded-xl bg-primary-500 text-white">
           <Plus className="w-5 h-5" />
@@ -141,10 +143,10 @@ export default function MyPlans({
         </div>
         <div className="flex-1 text-left">
           <p className="text-base font-semibold text-slate-900 dark:text-white">
-            {lang === 'de' ? 'Freies Training' : 'Free Workout'}
+            {t('ui.freeWorkout')}
           </p>
           <p className="text-xs text-slate-400 mt-0.5">
-            {lang === 'de' ? 'Wähle Übungen frei aus und starte sofort' : 'Choose exercises freely and start right away'}
+            {t('ui.chooseExercisesFreelyAndStartRight')}
           </p>
         </div>
         <Play className="w-5 h-5 text-green-500" />
@@ -157,17 +159,17 @@ export default function MyPlans({
         <div className="text-center py-12">
           <Dumbbell className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
           <p className="text-slate-500 dark:text-slate-400 mb-4">
-            {lang === 'de' ? 'Noch keine Pläne erstellt.' : 'No plans created yet.'}
+            {t('ui.noPlansCreatedYet')}
           </p>
           <button onClick={() => setShowCreateChoice(true)} className="px-6 py-3 bg-primary-500 text-white font-semibold rounded-2xl">
-            {lang === 'de' ? 'Plan erstellen' : 'Create Plan'}
+            {t('ui.createPlan')}
           </button>
         </div>
       ) : (
         <div className="space-y-3">
           {plans.length > 0 && (
             <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400">
-              {lang === 'de' ? 'Wochenpläne' : 'Weekly plans'}
+              {t('ui.weeklyPlans')}
             </h2>
           )}
           {plans.map((plan) => (
@@ -177,7 +179,7 @@ export default function MyPlans({
                   <p className="text-sm font-semibold text-slate-900 dark:text-white">{plan.name}</p>
                   {plan.is_active && (
                     <span className="px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/30 text-[10px] font-semibold text-primary-600 dark:text-primary-400">
-                      {lang === 'de' ? 'Aktiv' : 'Active'}
+                      {t('ui.active')}
                     </span>
                   )}
                 </div>
@@ -216,7 +218,7 @@ export default function MyPlans({
               </div>
 
               <p className="text-xs text-slate-400 mt-2">
-                {plan.sessions_per_week}x / {lang === 'de' ? 'Woche' : 'week'}
+                {plan.sessions_per_week}x / {t('ui.week2')}
               </p>
             </div>
           ))}
@@ -227,7 +229,7 @@ export default function MyPlans({
       {!loading && singlePlans.length > 0 && (
         <div className="mt-6">
           <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">
-            {lang === 'de' ? 'Einzelne Trainingspläne' : 'Single workout plans'}
+            {t('ui.singleWorkoutPlans')}
           </h2>
           <div className="flex flex-col gap-4">
             {singlePlans.map((plan) => {
@@ -265,24 +267,20 @@ export default function MyPlans({
         <div className="fixed inset-0 bg-black/50 z-[80] flex items-end" onClick={() => setShowCreateChoice(false)}>
           <div className="w-full bg-white dark:bg-surface-dark-alt rounded-t-3xl p-6 pb-8" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-bold mb-1">
-              {lang === 'de' ? 'Was möchtest du erstellen?' : 'What do you want to create?'}
+              {t('ui.whatDoYouWantToCreate')}
             </h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
-              {lang === 'de'
-                ? 'Beides findest du danach hier unter „Meine Pläne".'
-                : 'Both will appear here under "My Plans".'}
+              {t('ui.bothWillAppearHereUnderMy')}
             </p>
             <button
               onClick={() => { setShowCreateChoice(false); onCreate(); }}
               className="w-full text-left p-4 mb-3 rounded-2xl border-2 border-slate-200 dark:border-slate-700 hover:border-primary-400 transition-colors"
             >
               <p className="font-semibold text-slate-900 dark:text-white">
-                {lang === 'de' ? 'Wochenplan' : 'Weekly plan'}
+                {t('ui.weeklyPlan')}
               </p>
               <p className="text-xs text-slate-400 mt-0.5">
-                {lang === 'de'
-                  ? 'Feste Trainingstage pro Woche — erscheint im Kalender.'
-                  : 'Fixed training days per week — shows up in the calendar.'}
+                {t('ui.fixedTrainingDaysPerWeekShows')}
               </p>
             </button>
             <button
@@ -290,12 +288,10 @@ export default function MyPlans({
               className="w-full text-left p-4 mb-4 rounded-2xl border-2 border-slate-200 dark:border-slate-700 hover:border-primary-400 transition-colors"
             >
               <p className="font-semibold text-slate-900 dark:text-white">
-                {lang === 'de' ? 'Einzelner Trainingsplan' : 'Single workout plan'}
+                {t('ui.singleWorkoutPlan')}
               </p>
               <p className="text-xs text-slate-400 mt-0.5">
-                {lang === 'de'
-                  ? 'Eine Übungsliste zum direkten Starten — auch Cardio, HIIT oder Zirkel.'
-                  : 'One exercise list to start right away — also cardio, HIIT or circuit.'}
+                {t('ui.oneExerciseListToStartRight')}
               </p>
             </button>
             <button
@@ -313,19 +309,17 @@ export default function MyPlans({
         <div className="fixed inset-0 bg-black/50 z-[80] flex items-center justify-center p-6" onClick={() => setDeleteSingleConfirm(null)}>
           <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
             <p className="text-base font-semibold mb-2">
-              {lang === 'de' ? 'Plan löschen?' : 'Delete plan?'}
+              {t('ui.deletePlan')}
             </p>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
-              {lang === 'de'
-                ? `„${deleteSingleConfirm.name}" wird entfernt.`
-                : `"${deleteSingleConfirm.name}" will be removed.`}
+              {t('ui.deletesingleconfirmNameWillBeRemov', { name: deleteSingleConfirm.name })}
             </p>
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => handleDeleteSingle(deleteSingleConfirm.id)}
                 className="w-full py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-semibold"
               >
-                {lang === 'de' ? 'Löschen' : 'Delete'}
+                {t('ui.delete')}
               </button>
               <button
                 onClick={() => setDeleteSingleConfirm(null)}
@@ -343,19 +337,17 @@ export default function MyPlans({
         <div className="fixed inset-0 bg-black/50 z-[80] flex items-center justify-center p-6" onClick={() => setDeleteConfirm(null)}>
           <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
             <p className="text-base font-semibold mb-2">
-              {lang === 'de' ? 'Plan löschen?' : 'Delete plan?'}
+              {t('ui.deletePlan')}
             </p>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
-              {lang === 'de'
-                ? `„${deleteConfirm.name}" wird dauerhaft entfernt.`
-                : `"${deleteConfirm.name}" will be removed permanently.`}
+              {t('ui.deleteconfirmNameWillBeRemovedPerm', { name: deleteConfirm.name })}
             </p>
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => handleDelete(deleteConfirm.id)}
                 className="w-full py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-semibold"
               >
-                {lang === 'de' ? 'Löschen' : 'Delete'}
+                {t('ui.delete')}
               </button>
               <button
                 onClick={() => setDeleteConfirm(null)}

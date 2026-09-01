@@ -6,14 +6,17 @@ import { awardWorkoutCompletion } from '../../data/socialStorage';
 import { useAuth } from '../../context/AuthContext';
 import { getExerciseById } from '../../data/exercises';
 import useSegmentTimer from '../../hooks/useSegmentTimer';
+import i18nInstanz from '../../i18n';
 
-// Anzeige-Infos pro Schritt-Art (Farben analog ActiveHiit: Arbeit grün, Pause rot)
+// Anzeige-Infos pro Schritt-Art (Farben analog ActiveHiit: Arbeit grün, Pause rot).
+// Die Beschriftung steckt als Schlüssel drin, nicht als Text — sonst gäbe es
+// wieder eine zweite Sprachliste neben den Sprachdateien.
 const KIND_INFO = {
-  warmup:   { de: 'Aufwärmen',      en: 'Warm-up',   text: 'text-blue-600 dark:text-blue-400',   bg: 'bg-blue-50 dark:bg-blue-900/20',   ring: 'text-blue-500' },
-  work:     { de: 'Belastung',      en: 'Work',      text: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-900/20', ring: 'text-green-500' },
-  steady:   { de: 'Lockeres Tempo',  en: 'Easy pace', text: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-900/20', ring: 'text-green-500' },
-  rest:     { de: 'Erholung',       en: 'Recovery',  text: 'text-red-600 dark:text-red-400',     bg: 'bg-red-50 dark:bg-red-900/20',     ring: 'text-red-500' },
-  cooldown: { de: 'Auslaufen',      en: 'Cool-down', text: 'text-slate-500 dark:text-slate-400', bg: 'bg-slate-100 dark:bg-slate-800',   ring: 'text-slate-400' },
+  warmup:   { key: 'ui.phaseWarmup',   text: 'text-blue-600 dark:text-blue-400',   bg: 'bg-blue-50 dark:bg-blue-900/20',   ring: 'text-blue-500' },
+  work:     { key: 'ui.phaseWork',     text: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-900/20', ring: 'text-green-500' },
+  steady:   { key: 'ui.phaseSteady',   text: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-900/20', ring: 'text-green-500' },
+  rest:     { key: 'ui.phaseRest',     text: 'text-red-600 dark:text-red-400',     bg: 'bg-red-50 dark:bg-red-900/20',     ring: 'text-red-500' },
+  cooldown: { key: 'ui.phaseCooldown', text: 'text-slate-500 dark:text-slate-400', bg: 'bg-slate-100 dark:bg-slate-800',   ring: 'text-slate-400' },
 };
 
 function formatMins(seconds) {
@@ -31,16 +34,21 @@ function formatClock(seconds) {
 }
 
 // Kompakte Segment-Zusammenfassung, z. B. „10' Aufwärmen · 4× (4' hart / 3' locker) · 5' Auslaufen"
-export function describeSegments(segments = [], lang = 'de') {
+//
+// ⚠ Keine Komponente, also kein `useTranslation` — hier übersetzt die
+// i18n-Instanz direkt. Der frühere `lang`-Parameter entfällt: Er kannte nur
+// de und en und hätte Spanisch auf Englisch zurückfallen lassen. Aufrufer
+// dürfen ihn weiter mitgeben, er wird ignoriert.
+export function describeSegments(segments = []) {
   return segments.map((seg) => {
     if (seg.phase === 'interval') {
-      const hard = lang === 'de' ? 'hart' : 'hard';
-      const easy = lang === 'de' ? 'locker' : 'easy';
+      const hard = i18nInstanz.t('ui.hard');
+      const easy = i18nInstanz.t('ui.easy');
       if (!seg.rest) return `${seg.repeats}× ${formatMins(seg.work)} ${hard}`;
       return `${seg.repeats}× (${formatMins(seg.work)} ${hard} / ${formatMins(seg.rest)} ${easy})`;
     }
     const info = KIND_INFO[seg.phase] || KIND_INFO.steady;
-    return `${formatMins(seg.duration)} ${lang === 'de' ? info.de : info.en}`;
+    return `${formatMins(seg.duration)} ${i18nInstanz.t(info.key)}`;
   }).join(' · ');
 }
 
@@ -49,9 +57,8 @@ export function describeSegments(segments = [], lang = 'de') {
  * session = { label, exerciseId, segments, intensity?, week?, durationWeeks? }
  */
 export default function ActiveStructuredCardio({ session, onFinish, onDiscard }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user } = useAuth();
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [distance, setDistance] = useState('');
 
@@ -85,33 +92,31 @@ export default function ActiveStructuredCardio({ session, onFinish, onDiscard })
       <div className="p-4 pt-16 pb-24">
         <h1 className="text-2xl font-bold mb-1">{title}</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">
-          {exercise ? t(exercise.nameKey) : (lang === 'de' ? 'Cardio' : 'Cardio')}
+          {exercise ? t(exercise.nameKey) : (t('ui.cardio'))}
           {session.week && session.durationWeeks
-            ? ` · ${lang === 'de' ? 'Woche' : 'Week'} ${session.week}/${session.durationWeeks}`
+            ? ` · ${t('ui.week')} ${session.week}/${session.durationWeeks}`
             : ''}
         </p>
 
         <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 shadow-soft border border-slate-100 dark:border-slate-800/60 text-center mb-4 mt-3">
           <p className="text-5xl font-bold mb-1">{Math.round(timer.totalDuration / 60)}</p>
-          <p className="text-slate-500 dark:text-slate-400">{lang === 'de' ? 'Minuten gesamt' : 'total minutes'}</p>
+          <p className="text-slate-500 dark:text-slate-400">{t('ui.totalMinutes')}</p>
           {session.intensity?.rpe && (
             <p className="text-xs text-slate-400 mt-2">
-              {lang === 'de' ? 'Anstrengung bis' : 'Effort up to'} RPE {session.intensity.rpe}/10
-              {session.intensity.hrZone ? ` · ${lang === 'de' ? 'Pulszone' : 'HR zone'} ${session.intensity.hrZone}` : ''}
+              {t('ui.effortUpTo')} RPE {session.intensity.rpe}/10
+              {session.intensity.hrZone ? ` · ${t('ui.hrZone')} ${session.intensity.hrZone}` : ''}
             </p>
           )}
           {/* Klartext für lockere Einheiten (Zone 2) */}
           {(session.intensity?.hrZone <= 2 || session.intensity?.rpe <= 4) && (
             <p className="text-xs text-green-600 dark:text-green-400 mt-2 leading-relaxed">
-              {lang === 'de'
-                ? 'Lockeres Tempo — du solltest dich dabei noch unterhalten können.'
-                : 'Easy pace — you should still be able to hold a conversation.'}
+              {t('ui.easyPaceYouShouldStillBe')}
             </p>
           )}
         </div>
 
         <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">
-          {lang === 'de' ? 'Ablauf' : 'Session plan'}
+          {t('ui.sessionPlan')}
         </h2>
         <div className="flex flex-col gap-2 mb-6">
           {(session.segments || []).map((seg, i) => {
@@ -122,12 +127,12 @@ export default function ActiveStructuredCardio({ session, onFinish, onDiscard })
                 <div className="flex-1">
                   <p className="font-medium text-sm">
                     {seg.phase === 'interval'
-                      ? `${seg.repeats}× ${lang === 'de' ? 'Intervall' : 'interval'}`
-                      : (lang === 'de' ? info.de : info.en)}
+                      ? `${seg.repeats}× ${t('ui.interval')}`
+                      : (t(info.key))}
                   </p>
                   <p className="text-xs text-slate-400">
                     {seg.phase === 'interval'
-                      ? `${formatMins(seg.work)} ${lang === 'de' ? 'hart' : 'hard'}${seg.rest ? ` / ${formatMins(seg.rest)} ${lang === 'de' ? 'locker' : 'easy'}` : ''}`
+                      ? `${formatMins(seg.work)} ${t('ui.hard')}${seg.rest ? ` / ${formatMins(seg.rest)} ${t('ui.easy')}` : ''}`
                       : formatMins(seg.duration)}
                   </p>
                 </div>
@@ -164,7 +169,7 @@ export default function ActiveStructuredCardio({ session, onFinish, onDiscard })
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-bold">{title}</h1>
         <span className="text-sm text-slate-500 dark:text-slate-400">
-          {lang === 'de' ? 'Abschnitt' : 'Step'} {Math.min(timer.stepIdx + 1, timer.steps.length)}/{timer.steps.length}
+          {t('ui.step')} {Math.min(timer.stepIdx + 1, timer.steps.length)}/{timer.steps.length}
         </span>
       </div>
 
@@ -172,12 +177,12 @@ export default function ActiveStructuredCardio({ session, onFinish, onDiscard })
         {timer.finished ? (
           <div>
             <p className="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">{t('training.finishWorkout')}!</p>
-            <p className="text-slate-500">{Math.round(timer.totalDuration / 60)} {lang === 'de' ? 'Minuten' : 'minutes'}</p>
+            <p className="text-slate-500">{Math.round(timer.totalDuration / 60)} {t('ui.minutes')}</p>
           </div>
         ) : (
           <>
             <p className={`text-sm font-bold uppercase tracking-wide mb-1 ${info.text}`}>
-              {lang === 'de' ? info.de : info.en}
+              {t(info.key)}
               {timer.currentStep?.repTotal > 1 && ` ${timer.currentStep.rep}/${timer.currentStep.repTotal}`}
             </p>
             {(timer.currentStep?.rpe) && (

@@ -1,21 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { datumsLocale } from '../../lib/datumsformat';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Camera, Trash2, X, Lock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { saveProgressPhoto, getProgressPhotos, deleteProgressPhoto, compressImage } from '../../data/exercisePhotos';
 import { getWeightEntries } from '../../data/weightStorage';
 import { todayLocal } from '../../lib/dateUtils';
+import { appSprache } from '../../lib/sprache';
 
 function formatDate(dateStr, lang) {
-  return new Date(dateStr + 'T12:00:00').toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US', {
+  return new Date(dateStr + 'T12:00:00').toLocaleDateString(datumsLocale(lang), {
     day: 'numeric', month: 'short', year: 'numeric',
   });
 }
 
 export default function ProgressPhotosPage() {
   const { t, i18n } = useTranslation();
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
+  const lang = appSprache(i18n.language);
   const navigate = useNavigate();
   const { user } = useAuth();
   const fileInputRef = useRef(null);

@@ -6,7 +6,7 @@ import { legalDocs } from './legalContent';
 
 // Eigenständige Rechtsseite — auch ohne Login erreichbar (Routen: /legal/imprint|privacy|terms)
 export default function LegalPage({ doc }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const lang = i18n.language === 'de' ? 'de' : 'en';
   const content = legalDocs[doc]?.[lang];
@@ -20,7 +20,7 @@ export default function LegalPage({ doc }) {
           <button
             onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/'))}
             className="p-2 -ml-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-surface-dark-alt transition-colors"
-            aria-label={lang === 'de' ? 'Zurück' : 'Back'}
+            aria-label={t('ui.back')}
           >
             <ArrowLeft className="w-5 h-5" />
           </button>

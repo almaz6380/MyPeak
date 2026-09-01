@@ -83,22 +83,20 @@ export default function CoachPage() {
           <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-xl font-bold">{lang === 'de' ? 'KI-Coach' : 'AI Coach'}</h1>
+          <h1 className="text-xl font-bold">{t('ui.aiCoach')}</h1>
         </div>
         <div className="text-center pt-12">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-lg">
             <Crown className="w-8 h-8 text-white" />
           </div>
           <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
-            {lang === 'de'
-              ? 'Der KI-Coach beantwortet deine Fragen zu Training, Ernährung, Supplementen und ordnet Blutwerte grob ein — ein Premium-Feature.'
-              : 'The AI coach answers your questions about training, nutrition, supplements and roughly interprets blood work — a Premium feature.'}
+            {t('ui.theAiCoachAnswersYourQuestions')}
           </p>
           <button
             onClick={() => openPaywall('ki_coach')}
             className="px-6 py-3 rounded-2xl bg-primary-500 hover:bg-primary-600 text-white font-semibold shadow-lg"
           >
-            {lang === 'de' ? 'Premium entdecken' : 'Explore Premium'}
+            {t('ui.explorePremium')}
           </button>
         </div>
       </div>
@@ -122,11 +120,11 @@ export default function CoachPage() {
     if (res.error) {
       if (res.error === 'quota_exceeded') {
         setRemaining(0);
-        setError(lang === 'de' ? 'Tageslimit erreicht. Morgen geht es weiter.' : 'Daily limit reached. Continues tomorrow.');
+        setError(t('ui.dailyLimitReachedContinuesTomorrow'));
       } else if (res.error === 'premium_required') {
         openPaywall('ki_coach');
       } else {
-        setError(lang === 'de' ? 'Der Coach ist gerade nicht erreichbar. Bitte später erneut versuchen.' : 'The coach is unavailable right now. Please try again later.');
+        setError(t('ui.theCoachIsUnavailableRightNow'));
       }
       return;
     }
@@ -149,22 +147,22 @@ export default function CoachPage() {
           <Sparkles className="w-5 h-5 text-white" />
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="text-base font-bold leading-tight">{lang === 'de' ? 'KI-Coach' : 'AI Coach'}</h1>
+          <h1 className="text-base font-bold leading-tight">{t('ui.aiCoach')}</h1>
           {quota && (
             <p className="text-[11px] text-slate-400">
-              {lang === 'de' ? `Noch ${remaining} Fragen heute` : `${remaining} questions left today`}
+              {t('ui.remainingQuestionsLeftToday', { remaining })}
             </p>
           )}
         </div>
         {messages.length > 0 && (
           <button
             onClick={() => {
-              if (window.confirm(lang === 'de' ? 'Verlauf löschen?' : 'Clear history?')) {
+              if (window.confirm(t('ui.clearHistory'))) {
                 setMessages([]);
                 setError('');
               }
             }}
-            aria-label={lang === 'de' ? 'Verlauf löschen' : 'Clear history'}
+            aria-label={t('ui.clearHistory2')}
             className="p-2 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <Trash2 className="w-4 h-4" />
@@ -177,9 +175,7 @@ export default function CoachPage() {
         {messages.length === 0 && (
           <div className="text-center pt-8">
             <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-              {lang === 'de'
-                ? 'Frag mich alles rund um Training, Ernährung, Supplemente und Blutwerte. Zum Beispiel: „Wie baue ich einen 3er-Split auf?" oder „Was bedeutet ein Ferritin von 30?"'
-                : 'Ask me anything about training, nutrition, supplements and blood work. For example: “How do I build a 3-day split?” or “What does a ferritin of 30 mean?”'}
+              {t('ui.askMeAnythingAboutTrainingNutritio')}
             </p>
           </div>
         )}
@@ -225,8 +221,8 @@ export default function CoachPage() {
             rows={1}
             disabled={outOfQuota}
             placeholder={outOfQuota
-              ? (lang === 'de' ? 'Tageslimit erreicht' : 'Daily limit reached')
-              : (lang === 'de' ? 'Frage stellen…' : 'Ask a question…')}
+              ? (t('ui.dailyLimitReached'))
+              : (t('ui.askAQuestion'))}
             className="flex-1 resize-none rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark-alt px-4 py-2.5 text-sm focus:outline-none focus:border-primary-400 disabled:opacity-50 max-h-32"
           />
           <button

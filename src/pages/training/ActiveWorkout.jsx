@@ -21,6 +21,7 @@ import { maybeAskForReview } from '../../lib/review';
 import { widgetDatenAktualisieren } from '../../lib/widgetDaten';
 import useProgressComparison, { getExerciseTarget, setExerciseTarget } from '../../hooks/useProgressComparison';
 import { todayLocal } from '../../lib/dateUtils';
+import { appSprache } from '../../lib/sprache';
 
 export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
   const { t, i18n } = useTranslation();
@@ -232,7 +233,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
         {levelUp && (
           <LevelUpAnimation
             level={levelUp}
-            lang={i18n.language?.startsWith('de') ? 'de' : 'en'}
+            lang={appSprache(i18n.language)}
             onDismiss={() => setLevelUp(null)}
           />
         )}

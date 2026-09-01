@@ -1,11 +1,11 @@
 import { useRef, useMemo, useState, useCallback, useEffect } from 'react';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toLocalDateString } from '../lib/dateUtils';
+import { datumsLocale } from '../lib/datumsformat';
 
-const DAY_LABELS_DE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-const DAY_LABELS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const MONTH_NAMES_DE = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-const MONTH_NAMES_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+// Wochentage (Sonntag zuerst, passend zu Date#getDay) und Monatsnamen kommen
+// aus Intl statt aus Handlisten — sonst bräuchte jede neue Sprache hier zwei
+// weitere Arrays.
 
 // Kreisgröße/Deckkraft nach Abstand zur Mitte (0..4). Zwischenwerte werden
 // interpoliert — dadurch fließt der Bogen beim Wischen, statt zu springen.
@@ -68,8 +68,11 @@ export default function DiamondCalendar({ selectedDate, onSelectDate, scheduledD
   }, []);
 
   const sel = new Date(selectedDate + 'T12:00:00');
-  const dayLabels = lang === 'de' ? DAY_LABELS_DE : DAY_LABELS_EN;
-  const monthNames = lang === 'de' ? MONTH_NAMES_DE : MONTH_NAMES_EN;
+  const locale = datumsLocale(lang);
+  const dayLabels = Array.from({ length: 7 }, (_, i) =>
+    new Date(Date.UTC(2026, 0, 4 + i)).toLocaleDateString(locale, { weekday: 'short', timeZone: 'UTC' }).replace(/\.$/, ''));
+  const monthNames = Array.from({ length: 12 }, (_, m) =>
+    new Date(Date.UTC(2026, m, 15)).toLocaleDateString(locale, { month: 'long', timeZone: 'UTC' }));
   const monthName = monthNames[sel.getMonth()];
   const dayName = dayLabels[sel.getDay()];
 

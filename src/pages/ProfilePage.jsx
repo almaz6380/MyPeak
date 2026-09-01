@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { appSprache, beschriftung } from '../lib/sprache';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -183,7 +184,7 @@ export default function ProfilePage() {
         const levelInfo = calculateLevel(xpData.total_xp || 0);
         const title = getLevelTitle(levelInfo.level);
         const golden = hasGoldenFrame(levelInfo.level);
-        const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
+        const lang = appSprache(i18n.language);
         return (
         <div className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 p-4 mb-4 ${golden ? 'ring-2 ring-primary-400 shadow-primary-400/20 shadow-lg' : ''}`}>
           {/* Level + Title */}
@@ -192,7 +193,7 @@ export default function ProfilePage() {
               <span className="text-lg">{title.emoji}</span>
               <div>
                 <span className="text-sm font-bold text-primary-400">Level {levelInfo.level}</span>
-                <span className="text-xs text-slate-400 dark:text-slate-500 ml-2">{lang === 'de' ? title.de : title.en}</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500 ml-2">{beschriftung(title, lang)}</span>
               </div>
             </div>
             <span className="text-xs text-slate-400 dark:text-slate-500">{xpData.streak_days || 0} 🔥</span>
@@ -204,11 +205,11 @@ export default function ProfilePage() {
             </div>
             <span className="text-[10px] text-slate-400 font-mono">{levelInfo.xpInCurrentLevel}/{levelInfo.xpToNextLevel}</span>
           </div>
-          <p className="text-[10px] text-slate-400 dark:text-slate-500">{xpData.total_xp || 0} XP {lang === 'de' ? 'gesamt' : 'total'}</p>
+          <p className="text-[10px] text-slate-400 dark:text-slate-500">{xpData.total_xp || 0} XP {t('ui.total')}</p>
           {/* Friend Code */}
           {friendCode && (
             <div>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">{i18n.language?.startsWith('de') ? 'Mein FullRep-Code' : 'My FullRep Code'}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">{t('ui.myFullrepCode')}</p>
               <div className="flex items-center gap-2">
                 <code className="flex-1 bg-slate-50 dark:bg-slate-800 rounded-xl px-4 py-2.5 text-center font-mono text-sm font-bold tracking-wider text-primary-400">
                   {friendCode}
@@ -244,9 +245,9 @@ export default function ProfilePage() {
             <p className="text-[11px] text-slate-400">
               {isPremium
                 ? (isTrial
-                    ? (i18n.language?.startsWith('de') ? `Testphase aktiv — noch ${trialDaysLeft} Tage` : `Trial active — ${trialDaysLeft} days left`)
-                    : (i18n.language?.startsWith('de') ? 'Premium aktiv' : 'Premium active'))
-                : (i18n.language?.startsWith('de') ? 'KI-Coach & mehr freischalten' : 'Unlock AI coach & more')}
+                    ? (t('ui.trialActiveTrialdaysleftDaysLeft', { trialDaysLeft }))
+                    : (t('ui.premiumActive')))
+                : (t('ui.unlockAiCoachMore'))}
             </p>
           </div>
         </div>
@@ -423,7 +424,7 @@ export default function ProfilePage() {
             <span className="flex items-center gap-3">
               <ShieldCheck className="w-5 h-5 text-slate-400" />
               <span className="text-slate-700 dark:text-slate-200">
-                {i18n.language === 'de' ? 'Werbe-Einwilligung ändern' : 'Change ad consent'}
+                {t('ui.changeAdConsent')}
               </span>
             </span>
             <ChevronRight className="w-5 h-5 text-slate-300" />

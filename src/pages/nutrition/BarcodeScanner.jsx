@@ -6,12 +6,13 @@ import { useAuth } from '../../context/AuthContext';
 import { useCamera } from '../../context/CameraContext';
 import { lookupCommunityProduct, addCommunityProduct } from '../../data/communityProducts';
 import { getProductPhoto, saveProductPhoto, compressImage } from '../../data/exercisePhotos';
+import { appSprache } from '../../lib/sprache';
 
 export default function BarcodeScanner({ onScanned, onClose }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const camera = useCamera();
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
+  const lang = appSprache(i18n.language);
   const [status, setStatus] = useState('starting'); // starting | scanning | loading | found | notFound | addProduct | error
   const [errorMsg, setErrorMsg] = useState('');
   const [scannedBarcode, setScannedBarcode] = useState(null);
@@ -241,7 +242,7 @@ export default function BarcodeScanner({ onScanned, onClose }) {
         <div className="relative z-10 flex items-center justify-between px-4 pt-4 pb-2" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
           <div className="flex items-center gap-2 text-white">
             <Plus className="w-5 h-5" />
-            <h2 className="text-base font-semibold">{lang === 'de' ? 'Produkt hinzufügen' : 'Add Product'}</h2>
+            <h2 className="text-base font-semibold">{t('ui.addProduct')}</h2>
           </div>
           <button onClick={() => setStatus('notFound')} className="p-2 rounded-xl bg-white/10 text-white">
             <X className="w-5 h-5" />
@@ -253,17 +254,17 @@ export default function BarcodeScanner({ onScanned, onClose }) {
 
           <div className="space-y-3">
             <div>
-              <label className="text-xs font-medium text-slate-400 mb-1 block">{lang === 'de' ? 'Produktname' : 'Product Name'} *</label>
-              <input type="text" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder={lang === 'de' ? 'z.B. Protein Riegel' : 'e.g. Protein Bar'}
+              <label className="text-xs font-medium text-slate-400 mb-1 block">{t('ui.productName')} *</label>
+              <input type="text" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder={t('ui.eGProteinBar')}
                 className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-400" />
             </div>
             <div>
-              <label className="text-xs font-medium text-slate-400 mb-1 block">{lang === 'de' ? 'Marke' : 'Brand'}</label>
+              <label className="text-xs font-medium text-slate-400 mb-1 block">{t('ui.brand')}</label>
               <input type="text" value={productBrand} onChange={(e) => setProductBrand(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-400" />
             </div>
 
-            <p className="text-xs font-medium text-slate-400 mt-2">{lang === 'de' ? 'Nährwerte pro 100g' : 'Nutrition per 100g'}</p>
+            <p className="text-xs font-medium text-slate-400 mt-2">{t('ui.nutritionPer100g')}</p>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-[10px] text-slate-500 mb-0.5 block">kcal</label>
@@ -271,17 +272,17 @@ export default function BarcodeScanner({ onScanned, onClose }) {
                   className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white text-center focus:outline-none focus:ring-2 focus:ring-primary-400" />
               </div>
               <div>
-                <label className="text-[10px] text-slate-500 mb-0.5 block">{lang === 'de' ? 'Protein (g)' : 'Protein (g)'}</label>
+                <label className="text-[10px] text-slate-500 mb-0.5 block">{t('ui.proteinG')}</label>
                 <input type="number" inputMode="decimal" value={productProtein} onChange={(e) => setProductProtein(e.target.value)} placeholder="0"
                   className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white text-center focus:outline-none focus:ring-2 focus:ring-primary-400" />
               </div>
               <div>
-                <label className="text-[10px] text-slate-500 mb-0.5 block">{lang === 'de' ? 'Kohlenhydrate (g)' : 'Carbs (g)'}</label>
+                <label className="text-[10px] text-slate-500 mb-0.5 block">{t('ui.carbsG')}</label>
                 <input type="number" inputMode="decimal" value={productCarbs} onChange={(e) => setProductCarbs(e.target.value)} placeholder="0"
                   className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white text-center focus:outline-none focus:ring-2 focus:ring-primary-400" />
               </div>
               <div>
-                <label className="text-[10px] text-slate-500 mb-0.5 block">{lang === 'de' ? 'Fett (g)' : 'Fat (g)'}</label>
+                <label className="text-[10px] text-slate-500 mb-0.5 block">{t('ui.fatG')}</label>
                 <input type="number" inputMode="decimal" value={productFat} onChange={(e) => setProductFat(e.target.value)} placeholder="0"
                   className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white text-center focus:outline-none focus:ring-2 focus:ring-primary-400" />
               </div>
@@ -289,15 +290,13 @@ export default function BarcodeScanner({ onScanned, onClose }) {
           </div>
 
           <p className="text-[10px] text-slate-500 mt-3 leading-relaxed">
-            {lang === 'de'
-              ? 'Dieses Produkt wird der FullRep-Community zur Verfügung gestellt. Andere User können es dann ebenfalls per Barcode finden.'
-              : 'This product will be shared with the FullRep community. Other users will be able to find it by barcode too.'}
+            {t('ui.thisProductWillBeSharedWith')}
           </p>
 
           <button onClick={handleAddProduct} disabled={!productName.trim()}
             className="w-full mt-4 py-3 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:bg-slate-700 disabled:text-slate-500 text-white font-semibold flex items-center justify-center gap-2 transition-colors">
             <Check className="w-5 h-5" />
-            {lang === 'de' ? 'Produkt speichern' : 'Save Product'}
+            {t('ui.saveProduct')}
           </button>
         </div>
       </div>
@@ -350,7 +349,7 @@ export default function BarcodeScanner({ onScanned, onClose }) {
             <div className="flex flex-col gap-2 w-full max-w-xs">
               <button onClick={() => setStatus('addProduct')} className="w-full py-3 rounded-xl bg-primary-500 text-white font-medium text-sm flex items-center justify-center gap-2">
                 <Plus className="w-4 h-4" />
-                {lang === 'de' ? 'Produkt selbst hinzufügen' : 'Add product manually'}
+                {t('ui.addProductManually')}
               </button>
               <button onClick={() => { isProcessingRef.current = false; startScanner(); }} className="w-full py-3 rounded-xl bg-white/10 text-white font-medium text-sm">
                 {t('nutrition.scanAgain')}
@@ -407,7 +406,7 @@ function FoundProductScreen({ product, lang, onConfirm, onScanAgain, onClose, t 
       <div className="relative z-10 flex items-center justify-between px-4 pt-4 pb-2" style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}>
         <div className="flex items-center gap-2 text-white">
           <Check className="w-5 h-5 text-green-400" />
-          <h2 className="text-base font-semibold">{lang === 'de' ? 'Produkt gefunden' : 'Product found'}</h2>
+          <h2 className="text-base font-semibold">{t('ui.productFound')}</h2>
         </div>
         <button onClick={onClose} className="p-2 rounded-xl bg-white/10 text-white">
           <X className="w-5 h-5" />
@@ -441,7 +440,7 @@ function FoundProductScreen({ product, lang, onConfirm, onScanAgain, onClose, t 
               className="w-40 h-40 rounded-2xl bg-slate-800 flex flex-col items-center justify-center mb-5 border-2 border-dashed border-slate-600 hover:border-primary-500 transition-colors"
             >
               <Camera className="w-8 h-8 text-slate-500 mb-2" />
-              <span className="text-xs text-slate-500">{lang === 'de' ? 'Foto aufnehmen' : 'Take photo'}</span>
+              <span className="text-xs text-slate-500">{t('ui.takePhoto')}</span>
             </button>
             <input
               ref={fileInputRef}
@@ -476,12 +475,12 @@ function FoundProductScreen({ product, lang, onConfirm, onScanAgain, onClose, t 
           </div>
         </div>
 
-        <p className="text-[10px] text-slate-600 mb-4">{lang === 'de' ? 'pro 100g' : 'per 100g'}</p>
+        <p className="text-[10px] text-slate-600 mb-4">{t('ui.per100g')}</p>
 
         <div className="w-full max-w-xs flex flex-col gap-2">
           <button onClick={onConfirm} className="w-full py-3.5 rounded-xl bg-primary-500 text-white font-semibold flex items-center justify-center gap-2">
             <Plus className="w-5 h-5" />
-            {lang === 'de' ? 'Hinzufügen' : 'Add'}
+            {t('ui.add')}
           </button>
           <button onClick={onScanAgain} className="w-full py-3 rounded-xl bg-white/10 text-white font-medium text-sm">
             {t('nutrition.scanAgain')}

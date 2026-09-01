@@ -29,7 +29,7 @@ const SECTION_COLORS = [
 ];
 
 export default function DietsPage({ onBack }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, profile } = useAuth();
   const lang = i18n.language || 'de';
   const [activeCategory, setActiveCategory] = useState('all');
@@ -82,7 +82,7 @@ export default function DietsPage({ onBack }) {
           </button>
           <div>
             <h1 className="text-xl font-bold">{lang === 'de' ? d.nameDE : d.nameEN}</h1>
-            <p className="text-xs text-primary-400">{lang === 'de' ? 'Ausführliches E-Book' : 'Detailed E-Book'}</p>
+            <p className="text-xs text-primary-400">{t('ui.detailedEBook')}</p>
           </div>
         </div>
 
@@ -101,11 +101,11 @@ export default function DietsPage({ onBack }) {
         ) : (
           <div className="text-center py-12">
             <BookOpen className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
-            <p className="text-slate-400 text-sm">{lang === 'de' ? 'E-Book wird erstellt...' : 'E-Book coming soon...'}</p>
+            <p className="text-slate-400 text-sm">{t('ui.eBookComingSoon')}</p>
           </div>
         )}
 
-        <References items={d.references} lang={lang} />
+        <References items={d.references} />
       </div>
     );
   }
@@ -141,11 +141,11 @@ export default function DietsPage({ onBack }) {
         {quick && (
           <div className="space-y-3 mb-6">
             <div className="bg-primary-50 dark:bg-primary-900/20 border-l-4 border-l-primary-400 rounded-xl p-4">
-              <p className="text-xs font-semibold text-primary-600 dark:text-primary-400 mb-1">{lang === 'de' ? 'Methode' : 'Method'}</p>
+              <p className="text-xs font-semibold text-primary-600 dark:text-primary-400 mb-1">{t('ui.method')}</p>
               <p className="text-sm text-slate-700 dark:text-slate-300">{quick.methode || quick.method}</p>
             </div>
             <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-l-blue-400 rounded-xl p-4">
-              <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">{lang === 'de' ? 'Für wen?' : 'For whom?'}</p>
+              <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">{t('ui.forWhom')}</p>
               <p className="text-sm text-slate-700 dark:text-slate-300">{quick.fuer_wen || quick.for_whom}</p>
             </div>
           </div>
@@ -162,9 +162,9 @@ export default function DietsPage({ onBack }) {
         >
           <BookOpen className="w-6 h-6 flex-shrink-0" />
           <div className="flex-1 text-left">
-            <p className="font-semibold text-sm">{lang === 'de' ? 'Ausführliches E-Book lesen' : 'Read detailed E-Book'}</p>
+            <p className="font-semibold text-sm">{t('ui.readDetailedEBook')}</p>
             <p className={`text-xs mt-0.5 ${hasEbook ? 'text-white/70' : ''}`}>
-              {hasEbook ? `${d.sections.length} ${lang === 'de' ? 'Kapitel' : 'chapters'}` : (lang === 'de' ? 'Wird erstellt...' : 'Coming soon...')}
+              {hasEbook ? `${d.sections.length} ${t('ui.chapters')}` : (t('ui.comingSoon'))}
             </p>
           </div>
           {hasEbook && <ChevronRight className="w-5 h-5" />}
@@ -177,7 +177,7 @@ export default function DietsPage({ onBack }) {
             className="w-full rounded-2xl p-4 flex items-center justify-center gap-2 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-semibold"
           >
             <Square className="w-5 h-5" />
-            {lang === 'de' ? 'Diät beenden' : 'Stop diet'}
+            {t('ui.stopDiet')}
           </button>
         ) : (
           <button
@@ -185,7 +185,7 @@ export default function DietsPage({ onBack }) {
             className="w-full rounded-2xl p-4 flex items-center justify-center gap-2 bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400 font-semibold"
           >
             <Play className="w-5 h-5" />
-            {lang === 'de' ? 'Diese Diät starten' : 'Start this diet'}
+            {t('ui.startThisDiet')}
           </button>
         )}
 
@@ -193,11 +193,9 @@ export default function DietsPage({ onBack }) {
         {showConfirm && calculatedGoals && (
           <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-6" onClick={() => setShowConfirm(false)}>
             <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 w-full max-w-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
-              <h3 className="text-lg font-bold mb-2">{lang === 'de' ? 'Ernährungsziele anpassen?' : 'Adjust nutrition goals?'}</h3>
+              <h3 className="text-lg font-bold mb-2">{t('ui.adjustNutritionGoals')}</h3>
               <p className="text-sm text-slate-500 mb-4">
-                {lang === 'de'
-                  ? 'Deine täglichen Kalorien- und Makro-Ziele werden auf folgende Werte gesetzt:'
-                  : 'Your daily calorie and macro goals will be set to:'}
+                {t('ui.yourDailyCalorieAndMacroGoals')}
               </p>
               <div className="grid grid-cols-2 gap-3 mb-6">
                 <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3 text-center">
@@ -223,10 +221,10 @@ export default function DietsPage({ onBack }) {
 
               <div className="flex gap-2">
                 <button onClick={() => setShowConfirm(false)} className="flex-1 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold text-sm">
-                  {lang === 'de' ? 'Abbrechen' : 'Cancel'}
+                  {t('ui.cancel')}
                 </button>
                 <button onClick={confirmStartDiet} className="flex-1 py-3 rounded-xl bg-primary-500 text-white font-semibold text-sm">
-                  {lang === 'de' ? 'Starten' : 'Start'}
+                  {t('ui.start')}
                 </button>
               </div>
             </div>
@@ -243,7 +241,7 @@ export default function DietsPage({ onBack }) {
         <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-2xl font-bold">{lang === 'de' ? 'Diäten' : 'Diets'}</h1>
+        <h1 className="text-2xl font-bold">{t('ui.diets')}</h1>
       </div>
 
       {/* Category Filter */}
@@ -260,7 +258,7 @@ export default function DietsPage({ onBack }) {
                   : 'bg-white dark:bg-surface-dark-alt text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
               }`}
             >
-              {catId === 'all' ? (lang === 'de' ? 'Alle' : 'All') : (lang === 'de' ? cat?.nameDE : cat?.nameEN)}
+              {catId === 'all' ? (t('ui.all')) : (lang === 'de' ? cat?.nameDE : cat?.nameEN)}
             </button>
           );
         })}
@@ -271,7 +269,7 @@ export default function DietsPage({ onBack }) {
       <MedicalDisclaimer lang={lang} className="mb-4" />
 
       <p className="text-xs text-slate-400 mb-3">
-        {filtered.length} {lang === 'de' ? 'Diätformen' : 'Diet types'}
+        {filtered.length} {t('ui.dietTypes')}
       </p>
 
       {/* Diet Cards */}
@@ -297,7 +295,7 @@ export default function DietsPage({ onBack }) {
                     </p>
                     {isActive && (
                       <span className="px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/30 text-[10px] font-semibold text-primary-600 dark:text-primary-400">
-                        {lang === 'de' ? 'Aktiv' : 'Active'}
+                        {t('ui.active')}
                       </span>
                     )}
                   </div>

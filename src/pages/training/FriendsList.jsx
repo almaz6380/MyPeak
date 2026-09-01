@@ -5,9 +5,8 @@ import { useAuth } from '../../context/AuthContext';
 import { getFriends, getFriendRequests, respondToFriendRequest, removeFriend, sendFriendRequest, lookupFriendCode } from '../../data/socialStorage';
 
 export default function FriendsList({ onBack, onAddFriend }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user, isGuestMode } = useAuth();
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
   const [friends, setFriends] = useState([]);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,9 +66,9 @@ export default function FriendsList({ onBack, onAddFriend }) {
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
-          <h1 className="text-2xl font-bold">{lang === 'de' ? 'Freunde' : 'Friends'}</h1>
+          <h1 className="text-2xl font-bold">{t('ui.friends')}</h1>
         </div>
-        <p className="text-center text-slate-400 dark:text-slate-500 py-12">{lang === 'de' ? 'Registriere dich, um Freunde hinzuzufügen.' : 'Sign up to add friends.'}</p>
+        <p className="text-center text-slate-400 dark:text-slate-500 py-12">{t('ui.signUpToAddFriends')}</p>
       </div>
     );
   }
@@ -79,7 +78,7 @@ export default function FriendsList({ onBack, onAddFriend }) {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
-          <h1 className="text-2xl font-bold">{lang === 'de' ? 'Freunde' : 'Friends'}</h1>
+          <h1 className="text-2xl font-bold">{t('ui.friends')}</h1>
         </div>
         <button onClick={() => setShowAdd(!showAdd)} className="p-2 rounded-xl bg-primary-500 text-white">
           <UserPlus className="w-5 h-5" />
@@ -89,7 +88,7 @@ export default function FriendsList({ onBack, onAddFriend }) {
       {/* Add Friend */}
       {showAdd && (
         <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
-          <p className="text-sm font-medium mb-2">{lang === 'de' ? 'FullRep-Code eingeben' : 'Enter FullRep Code'}</p>
+          <p className="text-sm font-medium mb-2">{t('ui.enterFullrepCode')}</p>
           <div className="flex gap-2">
             <input
               type="text"
@@ -99,19 +98,19 @@ export default function FriendsList({ onBack, onAddFriend }) {
               className="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-mono text-center focus:outline-none focus:ring-2 focus:ring-primary-400"
             />
             <button onClick={handleSendRequest} disabled={!codeInput.trim() || addStatus === 'sending'} className="px-4 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white text-sm font-medium">
-              {addStatus === 'sending' ? '...' : lang === 'de' ? 'Senden' : 'Send'}
+              {addStatus === 'sending' ? '...' : t('ui.send')}
             </button>
           </div>
-          {addStatus === 'sent' && <p className="text-xs text-green-500 mt-2">{lang === 'de' ? 'Anfrage gesendet!' : 'Request sent!'}</p>}
-          {addStatus === 'notfound' && <p className="text-xs text-red-500 mt-2">{lang === 'de' ? 'Code nicht gefunden.' : 'Code not found.'}</p>}
-          {addStatus === 'error' && <p className="text-xs text-red-500 mt-2">{lang === 'de' ? 'Fehler beim Senden.' : 'Error sending.'}</p>}
+          {addStatus === 'sent' && <p className="text-xs text-green-500 mt-2">{t('ui.requestSent')}</p>}
+          {addStatus === 'notfound' && <p className="text-xs text-red-500 mt-2">{t('ui.codeNotFound')}</p>}
+          {addStatus === 'error' && <p className="text-xs text-red-500 mt-2">{t('ui.errorSending')}</p>}
         </div>
       )}
 
       {/* Pending Requests */}
       {requests.length > 0 && (
         <div className="mb-4">
-          <h2 className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">{lang === 'de' ? 'Anfragen' : 'Requests'} ({requests.length})</h2>
+          <h2 className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">{t('ui.requests')} ({requests.length})</h2>
           <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">
             {requests.map((req) => (
               <div key={req.id} className="flex items-center justify-between px-4 py-3 border-b border-slate-50 dark:border-slate-700/50 last:border-0">
@@ -132,12 +131,12 @@ export default function FriendsList({ onBack, onAddFriend }) {
       )}
 
       {/* Friends List */}
-      <h2 className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">{lang === 'de' ? 'Meine Freunde' : 'My Friends'} ({friends.length})</h2>
+      <h2 className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">{t('ui.myFriends')} ({friends.length})</h2>
       {loading ? (
         <p className="text-center text-sm text-slate-400 py-8">{t('common.loading')}</p>
       ) : friends.length === 0 ? (
         <p className="text-center text-sm text-slate-400 dark:text-slate-500 py-8">
-          {lang === 'de' ? 'Noch keine Freunde. Teile deinen FullRep-Code!' : 'No friends yet. Share your FullRep code!'}
+          {t('ui.noFriendsYetShareYourFullrep')}
         </p>
       ) : (
         <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">

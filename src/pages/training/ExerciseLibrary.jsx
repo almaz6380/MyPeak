@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { appSprache, beschriftung } from '../../lib/sprache';
 import { ArrowLeft, Search, Plus, X, Check, Dumbbell, Heart, Zap, RefreshCw, ChevronRight, Trash2 } from 'lucide-react';
 import exercises, { muscleGroups, getExercisesByType } from '../../data/exercises';
 import { getCustomExercises, saveCustomExercise, deleteCustomExercise } from '../../data/workoutStorage';
@@ -9,37 +10,37 @@ import ExerciseDetailSheet from './ExerciseDetailSheet';
 import { hasDemo } from '../../data/exerciseDemos';
 
 const EQUIPMENT_TYPES = [
-  { key: 'all', de: 'Alle', en: 'All' },
-  { key: 'barbell', de: 'Langhantel', en: 'Barbell' },
-  { key: 'dumbbell', de: 'Kurzhantel', en: 'Dumbbell' },
-  { key: 'cable', de: 'Kabelzug', en: 'Cable' },
-  { key: 'machine', de: 'Maschine', en: 'Machine' },
-  { key: 'bodyweight', de: 'Körpergewicht', en: 'Bodyweight' },
+  { key: 'all', de: 'Alle', en: 'All', es: 'Todos' },
+  { key: 'barbell', de: 'Langhantel', en: 'Barbell', es: 'Barra' },
+  { key: 'dumbbell', de: 'Kurzhantel', en: 'Dumbbell', es: 'Mancuerna' },
+  { key: 'cable', de: 'Kabelzug', en: 'Cable', es: 'Polea' },
+  { key: 'machine', de: 'Maschine', en: 'Machine', es: 'Máquina' },
+  { key: 'bodyweight', de: 'Körpergewicht', en: 'Bodyweight', es: 'Peso corporal' },
 ];
 
 const TRAINING_TYPES = [
-  { key: 'strength', de: 'Krafttraining', en: 'Strength', icon: Dumbbell },
-  { key: 'martial-arts', de: 'Kampfsport', en: 'Martial Arts', icon: null },
-  { key: 'cardio', de: 'Cardio', en: 'Cardio', icon: Heart },
-  { key: 'hiit', de: 'HIIT', en: 'HIIT', icon: Zap },
-  { key: 'circuit', de: 'Zirkel', en: 'Circuit', icon: RefreshCw },
+  { key: 'strength', de: 'Krafttraining', en: 'Strength', es: 'Fuerza', icon: Dumbbell },
+  { key: 'martial-arts', de: 'Kampfsport', en: 'Martial Arts', es: 'Artes marciales', icon: null },
+  { key: 'cardio', de: 'Cardio', en: 'Cardio', es: 'Cardio', icon: Heart },
+  { key: 'hiit', de: 'HIIT', en: 'HIIT', es: 'HIIT', icon: Zap },
+  { key: 'circuit', de: 'Zirkel', en: 'Circuit', es: 'Circuito', icon: RefreshCw },
 ];
 
 const MA_CATEGORIES = [
-  { key: 'all', de: 'Alle Stile', en: 'All Styles' },
-  { key: 'boxing', de: 'Boxen', en: 'Boxing' },
-  { key: 'kickboxing', de: 'Kickboxen', en: 'Kickboxing' },
-  { key: 'mma', de: 'MMA', en: 'MMA' },
-  { key: 'judo', de: 'Judo', en: 'Judo' },
-  { key: 'bjj', de: 'BJJ', en: 'BJJ' },
-  { key: 'taekwondo', de: 'Taekwondo', en: 'Taekwondo' },
-  { key: 'wrestling', de: 'Ringen', en: 'Wrestling' },
+  { key: 'all', de: 'Alle Stile', en: 'All Styles', es: 'Todos los estilos' },
+  { key: 'boxing', de: 'Boxen', en: 'Boxing', es: 'Boxeo' },
+  { key: 'kickboxing', de: 'Kickboxen', en: 'Kickboxing', es: 'Kickboxing' },
+  { key: 'mma', de: 'MMA', en: 'MMA', es: 'MMA' },
+  { key: 'judo', de: 'Judo', en: 'Judo', es: 'Judo' },
+  { key: 'bjj', de: 'BJJ', en: 'BJJ', es: 'BJJ' },
+  { key: 'taekwondo', de: 'Taekwondo', en: 'Taekwondo', es: 'Taekwondo' },
+  { key: 'wrestling', de: 'Ringen', en: 'Wrestling', es: 'Lucha' },
 ];
 
 export default function ExerciseLibrary({ onBack, onSelect, selectionMode = false }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
+  const lang = appSprache(i18n.language);
 
   const [trainingType, setTrainingType] = useState(null); // null = show type chooser
   const [muscleFilter, setMuscleFilter] = useState('all');
@@ -128,8 +129,8 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
                   <Icon className="w-6 h-6 text-primary-400" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold">{lang === 'de' ? tt.de : tt.en}</p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500">{count} {lang === 'de' ? 'Übungen' : 'exercises'}</p>
+                  <p className="font-semibold">{beschriftung(tt, lang)}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">{count} {t('ui.exercises')}</p>
                 </div>
                 <ChevronRight className="w-5 h-5 text-slate-300 dark:text-slate-600" />
               </button>
@@ -157,7 +158,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
       <div className="relative mb-3">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-          placeholder={lang === 'de' ? 'Übung suchen...' : 'Search exercise...'}
+          placeholder={t('ui.searchExercise')}
           className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
       </div>
 
@@ -165,14 +166,14 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
       {trainingType === 'strength' && (
         <>
           <div className="flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide">
-            <FilterPill label={lang === 'de' ? 'Alle' : 'All'} active={muscleFilter === 'all'} onClick={() => setMuscleFilter('all')} />
+            <FilterPill label={t('ui.all')} active={muscleFilter === 'all'} onClick={() => setMuscleFilter('all')} />
             {muscleGroups.map((mg) => (
               <FilterPill key={mg} label={t(`muscleGroups.${mg}`)} active={muscleFilter === mg} onClick={() => setMuscleFilter(mg)} />
             ))}
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 mb-3 scrollbar-hide">
             {EQUIPMENT_TYPES.map((eq) => (
-              <FilterPill key={eq.key} label={lang === 'de' ? eq.de : eq.en} active={equipmentFilter === eq.key} onClick={() => setEquipmentFilter(eq.key)} />
+              <FilterPill key={eq.key} label={beschriftung(eq, lang)} active={equipmentFilter === eq.key} onClick={() => setEquipmentFilter(eq.key)} />
             ))}
           </div>
         </>
@@ -182,7 +183,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
       {trainingType === 'martial-arts' && (
         <div className="flex gap-2 overflow-x-auto pb-2 mb-3 scrollbar-hide">
           {MA_CATEGORIES.map((cat) => (
-            <FilterPill key={cat.key} label={lang === 'de' ? cat.de : cat.en} active={maFilter === cat.key} onClick={() => setMaFilter(cat.key)} />
+            <FilterPill key={cat.key} label={beschriftung(cat, lang)} active={maFilter === cat.key} onClick={() => setMaFilter(cat.key)} />
           ))}
         </div>
       )}
@@ -197,7 +198,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
       )}
 
       {/* Count */}
-      <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">{filtered.length} {lang === 'de' ? 'Übungen' : 'exercises'}</p>
+      <p className="text-xs text-slate-400 dark:text-slate-500 mb-2">{filtered.length} {t('ui.exercises')}</p>
 
       {/* Exercise list */}
       <div className="flex flex-col gap-2">

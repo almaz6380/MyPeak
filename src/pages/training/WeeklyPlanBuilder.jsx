@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { appSprache } from '../../lib/sprache';
 import { ArrowLeft, ArrowRight, Check, Dumbbell } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { saveWeeklySchedule, updateWeeklySchedule } from '../../data/workoutStorage';
@@ -8,25 +9,27 @@ import Toast from '../../components/Toast';
 
 const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
+const splitLabel = (s, lang) => ({ de: s.labelDE, en: s.labelEN, es: s.labelES })[appSprache(lang)] || s.labelEN;
+
 const SPLIT_TYPES = [
-  { id: 'push', labelDE: 'Push', labelEN: 'Push' },
-  { id: 'pull', labelDE: 'Pull', labelEN: 'Pull' },
-  { id: 'legs', labelDE: 'Beine', labelEN: 'Legs' },
-  { id: 'upper', labelDE: 'Oberkörper', labelEN: 'Upper Body' },
-  { id: 'lower', labelDE: 'Unterkörper', labelEN: 'Lower Body' },
-  { id: 'full', labelDE: 'Ganzkörper', labelEN: 'Full Body' },
-  { id: 'chest', labelDE: 'Brust', labelEN: 'Chest' },
-  { id: 'back', labelDE: 'Rücken', labelEN: 'Back' },
-  { id: 'shoulders', labelDE: 'Schultern', labelEN: 'Shoulders' },
-  { id: 'arms', labelDE: 'Arme', labelEN: 'Arms' },
-  { id: 'core', labelDE: 'Core', labelEN: 'Core' },
-  { id: 'cardio', labelDE: 'Cardio', labelEN: 'Cardio' },
+  { id: 'push', labelDE: 'Push', labelEN: 'Push', labelES: 'Push' },
+  { id: 'pull', labelDE: 'Pull', labelEN: 'Pull', labelES: 'Pull' },
+  { id: 'legs', labelDE: 'Beine', labelEN: 'Legs', labelES: 'Piernas' },
+  { id: 'upper', labelDE: 'Oberkörper', labelEN: 'Upper Body', labelES: 'Tren superior' },
+  { id: 'lower', labelDE: 'Unterkörper', labelEN: 'Lower Body', labelES: 'Tren inferior' },
+  { id: 'full', labelDE: 'Ganzkörper', labelEN: 'Full Body', labelES: 'Cuerpo completo' },
+  { id: 'chest', labelDE: 'Brust', labelEN: 'Chest', labelES: 'Pecho' },
+  { id: 'back', labelDE: 'Rücken', labelEN: 'Back', labelES: 'Espalda' },
+  { id: 'shoulders', labelDE: 'Schultern', labelEN: 'Shoulders', labelES: 'Hombros' },
+  { id: 'arms', labelDE: 'Arme', labelEN: 'Arms', labelES: 'Brazos' },
+  { id: 'core', labelDE: 'Core', labelEN: 'Core', labelES: 'Core' },
+  { id: 'cardio', labelDE: 'Cardio', labelEN: 'Cardio', labelES: 'Cardio' },
 ];
 
 export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
+  const lang = appSprache(i18n.language);
   const isEditing = !!editPlan;
 
   // Initialize from editPlan if editing
@@ -73,7 +76,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
     const split = SPLIT_TYPES.find((s) => s.id === splitId);
     setDayConfigs((prev) => ({
       ...prev,
-      [day]: { type: 'split', label: lang === 'de' ? split.labelDE : split.labelEN, splitId },
+      [day]: { type: 'split', label: splitLabel(split, lang), splitId },
     }));
   }
 
@@ -86,7 +89,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
       ...prev,
       [day]: {
         type: 'strength',
-        label: `${list.length} ${lang === 'de' ? 'Übungen' : 'exercises'}`,
+        label: `${list.length} ${t('ui.exercises')}`,
         exercises: list,
       },
     }));
@@ -97,7 +100,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
 
   async function handleSave() {
     if (!planName.trim()) {
-      setToast({ variant: 'error', message: lang === 'de' ? 'Bitte gib dem Plan einen Namen.' : 'Please give the plan a name.' });
+      setToast({ variant: 'error', message: t('ui.pleaseGiveThePlanAName') });
       return;
     }
     setSaving(true);
@@ -126,9 +129,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
       console.error('Failed to save weekly plan:', err);
       setToast({
         variant: 'error',
-        message: lang === 'de'
-          ? 'Der Plan konnte nicht gespeichert werden. Bitte versuch es nochmal.'
-          : 'The plan could not be saved. Please try again.',
+        message: t('ui.thePlanCouldNotBeSaved'),
       });
     } finally {
       // Ohne finally blieb der Knopf nach einem Fehler dauerhaft auf „…".
@@ -146,26 +147,26 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
           <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-bold">{lang === 'de' ? 'Wochenplan erstellen' : 'Create Weekly Plan'}</h1>
+          <h1 className="text-2xl font-bold">{t('ui.createWeeklyPlan')}</h1>
         </div>
 
         <div className="space-y-8">
           <div>
             <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
-              {lang === 'de' ? 'Planname' : 'Plan Name'}
+              {t('ui.planName')}
             </label>
             <input
               type="text"
               value={planName}
               onChange={(e) => setPlanName(e.target.value)}
-              placeholder={lang === 'de' ? 'z.B. Mein 4er Split' : 'e.g. My 4-Day Split'}
+              placeholder={t('ui.eGMy4DaySplit')}
               className="w-full px-4 py-3.5 bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 rounded-2xl text-base focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
-              {lang === 'de' ? 'Einheiten pro Woche' : 'Sessions per week'}
+              {t('ui.sessionsPerWeek')}
             </label>
             <div className="text-center mb-3">
               <span className="text-5xl font-bold text-primary-500">{sessionsPerWeek}</span>
@@ -195,7 +196,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
             disabled={!planName.trim()}
             className="w-full py-4 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold rounded-2xl flex items-center justify-center gap-2"
           >
-            {lang === 'de' ? 'Weiter' : 'Next'}
+            {t('ui.next')}
             <ArrowRight className="w-5 h-5" />
           </button>
         </div>
@@ -211,16 +212,14 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
           <button onClick={() => setStep(1)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-bold">{lang === 'de' ? 'Trainingstage wählen' : 'Choose Training Days'}</h1>
+          <h1 className="text-2xl font-bold">{t('ui.chooseTrainingDays')}</h1>
         </div>
 
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-          {lang === 'de'
-            ? `Wähle ${sessionsPerWeek} Tage für dein Training`
-            : `Select ${sessionsPerWeek} days for your training`}
+          {t('ui.selectSessionsperweekDaysForYourTr', { sessionsPerWeek })}
         </p>
         <p className="text-xs text-slate-400 mb-6">
-          {selectedDays.size}/{sessionsPerWeek} {lang === 'de' ? 'ausgewählt' : 'selected'}
+          {selectedDays.size}/{sessionsPerWeek} {t('ui.selected')}
         </p>
 
         <div className="space-y-2 mb-8">
@@ -258,7 +257,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
           disabled={selectedDays.size !== sessionsPerWeek}
           className="w-full py-4 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-semibold rounded-2xl flex items-center justify-center gap-2"
         >
-          {lang === 'de' ? 'Weiter' : 'Next'}
+          {t('ui.next')}
           <ArrowRight className="w-5 h-5" />
         </button>
       </div>
@@ -289,13 +288,11 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
         <button onClick={() => setStep(2)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-2xl font-bold">{lang === 'de' ? 'Tage konfigurieren' : 'Configure Days'}</h1>
+        <h1 className="text-2xl font-bold">{t('ui.configureDays')}</h1>
       </div>
 
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-        {lang === 'de'
-          ? 'Wähle für jeden Tag einen Split-Typ oder weise Übungen zu.'
-          : 'Choose a split type or assign exercises for each day.'}
+        {t('ui.chooseASplitTypeOrAssign')}
       </p>
 
       {/* Day config for selecting split */}
@@ -316,7 +313,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
                         : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
                     }`}
                   >
-                    {lang === 'de' ? split.labelDE : split.labelEN}
+                    {splitLabel(split, lang)}
                   </button>
                 );
               })}
@@ -325,7 +322,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
               onClick={() => setConfiguringDay(null)}
               className="w-full py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 text-sm font-medium"
             >
-              {lang === 'de' ? 'Schließen' : 'Close'}
+              {t('ui.close')}
             </button>
           </div>
         </div>
@@ -356,7 +353,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
                       : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
                   }`}
                 >
-                  {lang === 'de' ? 'Split-Typ' : 'Split Type'}
+                  {t('ui.splitType')}
                 </button>
                 <button
                   onClick={() => setPickerDay(day)}
@@ -366,7 +363,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
                       : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
                   }`}
                 >
-                  {lang === 'de' ? 'Übungen' : 'Exercises'}
+                  {t('ui.exercises2')}
                 </button>
               </div>
             </div>
@@ -383,7 +380,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
         {saving ? '...' : (
           <>
             <Check className="w-5 h-5" />
-            {lang === 'de' ? 'Plan speichern' : 'Save Plan'}
+            {t('ui.savePlan')}
           </>
         )}
       </button>

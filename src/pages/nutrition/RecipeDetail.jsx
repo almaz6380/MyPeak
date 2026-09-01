@@ -1,36 +1,37 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { beschriftung } from '../../lib/sprache';
 import { ArrowLeft, Clock, Heart, Minus, Plus, Check, ChefHat, UtensilsCrossed } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { saveNutritionEntry } from '../../data/nutritionStorage';
 import { todayLocal } from '../../lib/dateUtils';
 
 const DIFFICULTY = {
-  easy: { de: 'Einfach', en: 'Easy', color: 'text-green-500 bg-green-50 dark:bg-green-900/20' },
-  medium: { de: 'Mittel', en: 'Medium', color: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' },
-  hard: { de: 'Schwer', en: 'Hard', color: 'text-red-500 bg-red-50 dark:bg-red-900/20' },
+  easy: { de: 'Einfach', en: 'Easy', es: 'Fácil', color: 'text-green-500 bg-green-50 dark:bg-green-900/20' },
+  medium: { de: 'Mittel', en: 'Medium', es: 'Media', color: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' },
+  hard: { de: 'Schwer', en: 'Hard', es: 'Difícil', color: 'text-red-500 bg-red-50 dark:bg-red-900/20' },
 };
 
 const TAG_LABELS = {
-  normal: { de: 'Normal', en: 'Normal' },
-  vegetarian: { de: 'Vegetarisch', en: 'Vegetarian' },
-  vegan: { de: 'Vegan', en: 'Vegan' },
-  keto: { de: 'Keto', en: 'Keto' },
-  lowcarb: { de: 'Low Carb', en: 'Low Carb' },
-  highcarb: { de: 'High Carb', en: 'High Carb' },
-  glutenfree: { de: 'Glutenfrei', en: 'Gluten-free' },
-  lactosefree: { de: 'Laktosefrei', en: 'Lactose-free' },
+  normal: { de: 'Normal', en: 'Normal', es: 'Normal' },
+  vegetarian: { de: 'Vegetarisch', en: 'Vegetarian', es: 'Vegetariana' },
+  vegan: { de: 'Vegan', en: 'Vegan', es: 'Vegana' },
+  keto: { de: 'Keto', en: 'Keto', es: 'Keto' },
+  lowcarb: { de: 'Low Carb', en: 'Low Carb', es: 'Baja en carbohidratos' },
+  highcarb: { de: 'High Carb', en: 'High Carb', es: 'Alta en carbohidratos' },
+  glutenfree: { de: 'Glutenfrei', en: 'Gluten-free', es: 'Sin gluten' },
+  lactosefree: { de: 'Laktosefrei', en: 'Lactose-free', es: 'Sin lactosa' },
 };
 
 const MEAL_SLOTS = [
-  { key: 'breakfast', de: 'Frühstück', en: 'Breakfast' },
-  { key: 'lunch', de: 'Mittagessen', en: 'Lunch' },
-  { key: 'dinner', de: 'Abendessen', en: 'Dinner' },
-  { key: 'snack', de: 'Snack', en: 'Snack' },
+  { key: 'breakfast', de: 'Frühstück', en: 'Breakfast', es: 'Desayuno' },
+  { key: 'lunch', de: 'Mittagessen', en: 'Lunch', es: 'Comida' },
+  { key: 'dinner', de: 'Abendessen', en: 'Dinner', es: 'Cena' },
+  { key: 'snack', de: 'Snack', en: 'Snack', es: 'Tentempié' },
 ];
 
 export default function RecipeDetail({ recipe, onBack, onSaved }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const lang = i18n.language || 'de';
   const [servings, setServings] = useState(recipe.servings || 2);
@@ -111,7 +112,7 @@ export default function RecipeDetail({ recipe, onBack, onSaved }) {
           <Clock className="w-3 h-3" /> {recipe.prepTime} min
         </span>
         <span className={`px-2 py-1 rounded-lg text-xs font-medium ${diff.color}`}>
-          {lang === 'de' ? diff.de : diff.en}
+          {beschriftung(diff, lang)}
         </span>
         {recipe.tags.map((tag) => (
           <span key={tag} className="px-2 py-1 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-xs text-primary-500 dark:text-primary-400">
@@ -123,7 +124,7 @@ export default function RecipeDetail({ recipe, onBack, onSaved }) {
       {/* Servings Picker */}
       <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-medium">{lang === 'de' ? 'Portionen' : 'Servings'}</p>
+          <p className="text-sm font-medium">{t('ui.servings')}</p>
           <div className="flex items-center gap-3">
             <button onClick={() => setServings(Math.max(1, servings - 1))}
               className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
@@ -141,17 +142,17 @@ export default function RecipeDetail({ recipe, onBack, onSaved }) {
       {/* Nutrition */}
       <div className="grid grid-cols-5 gap-2 mb-4">
         <MacroCard label="kcal" value={scaledNutrition.calories} color="bg-primary-50 dark:bg-primary-900/20 text-primary-500" />
-        <MacroCard label={lang === 'de' ? 'Protein' : 'Protein'} value={`${scaledNutrition.protein}g`} color="bg-blue-50 dark:bg-blue-900/20 text-blue-500" />
+        <MacroCard label={t('ui.protein')} value={`${scaledNutrition.protein}g`} color="bg-blue-50 dark:bg-blue-900/20 text-blue-500" />
         <MacroCard label="Carbs" value={`${scaledNutrition.carbs}g`} color="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500" />
-        <MacroCard label={lang === 'de' ? 'Fett' : 'Fat'} value={`${scaledNutrition.fat}g`} color="bg-rose-50 dark:bg-rose-900/20 text-rose-500" />
-        <MacroCard label={lang === 'de' ? 'Ballast.' : 'Fiber'} value={`${scaledNutrition.fiber}g`} color="bg-green-50 dark:bg-green-900/20 text-green-500" />
+        <MacroCard label={t('ui.fat')} value={`${scaledNutrition.fat}g`} color="bg-rose-50 dark:bg-rose-900/20 text-rose-500" />
+        <MacroCard label={t('ui.fiber')} value={`${scaledNutrition.fiber}g`} color="bg-green-50 dark:bg-green-900/20 text-green-500" />
       </div>
 
       {/* Ingredients */}
       <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
         <h2 className="text-sm font-semibold mb-3 flex items-center gap-2">
           <UtensilsCrossed className="w-4 h-4 text-primary-400" />
-          {lang === 'de' ? 'Zutaten' : 'Ingredients'}
+          {t('ui.ingredients')}
         </h2>
         <ul className="space-y-2">
           {(ingredients || []).map((item, i) => (
@@ -167,7 +168,7 @@ export default function RecipeDetail({ recipe, onBack, onSaved }) {
       <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-6">
         <h2 className="text-sm font-semibold mb-3 flex items-center gap-2">
           <ChefHat className="w-4 h-4 text-primary-400" />
-          {lang === 'de' ? 'Zubereitung' : 'Instructions'}
+          {t('ui.instructions')}
         </h2>
         <ol className="space-y-3">
           {(steps || []).map((step, i) => (
@@ -189,9 +190,9 @@ export default function RecipeDetail({ recipe, onBack, onSaved }) {
         }`}
       >
         {saved ? (
-          <><Check className="w-5 h-5" /> {lang === 'de' ? 'Gespeichert!' : 'Saved!'}</>
+          <><Check className="w-5 h-5" /> {t('ui.saved')}</>
         ) : (
-          <>{lang === 'de' ? 'Gegessen — ins Tracking übernehmen' : 'Eaten — add to tracking'}</>
+          <>{t('ui.eatenAddToTracking')}</>
         )}
       </button>
 
@@ -199,7 +200,7 @@ export default function RecipeDetail({ recipe, onBack, onSaved }) {
       {showMealPicker && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowMealPicker(false)}>
           <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 w-full max-w-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <p className="text-center font-semibold mb-4">{lang === 'de' ? 'Für welche Mahlzeit?' : 'For which meal?'}</p>
+            <p className="text-center font-semibold mb-4">{t('ui.forWhichMeal')}</p>
             <div className="space-y-2">
               {MEAL_SLOTS.map((slot) => (
                 <button
@@ -207,7 +208,7 @@ export default function RecipeDetail({ recipe, onBack, onSaved }) {
                   onClick={() => handleEaten(slot.key)}
                   className="w-full py-3 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-primary-50 dark:hover:bg-primary-900/20 text-sm font-medium transition-colors"
                 >
-                  {lang === 'de' ? slot.de : slot.en}
+                  {beschriftung(slot, lang)}
                 </button>
               ))}
             </div>

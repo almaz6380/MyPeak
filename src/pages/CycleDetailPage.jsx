@@ -1,3 +1,4 @@
+import { appSprache } from '../lib/sprache';
 import { toLocalDateString } from '../lib/dateUtils';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +28,7 @@ const SLEEP_LEVELS = ['great', 'good', 'poor', 'terrible'];
 export default function CycleDetailPage({ onBack }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
+  const lang = appSprache(i18n.language);
   const today = formatDate(new Date());
 
   const [settings, setSettings] = useState(null);

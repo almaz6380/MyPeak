@@ -252,11 +252,11 @@ export const XP_VALUES = {
 
 // Titel basierend auf Level
 export function getLevelTitle(level) {
-  if (level >= 51) return { de: 'GOAT', en: 'GOAT', emoji: '🐐' };
-  if (level >= 31) return { de: 'Legende', en: 'Legend', emoji: '👑' };
-  if (level >= 16) return { de: 'Champion', en: 'Champion', emoji: '🏆' };
-  if (level >= 6) return { de: 'Warrior', en: 'Warrior', emoji: '⚔️' };
-  return { de: 'Rookie', en: 'Rookie', emoji: '🌱' };
+  if (level >= 51) return { de: 'GOAT', en: 'GOAT', es: 'GOAT', emoji: '🐐' };
+  if (level >= 31) return { de: 'Legende', en: 'Legend', es: 'Leyenda', emoji: '👑' };
+  if (level >= 16) return { de: 'Champion', en: 'Champion', es: 'Campeón', emoji: '🏆' };
+  if (level >= 6) return { de: 'Warrior', en: 'Warrior', es: 'Guerrero', emoji: '⚔️' };
+  return { de: 'Rookie', en: 'Rookie', es: 'Novato', emoji: '🌱' };
 }
 
 // XP pro Level (progressiv: Level 1=100, Level 2=150, Level 3=200...)

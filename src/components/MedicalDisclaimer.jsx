@@ -1,4 +1,5 @@
 import { AlertTriangle } from 'lucide-react';
+import { beschriftung } from '../lib/sprache';
 
 // Arzt-Hinweis fuer alle gesundheitsbezogenen Bereiche.
 //
@@ -18,10 +19,12 @@ const TEXTS = {
   medical: {
     de: 'FullRep ersetzt keine ärztliche Beratung. Wende dich bei gesundheitlichen Fragen, für eine Diagnose oder eine Behandlung immer an eine Ärztin oder einen Arzt.',
     en: 'FullRep does not replace medical advice. For any health concern, diagnosis or treatment, always consult a doctor.',
+    es: 'FullRep no sustituye el consejo médico. Ante cualquier duda de salud, para un diagnóstico o un tratamiento, consulta siempre a un médico.',
   },
   general: {
     de: 'Diese Informationen dienen zu Bildungszwecken. Trainings- und Ernährungsempfehlungen sind allgemein gehalten und ersetzen keine individuelle oder ärztliche Beratung. Wende dich bei gesundheitlichen Fragen, für eine Diagnose oder eine Behandlung an eine Ärztin oder einen Arzt.',
     en: 'This information is for educational purposes. Training and nutrition recommendations are general and do not replace individual or medical advice. For any health concern, diagnosis or treatment, consult a doctor.',
+    es: 'Esta información tiene fines educativos. Las recomendaciones de entrenamiento y nutrición son generales y no sustituyen el asesoramiento individual ni médico. Ante cualquier duda de salud, para un diagnóstico o un tratamiento, consulta a un médico.',
   },
 };
 
@@ -29,8 +32,7 @@ const TEXTS = {
 // Oberflaeche stoeren wuerde — etwa die Fusszeile unter dem Coach-Eingabefeld.
 // Der Satz bleibt damit trotzdem an einer einzigen Stelle gepflegt.
 export function medicalDisclaimerText(lang, type = 'medical') {
-  const key = String(lang || '').startsWith('de') ? 'de' : 'en';
-  return (TEXTS[type] || TEXTS.medical)[key];
+  return beschriftung(TEXTS[type] || TEXTS.medical, lang);
 }
 
 export default function MedicalDisclaimer({ lang, type = 'medical', extra, className = '' }) {

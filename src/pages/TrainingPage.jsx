@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
+import { datumsLocale, wochentagKuerzel } from '../lib/datumsformat';
 import { Plus, Trophy, ArrowLeft, ChevronRight, X, Search, Play, Moon } from 'lucide-react';
 import ExerciseLibrary from './training/ExerciseLibrary';
 import ActiveWorkout from './training/ActiveWorkout';
@@ -33,6 +34,7 @@ import PlanDetail from './training/PlanDetail';
 // Lazy: hält die (großen) Programmdaten aus dem Hauptbundle
 const PeakPrograms = lazy(() => import('./training/PeakPrograms'));
 import { todayLocal, toLocalDateString } from '../lib/dateUtils';
+import { appSprache } from '../lib/sprache';
 
 export default function TrainingPage() {
   const { t, i18n } = useTranslation();
@@ -61,7 +63,7 @@ export default function TrainingPage() {
   const [scheduledDays, setScheduledDays] = useState(new Set());
   const [completedDays, setCompletedDays] = useState(new Set());
   const [showTrainingCalendar, setShowTrainingCalendar] = useState(false);
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
+  const lang = appSprache(i18n.language);
 
   useEffect(() => {
     if (user) loadCalendarData();
@@ -232,9 +234,7 @@ export default function TrainingPage() {
     await loadCalendarData();
     setToast({
       variant: 'success',
-      message: lang === 'de'
-        ? 'Programm beendet — du findest es weiter unter „Meine Pläne".'
-        : 'Program ended — you can find it under "My Plans".',
+      message: t('ui.programEndedYouCanFindIt'),
     });
   };
 
@@ -427,9 +427,7 @@ export default function TrainingPage() {
             setView('home');
             setToast({
               variant: 'success',
-              message: lang === 'de'
-                ? `„${name}" aktiviert — deine Trainingstage sind jetzt blau im Kalender markiert.`
-                : `"${name}" activated — your training days are now marked blue in the calendar.`,
+              message: t('ui.nameActivatedYourTrainingDaysAre', { name }),
             });
           }}
           userGoal={profile?.goal || ''}
@@ -483,11 +481,11 @@ export default function TrainingPage() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-                {lang === 'de' ? 'Heute' : 'Today'}: {todaySession ? (todaySession.label || todaySession.type) : (lang === 'de' ? 'Ruhetag' : 'Rest day')}
+                {t('ui.today')}: {todaySession ? (todaySession.label || todaySession.type) : (t('ui.restDay'))}
               </p>
               <p className="text-xs text-slate-400 truncate">
                 {todaySession?.week && todaySession?.durationWeeks
-                  ? `${activeSchedule.name} · ${lang === 'de' ? 'Woche' : 'Week'} ${todaySession.week}/${todaySession.durationWeeks}`
+                  ? `${activeSchedule.name} · ${t('ui.week')} ${todaySession.week}/${todaySession.durationWeeks}`
                   : activeSchedule.name}
               </p>
             </div>
@@ -498,7 +496,7 @@ export default function TrainingPage() {
               onClick={() => setConfirmEndProgram(true)}
               className="text-xs text-slate-400 hover:text-red-500 font-medium transition-colors"
             >
-              {lang === 'de' ? 'Programm beenden' : 'End program'}
+              {t('ui.endProgram')}
             </button>
           </div>
         </div>
@@ -540,13 +538,13 @@ export default function TrainingPage() {
           onClick={() => setView('myPlans')}
           className="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-white dark:bg-surface-dark-alt text-slate-900 dark:text-white shadow-soft border border-slate-100 dark:border-slate-800/60"
         >
-          {lang === 'de' ? 'Meine Pläne' : 'My Plans'}
+          {t('ui.myPlans')}
         </button>
         <button
           onClick={() => setView('peakPrograms')}
           className="flex-1 py-2.5 rounded-lg text-sm font-semibold text-slate-500 dark:text-slate-400"
         >
-          {lang === 'de' ? 'Programme' : 'Programs'}
+          {t('ui.programs')}
         </button>
       </div>
 
@@ -566,7 +564,7 @@ export default function TrainingPage() {
         </div>
         <div className="flex-1 text-left">
           <p className="text-sm font-semibold text-slate-900 dark:text-white">{t('training.history')}</p>
-          <p className="text-xs text-slate-400">{lang === 'de' ? 'Alle vergangenen Trainingseinheiten' : 'All past training sessions'}</p>
+          <p className="text-xs text-slate-400">{t('ui.allPastTrainingSessions')}</p>
         </div>
         <ChevronRight className="w-5 h-5 text-slate-300" />
       </button>
@@ -576,7 +574,7 @@ export default function TrainingPage() {
       <div className="grid grid-cols-3 gap-3">
         <QuickAction icon={<img src="/bg-photos/rank-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />} motif="/bg-photos/rank-icon.png" label="Ranking" onClick={() => setView('leaderboard')} vertical />
         <QuickAction icon={<img src="/bg-photos/challenge-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />} motif="/bg-photos/challenge-icon.png" label="Challenges" onClick={() => setView('challenges')} vertical />
-        <QuickAction icon={<img src="/bg-photos/friends-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />} motif="/bg-photos/friends-icon.png" label={lang === 'de' ? 'Freunde' : 'Friends'} onClick={() => setView('friends')} vertical />
+        <QuickAction icon={<img src="/bg-photos/friends-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />} motif="/bg-photos/friends-icon.png" label={t('ui.friends')} onClick={() => setView('friends')} vertical />
       </div>
 
       {/* Training Calendar Modal */}
@@ -597,19 +595,17 @@ export default function TrainingPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 w-full max-w-sm shadow-xl">
             <p className="text-center font-semibold mb-1">
-              {lang === 'de' ? 'Programm beenden?' : 'End program?'}
+              {t('ui.endProgram2')}
             </p>
             <p className="text-center text-sm text-slate-500 dark:text-slate-400 mb-4">
-              {lang === 'de'
-                ? 'Es wird nicht gelöscht — du findest es weiter unter „Meine Pläne" und kannst es jederzeit wieder starten.'
-                : 'It will not be deleted — you can find it under "My Plans" and restart it anytime.'}
+              {t('ui.itWillNotBeDeletedYou')}
             </p>
             <div className="flex gap-3">
               <button onClick={() => setConfirmEndProgram(false)} className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm">
                 {t('common.cancel')}
               </button>
               <button onClick={endActiveProgram} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-medium text-sm">
-                {lang === 'de' ? 'Beenden' : 'End'}
+                {t('ui.end')}
               </button>
             </div>
           </div>
@@ -1469,6 +1465,7 @@ function MartialArtsSetup({ onBack, onStart, t }) {
 }
 
 function TrainingCalendarModal({ selectedDate, lang, onSelect, onClose }) {
+  const { t } = useTranslation();
   const selDate = new Date(selectedDate + 'T12:00:00');
   const [viewYear, setViewYear] = useState(selDate.getFullYear());
   const [viewMonth, setViewMonth] = useState(selDate.getMonth());
@@ -1478,13 +1475,11 @@ function TrainingCalendarModal({ selectedDate, lang, onSelect, onClose }) {
   const adjustedFirst = firstDay === 0 ? 6 : firstDay - 1;
 
   const monthName = new Date(viewYear, viewMonth).toLocaleDateString(
-    lang === 'de' ? 'de-DE' : 'en-US',
+    datumsLocale(lang),
     { month: 'long', year: 'numeric' }
   );
 
-  const dayHeaders = lang === 'de'
-    ? ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
-    : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const dayHeaders = wochentagKuerzel(lang);
 
   function prevMonth() {
     if (viewMonth === 0) { setViewYear(viewYear - 1); setViewMonth(11); }
@@ -1547,10 +1542,10 @@ function TrainingCalendarModal({ selectedDate, lang, onSelect, onClose }) {
             onClick={() => onSelect(todayLocal())}
             className="flex-1 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-semibold"
           >
-            {lang === 'de' ? 'Heute' : 'Today'}
+            {t('ui.today')}
           </button>
           <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm font-semibold">
-            {lang === 'de' ? 'Schließen' : 'Close'}
+            {t('ui.close')}
           </button>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ChevronDown, ChevronUp, BookOpen, ChevronRight, Stethoscope } from 'lucide-react';
 import References from '../../components/References';
 import MedicalDisclaimer from '../../components/MedicalDisclaimer';
+import { appSprache } from '../../lib/sprache';
 
 // Generischer Reader für die Wissensbibliothek-Blöcke (Training, Ernährung,
 // Supplements, Blutwerte). Datengetrieben — jeder Block liefert `data` (Themen)
@@ -23,8 +24,8 @@ const QUICK_COLORS = [
 ];
 
 export default function KnowledgePage({ onBack, data, titleDE, titleEN, categories = [], disclaimer = 'general' }) {
-  const { i18n } = useTranslation();
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
+  const { t, i18n } = useTranslation();
+  const lang = appSprache(i18n.language);
   const [activeCategory, setActiveCategory] = useState('all');
   const [selected, setSelected] = useState(null);
   const [showEbook, setShowEbook] = useState(false);
@@ -50,7 +51,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, categori
           </button>
           <div>
             <h1 className="text-xl font-bold">{lang === 'de' ? p.nameDE : p.nameEN}</h1>
-            <p className="text-xs text-primary-400">{lang === 'de' ? 'Ausführliches E-Book' : 'Detailed E-Book'}</p>
+            <p className="text-xs text-primary-400">{t('ui.detailedEBook')}</p>
           </div>
         </div>
 
@@ -66,7 +67,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, categori
           ))}
         </div>
 
-        <References items={p.references} lang={lang} />
+        <References items={p.references} />
         <Disclaimer lang={lang} type={disclaimer} />
       </div>
     );
@@ -106,9 +107,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, categori
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 mb-4 flex gap-3">
             <Stethoscope className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
             <p className="text-xs text-blue-700 dark:text-blue-400 leading-relaxed">
-              {lang === 'de'
-                ? 'Diese Inhalte ersetzen keine ärztliche Beratung. Wende dich bei gesundheitlichen Fragen, für eine Diagnose oder eine Behandlung an eine Ärztin oder einen Arzt.'
-                : 'This content does not replace medical advice. For any health concern, diagnosis or treatment, consult a doctor.'}
+              {t('ui.thisContentDoesNotReplaceMedical')}
             </p>
           </div>
         )}
@@ -121,17 +120,17 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, categori
             <BookOpen className="w-6 h-6 flex-shrink-0" />
             <div className="flex-1 text-left">
               <p className="font-semibold text-sm">
-                {lang === 'de' ? 'Ausführliches E-Book lesen' : 'Read detailed E-Book'}
+                {t('ui.readDetailedEBook')}
               </p>
               <p className="text-xs mt-0.5 text-white/70">
-                {p.sections.length} {lang === 'de' ? 'Kapitel' : 'chapters'}
+                {p.sections.length} {t('ui.chapters')}
               </p>
             </div>
             <ChevronRight className="w-5 h-5" />
           </button>
         )}
 
-        <References items={p.references} lang={lang} />
+        <References items={p.references} />
         <Disclaimer lang={lang} type={disclaimer} />
       </div>
     );
@@ -166,7 +165,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, categori
       )}
 
       <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
-        {filtered.length} {lang === 'de' ? 'Themen' : 'topics'}
+        {filtered.length} {t('ui.topics')}
       </p>
 
       <div className="flex flex-col gap-3">

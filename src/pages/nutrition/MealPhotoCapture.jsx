@@ -134,15 +134,15 @@ export default function MealPhotoCapture({ onClose, onAddItems, language = 'de' 
                   {error === 'no_food'
                     ? t('nutrition.noFoodDetected')
                     : error === 'timeout'
-                      ? (lang === 'de' ? 'Zeitüberschreitung — bitte versuche es erneut.' : 'Request timed out — please try again.')
+                      ? (t('ui.requestTimedOutPleaseTryAgain'))
                       : error === 'image_too_large'
-                        ? (lang === 'de' ? 'Bild zu groß — bitte ein kleineres Foto verwenden.' : 'Image too large — please use a smaller photo.')
+                        ? (t('ui.imageTooLargePleaseUseA'))
                         : error === 'rate_limit'
-                          ? (lang === 'de' ? 'Zu viele Anfragen — bitte warte einen Moment und versuche es erneut.' : 'Too many requests — please wait a moment and try again.')
+                          ? (t('ui.tooManyRequestsPleaseWaitA'))
                           : error === 'auth_required'
-                            ? (lang === 'de' ? 'Die Foto-Analyse ist nur mit Konto verfügbar — registriere dich kostenlos.' : 'Photo analysis requires an account — sign up for free.')
+                            ? (t('ui.photoAnalysisRequiresAnAccountSign'))
                             : error === 'ai_service_unavailable'
-                              ? (lang === 'de' ? 'KI-Service nicht erreichbar — bitte später erneut versuchen.' : 'AI service unavailable — please try again later.')
+                              ? (t('ui.aiServiceUnavailablePleaseTryAgain'))
                               : t('nutrition.aiError')}
                 </p>
                 {error === 'no_food' && (
@@ -150,7 +150,7 @@ export default function MealPhotoCapture({ onClose, onAddItems, language = 'de' 
                 )}
                 {(error === 'timeout' || error === 'ai_service_unavailable' || error === 'rate_limit') && (
                   <button onClick={handleAnalyze} className="mt-2 text-primary-400 text-xs font-medium">
-                    {lang === 'de' ? 'Erneut versuchen' : 'Try again'}
+                    {t('ui.tryAgain')}
                   </button>
                 )}
               </div>

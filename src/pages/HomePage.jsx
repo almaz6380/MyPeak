@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { datumsLocale, wochentagKuerzel } from '../lib/datumsformat';
 import { Flame, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Calendar, Plus } from 'lucide-react';
 import FullRepLogo from '../components/FullRepLogo';
 import CardPhotoMotif from '../components/CardPhotoMotif';
@@ -37,7 +38,7 @@ function getDateLabel(dateStr, lang, t) {
   if (dateStr === tomorrow) return t('home.tomorrow');
 
   const d = new Date(dateStr + 'T12:00:00');
-  return d.toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US', {
+  return d.toLocaleDateString(datumsLocale(lang), {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
@@ -334,7 +335,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-slate-900 dark:text-white">{t('cycle.title')}</p>
-                  <p className="text-xs text-slate-400">{lang === 'de' ? 'Zyklus einrichten und Empfehlungen erhalten' : 'Set up cycle and get recommendations'}</p>
+                  <p className="text-xs text-slate-400">{t('ui.setUpCycleAndGetRecommendations')}</p>
                 </div>
                 <ChevronRight className="w-5 h-5 text-slate-300" />
               </div>
@@ -521,6 +522,7 @@ function MacroPill({ label, value, goal, color }) {
 }
 
 function CalendarModal({ selectedDate, onSelect, onClose, lang }) {
+  const { t } = useTranslation();
   const [viewDate, setViewDate] = useState(() => {
     const d = new Date(selectedDate + 'T12:00:00');
     return { year: d.getFullYear(), month: d.getMonth() };
@@ -531,13 +533,11 @@ function CalendarModal({ selectedDate, onSelect, onClose, lang }) {
   const adjustedFirst = firstDay === 0 ? 6 : firstDay - 1; // Monday first
 
   const monthName = new Date(viewDate.year, viewDate.month).toLocaleDateString(
-    lang === 'de' ? 'de-DE' : 'en-US',
+    datumsLocale(lang),
     { month: 'long', year: 'numeric' }
   );
 
-  const dayLabels = lang === 'de'
-    ? ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
-    : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const dayLabels = wochentagKuerzel(lang);
 
   function prevMonth() {
     setViewDate((v) => {
@@ -605,13 +605,13 @@ function CalendarModal({ selectedDate, onSelect, onClose, lang }) {
             onClick={() => { onSelect(todayStr); }}
             className="flex-1 py-2.5 rounded-xl bg-gradient-to-b from-primary-400 to-primary-500 text-white text-sm font-semibold shadow-md shadow-primary-500/25"
           >
-            {lang === 'de' ? 'Heute' : 'Today'}
+            {t('ui.today')}
           </button>
           <button
             onClick={onClose}
             className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm font-semibold"
           >
-            {lang === 'de' ? 'Schließen' : 'Close'}
+            {t('ui.close')}
           </button>
         </div>
       </div>

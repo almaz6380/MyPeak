@@ -62,8 +62,7 @@ const ANNUAL_SAVINGS = '25'; // Prozent gespart ggue. 12x Monatspreis (genau 24,
 // SubscriptionContext → kein Zirkelimport). Kauf/Restore laufen über den
 // Storage (mit AuthContext-User; AuthContext ist unkritisch für Zirkelimport).
 export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose }) {
-  const { i18n } = useTranslation();
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState(null);
@@ -83,26 +82,11 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
   // Live-Store-Preis eines Plans, sonst Fallback-Konstante.
   const priceFor = (plan) => livePrices[plan] || `${CURRENCY}${PRICES[plan].amount}`;
   const periodLabel = (plan) => (plan === 'annual'
-    ? (lang === 'de' ? 'Jahr' : 'year')
-    : (lang === 'de' ? 'Monat' : 'month'));
+    ? (t('ui.year'))
+    : (t('ui.month')));
 
-  const benefits = lang === 'de'
-    ? [
-        'KI-Coach für Training & Ernährung',
-        'Blutwerte-Einordnung mit Empfehlungen',
-        'Nährwerttabelle per Foto einscannen',
-        'Personalisierter KI-Ernährungsplan',
-        'Detaillierte Analysen & Statistiken',
-        'Werbefrei',
-      ]
-    : [
-        'AI coach for training & nutrition',
-        'Blood work interpretation with guidance',
-        'Scan nutrition labels by photo',
-        'Personalised AI nutrition plan',
-        'Detailed analytics & statistics',
-        'Ad-free',
-      ];
+  const benefits = ['Coach', 'Bloodwork', 'Labels', 'Plan', 'Stats', 'AdFree']
+    .map((k) => t(`ui.benefit${k}`));
 
   const handlePrimary = async () => {
     setBusy(true);
@@ -116,7 +100,7 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
       if (res.ok) {
         setToast({
           type: 'success',
-          message: lang === 'de' ? 'Premium ist aktiviert. Viel Erfolg!' : 'Premium is active. Enjoy!',
+          message: t('ui.premiumIsActiveEnjoy'),
         });
         setTimeout(() => onClose(), 1200);
         return;
@@ -124,16 +108,12 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
       if (res.reason === 'cancelled') return; // Nutzer hat abgebrochen → still
       const msg = (() => {
         if (res.reason === 'login_required') {
-          return lang === 'de' ? 'Bitte melde dich an, um Premium zu kaufen.' : 'Please sign in to buy Premium.';
+          return t('ui.pleaseSignInToBuyPremium');
         }
         if (res.reason === 'provider_not_configured') {
-          return lang === 'de'
-            ? 'Käufe sind bald verfügbar. Wir richten den Bezahlvorgang gerade ein.'
-            : 'Purchases are coming soon. We are setting up checkout.';
+          return t('ui.purchasesAreComingSoonWeAre');
         }
-        return lang === 'de'
-          ? 'Der Kauf hat nicht geklappt. Bitte später erneut versuchen.'
-          : 'The purchase did not go through. Please try again later.';
+        return t('ui.thePurchaseDidNotGoThrough');
       })();
       setToast({ type: 'error', message: msg });
     } finally {
@@ -146,12 +126,12 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
     try {
       const res = await restorePurchases(user?.id);
       if (res.ok && res.entitlementActive) {
-        setToast({ type: 'success', message: lang === 'de' ? 'Käufe wiederhergestellt.' : 'Purchases restored.' });
+        setToast({ type: 'success', message: t('ui.purchasesRestored') });
         setTimeout(() => onClose(), 1200);
       } else if (res.ok) {
-        setToast({ type: 'error', message: lang === 'de' ? 'Keine aktiven Käufe gefunden.' : 'No active purchases found.' });
+        setToast({ type: 'error', message: t('ui.noActivePurchasesFound') });
       } else if (res.reason !== 'provider_not_configured') {
-        setToast({ type: 'error', message: lang === 'de' ? 'Wiederherstellen fehlgeschlagen.' : 'Restore failed.' });
+        setToast({ type: 'error', message: t('ui.restoreFailed') });
       }
     } finally {
       setBusy(false);
@@ -159,8 +139,8 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
   };
 
   const primaryLabel = hadTrial
-    ? (lang === 'de' ? 'Premium freischalten' : 'Unlock Premium')
-    : (lang === 'de' ? `${TRIAL_DAYS} Tage kostenlos testen` : `Start ${TRIAL_DAYS}-day free trial`);
+    ? (t('ui.unlockPremium'))
+    : (t('ui.startTrialDaysDayFreeTrial', { TRIAL_DAYS }));
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -169,7 +149,7 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
         <div className="relative p-6 pb-4 text-center">
           <button
             onClick={onClose}
-            aria-label={lang === 'de' ? 'Schließen' : 'Close'}
+            aria-label={t('ui.close')}
             className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <X className="w-5 h-5" />
@@ -180,8 +160,8 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
           <h1 className="text-2xl font-bold">FullRep Premium</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             {reason
-              ? (lang === 'de' ? 'Diese Funktion ist Teil von Premium.' : 'This feature is part of Premium.')
-              : (lang === 'de' ? 'Hol das Maximum aus deinem Training.' : 'Get the most out of your training.')}
+              ? (t('ui.thisFeatureIsPartOfPremium'))
+              : (t('ui.getTheMostOutOfYour'))}
           </p>
         </div>
 
@@ -212,18 +192,18 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
             }`}
           >
             <span className="absolute -top-2.5 right-4 px-2 py-0.5 rounded-full bg-primary-500 text-white text-[10px] font-semibold uppercase tracking-wide">
-              {lang === 'de' ? 'Bester Wert' : 'Best value'}
+              {t('ui.bestValue')}
             </span>
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="font-semibold text-sm">{lang === 'de' ? 'Jährlich' : 'Yearly'}</p>
+                <p className="font-semibold text-sm">{t('ui.yearly')}</p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
                   {/* Frueher stand hier zusaetzlich „2 Monate gratis". Bei
                       4,99/44,99 waeren es 2,98 Monate — „3" waere knapp zu
                       viel, „2" deutlich zu wenig. Die Ersparnis steht ohnehin
                       als −{ANNUAL_SAVINGS} % daneben; eine zweite, nur
                       ungefaehr richtige Angabe braucht die Paywall nicht. */}
-                  {CURRENCY}{PRICES.annual.perMonth} / {lang === 'de' ? 'Monat' : 'month'}
+                  {CURRENCY}{PRICES.annual.perMonth} / {t('ui.month')}
                 </p>
               </div>
               <div className="text-right shrink-0">
@@ -248,14 +228,14 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
           >
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="font-semibold text-sm">{lang === 'de' ? 'Monatlich' : 'Monthly'}</p>
+                <p className="font-semibold text-sm">{t('ui.monthly')}</p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {lang === 'de' ? 'Flexibel, monatlich kündbar' : 'Flexible, cancel monthly'}
+                  {t('ui.flexibleCancelMonthly')}
                 </p>
               </div>
               <div className="text-right shrink-0">
                 <p className="font-bold">{priceFor('monthly')}</p>
-                <p className="text-[11px] text-slate-400">/ {lang === 'de' ? 'Monat' : 'month'}</p>
+                <p className="text-[11px] text-slate-400">/ {t('ui.month')}</p>
               </div>
             </div>
           </button>
@@ -263,9 +243,7 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
           {!hadTrial && (
             <p className="text-xs text-primary-600 dark:text-primary-400 mt-1 flex items-center justify-center gap-1 text-center">
               <Sparkles className="w-3.5 h-3.5 shrink-0" />
-              {lang === 'de'
-                ? `${TRIAL_DAYS} Tage kostenlos, danach ${priceFor(selectedPlan)} / ${periodLabel(selectedPlan)}`
-                : `${TRIAL_DAYS} days free, then ${priceFor(selectedPlan)} / ${periodLabel(selectedPlan)}`}
+              {t('ui.trialDaysDaysFreeThenPricefor', { TRIAL_DAYS, preis: priceFor(selectedPlan), zeitraum: periodLabel(selectedPlan) })}
             </p>
           )}
         </div>
@@ -284,9 +262,7 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
           ) : (
             // Trial bereits genutzt + kein Kauf auf dieser Plattform → nur Hinweis.
             <p className="text-sm text-slate-600 dark:text-slate-300 text-center">
-              {lang === 'de'
-                ? 'Diese Funktion ist Teil von Premium. Der Kauf ist in dieser App-Version noch nicht verfügbar.'
-                : 'This feature is part of Premium. Purchasing is not yet available in this version of the app.'}
+              {t('ui.thisFeatureIsPartOfPremium2')}
             </p>
           )}
           {hadTrial && canPurchase && (
@@ -295,14 +271,12 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
               disabled={busy}
               className="w-full mt-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-primary-500 disabled:opacity-60 transition-colors"
             >
-              {lang === 'de' ? 'Käufe wiederherstellen' : 'Restore purchases'}
+              {t('ui.restorePurchases')}
             </button>
           )}
           {(!hadTrial || canPurchase) && (
             <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-3 leading-relaxed">
-              {lang === 'de'
-                ? 'Jederzeit kündbar. Die Testphase kann in den Konto-Einstellungen beendet werden.'
-                : 'Cancel anytime. The trial can be ended in your account settings.'}
+              {t('ui.cancelAnytimeTheTrialCanBe')}
             </p>
           )}
         </div>

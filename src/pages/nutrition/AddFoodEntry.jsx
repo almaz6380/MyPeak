@@ -194,7 +194,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
               : 'text-slate-500 dark:text-slate-400'
           }`}
         >
-          {lang === 'de' ? 'Lebensmittel' : 'Food'}
+          {t('ui.food')}
         </button>
         <button
           onClick={() => setActiveTab('recent')}
@@ -204,7 +204,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
               : 'text-slate-500 dark:text-slate-400'
           }`}
         >
-          {lang === 'de' ? 'Letzte' : 'Recent'} {recentFoods.length > 0 && `(${recentFoods.length})`}
+          {t('ui.recent')} {recentFoods.length > 0 && `(${recentFoods.length})`}
         </button>
       </div>
 
@@ -271,7 +271,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
         <div>
           {recentFoods.length === 0 ? (
             <p className="text-center text-sm text-slate-400 dark:text-slate-500 py-12">
-              {lang === 'de' ? 'Noch keine Lebensmittel geloggt.' : 'No foods logged yet.'}
+              {t('ui.noFoodsLoggedYet')}
             </p>
           ) : (
             <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">
@@ -355,7 +355,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
               <Check className="w-4 h-4" />
               {saving
                 ? '...'
-                : `${selectedItems.length} ${lang === 'de' ? 'Einträge speichern' : 'entries save'} · ${Math.round(totalCalories)} kcal`}
+                : t('ui.saveEntriesCount', { anzahl: selectedItems.length, kcal: Math.round(totalCalories) })}
             </button>
           </div>
         </div>

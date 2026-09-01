@@ -29,7 +29,7 @@ const categoryNames = {
 };
 
 export default function PeptidesPage({ onBack }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const lang = i18n.language || 'de';
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedPeptide, setSelectedPeptide] = useState(null);
@@ -50,7 +50,7 @@ export default function PeptidesPage({ onBack }) {
           </button>
           <div>
             <h1 className="text-xl font-bold">{lang === 'de' ? p.nameDE : p.nameEN}</h1>
-            <p className="text-xs text-primary-400">{lang === 'de' ? 'Ausführliches E-Book' : 'Detailed E-Book'}</p>
+            <p className="text-xs text-primary-400">{t('ui.detailedEBook')}</p>
           </div>
         </div>
 
@@ -70,12 +70,12 @@ export default function PeptidesPage({ onBack }) {
           <div className="text-center py-12">
             <BookOpen className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
             <p className="text-slate-400 dark:text-slate-500 text-sm">
-              {lang === 'de' ? 'E-Book wird derzeit erstellt...' : 'E-Book is being created...'}
+              {t('ui.eBookIsBeingCreated')}
             </p>
           </div>
         )}
 
-        <References items={p.references} lang={lang} />
+        <References items={p.references} />
         <Disclaimer lang={lang} />
       </div>
     );
@@ -114,12 +114,12 @@ export default function PeptidesPage({ onBack }) {
         {quick && (
           <div className="space-y-3 mb-6">
             <QuickCard
-              title={lang === 'de' ? 'Wirkung' : 'Effects'}
+              title={t('ui.effects')}
               text={quick.wirkung}
               color="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-l-green-400"
             />
             <QuickCard
-              title={lang === 'de' ? 'Nebenwirkungen' : 'Side Effects'}
+              title={t('ui.sideEffects')}
               text={quick.nebenwirkungen}
               color="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-l-red-400"
             />
@@ -130,9 +130,7 @@ export default function PeptidesPage({ onBack }) {
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 mb-4 flex gap-3">
           <Stethoscope className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-blue-700 dark:text-blue-400 leading-relaxed">
-            {lang === 'de'
-              ? 'Dosierung und Anwendung sollten ausschließlich mit einem qualifizierten Arzt besprochen werden.'
-              : 'Dosage and administration should only be discussed with a qualified physician.'}
+            {t('ui.dosageAndAdministrationShouldOnlyB')}
           </p>
         </div>
 
@@ -148,18 +146,18 @@ export default function PeptidesPage({ onBack }) {
           <BookOpen className="w-6 h-6 flex-shrink-0" />
           <div className="flex-1 text-left">
             <p className="font-semibold text-sm">
-              {lang === 'de' ? 'Ausführliches E-Book lesen' : 'Read detailed E-Book'}
+              {t('ui.readDetailedEBook')}
             </p>
             <p className={`text-xs mt-0.5 ${hasEbook ? 'text-white/70' : ''}`}>
               {hasEbook
-                ? `${p.sections.length} ${lang === 'de' ? 'Kapitel' : 'chapters'}`
-                : (lang === 'de' ? 'Wird erstellt...' : 'Coming soon...')}
+                ? `${p.sections.length} ${t('ui.chapters')}`
+                : (t('ui.comingSoon'))}
             </p>
           </div>
           {hasEbook && <ChevronRight className="w-5 h-5" />}
         </button>
 
-        <References items={p.references} lang={lang} />
+        <References items={p.references} />
         <Disclaimer lang={lang} />
       </div>
     );
@@ -172,7 +170,7 @@ export default function PeptidesPage({ onBack }) {
         <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-2xl font-bold">{lang === 'de' ? 'Peptide' : 'Peptides'}</h1>
+        <h1 className="text-2xl font-bold">{t('ui.peptides')}</h1>
       </div>
 
       <Disclaimer lang={lang} />
@@ -195,7 +193,7 @@ export default function PeptidesPage({ onBack }) {
       </div>
 
       <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
-        {filtered.length} {lang === 'de' ? 'Peptide' : 'Peptides'}
+        {filtered.length} {t('ui.peptides')}
       </p>
 
       {/* Peptide Cards */}
@@ -261,11 +259,10 @@ function EbookSection({ title, content, colorClass, defaultOpen = false }) {
 }
 
 function Disclaimer({ lang }) {
+  const { t } = useTranslation();
   // Der Grundhinweis kommt aus dem gemeinsamen Baustein; peptidspezifisch bleiben
   // die Verschreibungspflicht und der Stand der Forschung.
-  const extra = lang === 'de'
-    ? 'Peptide sind in vielen Ländern verschreibungspflichtig oder nicht zugelassen. Konsultiere immer einen Arzt vor der Anwendung.\n\nZum Stand der Forschung: Nur wenige der hier beschriebenen Substanzen sind als Arzneimittel zugelassen (z. B. Semaglutid, Tirzepatid, Bremelanotid, Afamelanotid). Für die meisten übrigen stammt die Evidenz überwiegend aus Tier- und Laborstudien; belastbare Studien am Menschen fehlen. Die Quellenangaben unter jedem Eintrag verweisen auf die zugrunde liegende Literatur.'
-    : 'Peptides are prescription-only or unapproved in many countries. Always consult a doctor before use.\n\nOn the state of research: only a few of the substances described here are approved medicines (e.g. semaglutide, tirzepatide, bremelanotide, afamelanotide). For most of the others the evidence comes largely from animal and laboratory studies; robust human trials are lacking. The references below each entry link to the underlying literature.';
+  const extra = t('ui.peptidesArePrescriptionOnlyOrUnapp');
 
   return <MedicalDisclaimer lang={lang} type="medical" extra={extra} className="mt-6 mb-4" />;
 }

@@ -17,7 +17,7 @@ const GOAL_ADJUSTMENTS = {
 };
 
 export default function TDEECalculator({ onBack, onSaved }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const [saved, setSaved] = useState(false);
 
@@ -223,9 +223,7 @@ export default function TDEECalculator({ onBack, onSaved }) {
         {/* Quellenangabe zur Formel — Apple Guideline 1.4.1 verlangt Belege auch
             fuer gesundheitsbezogene Berechnungen. */}
         <p className="text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed mb-4">
-          {i18n.language?.startsWith('de')
-            ? 'Berechnet nach der Mifflin-St-Jeor-Formel. Quelle: Mifflin, M.D., St Jeor, S.T., Hill, L.A., Scott, B.J., Daugherty, S.A. & Koh, Y.O. (1990). A new predictive equation for resting energy expenditure in healthy individuals. American Journal of Clinical Nutrition 51:241–247. Die Werte sind Schätzungen und ersetzen keine Messung oder ärztliche Beratung.'
-            : 'Calculated using the Mifflin-St Jeor equation. Source: Mifflin, M.D., St Jeor, S.T., Hill, L.A., Scott, B.J., Daugherty, S.A. & Koh, Y.O. (1990). A new predictive equation for resting energy expenditure in healthy individuals. American Journal of Clinical Nutrition 51:241–247. These values are estimates and do not replace measurement or medical advice.'}
+          {t('ui.calculatedUsingTheMifflinStJeor')}
         </p>
 
         <div className="grid grid-cols-2 gap-3 mb-4">
