@@ -16,6 +16,10 @@ on:
         description: 'Wirklich zu App Store Connect hochladen? (aus = nur bauen)'
         type: boolean
         default: true
+      nur_kompilieren:
+        description: 'Nur kompilieren, ohne Signierung/Export? (prueft Code + Projektdatei, braucht keine App Group)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -78,6 +82,7 @@ jobs:
           npx cap sync ios
 
       - name: Signierung einrichten
+        if: ${{ !inputs.nur_kompilieren }}
         env:
           CERT_B64: ${{ secrets.IOS_CERT_P12_BASE64 }}
           CERT_PASSWORD: ${{ secrets.IOS_CERT_PASSWORD }}
@@ -111,6 +116,7 @@ jobs:
       # ⚠ App Group anlegen/zuordnen kann die API NICHT — das ist Josefs
       # einmaliger Handgriff im Developer-Portal (siehe CLAUDE.md, Widget).
       - name: Provisioning-Profile von der API holen
+        if: ${{ !inputs.nur_kompilieren }}
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
@@ -133,6 +139,7 @@ jobs:
             --out "$PROFDIR/widget.mobileprovision"
 
       - name: ExportOptions schreiben
+        if: ${{ !inputs.nur_kompilieren }}
         run: |
           set -euo pipefail
           PROFDIR="$HOME/Library/MobileDevice/Provisioning Profiles"
@@ -178,7 +185,19 @@ jobs:
           plutil -lint /tmp/ExportOptions.plist
           rm -f /tmp/profile.plist
 
+      # Reiner Kompilier-Lauf: prueft Swift-Code und Projektdatei (z. B. die von
+      # Hand eingesetzte Widget-Extension), ohne Zertifikate, Profile oder die
+      # App Group zu brauchen. Bewusst VOR dem Portal-Schritt nutzbar.
+      - name: Nur kompilieren (ohne Signierung)
+        if: ${{ inputs.nur_kompilieren }}
+        run: |
+          cd ios/App
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release \
+            -destination "generic/platform=iOS" \
+            CODE_SIGNING_ALLOWED=NO build
+
       - name: Archivieren
+        if: ${{ !inputs.nur_kompilieren }}
         run: |
           cd ios/App
           # Capacitor 8 bindet die Plugins ueber Swift Package Manager ein — es gibt
@@ -188,11 +207,13 @@ jobs:
             -archivePath "$RUNNER_TEMP/App.xcarchive" archive
 
       - name: Exportieren
+        if: ${{ !inputs.nur_kompilieren }}
         run: |
           xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/App.xcarchive" \
             -exportOptionsPlist /tmp/ExportOptions.plist -exportPath "$RUNNER_TEMP/export"
 
       - name: IPA als Artefakt ablegen
+        if: ${{ !inputs.nur_kompilieren }}
         uses: actions/upload-artifact@v4
         with:
           name: FullRep-ios-${{ env.V }}-b${{ env.B }}
@@ -200,7 +221,7 @@ jobs:
           retention-days: 30
 
       - name: Zu App Store Connect hochladen
-        if: ${{ inputs.upload }}
+        if: ${{ inputs.upload && !inputs.nur_kompilieren }}
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
