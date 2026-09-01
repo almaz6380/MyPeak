@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { isGuest } from '../context/AuthContext';
+import { beschriftung } from '../lib/sprache';
 
 function guestSkip(userId) { return isGuest(userId); }
 
@@ -186,47 +187,82 @@ export function getPhaseRecommendations(phase, lang) {
       training: {
         de: 'Leichtes Training empfohlen: Yoga, Mobility, Spaziergänge. Höre auf deinen Körper.',
         en: 'Light training recommended: Yoga, mobility, walks. Listen to your body.',
+        es: 'Se recomienda entrenamiento suave: yoga, movilidad, paseos. Escucha a tu cuerpo.',
+        fr: 'Entraînement léger recommandé : yoga, mobilité, marche. Écoute ton corps.',
+        pt: 'Treino leve recomendado: ioga, mobilidade, caminhadas. Escute o seu corpo.',
+        ar: 'يُنصح بتدريب خفيف: يوغا، وتمارين مرونة، ومشي. أنصت إلى جسدك.',
       },
       nutrition: {
         de: 'Eisenreiche Lebensmittel (Spinat, rotes Fleisch), Magnesium. Kein Kaloriendefizit.',
         en: 'Iron-rich foods (spinach, red meat), magnesium. No calorie deficit.',
+        es: 'Alimentos ricos en hierro (espinacas, carne roja), magnesio. Sin déficit calórico.',
+        fr: 'Aliments riches en fer (épinards, viande rouge), magnésium. Pas de déficit calorique.',
+        pt: 'Alimentos ricos em ferro (espinafre, carne vermelha), magnésio. Sem déficit calórico.',
+        ar: 'أطعمة غنية بالحديد (سبانخ، لحم أحمر) ومغنيسيوم. بلا عجز سعري.',
       },
     },
     follicular: {
       training: {
         de: 'Beste Phase für intensives Training! Krafttraining, Volumen hochfahren, PRs versuchen.',
         en: 'Best phase for intense training! Strength training, increase volume, go for PRs.',
+        es: '¡La mejor fase para entrenar fuerte! Fuerza, sube el volumen, busca récords.',
+        fr: 'Meilleure phase pour s’entraîner dur ! Musculation, monte le volume, vise des records.',
+        pt: 'A melhor fase para treinar pesado! Força, aumente o volume, busque recordes.',
+        ar: 'أفضل مرحلة للتدريب المكثّف! تدريب قوة، وارفع الحجم، وحاول تسجيل أرقام جديدة.',
       },
       nutrition: {
         de: 'Mehr Kohlenhydrate für maximale Performance. Protein wie gewohnt.',
         en: 'More carbs for peak performance. Protein as usual.',
+        es: 'Más carbohidratos para rendir al máximo. Proteína como siempre.',
+        fr: 'Plus de glucides pour la performance. Protéines comme d’habitude.',
+        pt: 'Mais carboidratos para o desempenho máximo. Proteína como sempre.',
+        ar: 'كربوهيدرات أكثر لأقصى أداء. والبروتين كالمعتاد.',
       },
     },
     ovulation: {
       training: {
         de: 'Peak-Energie! HIIT, Maximalbelastung möglich. Achtung: leicht erhöhtes Verletzungsrisiko.',
         en: 'Peak energy! HIIT, max effort possible. Note: slightly higher injury risk.',
+        es: '¡Energía máxima! HIIT y esfuerzo máximo posibles. Ojo: riesgo de lesión algo mayor.',
+        fr: 'Énergie au maximum ! HIIT et effort maximal possibles. Attention : risque de blessure un peu plus élevé.',
+        pt: 'Energia no pico! HIIT e esforço máximo são possíveis. Atenção: risco de lesão um pouco maior.',
+        ar: 'ذروة الطاقة! تمارين HIIT وجهد أقصى ممكنان. انتبه: خطر الإصابة أعلى قليلًا.',
       },
       nutrition: {
         de: 'Ausgewogene Ernährung, Protein hoch halten. Viel Wasser trinken.',
         en: 'Balanced nutrition, keep protein high. Stay hydrated.',
+        es: 'Alimentación equilibrada, mantén la proteína alta. Bebe mucha agua.',
+        fr: 'Alimentation équilibrée, garde les protéines hautes. Bois beaucoup d’eau.',
+        pt: 'Alimentação equilibrada, mantenha a proteína alta. Beba bastante água.',
+        ar: 'تغذية متوازنة مع إبقاء البروتين مرتفعًا. واشرب ماءً كثيرًا.',
       },
     },
     luteal: {
       training: {
         de: 'Moderate Intensität. Leichtere Gewichte, mehr Pausen. Ausdauer statt Maximalkraft.',
         en: 'Moderate intensity. Lighter weights, more rest. Endurance over max strength.',
+        es: 'Intensidad moderada. Pesos más ligeros, más descanso. Resistencia antes que fuerza máxima.',
+        fr: 'Intensité modérée. Charges plus légères, plus de repos. Endurance plutôt que force maximale.',
+        pt: 'Intensidade moderada. Cargas mais leves, mais descanso. Resistência em vez de força máxima.',
+        ar: 'شدّة معتدلة. أوزان أخف واستراحات أكثر. تحمّل بدل القوة القصوى.',
       },
       nutrition: {
         de: 'Kalorienbedarf steigt (+100-300 kcal). Heißhunger ist normal — gesunde Snacks einplanen.',
         en: 'Calorie needs increase (+100-300 kcal). Cravings are normal — plan healthy snacks.',
+        es: 'Sube la necesidad calórica (+100-300 kcal). Los antojos son normales: planifica snacks sanos.',
+        fr: 'Les besoins caloriques montent (+100-300 kcal). Les fringales sont normales — prévois des en-cas sains.',
+        pt: 'A necessidade calórica sobe (+100-300 kcal). A fome intensa é normal — planeje lanches saudáveis.',
+        ar: 'ترتفع الحاجة السعرية (100-300+ سعرة). والاشتهاء أمر طبيعي — خطّط لوجبات خفيفة صحية.',
       },
     },
   };
 
+  // `beschriftung` normalisiert den Sprachcode (HomePage reicht `pt-BR` durch)
+  // und faellt sauber auf Englisch zurueck. Ein blosses `recs[…][lang]` liess
+  // Regionalcodes ins Leere laufen.
   return recs[phase] ? {
-    training: recs[phase].training[lang] || recs[phase].training.en,
-    nutrition: recs[phase].nutrition[lang] || recs[phase].nutrition.en,
+    training: beschriftung(recs[phase].training, lang),
+    nutrition: beschriftung(recs[phase].nutrition, lang),
   } : null;
 }
 

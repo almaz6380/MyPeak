@@ -87,18 +87,30 @@ console.log(`  ${benutzt.size} wörtliche t()-Schlüssel im Code geprüft.`);
 // Fehlt dort `es`, fällt es NICHT auf: `tabelle[lang]` liefert `undefined`, die
 // Zeile bleibt leer oder zeigt die rohe Id. Genau das ist der Peptid-Seite
 // passiert — dort standen „healing" und „gh" statt der Kategorienamen.
+// ⚠ Der Block reicht über MEHRERE Zeilen. Eine frühere Fassung suchte `de:` und
+// `en:` in derselben Zeile — damit blieb jede umgebrochene Tabelle unsichtbar.
+// So ist der Arzt-Hinweis in `MedicalDisclaimer.jsx` durchgerutscht und stand
+// auf Französisch englisch da (und das ist Pflichttext für Google Play).
+// Zeilenweise abgrenzen statt bis zur nächsten `}`: Platzhalter wie `{{name}}`
+// enthalten selbst Klammern und würden den Block zu früh abschneiden.
 let tabellenGeprueft = 0;
 for (const d of dateien) {
   const src = readFileSync(d, 'utf8');
-  for (const m of src.matchAll(/\bde:\s*'(?:\\.|[^'\\])*'[^\n]*/g)) {
-    const zeile = m[0];
-    if (!/\ben:\s*'/.test(zeile)) continue; // keine Sprachtabelle
+  const zeilen = src.split('\n');
+  for (let i = 0; i < zeilen.length; i += 1) {
+    if (!/\bde:\s*'/.test(zeilen[i])) continue;
+    const block = [zeilen[i]];
+    for (let j = i + 1; j < zeilen.length && block.length <= 40; j += 1) {
+      if (/^\s*[}\]]/.test(zeilen[j])) break; // Ende der Tabelle
+      block.push(zeilen[j]);
+    }
+    const text = block.join('\n');
+    if (!/\ben:\s*'/.test(text)) continue; // keine Sprachtabelle
     tabellenGeprueft += 1;
     const fehlt = SPRACHEN.filter((sp) => sp !== 'de' && sp !== 'en'
-      && !new RegExp(`\\b${sp}:\\s*'`).test(zeile));
+      && !new RegExp(`\\b${sp}:\\s*'`).test(text));
     if (fehlt.length) {
-      const nr = src.slice(0, m.index).split('\n').length;
-      meckern(`${fehlt.join('/')} fehlt in Beschriftungstabelle — ${d.slice(WURZEL.length + 1)}:${nr}`);
+      meckern(`${fehlt.join('/')} fehlt in Beschriftungstabelle — ${d.slice(WURZEL.length + 1)}:${i + 1}`);
     }
   }
 }

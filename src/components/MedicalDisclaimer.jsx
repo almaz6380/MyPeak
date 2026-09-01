@@ -20,11 +20,17 @@ const TEXTS = {
     de: 'FullRep ersetzt keine ärztliche Beratung. Wende dich bei gesundheitlichen Fragen, für eine Diagnose oder eine Behandlung immer an eine Ärztin oder einen Arzt.',
     en: 'FullRep does not replace medical advice. For any health concern, diagnosis or treatment, always consult a doctor.',
     es: 'FullRep no sustituye el consejo médico. Ante cualquier duda de salud, para un diagnóstico o un tratamiento, consulta siempre a un médico.',
+    fr: 'FullRep ne remplace pas un avis médical. Pour toute question de santé, tout diagnostic ou tout traitement, consulte toujours un médecin.',
+    pt: 'O FullRep não substitui orientação médica. Para qualquer dúvida de saúde, diagnóstico ou tratamento, procure sempre um médico.',
+    ar: 'لا يغني FullRep عن الاستشارة الطبية. وعند أي سؤال صحي أو لتشخيص أو علاج، راجع الطبيب دائمًا.',
   },
   general: {
     de: 'Diese Informationen dienen zu Bildungszwecken. Trainings- und Ernährungsempfehlungen sind allgemein gehalten und ersetzen keine individuelle oder ärztliche Beratung. Wende dich bei gesundheitlichen Fragen, für eine Diagnose oder eine Behandlung an eine Ärztin oder einen Arzt.',
     en: 'This information is for educational purposes. Training and nutrition recommendations are general and do not replace individual or medical advice. For any health concern, diagnosis or treatment, consult a doctor.',
     es: 'Esta información tiene fines educativos. Las recomendaciones de entrenamiento y nutrición son generales y no sustituyen el asesoramiento individual ni médico. Ante cualquier duda de salud, para un diagnóstico o un tratamiento, consulta a un médico.',
+    fr: 'Ces informations ont une visée éducative. Les recommandations d’entraînement et de nutrition sont générales et ne remplacent ni un accompagnement individuel ni un avis médical. Pour toute question de santé, tout diagnostic ou tout traitement, consulte un médecin.',
+    pt: 'Estas informações têm finalidade educativa. As recomendações de treino e de nutrição são gerais e não substituem orientação individual nem médica. Para qualquer dúvida de saúde, diagnóstico ou tratamento, procure um médico.',
+    ar: 'هذه المعلومات لأغراض تعليمية. وتوصيات التدريب والتغذية عامة ولا تغني عن استشارة فردية أو طبية. وعند أي سؤال صحي أو لتشخيص أو علاج، راجع الطبيب.',
   },
 };
 
