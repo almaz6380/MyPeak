@@ -11,8 +11,9 @@ i18n.use(initReactI18next).init({
   resources: {
     de: { translation: de },
     en: { translation: en },
-    // Spanisch seit 1.4.0. Fehlt ein Schluessel, greift fallbackLng (de) —
-    // die fest verdrahteten de/en-Ternaries im Code zeigen fuer es Englisch.
+    // Spanisch seit 1.4.0. Fehlt ein Schluessel, greift fallbackLng (de).
+    // Die Inhaltsbibliotheken liegen als eigene Sprachpakete daneben, nicht
+    // hier — siehe src/data/uebersetzungen.js.
     es: { translation: es },
   },
   lng: savedLanguage,

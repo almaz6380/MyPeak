@@ -9,8 +9,8 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 leitet mit 307 dorthin weiter — bewusst behalten, solange irgendwo alte Links stehen)
 **Git-Repository:** https://github.com/almaz6380/MyPeak (Repo-Name unverändert)
 **Zielplattform:** Web-App → PWA → später App Store (iOS + Android)
-**Sprachen:** Deutsch, Englisch, Spanisch (Oberfläche vollständig; die
-Inhaltsbibliotheken bleiben DE/EN, siehe 4b)
+**Sprachen:** Deutsch, Englisch, Spanisch — **vollständig**, Oberfläche wie
+Inhaltsbibliotheken (siehe 4b und 4c)
 **Geschäftsmodell:** Freemium mit 7 Tagen kostenloser Testphase
 **Zielgruppe:** Fitnessstudio-Besucher (Geräte + freie Gewichte), Anfänger bis Fortgeschrittene
 
@@ -109,8 +109,9 @@ jetzt 244 `ui.*`-Schlüssel in allen drei Sprachdateien.
   zusätzlich in allen drei Sprachen an und sucht nach rohen Schlüsseln.
 - **Nicht jeder de/en-Ternary ist Text.** `lang === 'de' ? 'nameDE' : 'nameEN'`
   wählt ein *Datenfeld*, `? 'de' : 'en'` einen *Sprachcode*. Wer die mit
-  umschreibt, bricht die Inhaltsbibliotheken. Der Umbau hat sie ausdrücklich
-  ausgenommen; sie bleiben zweisprachig und sind auch richtig so.
+  umschreibt, bricht die Inhaltsbibliotheken; der Umbau hat sie ausdrücklich
+  ausgenommen. Die Datenfeld-Weichen sind inzwischen einzeln durch die Leser aus
+  `uebersetzungen.js` ersetzt (siehe 4c) — von Hand, nicht per Skript.
 - **`describeSegments()` und `formatDisplayDate()` sind keine Komponenten** —
   dort geht kein `useTranslation`. Sie übersetzen jetzt über die importierte
   i18n-Instanz (`i18nInstanz.t(…)`).
@@ -119,30 +120,78 @@ jetzt 244 `ui.*`-Schlüssel in allen drei Sprachdateien.
 - **Nachgeprüft im echten Browser:** Gastmodus, alle vier Reiter, Spanisch —
   keine rohen Schlüssel, keine deutschen Reste, keine Seitenfehler.
 
-**Was auf Spanisch NICHT übersetzt ist — und warum:**
+**4c. Die Inhaltsbibliotheken sind übersetzt (01.09.2026).** Josef hat den
+früheren Vorbehalt („kein Vergessen, sondern eine Entscheidung") ausdrücklich
+überstimmt: *„peptide etc (alles!!!!) auf spanisch übersetzen"*. Die rund
+480.000 Zeichen sind damit erledigt — **222 Einträge, 0 offen**
+(`node scripts/pruefe-inhalte.mjs`).
 
-Die Inhaltsbibliotheken bleiben DE/EN, spanische Nutzer sehen dort Englisch:
+| Bereich | Einträge | Paket |
+|---|---|---|
+| Peptide | 20 | `src/data/es/peptide.js` |
+| Diäten | 8 + 4 Kategorien | `es/diaeten.js` |
+| Training / Ernährung / Supplements / Blutwerte | je 6 + Kategorien | `es/training.js` u. a. |
+| Rezepte | 25 | `es/rezepte.js` |
+| Peak-Programme | 21 + 21 Studienbefunde | `es/programme.js` |
+| Lebensmittel | 124 + 17 Kategorien | `es/lebensmittel.js` |
+| Tagesbeschriftungen | 53 | `src/data/tagesbeschriftung.js` (DE/EN/ES) |
 
-| Datei | Deutscher Text |
-|---|---|
-| `peptidesData.js` | 239.245 Zeichen |
-| `dietsData.js` | 104.535 |
-| `trainingKnowledge.js` | 28.363 |
-| `nutritionKnowledge.js` | 26.228 |
-| `supplementsKnowledge.js` | 23.445 |
-| `bloodworkKnowledge.js` | 23.236 |
-| `peakPrograms.js` | 16.839 |
-| `recipesData.js` | 16.615 |
-| `foodDatabase.js` | 1.922 |
-| **Summe** | **rund 480.000 Zeichen** |
+**Warum eigene Sprachpakete statt `nameES` neben `nameDE`?** Drei Gründe, alle
+drei stehen auch im Kopf von `src/data/uebersetzungen.js`:
 
-Das ist kein Vergessen, sondern eine Entscheidung: Der größte Teil davon ist
-gesundheitsnaher Text (Peptide, Blutwerte, Diäten). Maschinell übersetzt und
-ungeprüft ausgeliefert widerspricht der Sorgfalt, mit der hier sonst jeder
-Arzt-Hinweis gesetzt ist — Google Play hat am 30.07. genau in diesem Bereich
-schon einmal durchgesetzt. Wenn es kommt, dann geprüft und stückweise. Der
-Arzt-Hinweis selbst (`MedicalDisclaimer`) ist **bereits dreisprachig**, damit die
-juristisch verlangte Zeile auf Spanisch nicht fehlt.
+1. **Bundle.** `PeptidesPage` ist schon 489 kB. Spanisch direkt in
+   `peptidesData.js` hätte den Brocken für ALLE verdoppelt, auch für die
+   deutschen Nutzer. Als dynamischer Import ist es ein eigener Chunk
+   (`peptide-*.js`, 248 kB) und wird nur bei eingestelltem Spanisch geladen.
+2. **Risiko.** Die Datendateien bleiben unangetastet; ein Fehler im Sprachpaket
+   kann DE/EN nicht kaputt machen.
+3. **Nächste Sprache.** Ein Ordner mehr unter `es/`, ein Eintrag mehr in
+   `PAKETE`. Sonst nichts.
+
+Fehlt ein Eintrag oder ein Feld, fällt es sauber auf DE/EN zurück — eine halb
+fertige Übersetzung zeigt gemischt, nie leer. Genau deshalb braucht es
+`pruefe-inhalte.mjs`: Es zählt nach, was der Build nie meldet.
+
+**Die Fallen, die dabei zugeschnappt sind:**
+
+- **`sections` werden über den INDEX zugeordnet.** Wer beim Übersetzen einen
+  Abschnitt zusammenzieht oder umsortiert, vertauscht Überschrift und Inhalt.
+  `melanotan2` hat deshalb eine ungewöhnliche Reihenfolge behalten
+  (Nebenwirkungen VOR Anwendungsgebieten) — sie ist im Original so.
+- **`quick` hat je Bereich eine andere Form**: Array aus `{label, text}` bei den
+  Wissensseiten, Objekt `{wirkung, nebenwirkungen}` bei Peptiden, `{methode,
+  fuer_wen}` bei Diäten. Die deutschen Schlüsselnamen bleiben — sie sind
+  Feldnamen, kein Text. Das Prüfskript vergleicht die Form.
+- **Die Kategorie-Chips der Peptid-Seite zeigten die rohen Ids** („healing",
+  „gh"): `categoryNames` war eine reine de/en-Tabelle, und zwei der drei
+  Lesestellen hatten nicht einmal einen Rückfall. **`pruefe-sprachen.mjs` sucht
+  seither Beschriftungstabellen im Code, denen `es` fehlt** (aktuell 124
+  geprüft).
+- **Die `label`-Felder der Trainingstage gibt es nur EINMAL, auf Deutsch.**
+  Englische Nutzer sahen „Oberkörper", „Rücken" und „Schwachstellen" mitten in
+  einer englischen Oberfläche — seit Jahren. Sie stehen jetzt dreisprachig in
+  `src/data/tagesbeschriftung.js`, mit dem deutschen Text als Schlüssel.
+- **Die Suche muss gegen den ÜBERSETZTEN Namen laufen**, sonst findet ein
+  spanischer Nutzer „Pechuga de pollo" nur unter „Hähnchenbrust". Betrifft
+  Kochbuch und Lebensmittelsuche.
+- **`foodDatabase.js` darf React nicht importieren.** Der erste Anlauf holte
+  sich `lebensmittelName()` aus `uebersetzungen.js` — damit hing React an einer
+  Datendatei, und die Prüfskripte konnten sie nicht mehr per node laden. Der
+  Zugriff steht dort jetzt ausgeschrieben.
+- **`import.meta.env.DEV` gibt es außerhalb von Vite nicht.** In
+  `peakPrograms.js` steht deshalb `import.meta.env?.DEV`; ohne den
+  Fragezeichen-Punkt bricht schon der Import ab, sobald ein Skript die Datei
+  direkt lädt.
+- **Mengenskalierung, nebenbei gefunden und behoben:** Bei „1/2 TL
+  Knoblauchpulver" griff der alte Ausdruck auf die 2 hinter dem Schrägstrich —
+  Verdoppeln machte daraus „1/4 TL", also die Hälfte statt des Doppelten. Galt
+  auch für Deutsch und Englisch. Liegt jetzt als `src/lib/mengenSkalierung.js`
+  mit acht Tests da; die Einheitenliste kennt zusätzlich cda/cdta (spanisch).
+
+Der Arzt-Hinweis (`MedicalDisclaimer`) war schon vorher dreisprachig und bleibt
+es. Die gesundheitsnahen Texte (Peptide, Blutwerte, Diäten) sind mit derselben
+Vorsicht übersetzt wie sie geschrieben wurden — Dosierungen stehen nirgends,
+der Verweis auf ärztlichen Rat überall.
 
 **5. Übungs-Demos: eigene 3D-Animationen statt Fotos** (`tools/uebungs-3d/`).
 
