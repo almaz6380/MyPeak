@@ -121,6 +121,49 @@ Modellierarbeit, keine Parameter.
 | **KI-Videoerzeugung** (fal.ai Kling/Wan) | nicht kostenlos (~80 $ fuer 162 Clips) und bei Bewegungsablaeufen unzuverlaessig |
 | **Mixamo** | Adobe-Konto noetig, und die Bibliothek enthaelt Alltagsbewegungen, keine Kraftuebungen |
 
+### Wie es andere machen — Marktlage, geprueft 01.09.2026
+
+Fitness-Apps mit Animationen **lizenzieren praktisch alle einen fertigen
+Datensatz**. Es gibt eine Handvoll Anbieter, die 3D-Animationen erzeugen und
+sie einmalig verkaufen; eigene Produktion macht in dieser Groessenordnung
+niemand.
+
+| Anbieter | Umfang | Preis | Lizenz |
+|---|---|---|---|
+| **Vital Animations** (exercisedb-pro) | 400 Gym-Uebungen | **49 $** | einmalig, Dateien selbst hosten, Nutzung in bezahlter App ausdruecklich erlaubt |
+| dieselbe, Pro | 800+ (m/w) | 99 $ | dito |
+| dieselbe, Komplett | 1.500+ inkl. Yoga/Pilates | 199 $ | dito |
+| MoveKit | 220 / 288 / 412 | 199–299 $ | einmalig, App-Bundling erlaubt |
+| Gym Animations | 800–4.200 | ab 199 $ | einmalig, royalty-free |
+| WorkoutX / ExerciseDB | API, 1.400+ | ab ~25 $/Monat | **kommerziell nur im BEZAHLTEN Tarif** |
+
+⚠ **49 $ ist der Boden, nicht 199 $** — eine frueher hier notierte Zahl war zu
+hoch. 400 Gym-Uebungen decken unsere 162 ab.
+
+### Warum die „kostenlosen" Angebote es nicht sind
+
+- **WorkoutX-Gratistarif**: 500 Abrufe im Monat, und laut deren eigener FAQ ist
+  die kommerzielle Nutzung der GIFs an einen **bezahlten** Tarif gebunden; der
+  Gratistarif gilt „for evaluation and small projects".
+- **ExerciseDB ueber RapidAPI**: Gratistarif ohne Animationen, kommerziell
+  eingeschraenkt.
+- **GitHub-Datensaetze mit GIFs**: Medien gehoeren **Gym visual** und sind dort
+  „mit Erlaubnis" eingebunden — die Erlaubnis gilt deren Projekt, nicht unserem.
+- **wger**: 78 Videos fuer 46 von 162 Uebungen, echte Personen, 46 MB je Datei,
+  CC-BY-SA mit Namensnennung und Share-Alike beim Umkodieren.
+- **Die FOSS-Welt hat es selbst nicht geloest**: Der Entwickler von *Feeel*
+  (quelloffene Workout-App) fragt oeffentlich bei anderen Projekten nach frei
+  lizenzierten Animationen — es gibt schlicht keine.
+
+### Eine offene Spur
+
+Vital Animations bietet einen **Gratis-Teil**: „Download free HD exercise
+animations with structured JSON metadata — no signup required",
+**vitalanimations.com/free-pack**. Wie viele Uebungen darin sind, liess sich
+von hier aus nicht feststellen: Die Seite baut ihren Inhalt per JavaScript auf,
+und der Browser dieser Umgebung kommt an keine fremden Server. Am Handy ist das
+in 30 Sekunden geklaert.
+
 ### Was es kostet, wenn es doch sein soll
 
 Fertige 3D-Bibliotheken mit ausdruecklicher App-Lizenz (geprueft 01.09.2026):
