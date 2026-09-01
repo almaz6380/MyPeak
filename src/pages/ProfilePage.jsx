@@ -18,7 +18,7 @@ import { Capacitor } from '@capacitor/core';
 import { healthVerfuegbar, istVerbunden, verbinden, trennen, gewichtImportieren } from '../lib/health';
 
 // Sichtbare Build-Kennung — muss bei jedem neuen Store-Build mitgezogen werden (siehe android/app/build.gradle)
-const APP_VERSION = '1.1.8 (13)';
+const APP_VERSION = '1.4.0 (8)';
 
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
@@ -53,7 +53,10 @@ export default function ProfilePage() {
   }, [user, isGuestMode, profile?.name]);
 
   const toggleLanguage = () => {
-    const newLang = i18n.language === 'de' ? 'en' : 'de';
+    // Reihum statt binaer, seit es drei Sprachen gibt.
+    const reihe = ['de', 'en', 'es'];
+    const aktuell = reihe.indexOf((i18n.language || 'de').slice(0, 2));
+    const newLang = reihe[(aktuell + 1) % reihe.length];
     i18n.changeLanguage(newLang);
     localStorage.setItem('language', newLang);
     if (user) saveSetting(user.id, 'language', newLang);
@@ -351,7 +354,7 @@ export default function ProfilePage() {
               onClick={toggleLanguage}
               className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-sm font-medium"
             >
-              {i18n.language === 'de' ? 'Deutsch' : 'English'}
+              {{ de: 'Deutsch', en: 'English', es: 'Español' }[(i18n.language || 'de').slice(0, 2)] || 'Deutsch'}
             </button>
           }
         />

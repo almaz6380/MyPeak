@@ -40,7 +40,10 @@ function speichereVerlauf(userId, messages) {
 
 export default function CoachPage() {
   const { t, i18n } = useTranslation();
-  const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
+  // es zaehlt mit: der Coach-Server hat seit 1.4.0 auch einen spanischen
+  // System-Prompt. Die restlichen Inline-Texte dieser Seite fallen fuer es
+  // auf Englisch zurueck — bewusst, bis alles auf i18n-Schluessel umzieht.
+  const lang = ['de', 'es'].find((l) => i18n.language?.startsWith(l)) || 'en';
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isPremium, isTrial, openPaywall } = useSubscription();

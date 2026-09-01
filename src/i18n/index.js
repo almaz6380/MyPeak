@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import de from './locales/de.json';
 import en from './locales/en.json';
+import es from './locales/es.json';
 import { CUSTOM_NAME_PREFIX } from '../data/exercises';
 
 const savedLanguage = localStorage.getItem('language') || 'de';
@@ -10,6 +11,9 @@ i18n.use(initReactI18next).init({
   resources: {
     de: { translation: de },
     en: { translation: en },
+    // Spanisch seit 1.4.0. Fehlt ein Schluessel, greift fallbackLng (de) —
+    // die fest verdrahteten de/en-Ternaries im Code zeigen fuer es Englisch.
+    es: { translation: es },
   },
   lng: savedLanguage,
   fallbackLng: 'de',
