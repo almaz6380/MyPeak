@@ -17,6 +17,71 @@ leitet mit 307 dorthin weiter — bewusst behalten, solange irgendwo alte Links 
 
 ## Aktueller Stand
 
+### Version 1.4.0 (iOS Build 8 / Android vc17) — Widget, Health, Spanisch (01.09.2026)
+
+Josefs Auftrag: „alle offenen punkte + Widget", autonom umgesetzt. Alles auf
+`main`, Builds noch nicht in den Stores (Validierungsbuild lief zuerst).
+
+**1. Homescreen-Widget (iOS + Android)** — zeigt Streak, Level, Workouts diese
+Woche (ab Montag 00:00 lokal). Architektur:
+
+- `src/lib/widgetDaten.js` schreibt `{streak, level, workoutsWoche, stand}` per
+  `@capacitor/preferences` (`group: 'FullRepWidget'`, Key `widget.daten`);
+  aufgerufen im HomePage-Effect und im finally-Block des Workout-Abschlusses.
+- ⚠ **`group` heisst auf iOS und Android NICHT dasselbe** (beide Plugin-Quellen
+  gelesen): Android = Name der SharedPreferences-DATEI (das Widget liest
+  `getSharedPreferences("FullRepWidget")` direkt). iOS = nur ein Key-PRÄFIX in
+  `UserDefaults.standard` — eine App-Group-Suite erreicht das Plugin NIE.
+  Deshalb spiegelt `AppDelegate.widgetDatenSpiegeln()` den Wert bei
+  `applicationWillResignActive` nach `UserDefaults(suiteName:
+  "group.at.gallab.mypeak")` und stösst `WidgetCenter.reloadAllTimelines()` an.
+  Ohne diesen Spiegel bliebe das iOS-Widget still leer — kein Fehler, nirgends.
+- Android: `FullRepWidget.java` + Layout/Drawable/Info-XML, Receiver im
+  Manifest, `MainActivity.onPause()` stösst die Aktualisierung an.
+- iOS: WidgetKit-Extension `ios/App/FullRepWidget/` (SwiftUI, systemMedium),
+  Target von Hand ins pbxproj operiert (mit npm-Paket `xcode` gegengeparst).
+  ⚠ CFBundleVersion/ShortVersion der Extension MÜSSEN denen der App gleichen
+  (sonst ITMS-90473) — beide kommen aus den Build-Settings, Versions-Bumps
+  ändern im pbxproj daher **vier** Stellen (2 Targets × Debug/Release).
+- **Josefs einmaliger Portal-Schritt (per API NICHT möglich, im Web belegt):**
+  App Group `group.at.gallab.mypeak` im Developer-Portal anlegen und BEIDEN
+  Bundle-IDs (`at.gallab.mypeak` + `at.gallab.mypeak.widget`) zuweisen. Ohne
+  das scheitert der Release-Build an den Entitlements.
+
+**2. Provisioning-Profile werden jetzt zur Bauzeit von der ASC-API geholt**
+(`scripts/ios-profile.py`, Schritt im `ios-release.yml`): legt die
+Widget-Bundle-ID an, schaltet Capabilities (HEALTHKIT, APP_GROUPS) ein und
+erzeugt/erneuert beide Profile. Grund: Jede Capability-Änderung INVALIDIERT
+bestehende Profile — ein statisches Profil-Secret wäre bei jedem solchen
+Schritt tot gewesen. Das alte Profil-Secret wird nicht mehr gelesen.
+
+**3. Apple Health / Health Connect — bewusst NUR LESEND** (`src/lib/health.js`,
+Schalter im Profil, Schritte auf der HomePage, Gewichts-Import mit
+Vorrang eigener Einträge). `capacitor-health` 8.2.0 hat schlicht **keine
+Schreib-API** (definitions.d.ts geprüft: nur query*; die WRITE_WORKOUTS-
+Permission ist ein Überbleibsel). Workout-Export wäre ein Pluginwechsel — V2.
+Datenschutzerklärung DE+EN um Health-Absatz ergänzt.
+
+**4. Spanisch (es) als dritte Sprache** — `es.json` vollständig inkl. aller
+488 Übungsnamen (vier parallele Subagents, Schlüsselgleichheit mit de.json
+skriptgeprüft), eigener spanischer Coach-System-Prompt in `api/coach.js`,
+Sprachwechsler de→en→es. Inline-de/en-Ternaries fallen für es auf Englisch
+zurück — bewusst, bis alles auf i18n-Schlüssel umzieht. `analyze-meal` hat
+noch KEINEN spanischen Prompt (fällt auf Englisch zurück).
+
+**5. Übungsfoto-Ersatz vorbereitet:** `scripts/uebungs-illustrationen.mjs`
+ersetzt die 162×2 Fotos unklarer Herkunft durch eigene fal.ai-Illustrationen
+(flux/dev, 832×1152, Seeds reproduzierbar, HERKUNFT.md-Protokoll, Ziel
+`public/exercise-demos-neu/` zur Sichtprüfung). Ohne `--los` reiner
+Trockenlauf mit Kostenrechnung: 324 Bilder ≈ **$8,10**. ⚠ Geldregel gilt:
+Lauf NUR nach Josefs ausdrücklichem „ja".
+
+**6. Ausserdem in 1.4.0 (Commits ff9df6d/88247b4):** Rest-Timer überlebt den
+Sperrbildschirm (Wanduhr `endsAt` statt Tick-Zählung + LocalNotification),
+erste Bewertungs-Anfrage nach Swaply-Muster (nativ, ≥5 Workouts, 90-Tage-
+Abstand), Coach-Verlauf in localStorage je Nutzer (max. 60), Android-Workflow
+mit `track`-Input (production|internal).
+
 ### ✅ Eigene Trainingspläne repariert + zusammengeführt (30.08.2026)
 Josefs Bruder scheiterte im **Gastmodus** daran, einen eigenen Plan zu erstellen.
 Zwei Ursachen, beide im Code belegt:
