@@ -46,7 +46,15 @@ Woche (ab Montag 00:00 lokal). Architektur:
 - **Josefs einmaliger Portal-Schritt (per API NICHT möglich, im Web belegt):**
   App Group `group.at.gallab.mypeak` im Developer-Portal anlegen und BEIDEN
   Bundle-IDs (`at.gallab.mypeak` + `at.gallab.mypeak.widget`) zuweisen. Ohne
-  das scheitert der Release-Build an den Entitlements.
+  das scheitert der Release-Build an den Entitlements — gemessen am 01.09.
+  (Lauf #9): „Provisioning profile … doesn't support the group.at.gallab.mypeak
+  App Group", für App UND Widget. Der Profil-Abruf selbst lief durch (Widget-
+  Bundle-ID angelegt, Capabilities gesetzt).
+- **Der Code kompiliert nachweislich:** `ios-release.yml` hat seit 01.09. den
+  Modus `nur_kompilieren` (baut mit `CODE_SIGNING_ALLOWED=NO`, überspringt
+  Zertifikate/Profile/Export) — Lauf #10 grün, Widget-Extension inklusive.
+  Damit ist die pbxproj-Handoperation validiert; nach Josefs Portal-Schritt
+  fehlt nur noch der echte Lauf.
 
 **2. Provisioning-Profile werden jetzt zur Bauzeit von der ASC-API geholt**
 (`scripts/ios-profile.py`, Schritt im `ios-release.yml`): legt die
