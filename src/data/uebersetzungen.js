@@ -28,6 +28,7 @@ const PAKETE = {
     bloodwork: () => import('./es/blutwerte.js'),
     recipes: () => import('./es/rezepte.js'),
     programs: () => import('./es/programme.js'),
+    foods: () => import('./es/lebensmittel.js'),
   },
 };
 
@@ -125,6 +126,18 @@ export function studienBefund(studie, lang, paket) {
   if (!studie) return '';
   return paket?.studien?.[`${studie.name}|${studie.year}`]
     ?? (lang === 'de' ? studie.findingDE : studie.findingEN);
+}
+
+// Lebensmittel. Flach: das Paket bildet direkt id → Name ab, es gibt keine
+// weiteren Felder. `food` kann auch ein Treffer von Open Food Facts sein —
+// der hat keine id aus unserer Datenbank und faellt darum sauber durch.
+export function lebensmittelName(food, lang, paket) {
+  if (!food) return '';
+  return paket?.[food.id]
+    ?? (lang === 'de'
+      ? (food.nameDE || food.nameEN || food.food_name)
+      : (food.nameEN || food.nameDE || food.food_name))
+    ?? '';
 }
 
 // Kategorienamen — flache { id: 'Nombre' }-Tabelle unter dem Schlüssel

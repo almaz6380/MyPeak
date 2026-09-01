@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Minus, Plus, X } from 'lucide-react';
 import { calculateMacrosForServing } from '../../data/foodDatabase';
+import { useUebersetzung, lebensmittelName } from '../../data/uebersetzungen';
 
 export default function PortionPicker({ food, onConfirm, onClose, initialServing, language = 'de', editMode = false }) {
   const { t } = useTranslation();
@@ -13,7 +14,8 @@ export default function PortionPicker({ food, onConfirm, onClose, initialServing
     [food, servingSize]
   );
 
-  const name = language === 'de' ? (food.nameDE || food.nameEN || food.food_name) : (food.nameEN || food.nameDE || food.food_name);
+  const paket = useUebersetzung('foods', language);
+  const name = lebensmittelName(food, language, paket);
 
   function adjustServing(amount) {
     setServingSize((prev) => Math.max(1, prev + amount));

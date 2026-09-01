@@ -2,9 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, Wifi, WifiOff, AlertTriangle } from 'lucide-react';
 import { searchLocalFoods, searchOpenFoodFacts, getCategoryEmoji } from '../../data/foodDatabase';
+import { useUebersetzung, lebensmittelName } from '../../data/uebersetzungen';
 
 export default function FoodSearch({ onSelectFood, language = 'de' }) {
   const { t } = useTranslation();
+  // Spanisches Lebensmittelpaket; null, solange es lädt oder die Sprache keines hat.
+  const paket = useUebersetzung('foods', language);
   const [query, setQuery] = useState('');
   const [localResults, setLocalResults] = useState([]);
   const [onlineResults, setOnlineResults] = useState([]);
@@ -24,7 +27,7 @@ export default function FoodSearch({ onSelectFood, language = 'de' }) {
     }
 
     // Instant local search
-    const local = searchLocalFoods(query, language);
+    const local = searchLocalFoods(query, language, paket);
     setLocalResults(local);
 
     // Debounced online search
@@ -41,7 +44,7 @@ export default function FoodSearch({ onSelectFood, language = 'de' }) {
     }
 
     return () => clearTimeout(debounceRef.current);
-  }, [query, language]);
+  }, [query, language, paket]);
 
   const hasResults = localResults.length > 0 || onlineResults.length > 0;
 
@@ -119,7 +122,8 @@ export default function FoodSearch({ onSelectFood, language = 'de' }) {
 }
 
 function FoodResultItem({ food, language, onSelect, isOnline }) {
-  const name = language === 'de' ? (food.nameDE || food.nameEN) : (food.nameEN || food.nameDE);
+  const paket = useUebersetzung('foods', language);
+  const name = lebensmittelName(food, language, paket);
   const [imgError, setImgError] = useState(false);
   const hasImage = food.image_url && !imgError;
 

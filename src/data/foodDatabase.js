@@ -163,11 +163,19 @@ const foods = [
 
 // ── Suchfunktion (lokal) ─────────────────────────────────────
 
-export function searchLocalFoods(query, language = 'de') {
+// `paket` ist das Sprachpaket aus `useUebersetzung('foods', …)`. Gesucht wird
+// gegen den ANGEZEIGTEN Namen — ohne das faende ein spanischer Nutzer
+// „Pechuga de pollo" nur unter „Hähnchenbrust".
+//
+// Der Zugriff steht hier ausgeschrieben statt über `lebensmittelName()` aus
+// `uebersetzungen.js`: Die zieht React mit, und diese Datei soll reine Daten
+// bleiben — sonst laufen die Prüfskripte in `scripts/` nicht mehr, die sie
+// direkt per node importieren.
+export function searchLocalFoods(query, language = 'de', paket = null) {
   if (!query || query.length < 2) return [];
   const q = query.toLowerCase();
   return foods.filter((f) => {
-    const name = language === 'de' ? f.nameDE : f.nameEN;
+    const name = paket?.[f.id] ?? (language === 'de' ? f.nameDE : f.nameEN);
     return name.toLowerCase().includes(q) || (f.brand && f.brand.toLowerCase().includes(q));
   });
 }

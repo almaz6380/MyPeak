@@ -189,6 +189,29 @@ for (const [bereich, [datei, exp, katExp, paketDatei]] of Object.entries(BEREICH
   }
 }
 
+// ── Lebensmittel ──
+// Flachste Form von allen: id → Name. `foods` ist nicht exportiert, deshalb
+// wird die Liste über die Kategorien zusammengesetzt.
+{
+  const db = await laden('foodDatabase.js');
+  const paket = (await laden('es/lebensmittel.js')).default || {};
+  const alle = db.foodCategories.flatMap((c) => db.getLocalFoodsByCategory(c.id));
+  const fehlend = alle.filter((f) => !gefuellt(paket[f.id])).map((f) => f.id);
+  const katOffen = db.foodCategories.filter((c) => !gefuellt(paket.kategorien?.[c.id])).map((c) => c.id);
+  for (const k of katOffen) meckern(`foods: Kategorie fehlt — ${k}`);
+
+  const bekannt = new Set([...alle.map((f) => f.id), 'kategorien']);
+  for (const k of Object.keys(paket)) if (!bekannt.has(k)) meckern(`foods: unbekannte id „${k}" im Paket`);
+
+  gesamtFertig += alle.length - fehlend.length;
+  gesamtOffen += fehlend.length;
+  if (!NUR_FEHLEND || fehlend.length) {
+    console.log(`  ${'foods'.padEnd(12)} ${`${alle.length - fehlend.length}/${alle.length}`.padStart(6)} Einträge`
+      + `  ·  Kategorien ${db.foodCategories.length - katOffen.length}/${db.foodCategories.length}`);
+    if (fehlend.length) console.log(`      offen: ${fehlend.join(', ')}`);
+  }
+}
+
 console.log(`\n${gesamtFertig} Einträge übersetzt, ${gesamtOffen} offen.`);
 if (fehler) console.error(`${fehler} Fehler in bereits übersetzten Einträgen.`);
 process.exit(fehler ? 1 : 0);
