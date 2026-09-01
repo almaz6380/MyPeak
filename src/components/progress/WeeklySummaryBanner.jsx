@@ -27,7 +27,7 @@ export default function WeeklySummaryBanner({ userId }) {
 
   return (
     <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4 relative">
-      <button onClick={handleDismiss} className="absolute top-3 right-3 p-1 text-slate-400 hover:text-slate-600">
+      <button onClick={handleDismiss} className="absolute top-3 end-3 p-1 text-slate-400 hover:text-slate-600">
         <X className="w-4 h-4" />
       </button>
 

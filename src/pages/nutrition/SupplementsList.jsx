@@ -38,7 +38,7 @@ export default function SupplementsList({ onBack, onAdd, onEdit }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold">{t('supplements.manage')}</h1>

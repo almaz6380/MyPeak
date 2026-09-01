@@ -63,7 +63,7 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-4">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold">{t('ui.cookbook')}</h1>
@@ -71,13 +71,13 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
 
       {/* Search */}
       <div className="relative mb-3">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t('ui.searchRecipes')}
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
+          className="w-full ps-10 pe-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400"
         />
       </div>
 
@@ -122,7 +122,7 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
               role="button"
               tabIndex={0}
               onClick={() => onSelectRecipe(recipe)}
-              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-left cursor-pointer"
+              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-start cursor-pointer"
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1 min-w-0">
@@ -133,7 +133,7 @@ export default function Cookbook({ onBack, onSelectRecipe }) {
                 </div>
                 <button
                   onClick={(e) => { e.stopPropagation(); toggleFav(recipe.id); }}
-                  className={`p-1.5 ml-2 flex-shrink-0 ${isFav ? 'text-red-500' : 'text-slate-300 dark:text-slate-600'}`}
+                  className={`p-1.5 ms-2 flex-shrink-0 ${isFav ? 'text-red-500' : 'text-slate-300 dark:text-slate-600'}`}
                 >
                   <Heart className={`w-4 h-4 ${isFav ? 'fill-current' : ''}`} />
                 </button>

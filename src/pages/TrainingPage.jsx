@@ -472,7 +472,7 @@ export default function TrainingPage() {
         <div className="mb-4">
           <button
             onClick={todayStartable ? startTodaySession : undefined}
-            className={`w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-primary-200 dark:border-primary-800/60 flex items-center gap-3 text-left ${todayStartable ? 'hover:shadow-md transition-shadow' : 'cursor-default'}`}
+            className={`w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-primary-200 dark:border-primary-800/60 flex items-center gap-3 text-start ${todayStartable ? 'hover:shadow-md transition-shadow' : 'cursor-default'}`}
           >
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${todaySession ? 'bg-primary-50 dark:bg-primary-900/30' : 'bg-slate-100 dark:bg-slate-800'}`}>
               {todaySession
@@ -562,7 +562,7 @@ export default function TrainingPage() {
         <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
           <img src="/bg-photos/history-icon.png" alt="" aria-hidden="true" className="h-6 w-auto object-contain" />
         </div>
-        <div className="flex-1 text-left">
+        <div className="flex-1 text-start">
           <p className="text-sm font-semibold text-slate-900 dark:text-white">{t('training.history')}</p>
           <p className="text-xs text-slate-400">{t('ui.allPastTrainingSessions')}</p>
         </div>
@@ -628,7 +628,7 @@ function QuickAction({ icon, label, onClick, className = '', vertical = false, m
       className={`relative bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow overflow-hidden ${
         vertical
           ? 'flex flex-col items-center justify-center gap-1.5 py-4 px-1 text-center min-h-[88px]'
-          : 'flex items-center gap-3 p-4 text-left'
+          : 'flex items-center gap-3 p-4 text-start'
       } ${className}`}
     >
       {motif && <CardPhotoMotif src={motif} />}
@@ -664,7 +664,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setStep('strengthChoice')} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={() => setStep('strengthChoice')} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold">{t('training.choosePlanDay')}</h1>
@@ -732,7 +732,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setStep('type')} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={() => setStep('type')} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold">{t('training.strength')}</h1>
@@ -741,7 +741,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
         <div className="flex flex-col gap-4">
           <button
             onClick={() => setStep('plans')}
-            className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-5 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
+            className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-5 text-start shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
           >
             <CardPhotoMotif src="/bg-photos/plan-icon.png" />
             <div className="flex items-center gap-4">
@@ -764,7 +764,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
 
           <button
             onClick={onStartEmpty}
-            className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-5 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
+            className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-5 text-start shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
           >
             <CardPhotoMotif src="/bg-photos/training-icon.png" />
             <div className="flex items-center gap-4">
@@ -788,7 +788,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setStep('type')} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={() => setStep('type')} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold">{t('training.selectCardioActivity')}</h1>
@@ -798,7 +798,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
             <button
               key={ex.id}
               onClick={() => onStartCardio(ex)}
-              className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
+              className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 text-start shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
             >
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
@@ -856,7 +856,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold">{t('training.chooseTrainingType')}</h1>
@@ -921,7 +921,7 @@ function TrainingTypeCard({ icon, motif, label, desc, color, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow flex items-center gap-4"
+      className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 text-start shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow flex items-center gap-4"
     >
       {motif && <CardPhotoMotif src={motif} />}
       <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${colorClasses[color]}`}>
@@ -979,7 +979,7 @@ function HiitSetup({ onBack, onStart, exercises, t }) {
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold">{t('training.configureHiit')}</h1>
@@ -1042,7 +1042,7 @@ function HiitSetup({ onBack, onStart, exercises, t }) {
           <button
             key={ex.id}
             onClick={() => toggleExercise(ex.id)}
-            className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${
+            className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-start shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${
               selectedExercises.includes(ex.id) ? 'ring-2 ring-amber-500' : ''
             }`}
           >
@@ -1134,7 +1134,7 @@ function CircuitSetup({ onBack, onStart, exercises: circuitExercises, t }) {
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold">{t('training.configureCircuit')}</h1>
@@ -1269,13 +1269,13 @@ function CircuitExercisePicker({ initialSelected, onBack, onConfirm, t }) {
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-4">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-2xl font-bold">{t('training.addExercise')}</h1>
       </div>
 
       <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('common.search')} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('common.search')} className="w-full ps-10 pe-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
@@ -1286,7 +1286,7 @@ function CircuitExercisePicker({ initialSelected, onBack, onConfirm, t }) {
 
       <div className="flex flex-col gap-2">
         {filtered.map((ex) => (
-          <button key={ex.id} onClick={() => toggle(ex.id)} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${selected.includes(ex.id) ? 'ring-2 ring-emerald-500' : ''}`}>
+          <button key={ex.id} onClick={() => toggle(ex.id)} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-start shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${selected.includes(ex.id) ? 'ring-2 ring-emerald-500' : ''}`}>
             <div className="flex items-center gap-3">
               <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${selected.includes(ex.id) ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300 dark:border-slate-600'}`}>
                 {selected.includes(ex.id) && (
@@ -1303,7 +1303,7 @@ function CircuitExercisePicker({ initialSelected, onBack, onConfirm, t }) {
       </div>
 
       {selected.length > 0 && (
-        <div className="fixed bottom-20 left-0 right-0 px-4 pb-2">
+        <div className="fixed bottom-20 start-0 end-0 px-4 pb-2">
           <button onClick={() => onConfirm(selected)} className="w-full max-w-lg mx-auto block bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl py-3.5 font-semibold text-center shadow-lg transition-colors">
             {t('training.done')} ({selected.length})
           </button>
@@ -1376,7 +1376,7 @@ function MartialArtsSetup({ onBack, onStart, t }) {
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold">{t('training.configureMartialArts')}</h1>
@@ -1432,7 +1432,7 @@ function MartialArtsSetup({ onBack, onStart, t }) {
       {/* Exercises */}
       <div className="flex flex-col gap-2 mb-6">
         {filteredExercises.map((ex) => (
-          <button key={ex.id} onClick={() => toggleExercise(ex.id)} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${selectedExercises.includes(ex.id) ? 'ring-2 ring-violet-500' : ''}`}>
+          <button key={ex.id} onClick={() => toggleExercise(ex.id)} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-start shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${selectedExercises.includes(ex.id) ? 'ring-2 ring-violet-500' : ''}`}>
             <div className="flex items-center gap-3">
               <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${selectedExercises.includes(ex.id) ? 'bg-violet-500 border-violet-500' : 'border-slate-300 dark:border-slate-600'}`}>
                 {selectedExercises.includes(ex.id) && (

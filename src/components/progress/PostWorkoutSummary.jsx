@@ -60,7 +60,7 @@ export default function PostWorkoutSummary({ exercises, prs = {}, duration, user
     <div className="p-4 pb-24">
       <h1 className="text-2xl font-bold mb-2">{t('training.postSummaryTitle')}</h1>
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-        <Clock className="w-4 h-4 inline mr-1" />{formatDuration(duration)}
+        <Clock className="w-4 h-4 inline me-1" />{formatDuration(duration)}
       </p>
 
       {/* Summary counts */}
@@ -110,7 +110,7 @@ export default function PostWorkoutSummary({ exercises, prs = {}, duration, user
                   <span className="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded font-medium">PR</span>
                 )}
               </div>
-              <div className="flex items-center gap-1 ml-2">
+              <div className="flex items-center gap-1 ms-2">
                 {r.status === 'improved' && (
                   <div className="flex items-center gap-1 text-green-500">
                     <ArrowUpRight className="w-4 h-4" />

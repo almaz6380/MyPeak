@@ -87,7 +87,7 @@ export default function TDEECalculator({ onBack, onSaved }) {
     <div className="p-4 pt-16 pb-24">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+        <button onClick={onBack} className="p-2 -ms-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-bold">{t('nutrition.tdeeTitle')}</h1>
@@ -162,7 +162,7 @@ export default function TDEECalculator({ onBack, onSaved }) {
             <button
               key={opt.value}
               onClick={() => setActivityLevel(opt.value)}
-              className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
+              className={`w-full p-3 rounded-xl border-2 text-start transition-all ${
                 activityLevel === opt.value
                   ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
                   : 'border-slate-200 dark:border-slate-700'
@@ -190,7 +190,7 @@ export default function TDEECalculator({ onBack, onSaved }) {
             <button
               key={opt.value}
               onClick={() => setGoal(opt.value)}
-              className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
+              className={`w-full p-3 rounded-xl border-2 text-start transition-all ${
                 goal === opt.value
                   ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
                   : 'border-slate-200 dark:border-slate-700'

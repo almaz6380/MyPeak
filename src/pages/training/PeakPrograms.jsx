@@ -117,7 +117,7 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setSelectedCategory(null)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={() => setSelectedCategory(null)} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold">{kategorieName(cat, lang, paket)}</h1>
@@ -131,7 +131,7 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
               <button
                 key={program.id}
                 onClick={() => setSelectedProgram(program)}
-                className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
+                className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-start hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${CAT_COLORS[program.category]}`}>
@@ -165,7 +165,7 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold">{t('ui.fullrepPrograms')}</h1>
@@ -183,7 +183,7 @@ export default function PeakPrograms({ onBack, onProgramActivated, userGoal, use
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-5 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow flex items-center gap-4"
+              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-5 shadow-soft border border-slate-100 dark:border-slate-800/60 text-start hover:shadow-md transition-shadow flex items-center gap-4"
             >
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${CAT_COLORS[cat.id]}`}>
                 <CatIcon className="w-6 h-6" />
@@ -278,7 +278,7 @@ function ProgramDetail({ program, lang, paket, userGoal, userExperience, activat
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
@@ -424,7 +424,7 @@ function ProgramDetail({ program, lang, paket, userGoal, userExperience, activat
               >
                 <span className="text-xs font-semibold text-slate-500 w-8">{DAY_NAMES_SHORT[i]}</span>
                 {day ? (
-                  <div className="flex-1 text-left">
+                  <div className="flex-1 text-start">
                     <p className="text-sm font-medium text-slate-900 dark:text-white">{tagesBeschriftung(day.label, lang) || day.type || ''}</p>
                     {day.exercises && <p className="text-[10px] text-slate-400">{day.exercises.length} {t('ui.exercises')}</p>}
                     {day.type === 'cardio' && day.exerciseId && (
@@ -445,7 +445,7 @@ function ProgramDetail({ program, lang, paket, userGoal, userExperience, activat
                     )}
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-400 italic flex-1 text-left">{t('ui.restDay')}</p>
+                  <p className="text-sm text-slate-400 italic flex-1 text-start">{t('ui.restDay')}</p>
                 )}
                 {day && (
                   <button
@@ -459,7 +459,7 @@ function ProgramDetail({ program, lang, paket, userGoal, userExperience, activat
 
               {/* Expanded exercises */}
               {editingDay === key && day?.exercises && (
-                <div className="ml-12 mt-1 space-y-1 mb-2">
+                <div className="ms-12 mt-1 space-y-1 mb-2">
                   {day.exercises.map((ex, exIdx) => (
                     <div key={exIdx} className="flex items-center justify-between px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg">
                       <span className="text-xs text-slate-600 dark:text-slate-400">

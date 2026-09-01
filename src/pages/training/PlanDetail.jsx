@@ -142,7 +142,7 @@ export default function PlanDetail({ plan, dayIndex, onBack, onStartWorkout }) {
 
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={handleBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onClick={handleBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">

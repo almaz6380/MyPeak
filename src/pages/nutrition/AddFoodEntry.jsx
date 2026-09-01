@@ -175,7 +175,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
     <div className="p-4 pt-16 pb-32">
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
-        <button onClick={onBack} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+        <button onClick={onBack} className="p-2 -ms-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
@@ -289,11 +289,11 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
                     </div>
                     <button
                       onClick={() => inQueue ? null : selectRecent(food)}
-                      className="flex-1 text-left min-w-0"
+                      className="flex-1 text-start min-w-0"
                     >
                       <p className={`text-sm font-medium truncate ${inQueue ? 'text-primary-400' : 'text-slate-700 dark:text-slate-200'}`}>
                         {food.food_name}
-                        {food.brand && <span className="text-xs text-slate-400 ml-1">{food.brand}</span>}
+                        {food.brand && <span className="text-xs text-slate-400 ms-1">{food.brand}</span>}
                       </p>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="text-xs text-slate-400">{food.serving_size}{food.serving_unit}</span>
@@ -329,7 +329,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
 
       {/* Selected Items Queue (floating bottom bar) */}
       {selectedItems.length > 0 && (
-        <div className="fixed bottom-20 left-0 right-0 px-4 z-30">
+        <div className="fixed bottom-20 start-0 end-0 px-4 z-30">
           <div className="max-w-lg mx-auto bg-white dark:bg-surface-dark-alt rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-3">
             {/* Items list */}
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mb-2">
@@ -337,7 +337,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
                 <div key={i} className="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-xs">
                   <span className="font-medium text-primary-600 dark:text-primary-400 max-w-[100px] truncate">{item.food_name}</span>
                   <span className="text-primary-400 dark:text-primary-500">{Math.round(item.calories)}</span>
-                  <button onClick={() => removeFromQueue(i)} className="text-primary-300 hover:text-red-400 ml-0.5">
+                  <button onClick={() => removeFromQueue(i)} className="text-primary-300 hover:text-red-400 ms-0.5">
                     <X className="w-3 h-3" />
                   </button>
                 </div>
@@ -389,7 +389,7 @@ function ManualEntryForm({ onBack, onSave, t }) {
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+        <button onClick={onBack} className="p-2 -ms-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-bold">{t('nutrition.manualEntry')}</h1>

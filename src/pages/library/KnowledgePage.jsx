@@ -12,16 +12,16 @@ import { useUebersetzung, uebersetzt, kategorieName } from '../../data/uebersetz
 // (aufklappbare Sektionen). Gleiches Muster wie PeptidesPage, aber wiederverwendbar.
 
 const SECTION_COLORS = [
-  'border-l-primary-400', 'border-l-blue-400', 'border-l-green-400',
-  'border-l-amber-400', 'border-l-red-400', 'border-l-purple-400',
-  'border-l-cyan-400', 'border-l-rose-400',
+  'border-s-primary-400', 'border-s-blue-400', 'border-s-green-400',
+  'border-s-amber-400', 'border-s-red-400', 'border-s-purple-400',
+  'border-s-cyan-400', 'border-s-rose-400',
 ];
 
 const QUICK_COLORS = [
-  'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-l-green-400',
-  'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-l-blue-400',
-  'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-l-amber-400',
-  'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border-l-purple-400',
+  'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-s-green-400',
+  'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-s-blue-400',
+  'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-s-amber-400',
+  'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border-s-purple-400',
 ];
 
 export default function KnowledgePage({ onBack, data, titleDE, titleEN, titleES, categories = [], disclaimer = 'general', bereich }) {
@@ -52,7 +52,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, titleES,
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setShowEbook(false)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <button onClick={() => setShowEbook(false)} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
@@ -89,7 +89,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, titleES,
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setSelected(null)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <button onClick={() => setSelected(null)} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex-1">
@@ -125,7 +125,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, titleES,
             className="w-full rounded-2xl p-4 flex items-center gap-4 transition-all bg-primary-500 hover:bg-primary-600 text-white shadow-lg"
           >
             <BookOpen className="w-6 h-6 flex-shrink-0" />
-            <div className="flex-1 text-left">
+            <div className="flex-1 text-start">
               <p className="font-semibold text-sm">
                 {t('ui.readDetailedEBook')}
               </p>
@@ -147,7 +147,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, titleES,
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold">{lang === 'es' ? (titleES || titleEN) : (lang === 'de' ? titleDE : titleEN)}</h1>
@@ -180,7 +180,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, titleES,
           <button
             key={topic.id}
             onClick={() => { setSelected(topic); setShowEbook(false); }}
-            className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-left"
+            className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-start"
           >
             <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-primary-50 dark:bg-primary-900/20">
               <BookOpen className="w-5 h-5 text-primary-500 dark:text-primary-400" />
@@ -201,7 +201,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, titleES,
 
 function QuickCard({ title, text, color }) {
   return (
-    <div className={`rounded-xl p-3 border-l-4 ${color}`}>
+    <div className={`rounded-xl p-3 border-s-4 ${color}`}>
       <p className="text-xs font-semibold mb-1">{title}</p>
       <p className="text-xs opacity-90 leading-relaxed">{text}</p>
     </div>
@@ -211,8 +211,8 @@ function QuickCard({ title, text, color }) {
 function EbookSection({ title, content, colorClass, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft overflow-hidden border-l-4 ${colorClass}`}>
-      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-4 text-left">
+    <div className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft overflow-hidden border-s-4 ${colorClass}`}>
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-4 text-start">
         <h3 className="font-semibold text-sm">{title}</h3>
         {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
       </button>

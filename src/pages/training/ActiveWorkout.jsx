@@ -252,7 +252,7 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
     <div className="p-4 pt-16 pb-24">
       {/* Rest Timer Banner */}
       {ctx.restTimer && (
-        <div className="fixed top-14 left-0 right-0 z-50 bg-primary-600 dark:bg-primary-700 text-white px-4 py-3 shadow-lg">
+        <div className="fixed top-14 start-0 end-0 z-50 bg-primary-600 dark:bg-primary-700 text-white px-4 py-3 shadow-lg">
           <div className="flex items-center justify-between max-w-lg mx-auto">
             <div className="flex items-center gap-3">
               <div className="text-2xl font-mono font-bold">

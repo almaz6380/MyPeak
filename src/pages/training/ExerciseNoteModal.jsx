@@ -130,7 +130,7 @@ export default function ExerciseNoteModal({ exerciseId, exerciseName, initialNot
               <div className="relative">
                 <img src={photo} alt="Exercise" className="w-full h-40 object-cover rounded-xl" />
                 <button onClick={handleDeletePhoto}
-                  className="absolute top-2 right-2 p-1.5 bg-black/50 rounded-lg text-white hover:bg-red-500 transition-colors">
+                  className="absolute top-2 end-2 p-1.5 bg-black/50 rounded-lg text-white hover:bg-red-500 transition-colors">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>

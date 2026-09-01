@@ -225,11 +225,11 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
                 <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0 text-base">
                   {getFoodEmoji(entry.source)}
                 </div>
-                <button onClick={() => onEditEntry(entry)} className="flex-1 text-left min-w-0">
+                <button onClick={() => onEditEntry(entry)} className="flex-1 text-start min-w-0">
                   <div className="flex items-baseline justify-between gap-2 mb-1">
                     <p className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">
                       {entry.food_name}
-                      {entry.brand && <span className="text-xs text-slate-400 dark:text-slate-500 ml-1">{entry.brand}</span>}
+                      {entry.brand && <span className="text-xs text-slate-400 dark:text-slate-500 ms-1">{entry.brand}</span>}
                     </p>
                     <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
                       {Math.round(entry.calories)} kcal
@@ -322,7 +322,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
       {/* Supplements Card */}
       <button
         onClick={onOpenSupplements}
-        className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4 flex items-center gap-3 text-left hover:shadow-md transition-shadow"
+        className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4 flex items-center gap-3 text-start hover:shadow-md transition-shadow"
       >
         <CardPhotoMotif src="/bg-photos/supplement-icon.png" />
         <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">

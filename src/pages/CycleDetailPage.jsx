@@ -97,7 +97,7 @@ export default function CycleDetailPage({ onBack }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold">{t('cycle.title')}</h1>
@@ -292,7 +292,7 @@ function CycleSetup({ onSave, onBack, lang, initial }) {
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold">{initial ? t('cycle.settings') : t('cycle.setup')}</h1>
@@ -320,7 +320,7 @@ function CycleSetup({ onSave, onBack, lang, initial }) {
           </label>
           <div className="text-center mb-2">
             <span className="text-3xl font-bold text-slate-900 dark:text-white">{cycleLength}</span>
-            <span className="text-sm text-slate-400 ml-1">{t('cycle.daysUnit')}</span>
+            <span className="text-sm text-slate-400 ms-1">{t('cycle.daysUnit')}</span>
           </div>
           <input
             type="range"
@@ -343,7 +343,7 @@ function CycleSetup({ onSave, onBack, lang, initial }) {
           </label>
           <div className="text-center mb-2">
             <span className="text-3xl font-bold text-slate-900 dark:text-white">{periodLength}</span>
-            <span className="text-sm text-slate-400 ml-1">{t('cycle.daysUnit')}</span>
+            <span className="text-sm text-slate-400 ms-1">{t('cycle.daysUnit')}</span>
           </div>
           <input
             type="range"

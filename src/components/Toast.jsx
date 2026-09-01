@@ -17,7 +17,7 @@ export default function Toast({ message, variant = 'success', onDismiss }) {
 
   return (
     <div
-      className={`fixed left-4 right-4 bottom-24 z-[190] flex justify-center transition-all duration-400 ${
+      className={`fixed start-4 end-4 bottom-24 z-[190] flex justify-center transition-all duration-400 ${
         phase === 'showing' ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
       }`}
       onClick={onDismiss}

@@ -262,7 +262,7 @@ function GenderStep({ value, onChange }) {
               {opt.label}
             </span>
             {value === opt.id && (
-              <div className="ml-auto">
+              <div className="ms-auto">
                 <Check className="w-6 h-6 text-primary-500" />
               </div>
             )}
@@ -289,7 +289,7 @@ function HeightStep({ value, onChange }) {
       {/* Big display */}
       <div className="text-center mb-10">
         <span className="text-6xl font-bold text-slate-900 dark:text-white">{value}</span>
-        <span className="text-2xl font-medium text-slate-400 ml-2">cm</span>
+        <span className="text-2xl font-medium text-slate-400 ms-2">cm</span>
       </div>
 
       {/* Slider */}
@@ -328,7 +328,7 @@ function WeightStep({ value, onChange }) {
       {/* Big display */}
       <div className="text-center mb-10">
         <span className="text-6xl font-bold text-slate-900 dark:text-white">{value.toFixed(1)}</span>
-        <span className="text-2xl font-medium text-slate-400 ml-2">kg</span>
+        <span className="text-2xl font-medium text-slate-400 ms-2">kg</span>
       </div>
 
       {/* Slider */}
@@ -409,7 +409,7 @@ function GoalStep({ value, onChange }) {
               {opt.label}
             </span>
             {value === opt.id && (
-              <div className="ml-auto">
+              <div className="ms-auto">
                 <Check className="w-6 h-6 text-primary-500" />
               </div>
             )}
@@ -456,7 +456,7 @@ function ActivityStep({ value, onChange }) {
             }`}>
               {opt.icon}
             </div>
-            <div className="text-left flex-1">
+            <div className="text-start flex-1">
               <span className={`text-base font-semibold block ${
                 value === opt.id ? 'text-primary-600 dark:text-primary-400' : 'text-slate-900 dark:text-white'
               }`}>
@@ -512,7 +512,7 @@ function ExperienceStep({ value, onChange }) {
             }`}>
               {opt.icon}
             </div>
-            <div className="text-left flex-1">
+            <div className="text-start flex-1">
               <span className={`text-base font-semibold block ${
                 value === opt.id ? 'text-primary-600 dark:text-primary-400' : 'text-slate-900 dark:text-white'
               }`}>
@@ -577,7 +577,7 @@ function TermsStep({ value, onChange }) {
         }`}>
           {value && <Check className="w-4 h-4 text-white" />}
         </div>
-        <span className={`text-sm font-medium flex-1 text-left ${
+        <span className={`text-sm font-medium flex-1 text-start ${
           value ? 'text-primary-600 dark:text-primary-400' : 'text-slate-700 dark:text-slate-300'
         }`}>
           {t('onboarding.termsAccept')}

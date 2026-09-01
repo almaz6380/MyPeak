@@ -123,7 +123,7 @@ export default function MyPlans({
       {toast && <Toast variant={toast.variant} message={toast.message} onDismiss={() => setToast(null)} />}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold">{t('ui.myPlans')}</h1>
@@ -141,7 +141,7 @@ export default function MyPlans({
         <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
           <Zap className="w-6 h-6 text-green-500" />
         </div>
-        <div className="flex-1 text-left">
+        <div className="flex-1 text-start">
           <p className="text-base font-semibold text-slate-900 dark:text-white">
             {t('ui.freeWorkout')}
           </p>
@@ -274,7 +274,7 @@ export default function MyPlans({
             </p>
             <button
               onClick={() => { setShowCreateChoice(false); onCreate(); }}
-              className="w-full text-left p-4 mb-3 rounded-2xl border-2 border-slate-200 dark:border-slate-700 hover:border-primary-400 transition-colors"
+              className="w-full text-start p-4 mb-3 rounded-2xl border-2 border-slate-200 dark:border-slate-700 hover:border-primary-400 transition-colors"
             >
               <p className="font-semibold text-slate-900 dark:text-white">
                 {t('ui.weeklyPlan')}
@@ -285,7 +285,7 @@ export default function MyPlans({
             </button>
             <button
               onClick={() => { setShowCreateChoice(false); onCreateSinglePlan?.(); }}
-              className="w-full text-left p-4 mb-4 rounded-2xl border-2 border-slate-200 dark:border-slate-700 hover:border-primary-400 transition-colors"
+              className="w-full text-start p-4 mb-4 rounded-2xl border-2 border-slate-200 dark:border-slate-700 hover:border-primary-400 transition-colors"
             >
               <p className="font-semibold text-slate-900 dark:text-white">
                 {t('ui.singleWorkoutPlan')}

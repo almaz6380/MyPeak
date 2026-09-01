@@ -33,7 +33,7 @@ export default function CustomMealsList({ onBack, onCreateMeal, onEditMeal }) {
     <div className="p-4 pt-16 pb-24">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+        <button onClick={onBack} className="p-2 -ms-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-bold">{t('nutrition.customMeals')}</h1>
@@ -60,7 +60,7 @@ export default function CustomMealsList({ onBack, onCreateMeal, onEditMeal }) {
               {/* Meal Header */}
               <button
                 onClick={() => setExpandedId(expandedId === meal.id ? null : meal.id)}
-                className="w-full flex items-center justify-between px-4 py-3.5 text-left"
+                className="w-full flex items-center justify-between px-4 py-3.5 text-start"
               >
                 <div>
                   <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{meal.name}</p>

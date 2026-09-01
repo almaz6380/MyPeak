@@ -75,7 +75,7 @@ export default function MuscleHeatmapCard({ userId }) {
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">
                   {t(`muscleGroups.${selected}`)}
-                  <span className="ml-2 font-normal text-slate-400">
+                  <span className="ms-2 font-normal text-slate-400">
                     {detail.sets} {t('heatmap.sets')} · {Math.round(detail.volumeKg).toLocaleString()} kg
                   </span>
                 </p>

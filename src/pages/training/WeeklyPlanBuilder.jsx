@@ -144,7 +144,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold">{t('ui.createWeeklyPlan')}</h1>
@@ -170,7 +170,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
             </label>
             <div className="text-center mb-3">
               <span className="text-5xl font-bold text-primary-500">{sessionsPerWeek}</span>
-              <span className="text-lg text-slate-400 ml-2">/ 7</span>
+              <span className="text-lg text-slate-400 ms-2">/ 7</span>
             </div>
             <input
               type="range"
@@ -209,7 +209,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setStep(1)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={() => setStep(1)} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold">{t('ui.chooseTrainingDays')}</h1>
@@ -285,7 +285,7 @@ export default function WeeklyPlanBuilder({ onBack, onSaved, editPlan }) {
     <div className="p-4 pt-16 pb-24">
       {toast && <Toast variant={toast.variant} message={toast.message} onDismiss={() => setToast(null)} />}
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => setStep(2)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onClick={() => setStep(2)} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold">{t('ui.configureDays')}</h1>

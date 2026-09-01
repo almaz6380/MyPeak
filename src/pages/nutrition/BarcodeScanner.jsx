@@ -322,11 +322,11 @@ export default function BarcodeScanner({ onScanned, onClose }) {
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-10">
             <div className="relative w-[85%] max-w-[340px] aspect-[2.2/1]">
               <div className="relative w-full h-full rounded-2xl" style={{ boxShadow: '0 0 0 2000px rgba(0,0,0,0.45)' }}>
-                <div className="absolute -top-0.5 -left-0.5 w-10 h-10 border-t-[3px] border-l-[3px] border-primary-400 rounded-tl-xl" />
-                <div className="absolute -top-0.5 -right-0.5 w-10 h-10 border-t-[3px] border-r-[3px] border-primary-400 rounded-tr-xl" />
-                <div className="absolute -bottom-0.5 -left-0.5 w-10 h-10 border-b-[3px] border-l-[3px] border-primary-400 rounded-bl-xl" />
-                <div className="absolute -bottom-0.5 -right-0.5 w-10 h-10 border-b-[3px] border-r-[3px] border-primary-400 rounded-br-xl" />
-                <div className="absolute left-3 right-3 h-0.5 bg-primary-400 shadow-[0_0_8px_rgba(251,191,36,0.6)] animate-scan-line" />
+                <div className="absolute -top-0.5 -left-0.5 w-10 h-10 border-t-[3px] border-s-[3px] border-primary-400 rounded-tl-xl" />
+                <div className="absolute -top-0.5 -right-0.5 w-10 h-10 border-t-[3px] border-e-[3px] border-primary-400 rounded-tr-xl" />
+                <div className="absolute -bottom-0.5 -left-0.5 w-10 h-10 border-b-[3px] border-s-[3px] border-primary-400 rounded-bl-xl" />
+                <div className="absolute -bottom-0.5 -right-0.5 w-10 h-10 border-b-[3px] border-e-[3px] border-primary-400 rounded-br-xl" />
+                <div className="absolute start-3 end-3 h-0.5 bg-primary-400 shadow-[0_0_8px_rgba(251,191,36,0.6)] animate-scan-line" />
               </div>
             </div>
           </div>

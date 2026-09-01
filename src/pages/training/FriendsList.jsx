@@ -65,7 +65,7 @@ export default function FriendsList({ onBack, onAddFriend }) {
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
+          <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
           <h1 className="text-2xl font-bold">{t('ui.friends')}</h1>
         </div>
         <p className="text-center text-slate-400 dark:text-slate-500 py-12">{t('ui.signUpToAddFriends')}</p>
@@ -77,7 +77,7 @@ export default function FriendsList({ onBack, onAddFriend }) {
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
+          <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
           <h1 className="text-2xl font-bold">{t('ui.friends')}</h1>
         </div>
         <button onClick={() => setShowAdd(!showAdd)} className="p-2 rounded-xl bg-primary-500 text-white">

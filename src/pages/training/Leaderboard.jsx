@@ -38,7 +38,7 @@ export default function Leaderboard({ onBack }) {
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-2xl font-bold">{t('ui.ranking')}</h1>
       </div>
 
@@ -91,7 +91,7 @@ export default function Leaderboard({ onBack }) {
               </div>
 
               {/* Score */}
-              <div className="text-right flex-shrink-0">
+              <div className="text-end flex-shrink-0">
                 <p className="text-sm font-bold">{entry.score.toLocaleString()}</p>
                 {info.unit && <p className="text-[10px] text-slate-400">{info.unit}</p>}
               </div>

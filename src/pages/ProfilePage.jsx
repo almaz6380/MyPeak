@@ -197,7 +197,7 @@ export default function ProfilePage() {
               <span className="text-lg">{title.emoji}</span>
               <div>
                 <span className="text-sm font-bold text-primary-400">Level {levelInfo.level}</span>
-                <span className="text-xs text-slate-400 dark:text-slate-500 ml-2">{beschriftung(title, lang)}</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500 ms-2">{beschriftung(title, lang)}</span>
               </div>
             </div>
             <span className="text-xs text-slate-400 dark:text-slate-500">{xpData.streak_days || 0} 🔥</span>
@@ -244,7 +244,7 @@ export default function ProfilePage() {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center flex-shrink-0">
             <Crown className="w-5 h-5 text-white" />
           </div>
-          <div className="text-left">
+          <div className="text-start">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">FullRep Premium</p>
             <p className="text-[11px] text-slate-400">
               {isPremium
@@ -273,7 +273,7 @@ export default function ProfilePage() {
           <div className="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
             <img src="/bg-photos/photos-icon.png" alt="" aria-hidden="true" className="h-6 w-auto object-contain" />
           </div>
-          <div className="text-left">
+          <div className="text-start">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('progressPhotos.title')}</p>
             <p className="text-[11px] text-slate-400">{t('progressPhotos.subtitle')}</p>
           </div>
@@ -346,7 +346,7 @@ export default function ProfilePage() {
               onClick={() => toggleDarkMode(user?.id)}
               className={`relative w-12 h-7 rounded-full transition-colors ${darkMode ? 'bg-primary-500' : 'bg-slate-300'}`}
             >
-              <span className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${darkMode ? 'translate-x-5' : ''}`} />
+              <span className={`absolute top-0.5 start-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${darkMode ? 'translate-x-5 rtl:-translate-x-5' : ''}`} />
             </button>
           }
         />
@@ -401,7 +401,7 @@ export default function ProfilePage() {
                 }}
                 className={`relative w-12 h-7 rounded-full transition-colors ${healthOn ? 'bg-primary-500' : 'bg-slate-300'}`}
               >
-                <span className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${healthOn ? 'translate-x-5' : ''}`} />
+                <span className={`absolute top-0.5 start-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${healthOn ? 'translate-x-5 rtl:-translate-x-5' : ''}`} />
               </button>
             }
             last
@@ -423,7 +423,7 @@ export default function ProfilePage() {
         {canChangeAdConsent() && (
           <button
             onClick={() => changeAdConsent()}
-            className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors text-left"
+            className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors text-start"
           >
             <span className="flex items-center gap-3">
               <ShieldCheck className="w-5 h-5 text-slate-400" />
@@ -553,7 +553,7 @@ function LegalRow({ to, label, last = false }) {
   return (
     <Link
       to={to}
-      className={`w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${last ? '' : 'border-b border-slate-100 dark:border-slate-700'}`}
+      className={`w-full flex items-center justify-between px-4 py-3.5 text-start hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${last ? '' : 'border-b border-slate-100 dark:border-slate-700'}`}
     >
       <div className="flex items-center gap-3 text-slate-700 dark:text-slate-200">
         <FileText className="w-5 h-5 text-primary-500" />
@@ -568,7 +568,7 @@ function ProfileDataRow({ label, value, onClick, last = false }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${last ? '' : 'border-b border-slate-100 dark:border-slate-700'}`}
+      className={`w-full flex items-center justify-between px-4 py-3.5 text-start hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${last ? '' : 'border-b border-slate-100 dark:border-slate-700'}`}
     >
       <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{label}</span>
       <div className="flex items-center gap-2">
@@ -742,7 +742,7 @@ function EditModal({ field, value, onChange, onSave, onClose, saving, error, t }
                 <button
                   key={opt.value}
                   onClick={() => onChange(opt.value)}
-                  className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
+                  className={`w-full p-3 rounded-xl border-2 text-start transition-all ${
                     value === opt.value
                       ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
                       : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark hover:border-slate-300 dark:hover:border-slate-600'

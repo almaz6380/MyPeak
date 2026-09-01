@@ -231,7 +231,7 @@ export default function HomePage() {
           {/* Calories + Macros Card */}
           <button
             onClick={() => navigate('/nutrition')}
-            className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
+            className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-start hover:shadow-md transition-shadow"
           >
             <CardPhotoMotif src="/bg-photos/flame-icon.png" />
             <div className="relative flex items-center justify-between mb-3">
@@ -242,7 +242,7 @@ export default function HomePage() {
               <div className="flex items-center gap-1">
                 <span className="text-lg font-bold text-primary-600 dark:text-primary-400">{Math.round(nutrition.calories)}</span>
                 <span className="text-sm text-slate-400">/ {goals.calories}</span>
-                <ChevronRight className="w-4 h-4 text-slate-300 ml-1" />
+                <ChevronRight className="w-4 h-4 text-slate-300 ms-1" />
               </div>
             </div>
 
@@ -265,7 +265,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => navigate('/nutrition')}
-              className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
+              className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-start hover:shadow-md transition-shadow"
             >
               <CardPhotoMotif src="/bg-photos/drop-icon.png" />
               <div className="relative flex items-center gap-2 mb-2">
@@ -282,7 +282,7 @@ export default function HomePage() {
 
             <button
               onClick={() => navigate('/nutrition')}
-              className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
+              className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-start hover:shadow-md transition-shadow"
             >
               <CardPhotoMotif src="/bg-photos/supplement-icon.png" />
               <div className="relative flex items-center gap-2 mb-2">
@@ -302,7 +302,7 @@ export default function HomePage() {
           {showCycle && cyclePhase && (
             <button
               onClick={() => navigate('/cycle')}
-              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
+              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-start hover:shadow-md transition-shadow"
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -327,7 +327,7 @@ export default function HomePage() {
           {showCycle && !cyclePhase && (
             <button
               onClick={() => navigate('/cycle')}
-              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft text-left hover:shadow-md transition-shadow border-2 border-dashed border-pink-300 dark:border-pink-700"
+              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft text-start hover:shadow-md transition-shadow border-2 border-dashed border-pink-300 dark:border-pink-700"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-pink-100 dark:bg-pink-900/20 flex items-center justify-center">
@@ -345,7 +345,7 @@ export default function HomePage() {
           {/* Training + Streak Card */}
           <button
             onClick={() => navigate('/training')}
-            className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow"
+            className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-start hover:shadow-md transition-shadow"
           >
             <CardPhotoMotif src="/bg-photos/training-icon.png" />
             <div className="relative flex items-center justify-between">
@@ -394,7 +394,7 @@ export default function HomePage() {
                 <img src="/bg-photos/weight-icon.png" alt="" aria-hidden="true" className="h-6 w-auto object-contain -my-1" />
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('home.weight')}</span>
                 {weightEntries.length > 0 && (
-                  <span className="text-sm text-slate-400 ml-1">
+                  <span className="text-sm text-slate-400 ms-1">
                     {weightEntries[weightEntries.length - 1].weight_kg} kg
                   </span>
                 )}

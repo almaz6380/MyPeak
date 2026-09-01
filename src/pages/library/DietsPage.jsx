@@ -24,9 +24,9 @@ const CAT_COLORS = {
 };
 
 const SECTION_COLORS = [
-  'border-l-primary-400', 'border-l-blue-400', 'border-l-green-400',
-  'border-l-amber-400', 'border-l-red-400', 'border-l-purple-400',
-  'border-l-cyan-400',
+  'border-s-primary-400', 'border-s-blue-400', 'border-s-green-400',
+  'border-s-amber-400', 'border-s-red-400', 'border-s-purple-400',
+  'border-s-cyan-400',
 ];
 
 export default function DietsPage({ onBack }) {
@@ -80,7 +80,7 @@ export default function DietsPage({ onBack }) {
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setShowEbook(false)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={() => setShowEbook(false)} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
@@ -123,7 +123,7 @@ export default function DietsPage({ onBack }) {
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setSelectedDiet(null)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={() => setSelectedDiet(null)} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex-1">
@@ -143,11 +143,11 @@ export default function DietsPage({ onBack }) {
         {/* Quick Info */}
         {quick && (
           <div className="space-y-3 mb-6">
-            <div className="bg-primary-50 dark:bg-primary-900/20 border-l-4 border-l-primary-400 rounded-xl p-4">
+            <div className="bg-primary-50 dark:bg-primary-900/20 border-s-4 border-s-primary-400 rounded-xl p-4">
               <p className="text-xs font-semibold text-primary-600 dark:text-primary-400 mb-1">{t('ui.method')}</p>
               <p className="text-sm text-slate-700 dark:text-slate-300">{quick.methode || quick.method}</p>
             </div>
-            <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-l-blue-400 rounded-xl p-4">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border-s-4 border-s-blue-400 rounded-xl p-4">
               <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">{t('ui.forWhom')}</p>
               <p className="text-sm text-slate-700 dark:text-slate-300">{quick.fuer_wen || quick.for_whom}</p>
             </div>
@@ -164,7 +164,7 @@ export default function DietsPage({ onBack }) {
           }`}
         >
           <BookOpen className="w-6 h-6 flex-shrink-0" />
-          <div className="flex-1 text-left">
+          <div className="flex-1 text-start">
             <p className="font-semibold text-sm">{t('ui.readDetailedEBook')}</p>
             <p className={`text-xs mt-0.5 ${hasEbook ? 'text-white/70' : ''}`}>
               {hasEbook ? `${d.sections.length} ${t('ui.chapters')}` : (t('ui.comingSoon'))}
@@ -241,7 +241,7 @@ export default function DietsPage({ onBack }) {
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold">{t('ui.diets')}</h1>
@@ -283,7 +283,7 @@ export default function DietsPage({ onBack }) {
             <button
               key={diet.id}
               onClick={() => setSelectedDiet(diet)}
-              className={`w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-left hover:shadow-md transition-shadow ${
+              className={`w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-start hover:shadow-md transition-shadow ${
                 isActive ? 'ring-2 ring-primary-400' : ''
               }`}
             >
@@ -319,9 +319,9 @@ export default function DietsPage({ onBack }) {
 function EbookSection({ title, content, colorClass, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className={`bg-white dark:bg-surface-dark-alt rounded-xl border-l-4 ${colorClass} shadow-soft overflow-hidden`}>
+    <div className={`bg-white dark:bg-surface-dark-alt rounded-xl border-s-4 ${colorClass} shadow-soft overflow-hidden`}>
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between px-4 py-3">
-        <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 text-left">{title}</h3>
+        <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 text-start">{title}</h3>
         {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
       </button>
       {open && (

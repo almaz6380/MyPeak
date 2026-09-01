@@ -103,7 +103,7 @@ export default function LibraryPage() {
         <span className="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
           <Sparkles className="w-6 h-6" />
         </span>
-        <div className="flex-1 text-left">
+        <div className="flex-1 text-start">
           <p className="font-semibold">{t('coach.title')}</p>
           <p className="text-xs text-white/80">{t('coach.subtitle')}</p>
         </div>
@@ -115,7 +115,7 @@ export default function LibraryPage() {
           <button
             key={section.id}
             onClick={() => section.ready ? setView(section.id) : null}
-            className={`relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-left ${!section.ready ? 'opacity-50' : ''}`}
+            className={`relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-start ${!section.ready ? 'opacity-50' : ''}`}
           >
             <CardPhotoMotif src={section.motif} />
             <span className={`rounded-xl p-3 ${section.color}`}>{section.icon}</span>

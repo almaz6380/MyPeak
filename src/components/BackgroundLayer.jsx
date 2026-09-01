@@ -41,7 +41,7 @@ export default function BackgroundLayer() {
         </div>
       ) : (
         <div className="max-w-lg mx-auto relative h-full text-slate-500 dark:text-primary-300 opacity-[0.06] dark:opacity-[0.05]">
-          <bg.motif className="absolute -top-4 right-[-12%] w-[125%]" />
+          <bg.motif className="absolute -top-4 end-[-12%] w-[125%]" />
         </div>
       )}
     </div>

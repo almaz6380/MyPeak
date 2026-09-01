@@ -227,7 +227,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onViewPlan, onStart
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => { resetCreateForms(); if (initialView === 'create') onBack(); else setView('list'); }} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={() => { resetCreateForms(); if (initialView === 'create') onBack(); else setView('list'); }} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold">{t('plans.createPlan')}</h1>
@@ -321,7 +321,7 @@ export default function TrainingPlans({ onBack, onStartPlan, onViewPlan, onStart
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-4">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold">{t('plans.title')}</h1>
@@ -552,13 +552,13 @@ function ExercisePicker({ initialSelected, onBack, onConfirm, exerciseType = 'st
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-4">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-2xl font-bold">{t('plans.selectExercisesForDay')}</h1>
       </div>
 
       <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('common.search')} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('common.search')} className="w-full ps-10 pe-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
@@ -581,7 +581,7 @@ function ExercisePicker({ initialSelected, onBack, onConfirm, exerciseType = 'st
 
       <div className="flex flex-col gap-2">
         {filtered.map((ex) => (
-          <button key={ex.id} onClick={() => toggleSelect(ex.id)} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${selected.includes(ex.id) ? 'ring-2 ring-primary-400' : ''}`}>
+          <button key={ex.id} onClick={() => toggleSelect(ex.id)} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-start shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${selected.includes(ex.id) ? 'ring-2 ring-primary-400' : ''}`}>
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate">{t(ex.nameKey)}</p>
@@ -589,7 +589,7 @@ function ExercisePicker({ initialSelected, onBack, onConfirm, exerciseType = 'st
                   {ex.muscleGroup ? `${t(`muscleGroups.${ex.muscleGroup}`)} · ${t(`equipment.${ex.equipment}`)}` : t(`training.${ex.type || 'strength'}`)}
                 </p>
               </div>
-              <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 ml-3 flex items-center justify-center ${selected.includes(ex.id) ? 'bg-primary-500 border-primary-500' : 'border-slate-300 dark:border-slate-600'}`}>
+              <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 ms-3 flex items-center justify-center ${selected.includes(ex.id) ? 'bg-primary-500 border-primary-500' : 'border-slate-300 dark:border-slate-600'}`}>
                 {selected.includes(ex.id) && (
                   <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                 )}
@@ -600,7 +600,7 @@ function ExercisePicker({ initialSelected, onBack, onConfirm, exerciseType = 'st
       </div>
 
       {selected.length > 0 && (
-        <div className="fixed bottom-20 left-0 right-0 px-4 pb-2">
+        <div className="fixed bottom-20 start-0 end-0 px-4 pb-2">
           <button onClick={() => onConfirm(selected)} className="w-full max-w-lg mx-auto block bg-primary-500 hover:bg-primary-500 text-white rounded-2xl py-3.5 font-semibold text-center shadow-lg transition-colors dark:bg-primary-500">{t('training.done')} ({selected.length})</button>
         </div>
       )}

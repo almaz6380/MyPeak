@@ -16,9 +16,9 @@ const CATEGORIES = [
 ];
 
 const SECTION_COLORS = [
-  'border-l-primary-400', 'border-l-blue-400', 'border-l-green-400',
-  'border-l-amber-400', 'border-l-red-400', 'border-l-purple-400',
-  'border-l-cyan-400', 'border-l-rose-400',
+  'border-s-primary-400', 'border-s-blue-400', 'border-s-green-400',
+  'border-s-amber-400', 'border-s-red-400', 'border-s-purple-400',
+  'border-s-cyan-400', 'border-s-rose-400',
 ];
 
 // Gelesen wird ausschliesslich ueber `beschriftung()`, nie direkt mit `[lang]`.
@@ -53,7 +53,7 @@ export default function PeptidesPage({ onBack }) {
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setShowEbook(false)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <button onClick={() => setShowEbook(false)} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
@@ -99,7 +99,7 @@ export default function PeptidesPage({ onBack }) {
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setSelectedPeptide(null)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <button onClick={() => setSelectedPeptide(null)} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex-1">
@@ -124,12 +124,12 @@ export default function PeptidesPage({ onBack }) {
             <QuickCard
               title={t('ui.effects')}
               text={quick.wirkung}
-              color="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-l-green-400"
+              color="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-s-green-400"
             />
             <QuickCard
               title={t('ui.sideEffects')}
               text={quick.nebenwirkungen}
-              color="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-l-red-400"
+              color="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-s-red-400"
             />
           </div>
         )}
@@ -152,7 +152,7 @@ export default function PeptidesPage({ onBack }) {
           }`}
         >
           <BookOpen className="w-6 h-6 flex-shrink-0" />
-          <div className="flex-1 text-left">
+          <div className="flex-1 text-start">
             <p className="font-semibold text-sm">
               {t('ui.readDetailedEBook')}
             </p>
@@ -175,7 +175,7 @@ export default function PeptidesPage({ onBack }) {
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold">{t('ui.peptides')}</h1>
@@ -214,7 +214,7 @@ export default function PeptidesPage({ onBack }) {
             <button
               key={peptide.id}
               onClick={() => setSelectedPeptide(peptide)}
-              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-left"
+              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-start"
             >
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${cat?.color}`}>
                 <img src={`/bg-photos/pep-${peptide.category}-icon.png`} alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
@@ -242,7 +242,7 @@ export default function PeptidesPage({ onBack }) {
 
 function QuickCard({ title, text, color }) {
   return (
-    <div className={`rounded-xl p-3 border-l-4 ${color}`}>
+    <div className={`rounded-xl p-3 border-s-4 ${color}`}>
       <p className="text-xs font-semibold mb-1">{title}</p>
       <p className="text-xs opacity-90 leading-relaxed">{text}</p>
     </div>
@@ -252,8 +252,8 @@ function QuickCard({ title, text, color }) {
 function EbookSection({ title, content, colorClass, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft overflow-hidden border-l-4 ${colorClass}`}>
-      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-4 text-left">
+    <div className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft overflow-hidden border-s-4 ${colorClass}`}>
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-4 text-start">
         <h3 className="font-semibold text-sm">{title}</h3>
         {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
       </button>

@@ -150,7 +150,7 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
           <button
             onClick={onClose}
             aria-label={t('ui.close')}
-            className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="absolute top-4 end-4 p-2 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -185,13 +185,13 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
             type="button"
             onClick={() => setSelectedPlan('annual')}
             aria-pressed={selectedPlan === 'annual'}
-            className={`relative w-full rounded-2xl border-2 p-4 text-left transition-colors ${
+            className={`relative w-full rounded-2xl border-2 p-4 text-start transition-colors ${
               selectedPlan === 'annual'
                 ? 'border-primary-400 bg-primary-50/50 dark:bg-primary-900/10'
                 : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
             }`}
           >
-            <span className="absolute -top-2.5 right-4 px-2 py-0.5 rounded-full bg-primary-500 text-white text-[10px] font-semibold uppercase tracking-wide">
+            <span className="absolute -top-2.5 end-4 px-2 py-0.5 rounded-full bg-primary-500 text-white text-[10px] font-semibold uppercase tracking-wide">
               {t('ui.bestValue')}
             </span>
             <div className="flex items-center justify-between gap-3">
@@ -206,7 +206,7 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
                   {CURRENCY}{PRICES.annual.perMonth} / {t('ui.month')}
                 </p>
               </div>
-              <div className="text-right shrink-0">
+              <div className="text-end shrink-0">
                 <p className="font-bold">{priceFor('annual')}</p>
                 <p className="text-[11px] text-primary-600 dark:text-primary-400 font-semibold">
                   −{ANNUAL_SAVINGS}%
@@ -220,7 +220,7 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
             type="button"
             onClick={() => setSelectedPlan('monthly')}
             aria-pressed={selectedPlan === 'monthly'}
-            className={`w-full rounded-2xl border-2 p-4 text-left transition-colors ${
+            className={`w-full rounded-2xl border-2 p-4 text-start transition-colors ${
               selectedPlan === 'monthly'
                 ? 'border-primary-400 bg-primary-50/50 dark:bg-primary-900/10'
                 : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
@@ -233,7 +233,7 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
                   {t('ui.flexibleCancelMonthly')}
                 </p>
               </div>
-              <div className="text-right shrink-0">
+              <div className="text-end shrink-0">
                 <p className="font-bold">{priceFor('monthly')}</p>
                 <p className="text-[11px] text-slate-400">/ {t('ui.month')}</p>
               </div>

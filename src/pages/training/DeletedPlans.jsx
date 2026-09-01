@@ -56,7 +56,7 @@ export default function DeletedPlans({ onBack }) {
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold">{t('plans.deletedPlans')}</h1>
@@ -86,7 +86,7 @@ export default function DeletedPlans({ onBack }) {
                     }
                   </p>
                 </div>
-                <div className="flex items-center gap-2 ml-3 flex-shrink-0">
+                <div className="flex items-center gap-2 ms-3 flex-shrink-0">
                   <button
                     onClick={() => handleRestoreCustom(plan.id)}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-500 dark:text-primary-400 text-sm font-medium hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors"
@@ -113,7 +113,7 @@ export default function DeletedPlans({ onBack }) {
                   <h3 className="font-semibold text-lg truncate">{t(plan.nameKey)}</h3>
                   <p className="text-sm text-slate-500 dark:text-slate-400">{t(plan.descKey)}</p>
                 </div>
-                <div className="flex items-center gap-2 ml-3 flex-shrink-0">
+                <div className="flex items-center gap-2 ms-3 flex-shrink-0">
                   <button
                     onClick={() => handleRestoreDefault(plan.id)}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-500 dark:text-primary-400 text-sm font-medium hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors"

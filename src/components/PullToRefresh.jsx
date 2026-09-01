@@ -69,7 +69,7 @@ export default function PullToRefresh({ children, onRefresh }) {
           der Seiten aus der Verankerung reißen. */}
       <div
         aria-hidden="true"
-        className="fixed top-0 left-0 right-0 z-40 flex justify-center pointer-events-none"
+        className="fixed top-0 start-0 end-0 z-40 flex justify-center pointer-events-none"
         style={{
           opacity: visible ? 1 : 0,
           transform: `translateY(${refreshing ? 16 : pullDistance * 0.5}px)`,

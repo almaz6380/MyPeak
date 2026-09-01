@@ -146,7 +146,7 @@ export default function WorkoutHistory({ onBack }) {
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={exitCompareMode} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={exitCompareMode} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold">{t('training.compareWorkouts')}</h1>
@@ -249,7 +249,7 @@ export default function WorkoutHistory({ onBack }) {
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setGraphExercise(null)} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={() => setGraphExercise(null)} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold">{t(graphExercise.nameKey)}</h1>
@@ -281,7 +281,7 @@ export default function WorkoutHistory({ onBack }) {
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={compareMode ? exitCompareMode : onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+        <button onClick={compareMode ? exitCompareMode : onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold flex-1">
@@ -679,7 +679,7 @@ function AddExerciseToEdit({ onAdd, onClose, t }) {
       <div className="max-h-40 overflow-y-auto space-y-1">
         {filtered.map((ex) => (
           <button key={ex.id} onClick={() => onAdd(ex)}
-            className="w-full text-left px-3 py-2 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 text-sm transition-colors">
+            className="w-full text-start px-3 py-2 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 text-sm transition-colors">
             {t(ex.nameKey)}
           </button>
         ))}

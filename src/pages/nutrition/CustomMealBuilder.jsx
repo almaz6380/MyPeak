@@ -78,7 +78,7 @@ export default function CustomMealBuilder({ onBack, onSaved, editMeal = null, la
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setShowSearch(false)} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+          <button onClick={() => setShowSearch(false)} className="p-2 -ms-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-xl font-bold">{t('nutrition.addFood')}</h1>
@@ -92,7 +92,7 @@ export default function CustomMealBuilder({ onBack, onSaved, editMeal = null, la
     <div className="p-4 pt-16 pb-24">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+        <button onClick={onBack} className="p-2 -ms-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-bold">

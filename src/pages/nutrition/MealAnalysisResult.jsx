@@ -46,7 +46,7 @@ export default function MealAnalysisResult({ result, photo, oilLevel, onOilChang
       {/* Header */}
       <div className="sticky top-0 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-lg z-10">
         <div className="flex items-center gap-3 p-4 pt-14">
-          <button onClick={onClose} className="p-2 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+          <button onClick={onClose} className="p-2 -ms-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
@@ -133,7 +133,7 @@ export default function MealAnalysisResult({ result, photo, oilLevel, onOilChang
       </div>
 
       {/* Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 pb-8 bg-gradient-to-t from-white dark:from-[#0a0a0a] via-white/95 dark:via-[#0a0a0a]/95 to-transparent">
+      <div className="fixed bottom-0 start-0 end-0 p-4 pb-8 bg-gradient-to-t from-white dark:from-[#0a0a0a] via-white/95 dark:via-[#0a0a0a]/95 to-transparent">
         <div className="flex gap-3 max-w-lg mx-auto">
           <button
             onClick={onRetake}

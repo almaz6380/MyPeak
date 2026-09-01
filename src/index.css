@@ -201,3 +201,37 @@
   height: 100% !important;
   pointer-events: none !important;
 }
+
+/* ── Rechts-nach-links (Arabisch) ─────────────────────────────
+   Richtungssymbole spiegeln. Pfeile und Chevrons bedeuten in der Oberflaeche
+   „zurueck" und „weiter" — das sind Richtungen, keine Formen. In RTL zeigt
+   „weiter" nach links.
+
+   Warum als eine Regel und nicht `rtl:rotate-180` an jedem Symbol: Es sind 144
+   Fundstellen. Lucide setzt an jedes Symbol seine eigene Klasse
+   (`lucide-arrow-left`), also greift eine Regel alle — und ein kuenftiger
+   Zurueck-Pfeil ist automatisch dabei, statt vergessen zu werden.
+
+   scaleX statt rotate: Ein gedrehter Chevron waere derselbe Haken, ein
+   gespiegelter ist das Spiegelbild. Bei symmetrischen Pfeilen ist das gleich,
+   bei asymmetrischen (ArrowLeft mit Schaft) sieht nur die Spiegelung richtig
+   aus. */
+[dir='rtl'] .lucide-arrow-left,
+[dir='rtl'] .lucide-arrow-right,
+[dir='rtl'] .lucide-chevron-left,
+[dir='rtl'] .lucide-chevron-right,
+[dir='rtl'] .lucide-chevrons-left,
+[dir='rtl'] .lucide-chevrons-right,
+[dir='rtl'] .lucide-corner-down-left,
+[dir='rtl'] .lucide-undo-2,
+[dir='rtl'] .lucide-redo-2 {
+  transform: scaleX(-1);
+}
+
+/* Der Barcode-Scanner zeichnet in ein absolut positioniertes Canvas ueber dem
+   Videobild. Das ist kein Text, sondern ein Deckel auf dem Kamerabild — es
+   bleibt physisch links, sonst verrutscht der Rahmen gegenueber dem Bild. */
+[dir='rtl'] #scanner-container > canvas.drawingBuffer {
+  left: 0 !important;
+  right: auto !important;
+}

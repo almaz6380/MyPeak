@@ -34,7 +34,7 @@ export default function BottomNav() {
   const { t } = useTranslation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50">
+    <nav className="fixed bottom-0 start-0 end-0 z-50">
       {/* Home FAB — positioned above the bar */}
       <div className="absolute left-1/2 -translate-x-1/2 -top-5 z-10">
         <NavLink to="/">

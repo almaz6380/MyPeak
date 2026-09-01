@@ -110,7 +110,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold">
@@ -124,7 +124,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
             const count = allExercises.filter((ex) => (ex.type || 'strength') === tt.key).length;
             return (
               <button key={tt.key} onClick={() => setTrainingType(tt.key)}
-                className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-left">
+                className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-start">
                 <div className="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center flex-shrink-0">
                   <Icon className="w-6 h-6 text-primary-400" />
                 </div>
@@ -146,7 +146,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-4">
         <button onClick={() => { setTrainingType(null); setSearch(''); setMuscleFilter('all'); setEquipmentFilter('all'); setMaFilter('all'); }}
-          className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+          className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold">
@@ -156,10 +156,10 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
 
       {/* Search */}
       <div className="relative mb-3">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
           placeholder={t('ui.searchExercise')}
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
+          className="w-full ps-10 pe-4 py-2.5 rounded-xl bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400" />
       </div>
 
       {/* Filters for Strength */}
@@ -206,7 +206,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
           const displayName = ex._customName || t(ex.nameKey);
           const isCustom = !!ex._isCustom;
           return (
-            <div key={ex.id} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-left shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${selected.includes(ex.id) ? 'ring-2 ring-primary-400' : ''}`}>
+            <div key={ex.id} className={`bg-white dark:bg-surface-dark-alt rounded-xl p-3 text-start shadow-soft border border-slate-100 dark:border-slate-800/60 transition-all ${selected.includes(ex.id) ? 'ring-2 ring-primary-400' : ''}`}>
               <div className="flex items-center justify-between cursor-pointer" onClick={() => selectionMode ? toggleSelect(ex.id) : setDetailExercise(ex)}>
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div className="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center flex-shrink-0">
@@ -216,18 +216,18 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
                     <p className="font-medium truncate">
                       {displayName}
                       {hasDemo(ex.id) && (
-                        <span className="ml-2 align-middle inline-block px-1.5 py-0.5 rounded text-[9px] font-bold bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
+                        <span className="ms-2 align-middle inline-block px-1.5 py-0.5 rounded text-[9px] font-bold bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
                           {t('training.demoBadge')}
                         </span>
                       )}
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       {ex.muscleGroup ? t(`muscleGroups.${ex.muscleGroup}`) : ''}{ex.equipment ? ` · ${t(`equipment.${ex.equipment}`)}` : ''}
-                      {isCustom && <span className="ml-1 text-primary-500">· {t('training.customExercise')}</span>}
+                      {isCustom && <span className="ms-1 text-primary-500">· {t('training.customExercise')}</span>}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                <div className="flex items-center gap-2 flex-shrink-0 ms-3">
                   {isCustom && (
                     <button onClick={(e) => { e.stopPropagation(); handleDeleteCustomExercise(ex.id); }}
                       className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
@@ -257,7 +257,7 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
       {detailExercise && <ExerciseDetailSheet exercise={detailExercise} onClose={() => setDetailExercise(null)} />}
 
       {selectionMode && selected.length > 0 && (
-        <div className="fixed bottom-20 left-0 right-0 px-4 pb-2">
+        <div className="fixed bottom-20 start-0 end-0 px-4 pb-2">
           <button onClick={handleConfirm}
             className="w-full max-w-lg mx-auto block bg-primary-500 hover:bg-primary-600 text-white rounded-2xl py-3.5 font-semibold text-center shadow-lg transition-colors">
             {t('training.addExercise')} ({selected.length})

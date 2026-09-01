@@ -19,7 +19,7 @@ export default function LegalPage({ doc }) {
         <div className="flex items-center gap-3 mb-6">
           <button
             onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/'))}
-            className="p-2 -ml-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-surface-dark-alt transition-colors"
+            className="p-2 -ms-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-surface-dark-alt transition-colors"
             aria-label={t('ui.back')}
           >
             <ArrowLeft className="w-5 h-5" />

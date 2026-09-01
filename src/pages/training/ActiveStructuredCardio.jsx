@@ -222,7 +222,7 @@ export default function ActiveStructuredCardio({ session, onFinish, onDiscard })
         <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
           <div className="h-full bg-primary-500 rounded-full transition-all duration-1000" style={{ width: `${overallPct}%` }} />
         </div>
-        <p className="text-[10px] text-slate-400 text-right mt-1">
+        <p className="text-[10px] text-slate-400 text-end mt-1">
           {formatClock(Math.round(timer.completedDuration))} / {formatClock(timer.totalDuration)}
         </p>
       </div>
