@@ -1,12 +1,28 @@
 # Beleg: Gratis-Animationspaket von Vital Animations
 
-**Gesichert am 01.09.2026, 11:55 UTC** auf Josefs Wunsch („speicher für mich
-dieses bild zum beweiszweck ab"). Das Bildschirmfoto selbst liess sich nicht
-ablegen — es kam als eingebettetes Bild in den Chat und lag nie als Datei im
-Container. Gesichert ist stattdessen die QUELLE, die es zeigt; das ist
-belastbarer als ein Foto, weil jeder es nachpruefen kann.
+**Gesichert am 01.09.2026** auf Josefs Wunsch. Es liegen ZWEI Belege vor, die
+sich gegenseitig stuetzen: das Bildschirmfoto und die Quelle, die es zeigt.
 
 ## Was gesichert ist
+
+### `screenshot-github-2026-09-01.png`
+
+Josefs Bildschirmfoto der GitHub-Seite, 1913x1043, PNG.
+SHA-256 `3e87b68cb58534546eef4f1720f21f0b41a471f1acd4ce10166b8aff59d98260`.
+
+⚠ **Woher die Datei kommt, gehoert dazu:** Das Bild kam als eingebettetes Bild
+in den Chat und lag nicht im Upload-Ordner. Es wurde aus dem Sitzungsprotokoll
+(`~/.claude/projects/.../<sitzung>.jsonl`) wiederhergestellt — dort liegen
+eingefuegte Bilder als Base64. Ein erster Versuch, nur im Upload-Ordner zu
+suchen, ging deshalb ins Leere. **Fuer kuenftige Faelle: eingefuegte Bilder
+sind im Sitzungsprotokoll, nicht unter `uploads/`.**
+
+Im Bild lesbar: Adresszeile `github.com/exercisedb-pro/exercisedb-dataset`,
+Commit `3652538 · 3 weeks ago`, 71 Commits, 49 Sterne, und der Abschnitt
+„🎁 Free Exercise Animations for Developers" mit beiden Kernsaetzen.
+Datum und Uhrzeit der Aufnahme unten rechts: 01.09.2026, 13:54.
+
+### `README-github-2026-09-01.md`
 
 `README-github-2026-09-01.md` — wortgleiche Kopie des README aus
 
