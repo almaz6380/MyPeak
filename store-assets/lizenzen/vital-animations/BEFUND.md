@@ -119,3 +119,34 @@ Schema, die Lizenz erlaubt die Einbindung. Fuer eine EINHEITLICHE Darstellung
 reicht das Gratis-Paket aber nicht — ein Viertel animiert und drei Viertel
 Fotos sieht aus wie ein halbfertiger Umbau. Die vollen 400 Uebungen kosten
 einmalig 49 $.
+
+---
+
+## Eingebaut (01.09.2026)
+
+36 der 50 Animationen sind uebernommen und in der App aktiv:
+
+- Quelle: die 50 MP4s aus dem Gratis-ZIP (1080x1080, H.264, bis 6,7 MB je Datei)
+- Verkleinert auf 480x480 / 24 fps / CRF 30 → zusammen **3,5 MB statt rund
+  150 MB**. Die Lizenz erlaubt das ausdruecklich („crop, resize, compress,
+  transcode … for technical compatibility or presentation purposes").
+- Ziel: `public/exercise-demos-anim/<Ordner>/demo.mp4` + `poster.jpg`
+- Zuordnung von Hand in `tools/anim-import/zuordnung.mjs`, Stichprobe von
+  zwoelf Stueck von Auge geprueft — alle richtig.
+- 14 der 50 blieben liegen, weil wir die Uebung nicht haben (Air Bike,
+  Stepmill, Kettlebell March …). Begruendung je Datei steht in der Zuordnung.
+- Alles ohne Animation zeigt weiter die Fotos. Die Weiche sitzt in
+  `ExerciseDemoImage` und liest `src/data/exerciseAnimations.js` (erzeugt).
+
+### Auflagen, im Code umgesetzt
+
+- Kein Download-Angebot: `controlsList="nodownload"`,
+  `disablePictureInPicture`, Rechtsklick unterbunden, nirgends verlinkt.
+- Kein Weiterverkauf, keine Verzeichnisauflistung.
+
+### ⚠ Noch offen
+
+Lag dem ZIP eine Lizenz- oder Copyright-Datei bei, gehoert sie nach § 5
+mitgefuehrt und in diesen Ordner. Josef hat nur die JSON und die MP4s
+geschickt — falls im ZIP noch eine `LICENSE`/`README` steckt, bitte
+nachreichen.
