@@ -1,37 +1,73 @@
 import { useEffect, useState } from 'react';
-import { getDemoImages } from '../data/exerciseDemos';
+import exerciseDemos, { getDemoImages } from '../data/exerciseDemos';
+import mitAnimation from '../data/exerciseAnimations';
 
-// Übungs-Demo als weiche Überblendung zwischen Start- und Endposition.
-// Rhythmus: Position halten → überblenden → halten → zurück (CSS-Keyframes,
-// kein JS-Timer — flüssig und akkuschonend).
+// Übungs-Demo. Wo eine Animation vorliegt, läuft sie; sonst die alten Fotos
+// als weiche Überblendung zwischen Start- und Endposition.
 //
-// ⚠ Am 01.09.2026 wurde versucht, hier echte 3D-Animationen zu zeigen. Zwei
-// Anläufe, beide von Josef verworfen. Die Suche nach einer freien Quelle war
-// danach ebenso ergebnislos — Einzelheiten in tools/uebungs-3d/README.md.
-// Wer es erneut versucht: dort steht, was schon geprüft ist.
+// Die Animationen stammen aus dem Gratis-Paket von Vital Animations. Lizenz
+// und Herkunftsnachweis: store-assets/lizenzen/vital-animations/.
+// Es sind 36 der 162 Übungen — vor allem Beine und Schultern; Rücken, Bizeps
+// und Bauch bleiben bei den Fotos. Deshalb hier kein harter Wechsel, sondern
+// eine Weiche pro Übung.
+//
+// ⚠ `muted` und `playsInline` sind Pflicht, nicht Kosmetik: Ohne beides
+// verweigert iOS die automatische Wiedergabe und öffnet stattdessen den
+// Vollbild-Player. `preload="metadata"` hält die Übungsliste leicht.
+//
+// ⚠ Die Videodateien dürfen laut Lizenz (§ 5) nicht als einzelne Dateien zum
+// Download angeboten werden. Auslieferung durch die App ist ausdrücklich
+// erlaubt — also nirgends direkt verlinken und keinen Download anbieten.
 export default function ExerciseDemoImage({ exerciseId, alt = '' }) {
-  const images = getDemoImages(exerciseId);
-  const [failed, setFailed] = useState(false);
+  const ordner = exerciseDemos[exerciseId];
+  const bilder = getDemoImages(exerciseId);
+  const hatAnimation = Boolean(ordner) && mitAnimation.has(ordner);
+  const [videoKaputt, setVideoKaputt] = useState(false);
+  const [bilderKaputt, setBilderKaputt] = useState(false);
 
   useEffect(() => {
-    setFailed(false);
+    setVideoKaputt(false);
+    setBilderKaputt(false);
   }, [exerciseId]);
 
-  if (!images || failed) return null;
+  if (hatAnimation && !videoKaputt) {
+    return (
+      <div className="relative w-full aspect-square bg-white rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700">
+        <video
+          key={ordner}
+          src={`/exercise-demos-anim/${ordner}/demo.mp4`}
+          poster={`/exercise-demos-anim/${ordner}/poster.jpg`}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          controlsList="nodownload"
+          disablePictureInPicture
+          onContextMenu={(e) => e.preventDefault()}
+          aria-label={alt}
+          onError={() => setVideoKaputt(true)}
+          className="absolute inset-0 w-full h-full object-contain"
+        />
+      </div>
+    );
+  }
+
+  if (!bilder || bilderKaputt) return null;
 
   return (
     <div className="relative w-full aspect-[4/3] bg-white rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700">
       <img
-        src={images[0]}
+        src={bilder[0]}
         alt={alt}
-        onError={() => setFailed(true)}
+        onError={() => setBilderKaputt(true)}
         className="absolute inset-0 w-full h-full object-contain"
       />
       <img
-        src={images[1]}
+        src={bilder[1]}
         alt=""
         aria-hidden="true"
-        onError={() => setFailed(true)}
+        onError={() => setBilderKaputt(true)}
         className="absolute inset-0 w-full h-full object-contain animate-demo-crossfade"
       />
     </div>
