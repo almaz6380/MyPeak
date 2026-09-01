@@ -49,16 +49,23 @@ export function paketLaden(bereich, sprache) {
 // Sprache keine Übersetzung hat — dann greift überall der DE/EN-Rückfall.
 export function useUebersetzung(bereich, sprache) {
   const s = appSprache(sprache);
-  const [paket, setPaket] = useState(() => null);
+  const schluessel = `${s}:${bereich}`;
+  // Der Schlüssel wandert mit im State. Ohne ihn müsste der Effekt beim
+  // Sprachwechsel erst synchron `null` setzen — das ist ein Zusatz-Render und
+  // wird von react-hooks/set-state-in-effect zu Recht angemeckert. So gilt ein
+  // geladenes Paket einfach nur für seinen eigenen Schlüssel.
+  const [geladen, setGeladen] = useState(null);
 
   useEffect(() => {
+    if (!PAKETE[s]?.[bereich]) return undefined;
     let lebt = true;
-    if (!PAKETE[s]?.[bereich]) { setPaket(null); return undefined; }
-    paketLaden(bereich, s).then((p) => { if (lebt) setPaket(p); });
+    paketLaden(bereich, s).then((paket) => {
+      if (lebt) setGeladen({ schluessel: `${s}:${bereich}`, paket });
+    });
     return () => { lebt = false; };
   }, [bereich, s]);
 
-  return paket;
+  return geladen?.schluessel === schluessel ? geladen.paket : null;
 }
 
 // Einen Eintrag in der aktuellen Sprache lesen. `eintrag` ist die Zeile aus der

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useUebersetzung, uebersetzt, kategorieName } from '../../data/uebersetzungen';
 import { ArrowLeft, ChevronDown, ChevronUp, BookOpen, ChevronRight, Flame, TrendingUp, Clock, Zap, Scale, Play, Square, AlertTriangle } from 'lucide-react';
 import { diets, dietCategories } from '../../data/dietsData';
 import References from '../../components/References';
@@ -32,6 +33,8 @@ export default function DietsPage({ onBack }) {
   const { t, i18n } = useTranslation();
   const { user, profile } = useAuth();
   const lang = i18n.language || 'de';
+  // Spanisches Inhaltspaket; null, solange es lädt oder die Sprache keines hat.
+  const paket = useUebersetzung('diets', i18n.language);
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedDiet, setSelectedDiet] = useState(null);
   const [showEbook, setShowEbook] = useState(false);
@@ -81,18 +84,18 @@ export default function DietsPage({ onBack }) {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-xl font-bold">{lang === 'de' ? d.nameDE : d.nameEN}</h1>
+            <h1 className="text-xl font-bold">{uebersetzt(d, lang, paket).name}</h1>
             <p className="text-xs text-primary-400">{t('ui.detailedEBook')}</p>
           </div>
         </div>
 
         {d.sections && d.sections.length > 0 ? (
           <div className="space-y-3">
-            {d.sections.map((section, i) => (
+            {uebersetzt(d, lang, paket).sections.map((section, i) => (
               <EbookSection
                 key={i}
-                title={lang === 'de' ? section.titleDE : section.titleEN}
-                content={lang === 'de' ? section.contentDE : section.contentEN}
+                title={section.title}
+                content={section.content}
                 colorClass={SECTION_COLORS[i % SECTION_COLORS.length]}
                 defaultOpen={i === 0}
               />
@@ -113,7 +116,7 @@ export default function DietsPage({ onBack }) {
   // ── DETAIL VIEW ──
   if (selectedDiet) {
     const d = selectedDiet;
-    const quick = lang === 'de' ? d.quickDE : d.quickEN;
+    const quick = uebersetzt(d, lang, paket).quick;
     const hasEbook = d.sections && d.sections.length > 0;
     const isActive = activeDietId === d.id;
 
@@ -124,8 +127,8 @@ export default function DietsPage({ onBack }) {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold">{lang === 'de' ? d.nameDE : d.nameEN}</h1>
-            <p className="text-xs text-slate-400">{dietCategories.find((c) => c.id === d.category)?.[lang === 'de' ? 'nameDE' : 'nameEN']}</p>
+            <h1 className="text-xl font-bold">{uebersetzt(d, lang, paket).name}</h1>
+            <p className="text-xs text-slate-400">{kategorieName(dietCategories.find((c) => c.id === d.category), lang, paket)}</p>
           </div>
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${CAT_COLORS[d.category]}`}>
             <img src={`/bg-photos/diet-${d.category.replace('_', '')}-icon.png`} alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
@@ -134,7 +137,7 @@ export default function DietsPage({ onBack }) {
 
         {/* Summary */}
         <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-          {lang === 'de' ? d.summaryDE : d.summaryEN}
+          {uebersetzt(d, lang, paket).summary}
         </p>
 
         {/* Quick Info */}
@@ -258,7 +261,7 @@ export default function DietsPage({ onBack }) {
                   : 'bg-white dark:bg-surface-dark-alt text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
               }`}
             >
-              {catId === 'all' ? (t('ui.all')) : (lang === 'de' ? cat?.nameDE : cat?.nameEN)}
+              {catId === 'all' ? (t('ui.all')) : kategorieName(cat, lang, paket)}
             </button>
           );
         })}
@@ -291,7 +294,7 @@ export default function DietsPage({ onBack }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-                      {lang === 'de' ? diet.nameDE : diet.nameEN}
+                      {uebersetzt(diet, lang, paket).name}
                     </p>
                     {isActive && (
                       <span className="px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/30 text-[10px] font-semibold text-primary-600 dark:text-primary-400">
@@ -300,7 +303,7 @@ export default function DietsPage({ onBack }) {
                     )}
                   </div>
                   <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 line-clamp-2">
-                    {lang === 'de' ? diet.summaryDE : diet.summaryEN}
+                    {uebersetzt(diet, lang, paket).summary}
                   </p>
                 </div>
                 <ChevronRight className="w-5 h-5 text-slate-300 flex-shrink-0 mt-2" />
