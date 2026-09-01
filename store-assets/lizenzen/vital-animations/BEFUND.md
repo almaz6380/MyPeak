@@ -78,3 +78,44 @@ und deshalb liegt er hier statt nur im Chatverlauf.
 
 Wie viele Uebungen im Gratis-Paket stecken, steht nirgends — das README sagt
 nur „a starter set". Die Zahl klaert sich erst mit der ZIP.
+
+---
+
+## Das Gratis-Paket, gemessen (01.09.2026)
+
+Josef hat die JSON aus dem Gratis-ZIP geliefert:
+`free-pack-50gymworkouts.json`, 50 Uebungen.
+
+⚠ **Die JSON enthaelt KEINE Animationen** — nur Metadaten (`bodyPart`,
+`equipment`, `id`, `name`, `target`, `secondaryMuscles`, `instructions`,
+`description`, `difficulty`, `category`). Kein einziges Feld verweist auf eine
+Mediendatei. Die MP4s liegen als eigene Dateien im ZIP, vermutlich nach `id`
+benannt (`0051.mp4` …).
+
+### Verteilung der 50 gegenueber unseren 162
+
+| Gruppe | Gratis-Paket | FullRep |
+|---|---|---|
+| Beine | 23 | 23 |
+| Schultern | 15 | 21 |
+| Ausdauer | 9 | 13 |
+| Brust | **2** | 22 |
+| Arme (Trizeps) | **1** | 18 |
+| Ruecken | **0** | 21 |
+| Bizeps | **0** | 18 |
+| Bauch | **0** | 10 |
+| Gesaess | **0** | 6 |
+| Unterarme | **0** | 5 |
+| Waden | **0** | 5 |
+
+**Sechs von elf Muskelgruppen kommen gar nicht vor.** Realistisch deckt das
+Paket rund ein Viertel unserer Uebungen ab — und ausgerechnet Ruecken, Bizeps
+und Bauch fehlen vollstaendig.
+
+### Was das bedeutet
+
+Der Rechteweg ist damit belegt und erprobt: Die Metadaten passen zu unserem
+Schema, die Lizenz erlaubt die Einbindung. Fuer eine EINHEITLICHE Darstellung
+reicht das Gratis-Paket aber nicht — ein Viertel animiert und drei Viertel
+Fotos sieht aus wie ein halbfertiger Umbau. Die vollen 400 Uebungen kosten
+einmalig 49 $.
