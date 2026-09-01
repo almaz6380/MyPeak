@@ -14,9 +14,18 @@ import { getDemoImages, getDemoVideo } from '../data/exerciseDemos';
 // verweigert iOS die automatische Wiedergabe und zeigt stattdessen den
 // Vollbild-Player. `preload="none"` haelt die Uebungsliste leicht — bei 162
 // Videos zieht der Browser sonst reihenweise Daten, die niemand ansieht.
+// ⚠ ABGESCHALTET am 01.09.2026. Die erste Fassung der selbst gerenderten
+// Animationen war nicht gut genug — Josefs Urteil: „die Bewegung ist falsch
+// und die Figur sieht beschissen aus", und das trifft zu. Die Figur besteht
+// aus Kapseln und Kugeln, die Bewegungen sind blind aus Gelenkwinkeln
+// geraten. Bis das behoben ist, zeigt die App weiter die Fotos.
+// Zum Wiedereinschalten: auf true setzen. Die Videos liegen weiter unter
+// public/exercise-demos-3d/, der Renderer unter tools/uebungs-3d/.
+const ANIMATION_AKTIV = false;
+
 export default function ExerciseDemoImage({ exerciseId, alt = '' }) {
   const bilder = getDemoImages(exerciseId);
-  const clip = getDemoVideo(exerciseId);
+  const clip = ANIMATION_AKTIV ? getDemoVideo(exerciseId) : null;
   const [videoKaputt, setVideoKaputt] = useState(false);
   const [bilderKaputt, setBilderKaputt] = useState(false);
 
