@@ -185,20 +185,6 @@ const exerciseDemos = {
 
 export default exerciseDemos;
 
-// Selbst gerenderte 3D-Animation (tools/uebungs-3d/). Sie ersetzt die Fotos,
-// deren Rechtekette nicht belegbar ist — siehe
-// store-assets/social/fotos/HERKUNFT.md. Die Fotos bleiben als Rueckfall im
-// Repo: Faellt eine Animation aus, zeigt die App lieber das alte Bild als
-// nichts.
-export function getDemoVideo(exerciseId) {
-  const dbId = exerciseDemos[exerciseId];
-  if (!dbId) return null;
-  return {
-    video: `/exercise-demos-3d/${dbId}/demo.mp4`,
-    poster: `/exercise-demos-3d/${dbId}/poster.jpg`,
-  };
-}
-
 export function getDemoImages(exerciseId) {
   const dbId = exerciseDemos[exerciseId];
   if (!dbId) return null;
