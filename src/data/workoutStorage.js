@@ -578,28 +578,30 @@ export async function getActiveSchedule(userId) {
   return schedules.find((s) => s.is_active) || null;
 }
 
-export async function saveWeeklySchedule(userId, schedule) {
+export async function saveWeeklySchedule(userId, schedule, { activate = true } = {}) {
   const entry = {
     user_id: userId,
     name: schedule.name,
     sessions_per_week: schedule.sessions_per_week,
     days: schedule.days,
-    is_active: true,
+    is_active: activate,
   };
 
-  // Deactivate other schedules in localStorage
-  const cached = JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]').map((s) => ({ ...s, is_active: false }));
+  // Andere Pläne nur deaktivieren, wenn der neue aktiv werden soll
+  const cached = JSON.parse(localStorage.getItem(SCHEDULE_KEY) || '[]')
+    .map((s) => (activate ? { ...s, is_active: false } : s));
   const localEntry = { ...entry, id: localId(), created_at: new Date().toISOString() };
   cached.unshift(localEntry);
   localStorage.setItem(SCHEDULE_KEY, JSON.stringify(cached));
 
   if (!isGuest(userId)) {
     try {
-      // Deactivate all existing
-      await supabase
-        .from('weekly_schedules')
-        .update({ is_active: false })
-        .eq('user_id', userId);
+      if (activate) {
+        await supabase
+          .from('weekly_schedules')
+          .update({ is_active: false })
+          .eq('user_id', userId);
+      }
 
       const { data } = await supabase
         .from('weekly_schedules')
@@ -622,6 +624,8 @@ export async function saveWeeklySchedule(userId, schedule) {
   return { data: localEntry, error: null };
 }
 
+// In-place-Update eines Wochenplans — erhält id, created_at und is_active
+// (kein delete+reinsert mehr; damit überlebt auch days._meta von Peak-Programmen).
 // Programm/Plan „beenden": deaktivieren (nicht löschen) — der Plan bleibt in
 // „Meine Pläne" erhalten und kann später wieder aktiviert werden.
 export async function deactivateAllSchedules(userId) {

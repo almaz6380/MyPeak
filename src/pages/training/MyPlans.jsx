@@ -23,9 +23,19 @@ function intervalConfig(plan) {
   };
 }
 
+const JS_DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
+// Heutiger Tag eines Wochenplans, wenn er sich direkt als Kraft-Workout
+// starten laesst — Grundlage fuer den „Heute starten"-Knopf auf der Karte.
+function todayStartableDay(plan) {
+  const day = plan.days?.[JS_DAY_KEYS[new Date().getDay()]];
+  return day?.type === 'strength' && day.exercises?.length > 0 ? day : null;
+}
+
 export default function MyPlans({
   onBack, onCreate, onCreateSinglePlan, onEdit, onStartFreeWorkout,
   onStartPlan, onViewPlan, onStartHiit, onStartCircuit, onStartCardio, onStartMartialArts,
+  onStartDay, initialToastMessage = null, onToastDone,
 }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
@@ -33,7 +43,7 @@ export default function MyPlans({
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [toast, setToast] = useState(null);
+  const [toast, setToast] = useState(initialToastMessage ? { variant: 'success', message: initialToastMessage } : null);
   // Eigene Einzelplaene lagen bisher unter „Trainingsplaene" — zwei Orte, die
   // beide „Plan" hiessen. Sie stehen jetzt hier, bei den uebrigen eigenen Plaenen.
   const [singlePlans, setSinglePlans] = useState([]);
@@ -49,8 +59,8 @@ export default function MyPlans({
   async function loadPlans() {
     setLoading(true);
     const [weekly, singles] = await Promise.all([
-      getWeeklySchedules(user.id),
-      getCustomPlans(user.id),
+      getWeeklySchedules(user?.id || 'guest'),
+      getCustomPlans(user?.id || 'guest'),
     ]);
     setPlans(weekly);
     setSinglePlans(singles);
@@ -60,7 +70,7 @@ export default function MyPlans({
   async function handleDeleteSingle(planId) {
     setDeleteSingleConfirm(null);
     try {
-      await deleteCustomPlan(user.id, planId);
+      await deleteCustomPlan(user?.id || 'guest', planId);
       setSinglePlans((prev) => prev.filter((p) => p.id !== planId));
     } catch (err) {
       console.error('Failed to delete plan:', err);
@@ -89,7 +99,7 @@ export default function MyPlans({
   async function handleDelete(planId) {
     setDeleteConfirm(null);
     try {
-      await deleteWeeklySchedule(user.id, planId);
+      await deleteWeeklySchedule(user?.id || 'guest', planId);
       setPlans((prev) => prev.filter((p) => p.id !== planId));
     } catch (err) {
       console.error('Failed to delete plan:', err);
@@ -104,7 +114,7 @@ export default function MyPlans({
     // Früher lief das über saveWeeklySchedule() — das legt immer neu an und
     // erzeugte bei jedem Aktivieren ein Duplikat.
     try {
-      const { error } = await activateWeeklySchedule(user.id, plan.id);
+      const { error } = await activateWeeklySchedule(user?.id || 'guest', plan.id);
       if (error) throw error;
       await loadPlans();
     } catch (err) {
@@ -118,7 +128,7 @@ export default function MyPlans({
 
   return (
     <div className="p-4 pt-16 pb-24">
-      {toast && <Toast variant={toast.variant} message={toast.message} onDismiss={() => setToast(null)} />}
+      {toast && <Toast variant={toast.variant} message={toast.message} onDismiss={() => { setToast(null); onToastDone?.(); }} />}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
@@ -215,9 +225,20 @@ export default function MyPlans({
                 })}
               </div>
 
-              <p className="text-xs text-slate-400 mt-2">
-                {plan.sessions_per_week}x / {lang === 'de' ? 'Woche' : 'week'}
-              </p>
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-xs text-slate-400">
+                  {plan.sessions_per_week}x / {lang === 'de' ? 'Woche' : 'week'}
+                </p>
+                {onStartDay && todayStartableDay(plan) && (
+                  <button
+                    onClick={() => onStartDay(todayStartableDay(plan), plan.name)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold"
+                  >
+                    <Play className="w-3.5 h-3.5" />
+                    {t('planBuilder.startToday')}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>
