@@ -1,334 +1,201 @@
 /* eslint-disable */
-// Browser-Seite des Uebungs-Renderers. Laeuft in headless Chromium und wird
-// von render.mjs ueber window.aufbauen(cfg) und window.setFrame(n) gesteuert.
+// Browser-Seite des Uebungs-Renderers. Laeuft in headless Chromium, gesteuert
+// von render.mjs ueber window.aufbauen(cfg) und window.setFrame(n).
 //
-// ⚠ REGEL (wie beim Reel-Generator in Anigosha): KEIN CSS-`animation`, KEIN
-// setTimeout, KEIN requestAnimationFrame-Zeitgeber. Alles Sichtbare ist reine
-// Funktion des Frame-Index. Sonst verrutschen Frames und nichts ist
-// reproduzierbar.
+// ⚠ REGEL: KEIN CSS-`animation`, KEIN setTimeout, KEIN Zeitgeber. Alles
+// Sichtbare ist reine Funktion des Frame-Index — sonst verrutschen Frames und
+// nichts ist reproduzierbar.
 //
-// THREE kommt als globale Variable aus dem eingebetteten three.cjs.
+// ⚠ ZWEITER ANLAUF (01.09.2026). Der erste scheiterte an zwei Dingen, die
+// beide hier anders geloest sind:
+// 1. Die Figur war aus Kapseln zusammengesteckt → jetzt eine durchgehende
+//    Haut ueber einem Skelett (figur.js).
+// 2. Die Bewegungen waren aus Gelenkwinkeln GERATEN → jetzt werden Hand- und
+//    Fussziele vorgegeben und die Winkel per IK ausgerechnet. Beim
+//    Bankdruecken steht da „Haende von 62 cm auf 102 cm", nicht „Schulter
+//    -92 Grad, Ellbogen -88 Grad". Das ist nachpruefbar; Winkel waren es nie.
 
 const GRAD = Math.PI / 180;
 
-// Muskeln auf der Rueckseite. Steht die Kamera fuer sie vorne, ist vom
-// Leuchten nichts zu sehen — genau das passierte beim vorgebeugten Rudern.
+const HAUT = 0xccd2da;
+const MUSKEL = new THREE.Color(0xff2a2a);
+const METALL = 0x3a3d44;
+const POLSTER = 0x22252b;
+
+// Muskeln auf der Rueckseite — dort schaut die Kamera von hinten, sonst ist
+// vom Leuchten nichts zu sehen.
 const HINTEN = new Set(['back', 'glutes', 'triceps', 'calves']);
 
-// ————— Farben —————
-const HAUT = 0xc9cdd4;      // helles Grau-Blau wie das Anatomiemodell
-const MUSKEL = 0xff2d2d;    // arbeitender Muskel
-const METALL = 0x3a3d44;
-const POLSTER = 0x24262b;
-const HINTERGRUND = 0x0d1018;
+// Wo welcher Muskel sitzt, in der RUHEHALTUNG (Weltkoordinaten). Die
+// Geometrie liegt in genau diesen Koordinaten vor, deshalb laesst sich die
+// Haut direkt einfaerben — kein aufgeklebter Fleck mehr, der bei jeder
+// Bewegung verrutscht.
+const MUSKELN = {
+  chest: [[0.062, 1.365, 0.085, 0.1418], [-0.062, 1.365, 0.085, 0.1418]],
+  back: [[0.065, 1.335, -0.085, 0.1553], [-0.065, 1.335, -0.085, 0.1553]],
+  shoulders: [[0.213, 1.455, 0.0, 0.1418], [-0.213, 1.455, 0.0, 0.1418]],
+  biceps: [[0.213, 1.315, 0.045, 0.1148], [-0.213, 1.315, 0.045, 0.1148]],
+  triceps: [[0.213, 1.305, -0.045, 0.1215], [-0.213, 1.305, -0.045, 0.1215]],
+  forearms: [[0.213, 1.055, 0.01, 0.135], [-0.213, 1.055, 0.01, 0.135]],
+  abs: [[0.0, 1.1, 0.088, 0.1688]],
+  legs: [[0.108, 0.735, 0.062, 0.2093], [-0.108, 0.735, 0.062, 0.2093]],
+  glutes: [[0.075, 0.895, -0.105, 0.1823], [-0.075, 0.895, -0.105, 0.1823]],
+  calves: [[0.108, 0.335, -0.05, 0.1553], [-0.108, 0.335, -0.05, 0.1553]],
+};
 
-let renderer, scene, camera, mixerDaten, koerperTeile, muskelFlecken;
-let konfig, geraetDaten, rahmen;
+let renderer, scene, camera, konfig, geraetDaten, rahmen;
+let figur, knochen, ruhePos;
 
-function matHaut() {
-  return new THREE.MeshStandardMaterial({ color: HAUT, roughness: 0.42, metalness: 0.05 });
-}
-function matMuskel() {
-  // Leicht durchscheinend und selbstleuchtend — liest sich als Glühen ueber
-  // dem Koerper, nicht als aufgeklebter Fleck.
-  return new THREE.MeshStandardMaterial({
-    color: MUSKEL, emissive: MUSKEL, emissiveIntensity: 0.75,
-    roughness: 0.5, transparent: true, opacity: 0.9, depthWrite: false,
-  });
-}
-function matMetall() {
-  return new THREE.MeshStandardMaterial({ color: METALL, roughness: 0.35, metalness: 0.75 });
-}
-function matPolster() {
-  return new THREE.MeshStandardMaterial({ color: POLSTER, roughness: 0.85, metalness: 0.0 });
-}
+// ————— Zwei-Knochen-IK —————
+// Gegeben Wurzel (Schulter/Huefte), Ziel fuer das Ende (Hand/Fuss) und eine
+// Richtung, in die der Ellbogen bzw. das Knie zeigen soll. Liefert die
+// Drehungen fuer beide Knochen.
+//
+// Das ist der Kern des zweiten Anlaufs: Eine Uebung ist dadurch beschrieben,
+// WO die Haende hingehen — nicht dadurch, wie viel Grad ein Ellbogen hat.
+const _R = new THREE.Vector3(), _T = new THREE.Vector3(), _F = new THREE.Vector3();
+const _N = new THREE.Vector3(), _D1 = new THREE.Vector3(), _D2 = new THREE.Vector3();
+const _E = new THREE.Vector3(), _Q = new THREE.Quaternion(), _PQ = new THREE.Quaternion();
+const RUHE_ACHSE = new THREE.Vector3(0, -1, 0);
 
-// ————— Bausteine —————
-function kapsel(radius, laenge, mat) {
-  // Kapsel ist um den Ursprung zentriert; wir haengen sie so ein, dass das
-  // Gelenk oben sitzt und das Glied nach unten zeigt.
-  const g = new THREE.CapsuleGeometry(radius, laenge, 6, 20);
-  const m = new THREE.Mesh(g, mat);
-  m.position.y = -laenge / 2;
-  m.castShadow = true;
-  return m;
-}
-
-// Kugel im Gelenk. Ohne sie klafft beim Beugen eine Kante zwischen den
-// Kapseln und die Figur wirkt wie zusammengesteckt statt gewachsen.
-function gelenkKugel(radius, mat) {
-  const m = new THREE.Mesh(new THREE.SphereGeometry(radius, 18, 14), mat);
-  m.castShadow = true;
-  return m;
+function richtungSetzen(bone, weltRichtung) {
+  // Knochen zeigen in Ruhe entlang -Y. Die gewuenschte Weltrichtung in den
+  // Raum des Elternknochens umrechnen und die kuerzeste Drehung nehmen.
+  bone.parent.getWorldQuaternion(_PQ);
+  const lokal = weltRichtung.clone().applyQuaternion(_PQ.invert()).normalize();
+  bone.quaternion.setFromUnitVectors(RUHE_ACHSE, lokal);
 }
 
-function lathe(profil, mat, zSkala) {
-  const punkte = profil.map(([r, y]) => new THREE.Vector2(r, y));
-  const g = new THREE.LatheGeometry(punkte, 28);
-  g.computeVertexNormals();
-  const m = new THREE.Mesh(g, mat);
-  m.scale.z = zSkala || 1;
-  m.castShadow = true;
-  return m;
-}
+function zweiKnochenIK(wurzelName, mittelName, ziel, pol, l1, l2) {
+  const wurzelB = knochen[wurzelName];
+  const mittelB = knochen[mittelName];
+  wurzelB.updateWorldMatrix(true, false);
+  wurzelB.getWorldPosition(_R);
+  _T.set(ziel[0], ziel[1], ziel[2]);
+  _F.subVectors(_T, _R);
+  let d = _F.length();
+  const min = Math.abs(l1 - l2) + 0.02;
+  const max = l1 + l2 - 0.015;
+  d = Math.max(min, Math.min(max, d));
+  _F.normalize();
 
-function fleck(rx, ry, rz, pos, rot) {
-  const g = new THREE.SphereGeometry(1, 20, 14);
-  const m = new THREE.Mesh(g, matMuskel());
-  m.scale.set(rx, ry, rz);
-  m.position.set(pos[0], pos[1], pos[2]);
-  if (rot) m.rotation.set(rot[0] * GRAD, rot[1] * GRAD, rot[2] * GRAD);
-  return m;
-}
+  const cosA = (l1 * l1 + d * d - l2 * l2) / (2 * l1 * d);
+  const alpha = Math.acos(Math.max(-1, Math.min(1, cosA)));
 
-function gruppe(eltern, x, y, z) {
-  const g = new THREE.Group();
-  g.position.set(x, y, z);
-  eltern.add(g);
-  return g;
-}
+  _N.crossVectors(_F, new THREE.Vector3(pol[0], pol[1], pol[2])).normalize();
+  if (!isFinite(_N.x) || _N.lengthSq() < 1e-6) _N.set(1, 0, 0);
+  _D1.copy(_F).applyAxisAngle(_N, alpha);
+  richtungSetzen(wurzelB, _D1);
 
-// ————— Figur —————
-// Masse in Metern, Gesamthoehe ~1.77. Der Ursprung der Figur liegt zwischen
-// den Fuessen auf dem Boden, damit Geraete auf y=0 stehen koennen.
-function figurBauen() {
-  const haut = matHaut();
-  const teile = {};
-  const flecken = {};
-
-  const wurzel = new THREE.Group();
-
-  // Becken
-  const becken = gruppe(wurzel, 0, 1.00, 0);
-  becken.add(lathe([
-    [0.001, -0.13], [0.105, -0.125], [0.145, -0.08],
-    [0.152, -0.02], [0.148, 0.03], [0.14, 0.06], [0.001, 0.065],
-  ], haut, 0.72));
-  flecken.glutes = fleck(0.092, 0.075, 0.055, [0, -0.05, -0.095]);
-  becken.add(flecken.glutes);
-
-  // Rumpf (Wirbelsaeule als EIN Gelenk — reicht fuer Kraftuebungen und
-  // vermeidet eine sichtbare Naht mitten im Bauch)
-  const rumpf = gruppe(becken, 0, 0.02, 0);
-  rumpf.add(lathe([
-    [0.001, 0.0], [0.13, 0.01], [0.138, 0.08], [0.132, 0.16],
-    [0.15, 0.25], [0.175, 0.33], [0.183, 0.40], [0.172, 0.46],
-    [0.13, 0.50], [0.08, 0.525], [0.001, 0.53],
-  ], haut, 0.66));
-  flecken.chest = new THREE.Group();
-  flecken.chest.add(fleck(0.075, 0.058, 0.05, [0.062, 0.365, 0.085]));
-  flecken.chest.add(fleck(0.075, 0.058, 0.05, [-0.062, 0.365, 0.085]));
-  rumpf.add(flecken.chest);
-  flecken.back = new THREE.Group();
-  flecken.back.add(fleck(0.088, 0.105, 0.055, [0.058, 0.335, -0.088]));
-  flecken.back.add(fleck(0.088, 0.105, 0.055, [-0.058, 0.335, -0.088]));
-  rumpf.add(flecken.back);
-  flecken.abs = fleck(0.082, 0.105, 0.05, [0, 0.13, 0.072]);
-  rumpf.add(flecken.abs);
-
-  // Hals + Kopf
-  const hals = gruppe(rumpf, 0, 0.50, 0);
-  const halsM = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.062, 0.10, 16), haut);
-  halsM.position.y = 0.05;
-  hals.add(halsM);
-  const kopf = gruppe(hals, 0, 0.10, 0);
-  const kopfM = new THREE.Mesh(new THREE.SphereGeometry(0.108, 24, 18), haut);
-  kopfM.position.y = 0.085;
-  kopfM.scale.set(0.94, 1.18, 1.05); // laenglich, ohne Gesicht
-  kopf.add(kopfM);
-
-  // Arme
-  const arm = {};
-  for (const [seite, vz] of [['L', 1], ['R', -1]]) {
-    const schulter = gruppe(rumpf, vz * 0.178, 0.435, 0);
-    const delta = new THREE.Mesh(new THREE.SphereGeometry(0.078, 20, 16), haut);
-    delta.scale.set(1.05, 1.0, 1.0);
-    schulter.add(delta);
-    schulter.add(kapsel(0.058, 0.295, haut)); // Oberarm: Schulter→Ellbogen
-
-    flecken['shoulders' + seite] = fleck(0.088, 0.082, 0.088, [0, 0.005, 0]);
-    schulter.add(flecken['shoulders' + seite]);
-    flecken['biceps' + seite] = fleck(0.055, 0.078, 0.042, [0, -0.15, 0.036]);
-    schulter.add(flecken['biceps' + seite]);
-    flecken['triceps' + seite] = fleck(0.055, 0.082, 0.042, [0, -0.155, -0.037]);
-    schulter.add(flecken['triceps' + seite]);
-
-    const ellbogen = gruppe(schulter, 0, -0.295, 0);
-    ellbogen.add(gelenkKugel(0.052, haut));
-    ellbogen.add(kapsel(0.048, 0.265, haut)); // Unterarm: Ellbogen→Handgelenk
-    flecken['forearms' + seite] = fleck(0.052, 0.078, 0.046, [0, -0.09, 0.012]);
-    ellbogen.add(flecken['forearms' + seite]);
-
-    const handgelenk = gruppe(ellbogen, 0, -0.265, 0);
-    const hand = new THREE.Mesh(new THREE.SphereGeometry(0.048, 14, 12), haut);
-    hand.scale.set(0.85, 1.25, 0.55);
-    hand.position.y = -0.045;
-    handgelenk.add(hand);
-
-    arm['schulter' + seite] = schulter;
-    arm['ellbogen' + seite] = ellbogen;
-    arm['handgelenk' + seite] = handgelenk;
-  }
-
-  // Beine
-  const bein = {};
-  for (const [seite, vz] of [['L', 1], ['R', -1]]) {
-    const huefte = gruppe(becken, vz * 0.088, -0.10, 0);
-    huefte.add(gelenkKugel(0.085, haut));
-    huefte.add(kapsel(0.082, 0.44, haut)); // Oberschenkel: Huefte→Knie
-    flecken['legs' + seite] = fleck(0.075, 0.13, 0.055, [0, -0.22, 0.05]);
-    huefte.add(flecken['legs' + seite]);
-
-    const knie = gruppe(huefte, 0, -0.44, 0);
-    knie.add(gelenkKugel(0.068, haut));
-    knie.add(kapsel(0.062, 0.42, haut)); // Unterschenkel: Knie→Sprunggelenk
-    flecken['calves' + seite] = fleck(0.06, 0.092, 0.05, [0, -0.14, -0.04]);
-    knie.add(flecken['calves' + seite]);
-
-    const fussgelenk = gruppe(knie, 0, -0.42, 0);
-    const fuss = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.055, 0.22), haut);
-    fuss.position.set(0, -0.028, 0.055);
-    fussgelenk.add(fuss);
-
-    bein['huefte' + seite] = huefte;
-    bein['knie' + seite] = knie;
-    bein['fussgelenk' + seite] = fussgelenk;
-  }
-
-  Object.assign(teile, { wurzel, becken, rumpf, hals, kopf }, arm, bein);
-  return { wurzel, teile, flecken };
+  wurzelB.updateWorldMatrix(true, false);
+  mittelB.updateWorldMatrix(true, false);
+  mittelB.getWorldPosition(_E);
+  _D2.subVectors(_T, _E);
+  if (_D2.lengthSq() < 1e-8) _D2.copy(_D1);
+  _D2.normalize();
+  richtungSetzen(mittelB, _D2);
+  mittelB.updateWorldMatrix(true, false);
 }
 
 // ————— Geraete —————
-function langhantel(laenge) {
+function matMetall() { return new THREE.MeshStandardMaterial({ color: METALL, roughness: 0.35, metalness: 0.7 }); }
+function matPolster() { return new THREE.MeshStandardMaterial({ color: POLSTER, roughness: 0.85 }); }
+
+function langhantel() {
   const g = new THREE.Group();
-  const stange = new THREE.Mesh(new THREE.CylinderGeometry(0.017, 0.017, laenge || 1.25, 14), matMetall());
-  stange.rotation.z = 90 * GRAD;
-  g.add(stange);
-  for (const vz of [1, -1]) {
-    for (const [abst, r, dick] of [[0.44, 0.105, 0.042], [0.485, 0.09, 0.032]]) {
-      const s = new THREE.Mesh(new THREE.CylinderGeometry(r, r, dick, 20), matPolster());
-      s.rotation.z = 90 * GRAD;
-      s.position.x = vz * abst;
-      g.add(s);
-    }
+  const st = new THREE.Mesh(new THREE.CylinderGeometry(0.017, 0.017, 1.35, 14), matMetall());
+  st.rotation.z = 90 * GRAD; g.add(st);
+  for (const vz of [1, -1]) for (const [a, r, dk] of [[0.48, 0.11, 0.045], [0.53, 0.095, 0.033]]) {
+    const s = new THREE.Mesh(new THREE.CylinderGeometry(r, r, dk, 20), matPolster());
+    s.rotation.z = 90 * GRAD; s.position.x = vz * a; g.add(s);
   }
   return g;
 }
-
 function kurzhantel() {
   const g = new THREE.Group();
-  const stange = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.30, 12), matMetall());
-  stange.rotation.z = 90 * GRAD;
-  g.add(stange);
+  const st = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.28, 12), matMetall());
+  st.rotation.z = 90 * GRAD; g.add(st);
   for (const vz of [1, -1]) {
-    const kopf = new THREE.Mesh(new THREE.CylinderGeometry(0.062, 0.062, 0.10, 18), matPolster());
-    kopf.rotation.z = 90 * GRAD;
-    kopf.position.x = vz * 0.125;
-    g.add(kopf);
+    const k = new THREE.Mesh(new THREE.CylinderGeometry(0.058, 0.058, 0.095, 18), matPolster());
+    k.rotation.z = 90 * GRAD; k.position.x = vz * 0.115; g.add(k);
   }
   return g;
 }
-
-function bank(neigung) {
+function bank(neigung, hoehe) {
   const g = new THREE.Group();
-  const liege = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.09, 1.25), matPolster());
-  liege.position.y = 0.46;
-  liege.rotation.x = (neigung || 0) * GRAD;
-  g.add(liege);
-  for (const z of [0.52, -0.52]) {
-    const b = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.42, 0.10), matMetall());
-    b.position.set(0, 0.21, z);
-    g.add(b);
-    const f = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.05, 0.14), matMetall());
-    f.position.set(0, 0.025, z);
-    g.add(f);
+  const h = hoehe === undefined ? 0.44 : hoehe;
+  const l = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.085, 1.30), matPolster());
+  l.position.y = h; l.rotation.x = (neigung || 0) * GRAD; l.receiveShadow = true; g.add(l);
+  for (const z of [0.54, -0.54]) {
+    const b = new THREE.Mesh(new THREE.BoxGeometry(0.09, h - 0.05, 0.09), matMetall());
+    b.position.set(0, (h - 0.05) / 2, z); g.add(b);
+    const f = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.05, 0.13), matMetall());
+    f.position.set(0, 0.025, z); g.add(f);
   }
   return g;
 }
-
-function staender(hoehe) {
+function staender() {
   const g = new THREE.Group();
   for (const vz of [1, -1]) {
-    const saeule = new THREE.Mesh(new THREE.BoxGeometry(0.09, hoehe, 0.09), matMetall());
-    saeule.position.set(vz * 0.62, hoehe / 2, 0);
-    g.add(saeule);
-    const fuss = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.05, 0.60), matMetall());
-    fuss.position.set(vz * 0.62, 0.025, 0);
-    g.add(fuss);
+    const s = new THREE.Mesh(new THREE.BoxGeometry(0.08, 1.05, 0.08), matMetall());
+    s.position.set(vz * 0.42, 0.52, -0.48); g.add(s);
   }
   return g;
 }
-
 function kabelturm() {
   const g = new THREE.Group();
-  g.position.set(-1.05, 0, -0.30);
-  const rahmen = new THREE.Mesh(new THREE.BoxGeometry(0.34, 2.1, 0.34), matMetall());
-  rahmen.position.set(0, 1.05, 0);
-  g.add(rahmen);
-  const stapel = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.75, 0.26), matPolster());
-  stapel.position.set(0, 0.45, 0.01);
-  g.add(stapel);
-  const platte = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.05, 0.55), matMetall());
-  platte.position.set(0, 0.025, 0);
-  g.add(platte);
+  g.position.set(-1.05, 0, -0.35);
+  const r = new THREE.Mesh(new THREE.BoxGeometry(0.30, 2.05, 0.30), matMetall());
+  r.position.y = 1.02; g.add(r);
+  const st = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.72, 0.24), matPolster());
+  st.position.set(0, 0.44, 0.02); g.add(st);
+  const p = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.05, 0.52), matMetall());
+  p.position.y = 0.025; g.add(p);
   return g;
 }
-
 function maschine() {
-  // Generische Sitzmaschine (Butterfly, Rudern, Beinstrecker …)
   const g = new THREE.Group();
-  g.position.set(-0.30, 0, 0);
-  g.rotation.y = 16 * Math.PI / 180;
-  const stapel = new THREE.Mesh(new THREE.BoxGeometry(0.28, 1.0, 0.30), matPolster());
-  stapel.position.set(0, 0.62, -0.62);
-  g.add(stapel);
-  const saeule = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.45, 0.12), matMetall());
-  saeule.position.set(0, 0.72, -0.42);
-  g.add(saeule);
-  const sitz = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.09, 0.36), matPolster());
-  sitz.position.set(0, 0.46, 0);
-  g.add(sitz);
-  const lehne = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.60, 0.09), matPolster());
-  lehne.position.set(0, 0.76, -0.20);
-  g.add(lehne);
-  const grund = new THREE.Mesh(new THREE.BoxGeometry(0.60, 0.05, 1.5), matMetall());
-  grund.position.set(0, 0.025, -0.25);
-  g.add(grund);
+  g.position.set(-0.28, 0, 0);
+  g.rotation.y = 14 * GRAD;
+  const st = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.95, 0.28), matPolster());
+  st.position.set(0, 0.60, -0.62); g.add(st);
+  const s = new THREE.Mesh(new THREE.BoxGeometry(0.11, 1.40, 0.11), matMetall());
+  s.position.set(0, 0.70, -0.44); g.add(s);
+  const si = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.085, 0.34), matPolster());
+  si.position.set(0, 0.44, 0); si.receiveShadow = true; g.add(si);
+  const le = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.56, 0.085), matPolster());
+  le.position.set(0, 0.73, -0.19); g.add(le);
+  const gr = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.05, 1.4), matMetall());
+  gr.position.set(0, 0.025, -0.24); g.add(gr);
   return g;
 }
-
 function klimmzugstange() {
   const g = new THREE.Group();
-  const stange = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 1.2, 14), matMetall());
-  stange.rotation.z = 90 * GRAD;
-  stange.position.y = 2.18;
-  g.add(stange);
+  const st = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 1.15, 14), matMetall());
+  st.rotation.z = 90 * GRAD; st.position.y = 2.16; g.add(st);
   for (const vz of [1, -1]) {
-    const saeule = new THREE.Mesh(new THREE.BoxGeometry(0.09, 2.2, 0.09), matMetall());
-    saeule.position.set(vz * 0.58, 1.1, 0);
-    g.add(saeule);
-    const fuss = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.05, 0.7), matMetall());
-    fuss.position.set(vz * 0.58, 0.025, 0);
-    g.add(fuss);
+    const s = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.18, 0.08), matMetall());
+    s.position.set(vz * 0.56, 1.09, 0); g.add(s);
+    const f = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.05, 0.66), matMetall());
+    f.position.set(vz * 0.56, 0.025, 0); g.add(f);
   }
   return g;
 }
 
 function geraetBauen(art) {
   const g = new THREE.Group();
-  const d = { gruppe: g, art, hantel: null };
-  if (art === 'bank_langhantel') { g.add(bank(0)); d.hantel = langhantel(1.25); g.add(d.hantel); g.add(staender(1.0)); }
-  else if (art === 'bank_kurzhantel') { g.add(bank(0)); d.hantel = 'kurz'; }
-  else if (art === 'schraegbank_langhantel') { g.add(bank(-28)); d.hantel = langhantel(1.25); g.add(d.hantel); }
-  else if (art === 'schraegbank_kurzhantel') { g.add(bank(-28)); d.hantel = 'kurz'; }
+  const d = { gruppe: g, art, lang: null, kurz: null };
+  if (art === 'bank_langhantel') { g.add(bank(0)); g.add(staender()); d.lang = langhantel(); g.add(d.lang); }
+  else if (art === 'bank_kurzhantel') { g.add(bank(0)); d.kurz = true; }
+  else if (art === 'schraegbank_langhantel') { g.add(bank(-26, 0.48)); d.lang = langhantel(); g.add(d.lang); }
+  else if (art === 'schraegbank_kurzhantel') { g.add(bank(-26, 0.48)); d.kurz = true; }
   else if (art === 'bank') { g.add(bank(0)); }
-  else if (art === 'langhantel') { d.hantel = langhantel(1.25); g.add(d.hantel); }
-  else if (art === 'kurzhantel') { d.hantel = 'kurz'; }
+  else if (art === 'langhantel') { d.lang = langhantel(); g.add(d.lang); }
+  else if (art === 'kurzhantel') { d.kurz = true; }
   else if (art === 'kabel') { g.add(kabelturm()); }
   else if (art === 'maschine') { g.add(maschine()); }
   else if (art === 'klimmzug') { g.add(klimmzugstange()); }
-  // 'keins' → leer
+  if (d.kurz) { d.kurzL = kurzhantel(); d.kurzR = kurzhantel(); g.add(d.kurzL); g.add(d.kurzR); }
   return d;
 }
 
@@ -336,226 +203,198 @@ function geraetBauen(art) {
 window.aufbauen = function (cfg) {
   konfig = cfg;
   scene = new THREE.Scene();
-  // Verlauf statt Flaeche: ein flacher Hintergrund laesst die Figur wie
-  // ausgeschnitten wirken. Als Leinwand-Textur gezeichnet, weil eine
-  // setContent-Seite keine Bilddateien laden kann.
+
   const lw = document.createElement('canvas');
   lw.width = 4; lw.height = 512;
   const ctx = lw.getContext('2d');
-  const verl = ctx.createLinearGradient(0, 0, 0, 512);
-  verl.addColorStop(0, '#223154');
-  verl.addColorStop(0.62, '#18223a');
-  verl.addColorStop(1, '#18223a');
-  ctx.fillStyle = verl;
-  ctx.fillRect(0, 0, 4, 512);
+  const v = ctx.createLinearGradient(0, 0, 0, 512);
+  v.addColorStop(0, '#243258');
+  v.addColorStop(0.6, '#18223a');
+  v.addColorStop(1, '#111827');
+  ctx.fillStyle = v; ctx.fillRect(0, 0, 4, 512);
   scene.background = new THREE.CanvasTexture(lw);
 
   camera = new THREE.PerspectiveCamera(34, cfg.breite / cfg.hoehe, 0.1, 60);
-
   renderer = new THREE.WebGLRenderer({ antialias: true, canvas: document.getElementById('c') });
   renderer.setSize(cfg.breite, cfg.hoehe, false);
   renderer.setPixelRatio(1);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
+  renderer.toneMappingExposure = 0.98;
 
-  // Licht: ein Hauptlicht mit Schatten, ein kaltes Gegenlicht fuer die Kante,
-  // dazu wenig Umgebungslicht — das gibt dem Modell Plastik ohne Flaute.
-  const haupt = new THREE.DirectionalLight(0xffffff, 2.6);
-  haupt.position.set(2.6, 4.2, 3.2);
+  const haupt = new THREE.DirectionalLight(0xffffff, 2.5);
+  haupt.position.set(2.4, 4.0, 3.0);
   haupt.castShadow = true;
   haupt.shadow.mapSize.set(2048, 2048);
-  haupt.shadow.camera.left = -7; haupt.shadow.camera.right = 7;
-  haupt.shadow.camera.top = 7; haupt.shadow.camera.bottom = -7;
-  haupt.shadow.camera.near = 0.5; haupt.shadow.camera.far = 22;
-  haupt.shadow.bias = -0.0015;
+  haupt.shadow.camera.left = -3.5; haupt.shadow.camera.right = 3.5;
+  haupt.shadow.camera.top = 3.5; haupt.shadow.camera.bottom = -3.5;
+  haupt.shadow.camera.near = 0.5; haupt.shadow.camera.far = 16;
+  haupt.shadow.bias = -0.0006;
+  haupt.shadow.normalBias = 0.012; // gegen Streifen auf der eigenen Haut
   scene.add(haupt);
-  // Gegenlicht bewusst schwach und nur leicht blau: bei 1.5 kippte die ganze
-  // Figur ins Violette und sah nach Spielzeug aus statt nach Anatomiemodell.
-  const gegen = new THREE.DirectionalLight(0x9db4ee, 0.75);
-  gegen.position.set(-3.0, 2.0, -2.6);
+  const gegen = new THREE.DirectionalLight(0x93a9e0, 0.55);
+  gegen.position.set(-3.0, 2.2, -2.6);
   scene.add(gegen);
-  const fuell = new THREE.DirectionalLight(0xffffff, 0.5);
-  fuell.position.set(-1.5, 1.2, 3.5);
+  const fuell = new THREE.DirectionalLight(0xffffff, 0.18);
+  fuell.position.set(-1.4, 1.2, 3.4);
   scene.add(fuell);
-  scene.add(new THREE.HemisphereLight(0xcdd8f0, 0x0e1219, 0.75));
+  scene.add(new THREE.HemisphereLight(0xb9c8e6, 0x0c1018, 0.34));
 
-  // Boden: dunkle Platte, faengt den Schatten und erdet die Figur
-  // Boden NUR als Schattenfaenger, ohne eigene Farbe.
-  //
-  // Drei Anlaeufe mit einer sichtbaren Flaeche endeten alle im selben dunklen
-  // Band quer durchs Bild: Der eingenebelte Boden am Horizont und der
-  // Himmelsverlauf an derselben Bildhoehe treffen nie exakt dieselbe Farbe,
-  // und jede Korrektur verschob die Kante nur. Mit ShadowMaterial gibt es
-  // keine Kante mehr — der Verlauf fuellt das ganze Bild, geerdet wird die
-  // Figur allein durch ihren Schatten.
-  const boden = new THREE.Mesh(
-    new THREE.CircleGeometry(9, 48),
-    new THREE.ShadowMaterial({ opacity: 0.42, transparent: true }),
-  );
+  // Boden nur als Schattenfaenger — eine sichtbare Flaeche ergab im ersten
+  // Anlauf immer ein dunkles Band am Horizont.
+  const boden = new THREE.Mesh(new THREE.CircleGeometry(9, 48),
+    new THREE.ShadowMaterial({ opacity: 0.4, transparent: true }));
   boden.rotation.x = -90 * GRAD;
   boden.receiveShadow = true;
   scene.add(boden);
 
-  const f = figurBauen();
-  koerperTeile = f.teile;
-  muskelFlecken = f.flecken;
-  scene.add(f.wurzel);
+  const umgebungSzene = new THREE.Scene();
+  umgebungSzene.background = scene.background;
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const umgebung = pmrem.fromScene(umgebungSzene, 0.04).texture;
+
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0xffffff, roughness: 0.26, metalness: 0.0, vertexColors: true,
+    envMap: umgebung, envMapIntensity: 0.9,
+  });
+  const f = window.figurBauen(mat);
+  figur = f.mesh;
+  knochen = f.knochen;
+  ruhePos = f.weltPos;
+  scene.add(figur);
+
+  muskelFaerben(cfg.muskel);
 
   geraetDaten = geraetBauen(cfg.bewegung.geraet);
   scene.add(geraetDaten.gruppe);
-  if (geraetDaten.hantel === 'kurz') {
-    geraetDaten.kurzL = kurzhantel();
-    geraetDaten.kurzR = kurzhantel();
-    scene.add(geraetDaten.kurzL);
-    scene.add(geraetDaten.kurzR);
-  }
-
-  // Muskeln einschalten: 'chest' schaltet chest, 'biceps' beide Seiten.
-  const ziel = cfg.muskel;
-  for (const [name, obj] of Object.entries(muskelFlecken)) {
-    const basis = name.replace(/[LR]$/, '');
-    obj.visible = basis === ziel;
-  }
 
   rahmenMessen();
   return true;
 };
 
-// Bildausschnitt EINMAL ueber die ganze Bewegung messen, nicht je Frame:
-// Eine mitwandernde Kamera pumpt sichtbar, sobald die Arme hochgehen.
-// Gemessen wird nur die Figur samt Handgeraet — ein Kabelturm oder eine
-// Maschine wuerde den Ausschnitt sonst so weit aufziehen, dass die Figur
-// zur Ameise wird; dass ein Geraet angeschnitten ist, stoert dagegen nicht.
+// Muskel direkt in die HAUT einfaerben, mit weichem Rand. Aufgeklebte Flecken
+// (erster Anlauf) sitzen bei jeder Bewegung woanders und sehen aufgeklebt aus.
+function muskelFaerben(name) {
+  const pos = figur.geometry.attributes.position;
+  const anzahl = pos.count;
+  const farben = new Float32Array(anzahl * 3);
+  const basis = new THREE.Color(HAUT);
+  const kugeln = MUSKELN[name] || [];
+  for (let i = 0; i < anzahl; i++) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+    let staerke = 0;
+    for (const [cx, cy, cz, r] of kugeln) {
+      const d = Math.hypot(x - cx, y - cy, z - cz);
+      // Weicher Rand: innerhalb 55 % voll, danach auslaufend.
+      const s = 1 - Math.max(0, Math.min(1, (d - r * 0.55) / (r * 0.45)));
+      if (s > staerke) staerke = s;
+    }
+    const c = basis.clone().lerp(MUSKEL, staerke * staerke * (3 - 2 * staerke));
+    farben[i * 3] = c.r; farben[i * 3 + 1] = c.g; farben[i * 3 + 2] = c.b;
+  }
+  figur.geometry.setAttribute('color', new THREE.Float32BufferAttribute(farben, 3));
+}
+
+// ————— Pose —————
+function misch(a, b, t) { return a + (b - a) * t; }
+function mischPunkt(a, b, t) {
+  return [misch(a[0], b[0], t), misch(a[1], b[1], t), misch(a[2], b[2], t)];
+}
+
+function poseSetzen(t) {
+  const b = konfig.bewegung;
+  // Wurzel (Becken) setzen — Lage und Neigung des ganzen Koerpers.
+  const w = knochen.huefte;
+  const p = mischPunkt(b.huefte.start, b.huefte.ende || b.huefte.start, t);
+  w.position.set(p[0], p[1], p[2]);
+  const r = mischPunkt(b.neigung ? b.neigung.start : [0, 0, 0],
+    b.neigung ? (b.neigung.ende || b.neigung.start) : [0, 0, 0], t);
+  w.rotation.set(r[0] * GRAD, r[1] * GRAD, r[2] * GRAD);
+
+  // Wirbelsaeule und Kopf als einfache Winkel — dort gibt es kein Ziel im
+  // Raum, das man vorgeben koennte.
+  for (const [name, feld] of [['rumpf', b.rumpf], ['brust', b.brust], ['kopf', b.kopf]]) {
+    if (!feld) { knochen[name].rotation.set(0, 0, 0); continue; }
+    const a = mischPunkt(feld.start, feld.ende || feld.start, t);
+    knochen[name].rotation.set(a[0] * GRAD, a[1] * GRAD, a[2] * GRAD);
+  }
+  figur.updateMatrixWorld(true);
+
+  // Arme und Beine ueber Ziele im Raum.
+  const proSeite = (p, i, standard) => {
+    const v = p || standard;
+    return Array.isArray(v[0]) ? v[i] : v;
+  };
+  for (const [seite, i] of [['L', 0], ['R', 1]]) {
+    const hz = mischPunkt(b.hand.start[i], (b.hand.ende || b.hand.start)[i], t);
+    zweiKnochenIK('schulter' + seite, 'ellbogen' + seite, hz,
+      proSeite(b.polArm, i, [0, 0, -1]), window.MASSE.oberarm, window.MASSE.unterarm);
+    const fz = mischPunkt(b.fuss.start[i], (b.fuss.ende || b.fuss.start)[i], t);
+    zweiKnochenIK('huefte' + seite, 'knie' + seite, fz,
+      proSeite(b.polBein, i, [0, 0, 1]), window.MASSE.oberschenkel, window.MASSE.unterschenkel);
+  }
+  figur.updateMatrixWorld(true);
+}
+
+// Hanteln folgen den Haenden.
+const _hL = new THREE.Vector3(), _hR = new THREE.Vector3();
+function hantelnFuehren() {
+  if (!geraetDaten) return;
+  knochen.handL.getWorldPosition(_hL);
+  knochen.handR.getWorldPosition(_hR);
+  if (geraetDaten.kurz) {
+    geraetDaten.kurzL.position.copy(_hL);
+    geraetDaten.kurzR.position.copy(_hR);
+    geraetDaten.kurzL.rotation.set(0, 90 * GRAD, 0);
+    geraetDaten.kurzR.rotation.set(0, 90 * GRAD, 0);
+    return;
+  }
+  if (!geraetDaten.lang) return;
+  const mitte = _hL.clone().add(_hR).multiplyScalar(0.5);
+  geraetDaten.lang.position.copy(mitte);
+  const richtung = _hL.clone().sub(_hR).normalize();
+  geraetDaten.lang.rotation.set(0, -Math.atan2(richtung.z, richtung.x),
+    Math.asin(Math.max(-1, Math.min(1, richtung.y))));
+}
+
+// Bildausschnitt EINMAL ueber die ganze Bewegung messen — je Frame gemessen
+// pumpt die Kamera sichtbar, sobald die Arme hochgehen.
 function rahmenMessen() {
   const box = new THREE.Box3();
   const einzel = new THREE.Box3();
   for (let i = 0; i <= 8; i++) {
     poseSetzen(i / 8);
-    if (konfig.bewegung.bodenHaftung !== false) bodenHaftung();
     hantelnFuehren();
-    koerperTeile.wurzel.updateWorldMatrix(true, true);
-    box.union(einzel.setFromObject(koerperTeile.wurzel));
-    if (geraetDaten.hantel && geraetDaten.hantel !== 'kurz') {
-      box.union(einzel.setFromObject(geraetDaten.hantel));
-    }
-    if (geraetDaten.kurzL) {
+    box.union(einzel.setFromObject(figur));
+    if (geraetDaten.lang) box.union(einzel.setFromObject(geraetDaten.lang));
+    if (geraetDaten.kurz) {
       box.union(einzel.setFromObject(geraetDaten.kurzL));
       box.union(einzel.setFromObject(geraetDaten.kurzR));
     }
   }
   const mitte = box.getCenter(new THREE.Vector3());
   const groesse = box.getSize(new THREE.Vector3());
-  // Der Radius zaehlt die BREITE nur zur Haelfte: die Kamera steht schraeg,
-  // eine seitlich weit ausladende Pose (Seitheben) braucht nicht so viel
-  // Abstand wie eine gleich hohe.
   const radius = Math.max(groesse.y, Math.max(groesse.x, groesse.z) * 0.72) * 0.5;
-  const fov = camera.fov * GRAD;
   rahmen = {
     mitte,
-    dist: (radius * 1.28) / Math.tan(fov / 2),
-    hoehe: groesse.y * 0.16, // leichte Aufsicht, wirkt weniger wie ein Passfoto
+    dist: (radius * 1.32) / Math.tan((camera.fov * GRAD) / 2),
+    hoehe: groesse.y * 0.14,
   };
 }
 
-// Weiche Hin-und-Her-Bewegung, die sich exakt schliesst: bei n=0 und n=N
-// steht dieselbe Pose. Sonst ruckelt jede Schleife an der Nahtstelle.
+// Weiche Hin-und-Her-Bewegung, die sich exakt schliesst.
 function verlauf(n, gesamt) {
   return (1 - Math.cos((n / gesamt) * Math.PI * 2)) / 2;
 }
 
-function poseSetzen(t) {
-  const b = konfig.bewegung;
-  const gelenke = new Set([...Object.keys(b.start), ...Object.keys(b.ende)]);
-  for (const name of gelenke) {
-    const teil = koerperTeile[name];
-    if (!teil) continue;
-    const a = b.start[name] || [0, 0, 0];
-    const c = b.ende[name] || a;
-    teil.rotation.set(
-      (a[0] + (c[0] - a[0]) * t) * GRAD,
-      (a[1] + (c[1] - a[1]) * t) * GRAD,
-      (a[2] + (c[2] - a[2]) * t) * GRAD,
-    );
-  }
-  const w = koerperTeile.wurzel;
-  const ps = b.wurzelPos || [0, 0, 0];
-  const pe = b.wurzelPosEnde || ps;
-  w.position.set(ps[0] + (pe[0] - ps[0]) * t, ps[1] + (pe[1] - ps[1]) * t, ps[2] + (pe[2] - ps[2]) * t);
-  const rs = b.wurzelRot || [0, 0, 0];
-  const re = b.wurzelRotEnde || rs;
-  w.rotation.set(
-    (rs[0] + (re[0] - rs[0]) * t) * GRAD,
-    (rs[1] + (re[1] - rs[1]) * t) * GRAD,
-    (rs[2] + (re[2] - rs[2]) * t) * GRAD,
-  );
-}
-
-// Fuesse am Boden halten.
-//
-// Warum automatisch statt in jedem Muster von Hand: Beugt sich Huefte und Knie,
-// wandert der Fuss nach oben UND nach vorne — bei der Kniebeuge um 43 bzw.
-// 38 cm. Die Figur schwebte deshalb im ersten Durchgang ueber dem Boden. Das
-// je Muster auszurechnen waere zwei Dutzend Mal dieselbe Trigonometrie mit
-// zwei Dutzend Gelegenheiten, sich zu vertun. Stattdessen: posieren, messen,
-// Wurzel nachziehen. Muster ohne Bodenkontakt (liegend, haengend) schalten es
-// mit `bodenHaftung: false` ab.
-const _fL = new THREE.Vector3(), _fR = new THREE.Vector3();
-const KNOECHEL_Y = 0.04;  // Hoehe des Sprunggelenks im aufrechten Stand
-function bodenHaftung() {
-  koerperTeile.wurzel.updateWorldMatrix(true, true);
-  koerperTeile.fussgelenkL.getWorldPosition(_fL);
-  koerperTeile.fussgelenkR.getWorldPosition(_fR);
-  const w = koerperTeile.wurzel;
-  w.position.y += KNOECHEL_Y - Math.min(_fL.y, _fR.y);
-  w.position.z += -(_fL.z + _fR.z) / 2;
-}
-
-// Hanteln folgen den Haenden. Erst nach dem Posieren aufrufen — die
-// Welt-Positionen stehen sonst noch auf der vorigen Pose.
-const _hL = new THREE.Vector3(), _hR = new THREE.Vector3();
-function hantelnFuehren() {
-  if (!geraetDaten || !geraetDaten.hantel) return;
-  koerperTeile.wurzel.updateWorldMatrix(true, true);
-  koerperTeile.handgelenkL.getWorldPosition(_hL);
-  koerperTeile.handgelenkR.getWorldPosition(_hR);
-  const griffL = _hL.clone().add(new THREE.Vector3(0, -0.05, 0));
-  const griffR = _hR.clone().add(new THREE.Vector3(0, -0.05, 0));
-
-  if (geraetDaten.hantel === 'kurz') {
-    for (const [obj, p] of [[geraetDaten.kurzL, griffL], [geraetDaten.kurzR, griffR]]) {
-      obj.position.copy(p);
-      // Kurzhanteln zeigen quer zur Blickrichtung des Unterarms
-      obj.rotation.set(0, 90 * GRAD, 0);
-    }
-    return;
-  }
-  // Langhantel: Mitte zwischen den Haenden, Achse entlang der Verbindung
-  const mitte = griffL.clone().add(griffR).multiplyScalar(0.5);
-  geraetDaten.hantel.position.copy(mitte);
-  const richtung = griffL.clone().sub(griffR).normalize();
-  const winkelY = Math.atan2(richtung.z, richtung.x);
-  const winkelZ = Math.asin(Math.max(-1, Math.min(1, richtung.y)));
-  geraetDaten.hantel.rotation.set(0, -winkelY, winkelZ);
-}
-
 window.setFrame = function (n) {
-  const t = verlauf(n, konfig.frames);
-  poseSetzen(t);
-  if (konfig.bewegung.bodenHaftung !== false) bodenHaftung();
+  poseSetzen(verlauf(n, konfig.frames));
   hantelnFuehren();
 
-  // Kamera: sanftes Pendeln, das sich ebenfalls schliesst. Volle Umrundung
-  // waere hübsch, macht die Uebung aber phasenweise unlesbar.
-  //
-  // Abstand und Zielpunkt kommen aus dem in aufbauen() gemessenen Rahmen,
-  // NICHT aus Handwerten je Muster: Sonst schnitte jede zweite Uebung den
-  // Kopf oder die Fuesse ab, und jede Aenderung an der Pose zoege eine neue
-  // Runde Kamera-Feintuning nach sich.
   const k = konfig.bewegung.kamera || {};
-  const grund = (k.winkel !== undefined ? k.winkel : (HINTEN.has(konfig.muskel) ? 146 : -34));
-  const schwung = (k.schwung === undefined ? 16 : k.schwung);
+  const grund = (k.winkel !== undefined ? k.winkel : (HINTEN.has(konfig.muskel) ? 148 : -34));
+  const schwung = (k.schwung === undefined ? 14 : k.schwung);
   const winkel = (grund + schwung * Math.sin((n / konfig.frames) * Math.PI * 2)) * GRAD;
   const dist = rahmen.dist * (k.zoom || 1);
   camera.position.set(
@@ -564,7 +403,6 @@ window.setFrame = function (n) {
     rahmen.mitte.z + Math.cos(winkel) * dist,
   );
   camera.lookAt(rahmen.mitte.x, rahmen.mitte.y, rahmen.mitte.z);
-
   renderer.render(scene, camera);
   return true;
 };

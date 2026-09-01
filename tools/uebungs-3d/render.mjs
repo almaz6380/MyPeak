@@ -36,6 +36,7 @@ const wert = (flagge) => {
 };
 
 const dreiJs = readFileSync(join(WURZEL, 'node_modules/three/build/three.cjs'), 'utf8');
+const figurJs = readFileSync(join(HIER, 'figur.js'), 'utf8');
 const szeneJs = readFileSync(join(HIER, 'szene.js'), 'utf8');
 
 // three.cjs ist ein in sich geschlossenes CommonJS-Bundle (keine require-
@@ -52,7 +53,14 @@ const seite = `<!doctype html><html><head><meta charset="utf-8"><style>
   var THREE = module.exports;
 </script>
 <script>
+  (function () {
+  ${figurJs}
+  })();
+</script>
+<script>
+  (function () {
   ${szeneJs}
+  })();
 </script>
 </body></html>`;
 
