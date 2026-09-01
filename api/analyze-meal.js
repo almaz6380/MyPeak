@@ -52,7 +52,48 @@ export default async function handler(req, res) {
     return res.status(413).json({ error: 'Image too large. Please use a compressed image under 3MB.' });
   }
 
-  const prompt = language === 'de'
+  // Fuer es kommen name_es/meal_description_es ZUSAETZLICH zu de/en mit —
+  // die Client-Weichen fallen auf en zurueck, wenn ein Feld fehlt (alte
+  // App-Versionen schicken weiter nur de/en und bleiben unberuehrt).
+  const prompt = language === 'es'
+    ? `Eres un asistente de análisis nutricional. Analiza esta foto de una comida e identifica cada alimento visible.
+
+Para cada alimento, estima:
+- Nombre en español, alemán e inglés
+- Tamaño de la porción en gramos (según el tamaño visual respecto al plato/bol)
+- Calorías (kcal)
+- Proteínas (g)
+- Carbohidratos (g)
+- Grasas (g)
+- Nivel de confianza (high, medium, low)
+
+Importante:
+- Estima las porciones según el tamaño visual
+- Usa bases de datos nutricionales estándar como referencia
+- Asume una cantidad normal de aceite/grasa en la preparación
+- Si no puedes identificar un alimento, descríbelo y da tu mejor estimación
+- Si la imagen no muestra comida, responde con {"error": "no_food_detected"}
+
+Responde SOLO con JSON válido exactamente en este formato, sin ningún otro texto:
+{
+  "items": [
+    {
+      "name_es": "Pechuga de pollo",
+      "name_de": "Hähnchenbrust",
+      "name_en": "Chicken breast",
+      "portion_g": 150,
+      "calories": 248,
+      "protein": 46.5,
+      "carbs": 0,
+      "fat": 5.4,
+      "confidence": "high"
+    }
+  ],
+  "meal_description_es": "Breve descripción de la comida",
+  "meal_description_de": "Kurze Beschreibung der Mahlzeit",
+  "meal_description_en": "Short description of the meal"
+}`
+    : language === 'de'
     ? `Du bist ein Ernährungsanalyse-Assistent. Analysiere dieses Foto einer Mahlzeit und identifiziere jedes sichtbare Lebensmittel.
 
 Für jedes Lebensmittel schätze:

@@ -111,12 +111,21 @@ export function applyOilAdjustment(items, oilLevel = 'normal') {
   });
 }
 
+// Name in der App-Sprache; fehlt das Feld (alte API-Antwort, unerwartete
+// Sprache), faellt es auf Englisch zurueck. startsWith, weil i18n.language
+// auch als Regionalcode ankommen kann ('de-AT').
+export function itemName(item, language = 'de') {
+  if (language?.startsWith('de') && item.name_de) return item.name_de;
+  if (language?.startsWith('es') && item.name_es) return item.name_es;
+  return item.name_en || item.name_de || '';
+}
+
 /**
  * Convert AI result items to nutrition entry format
  */
 export function itemsToNutritionEntries(items, language = 'de') {
   return items.map((item) => ({
-    food_name: language === 'de' ? item.name_de : item.name_en,
+    food_name: itemName(item, language),
     brand: null,
     serving_size: item.portion_g,
     serving_unit: 'g',
