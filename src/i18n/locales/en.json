@@ -880,7 +880,15 @@
     "kneeStrikes": "Knee Strikes",
     "kneeStrikesDesc": "Explosive knee strikes from the clinch or at range. Trains hip power and balance.",
     "elbowStrikes": "Elbow Strikes",
-    "elbowStrikesDesc": "Short, hard elbow techniques at close range. Precision over power."
+    "elbowStrikesDesc": "Short, hard elbow techniques at close range. Precision over power.",
+    "airBike": "Air Bike",
+    "airBikeDesc": "Fan bike with moving arm levers. Arms and legs work together — very demanding while easy on the joints.",
+    "stepmill": "Stepmill",
+    "stepmillDesc": "A never-ending staircase. Very intense cardio for legs and glutes.",
+    "treadmillWalk": "Treadmill Walk",
+    "treadmillWalkDesc": "Brisk walking, ideally on an incline. Joint-friendly and good for warm-ups or easy sessions.",
+    "hipHinge": "Hip Hinge",
+    "hipHingeDesc": "The base movement behind deadlifts and rows: push the hips back, keep the back flat. Learn it with a light dumbbell before adding load."
   },
   "auth": {
     "login": "Log In",

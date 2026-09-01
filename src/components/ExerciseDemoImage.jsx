@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react';
-import exerciseDemos, { getDemoImages } from '../data/exerciseDemos';
-import mitAnimation from '../data/exerciseAnimations';
+import { getDemoImages } from '../data/exerciseDemos';
+import animationen from '../data/exerciseAnimations';
 
 // Übungs-Demo. Wo eine Animation vorliegt, läuft sie; sonst die alten Fotos
 // als weiche Überblendung zwischen Start- und Endposition.
 //
 // Die Animationen stammen aus dem Gratis-Paket von Vital Animations. Lizenz
 // und Herkunftsnachweis: store-assets/lizenzen/vital-animations/.
-// Es sind 36 der 162 Übungen — vor allem Beine und Schultern; Rücken, Bizeps
-// und Bauch bleiben bei den Fotos. Deshalb hier kein harter Wechsel, sondern
-// eine Weiche pro Übung.
+// Es sind 42 Übungen — vor allem Beine und Schultern; Rücken, Bizeps und
+// Bauch bleiben bei den Fotos. Deshalb hier kein harter Wechsel, sondern eine
+// Weiche pro Übung.
+//
+// Die Weiche geht über die ÜBUNGS-ID, nicht über den Fotoordner: Sechs der
+// Übungen (Ergometer, Seitheben an der Maschine, Air Bike, Stepper, Gehen am
+// Laufband, Hüftscharnier) haben gar kein Foto und wären sonst leer geblieben.
 //
 // ⚠ `muted` und `playsInline` sind Pflicht, nicht Kosmetik: Ohne beides
 // verweigert iOS die automatische Wiedergabe und öffnet stattdessen den
@@ -19,9 +23,8 @@ import mitAnimation from '../data/exerciseAnimations';
 // Download angeboten werden. Auslieferung durch die App ist ausdrücklich
 // erlaubt — also nirgends direkt verlinken und keinen Download anbieten.
 export default function ExerciseDemoImage({ exerciseId, alt = '' }) {
-  const ordner = exerciseDemos[exerciseId];
+  const ordner = animationen[exerciseId];
   const bilder = getDemoImages(exerciseId);
-  const hatAnimation = Boolean(ordner) && mitAnimation.has(ordner);
   const [videoKaputt, setVideoKaputt] = useState(false);
   const [bilderKaputt, setBilderKaputt] = useState(false);
 
@@ -30,7 +33,7 @@ export default function ExerciseDemoImage({ exerciseId, alt = '' }) {
     setBilderKaputt(false);
   }, [exerciseId]);
 
-  if (hatAnimation && !videoKaputt) {
+  if (ordner && !videoKaputt) {
     return (
       <div className="relative w-full aspect-square bg-white rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700">
         <video

@@ -23,7 +23,7 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { execFileSync } from 'child_process';
 import ffmpegPfad from 'ffmpeg-static';
-import { zuordnung } from './zuordnung.mjs';
+import { zuordnung, direkt, ausnahmen } from './zuordnung.mjs';
 
 const HIER = dirname(fileURLToPath(import.meta.url));
 const WURZEL = join(HIER, '../..');
@@ -45,7 +45,11 @@ for (const n of readdirSync(quelle)) {
 mkdirSync(ZIEL, { recursive: true });
 let ok = 0, fehlend = [], gesamt = 0;
 
-for (const [id, ordner] of Object.entries(zuordnung)) {
+const auftraege = [
+  ...Object.entries(zuordnung),
+  ...Object.entries(direkt), // Ordnername = Uebungs-ID
+];
+for (const [id, ordner] of auftraege) {
   const quellDatei = dateien[id];
   if (!quellDatei) { fehlend.push(id); continue; }
   const ausgabe = join(ZIEL, ordner);
@@ -67,14 +71,30 @@ for (const [id, ordner] of Object.entries(zuordnung)) {
   console.log(`  ${id} → ${ordner.padEnd(40)} ${kb.toFixed(0)} KB`);
 }
 
-// Liste fuer die App: welche Uebungsordner haben eine Animation.
-const ordnerListe = Object.values(zuordnung).filter((o) => existsSync(join(ZIEL, o, 'demo.mp4'))).sort();
+// Zuordnung fuer die App: UEBUNGS-ID → Animationsordner.
+// Ueber die Uebungs-ID statt ueber den Fotoordner, weil Uebungen ohne Foto
+// (Ergometer, Seitheben Maschine, die vier neuen) sonst leer ausgingen.
+const demos = (await import('../../src/data/exerciseDemos.js')).default;
+const karte = {};
+for (const [id, ordner] of Object.entries(zuordnung)) {
+  if (!existsSync(join(ZIEL, ordner, 'demo.mp4'))) continue;
+  // Mehrere Uebungen koennen sich einen Fotoordner teilen — alle bekommen die
+  // Animation.
+  for (const [uebungsId, o] of Object.entries(demos)) {
+    if (o === ordner && !ausnahmen.has(uebungsId)) karte[uebungsId] = ordner;
+  }
+}
+for (const [id, uebungsId] of Object.entries(direkt)) {
+  if (existsSync(join(ZIEL, uebungsId, 'demo.mp4'))) karte[uebungsId] = uebungsId;
+}
+const sortiert = Object.fromEntries(Object.entries(karte).sort(([a], [b]) => a.localeCompare(b)));
 writeFileSync(join(HIER, '../../src/data/exerciseAnimations.js'),
   `// AUTOMATISCH ERZEUGT von tools/anim-import/import.mjs — nicht von Hand aendern.\n`
-  + `// Uebungsordner mit einer Animation aus dem Vital-Animations-Gratispaket.\n`
-  + `// Alles andere zeigt weiter die Fotos.\n`
-  + `const mitAnimation = new Set(${JSON.stringify(ordnerListe, null, 2)});\n\n`
-  + `export default mitAnimation;\n`);
+  + `// Uebungs-ID → Ordner unter public/exercise-demos-anim/.\n`
+  + `// Quelle: Gratis-Paket von Vital Animations, Lizenz siehe\n`
+  + `// store-assets/lizenzen/vital-animations/. Alles ohne Eintrag zeigt die Fotos.\n`
+  + `const animationen = ${JSON.stringify(sortiert, null, 2)};\n\n`
+  + `export default animationen;\n`);
 
 console.log(`\n${ok} uebernommen, ${(gesamt / 1024).toFixed(1)} MB gesamt.`);
 if (fehlend.length) console.log(`Nicht gefunden: ${fehlend.join(', ')}`);
