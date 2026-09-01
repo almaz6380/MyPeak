@@ -308,17 +308,49 @@ export function getExercisesByType(type) {
   return exercises.filter((e) => (e.type || 'strength') === type);
 }
 
+// Selbst erstellte Übungen haben keinen Übersetzungsschlüssel. Damit sie sich
+// wie Katalog-Übungen anfassen lassen, tragen sie ihren Namen im nameKey mit
+// diesem Präfix. Wer den Namen anzeigt, muss ihn hier wieder abziehen.
+export const CUSTOM_NAME_PREFIX = '__custom__';
+const CUSTOM_EXERCISES_STORAGE_KEY = 'custom_exercises';
+
+// Eigene Übungen (localStorage 'custom_exercises') als Exercise-Objekte.
+// Raw-String-Cache: getExerciseById läuft in Hot-Loops (useMuscleHeatmap,
+// achievements) — nur bei geändertem localStorage-Inhalt neu parsen.
+let _customRaw = null;
+let _customParsed = [];
+
+export function getCustomExercisesAsExercises() {
+  try {
+    const raw = localStorage.getItem(CUSTOM_EXERCISES_STORAGE_KEY);
+    if (raw !== _customRaw) {
+      _customRaw = raw;
+      const list = raw ? JSON.parse(raw) : [];
+      _customParsed = list.map((ce) => ({
+        id: ce.exercise_id || ce.id,
+        type: 'strength',
+        muscleGroup: ce.muscle_group || 'chest',
+        equipment: ce.equipment || 'bodyweight',
+        nameKey: `${CUSTOM_NAME_PREFIX}${ce.name}`,
+        descKey: '',
+        _customName: ce.name,
+        _isCustom: true,
+      }));
+    }
+  } catch {
+    _customParsed = [];
+  }
+  return _customParsed;
+}
+
 export function getExerciseById(id) {
-  const found = exercises.find((e) => e.id === id);
+  const found = exercises.find((e) => e.id === id)
+    || getCustomExercisesAsExercises().find((e) => e.id === id);
   if (!found && import.meta.env.DEV) {
     console.warn(`[exercises] Unbekannte Übungs-ID: "${id}"`);
   }
   return found;
 }
-// Selbst erstellte Übungen haben keinen Übersetzungsschlüssel. Damit sie sich
-// wie Katalog-Übungen anfassen lassen, tragen sie ihren Namen im nameKey mit
-// diesem Präfix. Wer den Namen anzeigt, muss ihn hier wieder abziehen.
-export const CUSTOM_NAME_PREFIX = '__custom__';
 
 function stripCustomPrefix(nameKey, t) {
   return nameKey.startsWith(CUSTOM_NAME_PREFIX)

@@ -14,7 +14,7 @@ import FriendsList from './training/FriendsList';
 import Leaderboard from './training/Leaderboard';
 import ChallengesList from './training/ChallengesList';
 import exercises, { getExerciseById, getExercisesByType, CUSTOM_NAME_PREFIX } from '../data/exercises';
-import { getCustomPlans, getCustomPlansByType, saveCustomPlan, getActiveSchedule, getScheduledDaysForMonth, getWorkouts, deactivateAllSchedules, getCustomExercises } from '../data/workoutStorage';
+import { getCustomPlansByType, saveCustomPlan, getActiveSchedule, getScheduledDaysForMonth, getWorkouts, deactivateAllSchedules, getCustomExercises } from '../data/workoutStorage';
 import { resolveScheduledDay } from '../data/programResolver';
 import { getHiddenDefaultPlans, getPermanentDeletedDefaultPlans } from '../data/settingsStorage';
 import { useAuth } from '../context/AuthContext';
@@ -51,6 +51,7 @@ export default function TrainingPage() {
   const [circuitConfig, setCircuitConfig] = useState(null);
   const [martialArtsConfig, setMartialArtsConfig] = useState(null);
   const [editingPlan, setEditingPlan] = useState(null);
+  const [myPlansToast, setMyPlansToast] = useState(null); // Erfolgstext für die MyPlans-Ansicht
   const [viewingPlan, setViewingPlan] = useState(null);
   const [viewingDayIndex, setViewingDayIndex] = useState(0);
   const [planDetailOrigin, setPlanDetailOrigin] = useState('plans'); // wohin „Zurück" führt
@@ -222,6 +223,9 @@ export default function TrainingPage() {
       handleStartHiit({ rounds: day.rounds, workTime: day.workTime, restTime: day.restTime, exercises: day.exercises || [] });
     } else if (day.type === 'martial_arts' && day.rounds) {
       handleStartMartialArts({ rounds: day.rounds, workTime: day.workTime, restTime: day.restTime, exercises: day.exercises || [] });
+    } else if (day.type === 'split') {
+      // Reiner Split-Tag ohne Übungen: Trainingsauswahl öffnen statt tot zu sein
+      setView('startChoice');
     }
   };
 
@@ -238,11 +242,12 @@ export default function TrainingPage() {
     });
   };
 
-  // Kann die Heute-Session direkt gestartet werden? (Custom-'split'-Tage z. B. nicht)
+  // Kann die Heute-Session direkt gestartet werden?
   const todayStartable = !!todaySession && (
     (todaySession.type === 'strength' && todaySession.exercises?.length > 0)
     || (todaySession.type === 'cardio' && (todaySession.segments?.length > 0 || todaySession.exerciseId))
     || ((todaySession.type === 'hiit' || todaySession.type === 'martial_arts') && todaySession.rounds)
+    || todaySession.type === 'split' // öffnet die Trainingsauswahl
   );
 
   if (view === 'startChoice') {
@@ -381,6 +386,9 @@ export default function TrainingPage() {
         onStartCircuit={handleStartCircuit}
         onStartCardio={handleStartCardio}
         onStartMartialArts={handleStartMartialArts}
+        onStartDay={(day, planName) => handleStartPlan(day.exercises, null, day.label || planName)}
+        initialToastMessage={myPlansToast}
+        onToastDone={() => setMyPlansToast(null)}
       />
     );
   }
@@ -400,7 +408,19 @@ export default function TrainingPage() {
   }
 
   if (view === 'weeklyPlan') {
-    return <WeeklyPlanBuilder editPlan={editingPlan} onBack={() => setView('myPlans')} onSaved={() => { setEditingPlan(null); loadCalendarData(); setView('myPlans'); }} />;
+    return (
+      <WeeklyPlanBuilder
+        editPlan={editingPlan}
+        activeSchedule={activeSchedule}
+        onBack={() => setView('myPlans')}
+        onSaved={(message) => {
+          setEditingPlan(null);
+          loadCalendarData();
+          if (message) setMyPlansToast(message);
+          setView('myPlans');
+        }}
+      />
+    );
   }
 
   if (view === 'planDetail' && viewingPlan) {
@@ -483,7 +503,9 @@ export default function TrainingPage() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-                {lang === 'de' ? 'Heute' : 'Today'}: {todaySession ? (todaySession.label || todaySession.type) : (lang === 'de' ? 'Ruhetag' : 'Rest day')}
+                {lang === 'de' ? 'Heute' : 'Today'}: {todaySession
+                  ? (todaySession.splitId ? t(`training.split_${todaySession.splitId}`) : (todaySession.label || todaySession.type))
+                  : (lang === 'de' ? 'Ruhetag' : 'Rest day')}
               </p>
               <p className="text-xs text-slate-400 truncate">
                 {todaySession?.week && todaySession?.durationWeeks
@@ -651,7 +673,9 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
 
   useEffect(() => {
     if (user) {
-      getCustomPlans(user.id).then(setCustomPlans);
+      // Nur Kraftpläne (Array-days) — HIIT/Cardio-Pläne speichern days als Objekt
+      // und würden das plan.days.map()-Rendering unten crashen lassen.
+      getCustomPlansByType(user.id, 'strength').then(setCustomPlans);
     }
     setHiddenDefaults(getHiddenDefaultPlans());
   }, [user]);
@@ -682,7 +706,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
                 <div key={plan.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
                   <h3 className="font-semibold text-lg mb-3">{plan.name}</h3>
                   <div className="flex flex-col gap-2">
-                    {plan.days.map((day, i) => (
+                    {Array.isArray(plan.days) && plan.days.map((day, i) => (
                       <button
                         key={i}
                         onClick={() => onViewPlan(plan, i)}
@@ -690,7 +714,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
                       >
                         <span className="text-sm font-medium">{day.name}</span>
                         <div className="flex items-center gap-1 text-xs text-slate-400">
-                          <span>{day.exercises.length} {t('training.exercises')}</span>
+                          <span>{day.exercises?.length ?? 0} {t('training.exercises')}</span>
                           <ChevronRight className="w-4 h-4" />
                         </div>
                       </button>
