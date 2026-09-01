@@ -8,6 +8,8 @@ export default function SupplementsKnowledgePage({ onBack }) {
       data={supplementsTopics}
       titleDE="Supplemente-Wissen"
       titleEN="Supplements Knowledge"
+      titleES="Conocimiento sobre suplementos"
+      bereich="supplements"
       categories={supplementsCategories}
       disclaimer="medical"
     />

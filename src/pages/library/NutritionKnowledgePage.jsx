@@ -8,6 +8,8 @@ export default function NutritionKnowledgePage({ onBack }) {
       data={nutritionTopics}
       titleDE="Ernährungs-Wissen"
       titleEN="Nutrition Knowledge"
+      titleES="Conocimiento sobre nutrición"
+      bereich="nutrition"
       categories={nutritionCategories}
       disclaimer="general"
     />

@@ -8,6 +8,8 @@ export default function BloodworkKnowledgePage({ onBack }) {
       data={bloodworkTopics}
       titleDE="Blutwerte-Wissen"
       titleEN="Blood Work Knowledge"
+      titleES="Conocimiento sobre análisis de sangre"
+      bereich="bloodwork"
       categories={bloodworkCategories}
       disclaimer="medical"
     />

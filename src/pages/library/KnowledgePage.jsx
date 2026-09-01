@@ -4,6 +4,7 @@ import { ArrowLeft, ChevronDown, ChevronUp, BookOpen, ChevronRight, Stethoscope 
 import References from '../../components/References';
 import MedicalDisclaimer from '../../components/MedicalDisclaimer';
 import { appSprache } from '../../lib/sprache';
+import { useUebersetzung, uebersetzt, kategorieName } from '../../data/uebersetzungen';
 
 // Generischer Reader für die Wissensbibliothek-Blöcke (Training, Ernährung,
 // Supplements, Blutwerte). Datengetrieben — jeder Block liefert `data` (Themen)
@@ -23,17 +24,21 @@ const QUICK_COLORS = [
   'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border-l-purple-400',
 ];
 
-export default function KnowledgePage({ onBack, data, titleDE, titleEN, categories = [], disclaimer = 'general' }) {
+export default function KnowledgePage({ onBack, data, titleDE, titleEN, titleES, categories = [], disclaimer = 'general', bereich }) {
   const { t, i18n } = useTranslation();
   const lang = appSprache(i18n.language);
+  // Spanisches Inhaltspaket; null, solange es lädt oder die Sprache keines hat.
+  const paket = useUebersetzung(bereich, i18n.language);
   const [activeCategory, setActiveCategory] = useState('all');
   const [selected, setSelected] = useState(null);
   const [showEbook, setShowEbook] = useState(false);
 
-  const catList = [{ id: 'all', nameDE: 'Alle', nameEN: 'All' }, ...categories];
+  const catList = [{ id: 'all', nameDE: 'Alle', nameEN: 'All', nameES: 'Todos' }, ...categories];
+  const catLabel = (c) => (c.id === 'all' ? (lang === 'es' ? c.nameES : (lang === 'de' ? c.nameDE : c.nameEN))
+    : kategorieName(c, lang, paket));
   const catName = (id) => {
     const c = catList.find((x) => x.id === id);
-    return c ? (lang === 'de' ? c.nameDE : c.nameEN) : id;
+    return c ? catLabel(c) : id;
   };
 
   const filtered = activeCategory === 'all'
@@ -43,6 +48,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, categori
   // ── E-BOOK VIEW ──
   if (selected && showEbook) {
     const p = selected;
+    const txt = uebersetzt(p, lang, paket);
     return (
       <div className="p-4 pt-16 pb-24">
         <div className="flex items-center gap-3 mb-6">
@@ -50,17 +56,17 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, categori
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-xl font-bold">{lang === 'de' ? p.nameDE : p.nameEN}</h1>
+            <h1 className="text-xl font-bold">{txt.name}</h1>
             <p className="text-xs text-primary-400">{t('ui.detailedEBook')}</p>
           </div>
         </div>
 
         <div className="space-y-3">
-          {p.sections.map((section, i) => (
+          {txt.sections.map((section, i) => (
             <EbookSection
               key={i}
-              title={lang === 'de' ? section.titleDE : section.titleEN}
-              content={lang === 'de' ? section.contentDE : section.contentEN}
+              title={section.title}
+              content={section.content}
               colorClass={SECTION_COLORS[i % SECTION_COLORS.length]}
               defaultOpen={i === 0}
             />
@@ -76,7 +82,8 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, categori
   // ── KURZFASSUNG (Detail-Ansicht) ──
   if (selected) {
     const p = selected;
-    const quick = lang === 'de' ? p.quickDE : p.quickEN;
+    const txt = uebersetzt(p, lang, paket);
+    const quick = txt.quick;
     const hasEbook = p.sections && p.sections.length > 0;
 
     return (
@@ -86,13 +93,13 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, categori
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold">{lang === 'de' ? p.nameDE : p.nameEN}</h1>
+            <h1 className="text-xl font-bold">{txt.name}</h1>
             <p className="text-xs text-slate-400 dark:text-slate-500">{catName(p.category)}</p>
           </div>
         </div>
 
         <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-          {lang === 'de' ? p.summaryDE : p.summaryEN}
+          {txt.summary}
         </p>
 
         {Array.isArray(quick) && quick.length > 0 && (
@@ -143,7 +150,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, categori
         <button onClick={onBack} className="p-2 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-2xl font-bold">{lang === 'de' ? titleDE : titleEN}</h1>
+        <h1 className="text-2xl font-bold">{lang === 'es' ? (titleES || titleEN) : (lang === 'de' ? titleDE : titleEN)}</h1>
       </div>
 
       {categories.length > 0 && (
@@ -158,7 +165,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, categori
                   : 'bg-white dark:bg-surface-dark-alt text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
               }`}
             >
-              {lang === 'de' ? cat.nameDE : cat.nameEN}
+              {catLabel(cat)}
             </button>
           ))}
         </div>
@@ -179,7 +186,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, categori
               <BookOpen className="w-5 h-5 text-primary-500 dark:text-primary-400" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold truncate">{lang === 'de' ? topic.nameDE : topic.nameEN}</p>
+              <p className="font-semibold truncate">{uebersetzt(topic, lang, paket).name}</p>
               <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{catName(topic.category)}</p>
             </div>
             <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 flex-shrink-0" />
