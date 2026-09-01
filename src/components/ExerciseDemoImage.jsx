@@ -1,33 +1,65 @@
 import { useEffect, useState } from 'react';
-import { getDemoImages } from '../data/exerciseDemos';
+import { getDemoImages, getDemoVideo } from '../data/exerciseDemos';
 
-// Übungs-Demo als weiche Überblendung zwischen Start- und Endposition
-// (Public-Domain-Fotos aus free-exercise-db, lokal in /exercise-demos/).
-// Rhythmus: Position halten → überblenden → halten → zurück (CSS-Keyframes,
-// kein JS-Timer — flüssig und akkuschonend).
+// Uebungs-Demo. Zuerst die selbst gerenderte 3D-Animation
+// (tools/uebungs-3d/, Ordner /exercise-demos-3d/), sonst die alten Fotos als
+// weiche Ueberblendung.
+//
+// Warum mit Rueckfall statt hartem Wechsel: Die Fotos sind seit dem Launch
+// drin und funktionieren; faellt eine Animation aus — fehlende Datei, Codec,
+// Autoplay verweigert — soll der Nutzer das alte Bild sehen und nicht eine
+// leere Flaeche.
+//
+// ⚠ `muted` und `playsInline` sind Pflicht, nicht Kosmetik: Ohne beides
+// verweigert iOS die automatische Wiedergabe und zeigt stattdessen den
+// Vollbild-Player. `preload="none"` haelt die Uebungsliste leicht — bei 162
+// Videos zieht der Browser sonst reihenweise Daten, die niemand ansieht.
 export default function ExerciseDemoImage({ exerciseId, alt = '' }) {
-  const images = getDemoImages(exerciseId);
-  const [failed, setFailed] = useState(false);
+  const bilder = getDemoImages(exerciseId);
+  const clip = getDemoVideo(exerciseId);
+  const [videoKaputt, setVideoKaputt] = useState(false);
+  const [bilderKaputt, setBilderKaputt] = useState(false);
 
   useEffect(() => {
-    setFailed(false);
+    setVideoKaputt(false);
+    setBilderKaputt(false);
   }, [exerciseId]);
 
-  if (!images || failed) return null;
+  if (clip && !videoKaputt) {
+    return (
+      <div className="relative w-full aspect-square bg-[#18223a] rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700">
+        <video
+          key={clip.video}
+          src={clip.video}
+          poster={clip.poster}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="none"
+          aria-label={alt}
+          onError={() => setVideoKaputt(true)}
+          className="absolute inset-0 w-full h-full object-contain"
+        />
+      </div>
+    );
+  }
+
+  if (!bilder || bilderKaputt) return null;
 
   return (
     <div className="relative w-full aspect-[4/3] bg-white rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700">
       <img
-        src={images[0]}
+        src={bilder[0]}
         alt={alt}
-        onError={() => setFailed(true)}
+        onError={() => setBilderKaputt(true)}
         className="absolute inset-0 w-full h-full object-contain"
       />
       <img
-        src={images[1]}
+        src={bilder[1]}
         alt=""
         aria-hidden="true"
-        onError={() => setFailed(true)}
+        onError={() => setBilderKaputt(true)}
         className="absolute inset-0 w-full h-full object-contain animate-demo-crossfade"
       />
     </div>
