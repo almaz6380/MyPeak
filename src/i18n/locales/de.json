@@ -158,7 +158,9 @@
     "equipment": "Equipment",
     "customExercise": "Eigene",
     "confirmDeleteExercise": "Möchtest du diese eigene Übung wirklich löschen?",
-    "demoBadge": "Demo"
+    "demoBadge": "Demo",
+    "restOverTitle": "Pause vorbei",
+    "restOverBody": "Weiter geht’s mit dem nächsten Satz."
   },
   "nutrition": {
     "title": "Ernährung",

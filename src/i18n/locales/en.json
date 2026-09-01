@@ -158,7 +158,9 @@
     "equipment": "Equipment",
     "customExercise": "Custom",
     "confirmDeleteExercise": "Do you really want to delete this custom exercise?",
-    "demoBadge": "Demo"
+    "demoBadge": "Demo",
+    "restOverTitle": "Rest over",
+    "restOverBody": "Time for your next set."
   },
   "nutrition": {
     "title": "Nutrition",

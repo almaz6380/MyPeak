@@ -39,4 +39,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Kamera für Barcode-Scanner und Mahlzeiten-Fotos (getUserMedia im WebView) -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Pausenende-Benachrichtigung des Rest-Timers (Android 13+ fragt zur
+         Laufzeit; der Dialog kommt erst beim ersten Timer-Start, s.
+         src/lib/restNotification.js). Das Plugin deklariert die Berechtigung
+         auch selbst — doppelt schadet beim Manifest-Merge nicht, fehlend schon. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 </manifest>
