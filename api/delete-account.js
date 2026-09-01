@@ -1,6 +1,9 @@
+import { corsBehandeln } from './_cors.js';
+
 // Löscht das Konto des eingeloggten Users inkl. aller Daten (DSGVO / App-Store-Pflicht).
 // Benötigt in Vercel: SUPABASE_SERVICE_ROLE_KEY (Supabase Dashboard → Settings → API → service_role)
 export default async function handler(req, res) {
+  if (corsBehandeln(req, res)) return; // Preflight der nativen App
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }

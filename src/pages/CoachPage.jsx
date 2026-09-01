@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send, Sparkles, Crown, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Send, Sparkles, Crown, AlertTriangle, Trash2 } from 'lucide-react';
 import { medicalDisclaimerText } from '../components/MedicalDisclaimer';
 import { useAuth } from '../context/AuthContext';
 import { useSubscription } from '../context/SubscriptionContext';
@@ -10,6 +10,34 @@ import { askCoach, getCoachUsageToday } from '../data/coachStorage';
 const TRIAL_LIMIT = 5;
 const PREMIUM_LIMIT = 30;
 
+// Verlauf pro Nutzer auf dem Geraet halten. Vorher lebten die Nachrichten nur
+// im React-State — Seite verlassen, alles weg; es sah aus, als gaebe es keinen
+// Verlauf. Bewusst localStorage statt Supabase: Coach-Fragen sind persoenliche
+// Gesundheits-/Trainingsdaten, die nirgendwohin muessen; auf dem Geraet
+// brauchen sie weder Sync noch einen neuen Absatz in der Datenschutzerklaerung.
+const VERLAUF_MAX = 60; // Nachrichten; haelt den Eintrag klein und das Rendern fluessig
+const verlaufKey = (userId) => `fullrep.coach.verlauf.${userId}`;
+
+function ladeVerlauf(userId) {
+  if (!userId) return [];
+  try {
+    const roh = JSON.parse(localStorage.getItem(verlaufKey(userId)) || '[]');
+    if (!Array.isArray(roh)) return [];
+    return roh.filter((m) => (m?.role === 'user' || m?.role === 'assistant') && typeof m?.content === 'string');
+  } catch {
+    return [];
+  }
+}
+
+function speichereVerlauf(userId, messages) {
+  if (!userId) return;
+  try {
+    localStorage.setItem(verlaufKey(userId), JSON.stringify(messages.slice(-VERLAUF_MAX)));
+  } catch {
+    // voll oder gesperrt (privater Modus) — dann eben ohne Verlauf, kein Absturz
+  }
+}
+
 export default function CoachPage() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language?.startsWith('de') ? 'de' : 'en';
@@ -17,7 +45,9 @@ export default function CoachPage() {
   const { user } = useAuth();
   const { isPremium, isTrial, openPaywall } = useSubscription();
 
-  const [messages, setMessages] = useState([]);
+  // Verlauf sofort aus dem Speicher — kein Effect, sonst blitzt erst der leere
+  // Zustand auf und der wiederhergestellte Verlauf springt nach.
+  const [messages, setMessages] = useState(() => ladeVerlauf(user?.id));
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [remaining, setRemaining] = useState(null);
@@ -25,6 +55,12 @@ export default function CoachPage() {
   const scrollRef = useRef(null);
 
   const dailyLimit = isTrial ? TRIAL_LIMIT : PREMIUM_LIMIT;
+
+  // Jede Aenderung sichern (auch die Nutzerfrage allein, falls die App vor der
+  // Antwort beendet wird).
+  useEffect(() => {
+    if (user?.id) speichereVerlauf(user.id, messages);
+  }, [user?.id, messages]);
 
   // Verbrauch beim Öffnen laden.
   useEffect(() => {
@@ -117,6 +153,20 @@ export default function CoachPage() {
             </p>
           )}
         </div>
+        {messages.length > 0 && (
+          <button
+            onClick={() => {
+              if (window.confirm(lang === 'de' ? 'Verlauf löschen?' : 'Clear history?')) {
+                setMessages([]);
+                setError('');
+              }
+            }}
+            aria-label={lang === 'de' ? 'Verlauf löschen' : 'Clear history'}
+            className="p-2 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Nachrichten */}

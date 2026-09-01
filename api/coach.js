@@ -10,6 +10,7 @@
 // Optional: ANTHROPIC_API_KEY.
 
 import coachKnowledge from './_coachKnowledge.js';
+import { corsBehandeln } from './_cors.js';
 
 const TRIAL_LIMIT = 5;     // Coach-Fragen/Tag während der Testphase
 const PREMIUM_LIMIT = 30;  // Coach-Fragen/Tag mit bezahltem Premium
@@ -78,7 +79,12 @@ async function callGemini(apiKey, sys, messages, signal) {
     role: m.role === 'assistant' ? 'model' : 'user',
     parts: [{ text: String(m.content || '') }],
   }));
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  // ⚠ Modellname NIE raten — mit /api/gemini-modelle?probe=<name> nachmessen.
+  // 31.08.2026: 2.0-flash war abgeschaltet (404), der Nutzer sah nur „Coach
+  // nicht erreichbar". 2.5-flash stand zwar in ListModels, generateContent
+  // meldete aber: „no longer available to new users … use gemini-3.6-flash".
+  // 3.6-flash ist mit dem echten Schluessel geprueft (200).
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -155,6 +161,7 @@ async function sbFetch(supabaseUrl, serviceKey, path, init = {}) {
 }
 
 export default async function handler(req, res) {
+  if (corsBehandeln(req, res)) return; // Preflight der nativen App
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }

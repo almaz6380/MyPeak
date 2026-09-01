@@ -142,6 +142,17 @@ Ausgabenlimit erschöpft. Das Repo ist privat, und die macOS-Läufe
 nicht einsehbar. **Bis das geklärt ist: `npm test` vor jedem Push lokal laufen
 lassen** — die CI fängt derzeit nichts ab.
 
+**Stand 31.08. abends: bestätigt und weiter zu.** Josef selbst: „mein
+githubkontingent voll". Auch die beiden Release-Läufe für 1.3.1 (iOS Build 7,
+Android vc16 → interner Track) starben nach 5 s ohne Protokoll — wie schon
+der Versuch vom 30.08. (gleiche Versionen, andere Sitzung). **Wiedervorlage:**
+Sobald das Kontingent frei ist (Limit anheben oder neuer Abrechnungszeitraum,
+vermutlich 01.09.), beide Workflows auf `main` neu anstoßen: `ios-release.yml`
+(upload=true) und `android-release.yml` (upload=true, **track=internal**,
+notes gesetzt). Versionsnummern sind schon committet, nichts weiter nötig.
+Stirbt es wieder in Sekunden ohne Log: NICHT erneut starten — es ist
+weiterhin das Kontingent, und jeder Fehlstart verwirrt nur die Lauf-Historie.
+
 ⚠️ **`npm run lint` über das ganze Projekt ist rot** — 106 Fehler, 24 Warnungen,
 alle vorbestehend in `src/` (ungenutzte Importe, `react-hooks`-Regeln). Die CI
 lintet deshalb nur `api/` + `tests/`. Wird der Altbestand aufgeräumt, kann im
@@ -746,6 +757,44 @@ nutzt `.splash-circle` / `.splash-parts`. Die alten Klassen `ptr-line-animate`, 
 - **iOS 1.0 weiterhin „Abgelehnt" (4.3.0 Design: Spam).** Josefs Klarstellung vom 12.07. **hat Apple in 5 Tagen NICHT beantwortet** → Thread steht still, Warten bringt nichts.
 - **Empfohlener Weg: neuer, verbesserter Build** — die App ist seit der Ablehnung massiv gewachsen (KI-Coach + eigene Wissens-DB, Freemium-Abo, Wissensbibliothek) → entkräftet „Spam" direkt.
 - **⚠️ Neuer Build hat jetzt bezahltes Abo → Apple verlangt iOS In-App-Purchase** (nicht Web/Stripe). iOS-IAP ist noch NICHT eingerichtet. Zwei Wege besprochen: **(A)** iOS-IAP über RevenueCat (App-Store-Connect-Abo + RC-iOS-Key + `cap sync`) sauber einrichten, dann einreichen; **(B) empfohlen zuerst:** Kauf-Button auf iOS ausblenden, nur Trial, erst die Gratis-App durch 4.3(a) bringen, IAP/Premium im Update 1.1 nachliefern. Vor Upload: Versionsnummern hoch, **Light-Mode-Screenshots**, `npx cap sync`, Archive+Upload. Noch nicht begonnen.
+
+### KI-Coach + Foto-Erkennung: Doppelausfall behoben (31.08.2026)
+
+Josefs Meldung „der Coach beantwortet keine Fragen" hatte ZWEI Ursachen
+übereinander — beide behoben, beide gegen die Live-API gemessen:
+
+1. **Google hat `gemini-2.0-flash` abgeschaltet (404).** Damit waren Coach
+   UND Essens-Foto-Erkennung gleichzeitig tot; ohne `ANTHROPIC_API_KEY` als
+   Rückfall blieb nur „nicht erreichbar". ⚠ Der naheliegende Ersatz
+   `gemini-2.5-flash` stand zwar in ListModels, generateContent darauf
+   meldete aber „no longer available to new users … use gemini-3.6-flash".
+   **Modellnamen nie raten:** `/api/gemini-modelle` (login-geschützt) listet
+   die Modelle des echten Schlüssels; `?probe=<name>` schickt ein Mini-
+   generateContent, `?probe=<name>&art=coach` die exakte Coach-Anfrageform.
+   Erst nach Probe-200 wird ein Name eingetragen. Beide Endpunkte
+   (`coach.js`, `analyze-meal.js`) müssen denselben Namen tragen.
+2. **Die NATIVE App hat `/api` nie erreicht.** Alle Client-Aufrufe waren
+   relativ (`fetch('/api/…')`) — im Browser trifft das dieselbe Domain, in
+   der App ist die Herkunft `capacitor://localhost`, dort gibt es kein
+   `/api`. Betroffen: Coach, Foto-Erkennung, Testphase-Start und die
+   Apple-PFLICHT-Funktion Konto-Löschung. **Regel fürs ganze Repo:**
+   `/api`-Aufrufe laufen über `API_BASIS` (`src/data/apiBasis.js` — nativ
+   absolut, Web relativ), und jeder `api/`-Handler beginnt mit
+   `corsBehandeln()` (`api/_cors.js`, nur die App-Herkünfte, nicht `*`).
+   Ohne CORS bricht der OPTIONS-Preflight mit 405 ab, obwohl curl geht.
+   Der Client-Teil erreicht die Geräte erst mit Build ≥ 1.3.1.
+
+Dazu: Coach-Verlauf liegt jetzt pro Nutzer in localStorage (letzte 60,
+Initializer statt Effect, Papierkorb im Kopf) — vorher war er beim Verlassen
+der Seite weg. Bewusst NICHT in Supabase: Gesundheitsdaten, kein Sync nötig,
+kein neuer Datenschutz-Absatz. `coach.js` hat jetzt wie `analyze-meal.js`
+`maxDuration: 30` (Vercel-Standard sind 10 s).
+
+⚠ **Testkonten:** `appreview@wellbooked.at` hat KEIN Premium (bewusst, s. o.)
+— es taugt zum Prüfen von Auth/Gate (403 ist dort korrekt), nicht für den
+Coach-Volltest. Sein unverbrauchter Trial gehört Apple: nie `start-trial`
+damit auslösen. Für Diagnose wurde `coach-diagnose-claude@wellbooked.at`
+angelegt (unbestätigt, kann im Supabase-Dashboard gelöscht werden).
 
 ### KI-Coach (Premium-Feature) — IN ARBEIT (16.07.2026, Branch claude/github-connection-check-v5zzpl)
 - **Chat-Coach für Training/Ernährung/Supplemente + grobe Blutwerte-Einordnung** (mit Arzt-Verweis, keine Diagnose/Therapie), hinter Premium-Gate (`requirePremium('ki_coach')`). Läuft ab Tag 1 mit **Gemini 2.0 Flash** (schon konfiguriert, kostenlos); ist `ANTHROPIC_API_KEY` gesetzt, werden **Claude gestuft** eingesetzt (Haiku einfach / Sonnet komplex, Länge-Heuristik) mit Gemini als Fallback — ohne Code-Änderung.
