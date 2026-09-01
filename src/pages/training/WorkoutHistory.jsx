@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import allExercisesData, { getExerciseById } from '../../data/exercises';
 import MuscleGroupIcon from '../../components/icons/MuscleGroupIcon';
 import useProgressComparison from '../../hooks/useProgressComparison';
+import { datumsLocale } from '../../lib/datumsformat';
 import ExerciseLineGraph from '../../components/progress/ExerciseLineGraph';
 import { appSprache } from '../../lib/sprache';
 
@@ -40,9 +41,13 @@ export default function WorkoutHistory({ onBack }) {
     setDeleteConfirmId(null);
   };
 
+  // `undefined` als Locale nimmt die BROWSER-Sprache, nicht die eingestellte
+  // App-Sprache. Wer die App auf Arabisch stellt, sah hier weiter deutsche
+  // Datumsangaben — und umgekehrt.
+  const locale = datumsLocale(i18n.language);
   const formatDate = (iso) => {
     const d = new Date(iso);
-    return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    return d.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
   };
 
   const formatDuration = (ms) => {
@@ -332,7 +337,7 @@ export default function WorkoutHistory({ onBack }) {
                   {t('training.calendarWeek', { week: week.weekNumber })}
                 </span>
                 <span className="text-xs text-slate-400">
-                  {week.start.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} – {week.end.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                  {week.start.toLocaleDateString(locale, { day: 'numeric', month: 'short' })} – {week.end.toLocaleDateString(locale, { day: 'numeric', month: 'short' })}
                 </span>
               </div>
               <div className="flex flex-col gap-3">

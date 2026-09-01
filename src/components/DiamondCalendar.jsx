@@ -2,6 +2,7 @@ import { useRef, useMemo, useState, useCallback, useEffect } from 'react';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toLocalDateString } from '../lib/dateUtils';
 import { datumsLocale } from '../lib/datumsformat';
+import { istRtl } from '../lib/sprache';
 
 // Wochentage (Sonntag zuerst, passend zu Date#getDay) und Monatsnamen kommen
 // aus Intl statt aus Handlisten — sonst bräuchte jede neue Sprache hier zwei
@@ -69,12 +70,20 @@ export default function DiamondCalendar({ selectedDate, onSelectDate, scheduledD
 
   const sel = new Date(selectedDate + 'T12:00:00');
   const locale = datumsLocale(lang);
-  const dayLabels = Array.from({ length: 7 }, (_, i) =>
-    new Date(Date.UTC(2026, 0, 4 + i)).toLocaleDateString(locale, { weekday: 'short', timeZone: 'UTC' }).replace(/\.$/, ''));
+  // Der Streifen setzt jeden Tag mit einem absoluten `translate3d(x, …)`.
+  // Pixelwerte spiegelt `dir=rtl` NICHT mit — ohne dieses Vorzeichen liefe der
+  // Streifen auf Arabisch rückwärts: rechts stünde der 5., links der 28.
+  // Dasselbe gilt für die Wischgeste, sonst zöge man in die falsche Richtung.
+  const richtung = istRtl(lang) ? -1 : 1;
   const monthNames = Array.from({ length: 12 }, (_, m) =>
     new Date(Date.UTC(2026, m, 15)).toLocaleDateString(locale, { month: 'long', timeZone: 'UTC' }));
   const monthName = monthNames[sel.getMonth()];
-  const dayName = dayLabels[sel.getDay()];
+  // Ausgeschriebenes Datum komplett von Intl bauen lassen, nicht aus Teilen
+  // zusammensetzen. `{dayName}, {tag}. {monat}` war deutsche Zeichensetzung:
+  // Franzoesisch schreibt „mardi 1 septembre" ohne Komma und ohne Punkt,
+  // Portugiesisch „terça-feira, 1 de setembro", Arabisch mit dem arabischen
+  // Komma „،". Deutsch kommt dabei unveraendert heraus.
+  const datumLang = sel.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
 
   // Datum übernehmen und den Rest-Versatz weich auf 0 auslaufen lassen.
   const settle = useCallback((days, restShift) => {
@@ -114,7 +123,7 @@ export default function DiamondCalendar({ selectedDate, onSelectDate, scheduledD
     e.preventDefault();
     setAnimate(false);
     // Jenseits von MAX_JUMP zäher werden lassen (gummiartiger Widerstand).
-    const raw = -dx / DAY_WIDTH;
+    const raw = (-dx * richtung) / DAY_WIDTH;
     const clamped = Math.max(-MAX_JUMP, Math.min(MAX_JUMP, raw));
     setShift(clamped + (raw - clamped) * 0.2);
   }
@@ -194,7 +203,7 @@ export default function DiamondCalendar({ selectedDate, onSelectDate, scheduledD
                 marginLeft: -BASE / 2,
                 marginTop: (ROW_HEIGHT - BASE) / 2,
                 opacity: Math.abs(dist) > VISIBLE ? 0 : curve(OPACITIES, dist),
-                transform: `translate3d(${xAt(dist)}px, ${y}px, 0) scale(${scale})`,
+                transform: `translate3d(${xAt(dist) * richtung}px, ${y}px, 0) scale(${scale})`,
                 transition,
                 willChange: 'transform, opacity',
               }}
@@ -213,7 +222,7 @@ export default function DiamondCalendar({ selectedDate, onSelectDate, scheduledD
 
       {/* Selected day label */}
       <p className="text-sm font-semibold text-slate-900 dark:text-white text-center mt-1">
-        {dayName}, {sel.getDate()}. {monthName}
+        {datumLang}
       </p>
     </div>
   );
