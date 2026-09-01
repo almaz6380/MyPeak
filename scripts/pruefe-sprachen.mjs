@@ -64,6 +64,26 @@ for (const k of benutzt) {
 }
 console.log(`  ${benutzt.size} wörtliche t()-Schlüssel im Code geprüft.`);
 
+// Beschriftungstabellen im Code (`{ de: '…', en: '…' }`). Sie stehen bewusst
+// neben i18n — meist weil dieselbe Zeile auch eine Farbe oder ein Symbol trägt.
+// Fehlt dort `es`, fällt es NICHT auf: `tabelle[lang]` liefert `undefined`, die
+// Zeile bleibt leer oder zeigt die rohe Id. Genau das ist der Peptid-Seite
+// passiert — dort standen „healing" und „gh" statt der Kategorienamen.
+let tabellenGeprueft = 0;
+for (const d of dateien) {
+  const src = readFileSync(d, 'utf8');
+  for (const m of src.matchAll(/\bde:\s*'(?:\\.|[^'\\])*'[^\n]*/g)) {
+    const zeile = m[0];
+    if (!/\ben:\s*'/.test(zeile)) continue; // keine Sprachtabelle
+    tabellenGeprueft += 1;
+    if (!/\bes:\s*'/.test(zeile)) {
+      const nr = src.slice(0, m.index).split('\n').length;
+      meckern(`es fehlt in Beschriftungstabelle — ${d.slice(WURZEL.length + 1)}:${nr}`);
+    }
+  }
+}
+console.log(`  ${tabellenGeprueft} Beschriftungstabellen im Code geprüft.`);
+
 if (!process.argv.includes('--browser')) {
   console.log(fehler ? `\n${fehler} Fehler.` : '\nAlles in Ordnung.');
   process.exit(fehler ? 1 : 0);

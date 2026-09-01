@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUebersetzung, uebersetzt } from '../../data/uebersetzungen';
+import { beschriftung } from '../../lib/sprache';
 import { ArrowLeft, ChevronDown, ChevronUp, FlaskConical, Brain, Flame, Heart, ShieldCheck, BookOpen, ChevronRight, Stethoscope } from 'lucide-react';
 import peptides from '../../data/peptidesData';
 import References from '../../components/References';
@@ -20,13 +21,17 @@ const SECTION_COLORS = [
   'border-l-cyan-400', 'border-l-rose-400',
 ];
 
+// Gelesen wird ausschliesslich ueber `beschriftung()`, nie direkt mit `[lang]`.
+// Genau das hat auf Spanisch die rohen Ids gezeigt („healing", „gh") — und an
+// zwei der drei Fundstellen fehlte selbst dieser Rueckfall, dort stand nichts.
+// Der Helfer faellt sauber auf EN, dann DE zurueck.
 const categoryNames = {
-  all: { de: 'Alle', en: 'All' },
-  healing: { de: 'Heilung & Recovery', en: 'Healing & Recovery' },
-  gh: { de: 'Wachstumshormon', en: 'Growth Hormone' },
-  fatloss: { de: 'Fettabbau', en: 'Fat Loss' },
-  antiaging: { de: 'Anti-Aging', en: 'Anti-Aging' },
-  cognitive: { de: 'Kognition', en: 'Cognition' },
+  all: { de: 'Alle', en: 'All', es: 'Todos' },
+  healing: { de: 'Heilung & Recovery', en: 'Healing & Recovery', es: 'Curación y recuperación' },
+  gh: { de: 'Wachstumshormon', en: 'Growth Hormone', es: 'Hormona del crecimiento' },
+  fatloss: { de: 'Fettabbau', en: 'Fat Loss', es: 'Pérdida de grasa' },
+  antiaging: { de: 'Anti-Aging', en: 'Anti-Aging', es: 'Antienvejecimiento' },
+  cognitive: { de: 'Kognition', en: 'Cognition', es: 'Cognición' },
 };
 
 export default function PeptidesPage({ onBack }) {
@@ -99,7 +104,7 @@ export default function PeptidesPage({ onBack }) {
           </button>
           <div className="flex-1">
             <h1 className="text-xl font-bold">{uebersetzt(p, lang, paket).name}</h1>
-            <p className="text-xs text-slate-400 dark:text-slate-500">{categoryNames[p.category]?.[lang]}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">{beschriftung(categoryNames[p.category], lang)}</p>
           </div>
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${cat?.color}`}>
             <img src={`/bg-photos/pep-${p.category}-icon.png`} alt="" aria-hidden="true" className="w-7 h-7 object-contain" />
@@ -190,7 +195,7 @@ export default function PeptidesPage({ onBack }) {
                 : 'bg-white dark:bg-surface-dark-alt text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
             }`}
           >
-            {categoryNames[catId]?.[lang] || catId}
+            {beschriftung(categoryNames[catId], lang) || catId}
           </button>
         ))}
       </div>
@@ -216,7 +221,7 @@ export default function PeptidesPage({ onBack }) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold truncate">{uebersetzt(peptide, lang, paket).name}</p>
-                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{categoryNames[peptide.category]?.[lang]}</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{beschriftung(categoryNames[peptide.category], lang)}</p>
               </div>
               <div className="flex items-center gap-1.5 flex-shrink-0">
                 {hasEbook && (
