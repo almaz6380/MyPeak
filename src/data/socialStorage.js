@@ -252,11 +252,11 @@ export const XP_VALUES = {
 
 // Titel basierend auf Level
 export function getLevelTitle(level) {
-  if (level >= 51) return { de: 'GOAT', en: 'GOAT', es: 'GOAT', emoji: '🐐' };
-  if (level >= 31) return { de: 'Legende', en: 'Legend', es: 'Leyenda', emoji: '👑' };
-  if (level >= 16) return { de: 'Champion', en: 'Champion', es: 'Campeón', emoji: '🏆' };
-  if (level >= 6) return { de: 'Warrior', en: 'Warrior', es: 'Guerrero', emoji: '⚔️' };
-  return { de: 'Rookie', en: 'Rookie', es: 'Novato', emoji: '🌱' };
+  if (level >= 51) return { de: 'GOAT', en: 'GOAT', es: 'GOAT', fr: 'GOAT', pt: 'GOAT', ar: 'الأعظم', emoji: '🐐' };
+  if (level >= 31) return { de: 'Legende', en: 'Legend', es: 'Leyenda', fr: 'Légende', pt: 'Lenda', ar: 'أسطورة', emoji: '👑' };
+  if (level >= 16) return { de: 'Champion', en: 'Champion', es: 'Campeón', fr: 'Champion', pt: 'Campeão', ar: 'بطل', emoji: '🏆' };
+  if (level >= 6) return { de: 'Warrior', en: 'Warrior', es: 'Guerrero', fr: 'Guerrier', pt: 'Guerreiro', ar: 'محارب', emoji: '⚔️' };
+  return { de: 'Rookie', en: 'Rookie', es: 'Novato', fr: 'Débutant', pt: 'Novato', ar: 'مبتدئ', emoji: '🌱' };
 }
 
 // XP pro Level (progressiv: Level 1=100, Level 2=150, Level 3=200...)

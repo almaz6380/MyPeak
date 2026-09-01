@@ -14,9 +14,9 @@ export default function Leaderboard({ onBack }) {
   const category = getLeaderboardCategory();
 
   const categoryInfo = {
-    volume: { de: 'Gesamtvolumen', en: 'Total Volume', es: 'Volumen total', icon: Dumbbell, unit: 'kg', color: 'text-blue-500' },
-    streak: { de: 'Trainings-Streak', en: 'Training Streak', es: 'Racha de entrenamiento', icon: Flame, unit: t('ui.days'), color: 'text-orange-500' },
-    workouts: { de: 'Anzahl Trainings', en: 'Workout Count', es: 'Número de entrenamientos', icon: TrendingUp, unit: '', color: 'text-green-500' },
+    volume: { de: 'Gesamtvolumen', en: 'Total Volume', es: 'Volumen total', fr: 'Volume total', pt: 'Volume total', ar: 'إجمالي الحجم', icon: Dumbbell, unit: 'kg', color: 'text-blue-500' },
+    streak: { de: 'Trainings-Streak', en: 'Training Streak', es: 'Racha de entrenamiento', fr: 'Série d\'entraînement', pt: 'Sequência de treinos', ar: 'تتابع التمارين', icon: Flame, unit: t('ui.days'), color: 'text-orange-500' },
+    workouts: { de: 'Anzahl Trainings', en: 'Workout Count', es: 'Número de entrenamientos', fr: 'Nombre de séances', pt: 'Número de treinos', ar: 'عدد الحصص', icon: TrendingUp, unit: '', color: 'text-green-500' },
   };
 
   const info = categoryInfo[category];

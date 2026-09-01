@@ -6,30 +6,30 @@ import recipes from '../../data/recipesData';
 import { useUebersetzung, uebersetztesRezept } from '../../data/uebersetzungen';
 
 const MEAL_FILTERS = [
-  { key: 'all', de: 'Alle', en: 'All', es: 'Todas' },
-  { key: 'breakfast', de: 'Frühstück', en: 'Breakfast', es: 'Desayuno' },
-  { key: 'lunch', de: 'Mittagessen', en: 'Lunch', es: 'Comida' },
-  { key: 'dinner', de: 'Abendessen', en: 'Dinner', es: 'Cena' },
-  { key: 'snack', de: 'Snack', en: 'Snack', es: 'Tentempié' },
-  { key: 'postworkout', de: 'Post-Workout', en: 'Post-Workout', es: 'Post-entreno' },
+  { key: 'all', de: 'Alle', en: 'All', es: 'Todas', fr: 'Toutes', pt: 'Todas', ar: 'الكل' },
+  { key: 'breakfast', de: 'Frühstück', en: 'Breakfast', es: 'Desayuno', fr: 'Petit-déjeuner', pt: 'Café da manhã', ar: 'الإفطار' },
+  { key: 'lunch', de: 'Mittagessen', en: 'Lunch', es: 'Comida', fr: 'Déjeuner', pt: 'Almoço', ar: 'الغداء' },
+  { key: 'dinner', de: 'Abendessen', en: 'Dinner', es: 'Cena', fr: 'Dîner', pt: 'Jantar', ar: 'العشاء' },
+  { key: 'snack', de: 'Snack', en: 'Snack', es: 'Tentempié', fr: 'Collation', pt: 'Lanche', ar: 'وجبة خفيفة' },
+  { key: 'postworkout', de: 'Post-Workout', en: 'Post-Workout', es: 'Post-entreno', fr: 'Après séance', pt: 'Pós-treino', ar: 'بعد التمرين' },
 ];
 
 const TAG_FILTERS = [
-  { key: 'all', de: 'Alle', en: 'All', es: 'Todas' },
-  { key: 'normal', de: 'Normal', en: 'Normal', es: 'Normal' },
-  { key: 'vegetarian', de: 'Vegetarisch', en: 'Vegetarian', es: 'Vegetariana' },
-  { key: 'vegan', de: 'Vegan', en: 'Vegan', es: 'Vegana' },
-  { key: 'keto', de: 'Keto', en: 'Keto', es: 'Keto' },
-  { key: 'lowcarb', de: 'Low Carb', en: 'Low Carb', es: 'Baja en carbohidratos' },
-  { key: 'highcarb', de: 'High Carb', en: 'High Carb', es: 'Alta en carbohidratos' },
-  { key: 'glutenfree', de: 'Glutenfrei', en: 'Gluten-free', es: 'Sin gluten' },
-  { key: 'lactosefree', de: 'Laktosefrei', en: 'Lactose-free', es: 'Sin lactosa' },
+  { key: 'all', de: 'Alle', en: 'All', es: 'Todas', fr: 'Toutes', pt: 'Todas', ar: 'الكل' },
+  { key: 'normal', de: 'Normal', en: 'Normal', es: 'Normal', fr: 'Normal', pt: 'Normal', ar: 'عادي' },
+  { key: 'vegetarian', de: 'Vegetarisch', en: 'Vegetarian', es: 'Vegetariana', fr: 'Végétarien', pt: 'Vegetariana', ar: 'نباتي' },
+  { key: 'vegan', de: 'Vegan', en: 'Vegan', es: 'Vegana', fr: 'Végétalien', pt: 'Vegana', ar: 'نباتي صرف' },
+  { key: 'keto', de: 'Keto', en: 'Keto', es: 'Keto', fr: 'Céto', pt: 'Keto', ar: 'كيتو' },
+  { key: 'lowcarb', de: 'Low Carb', en: 'Low Carb', es: 'Baja en carbohidratos', fr: 'Pauvre en glucides', pt: 'Baixo carboidrato', ar: 'قليل الكربوهيدرات' },
+  { key: 'highcarb', de: 'High Carb', en: 'High Carb', es: 'Alta en carbohidratos', fr: 'Riche en glucides', pt: 'Alto carboidrato', ar: 'عالي الكربوهيدرات' },
+  { key: 'glutenfree', de: 'Glutenfrei', en: 'Gluten-free', es: 'Sin gluten', fr: 'Sans gluten', pt: 'Sem glúten', ar: 'خالٍ من الغلوتين' },
+  { key: 'lactosefree', de: 'Laktosefrei', en: 'Lactose-free', es: 'Sin lactosa', fr: 'Sans lactose', pt: 'Sem lactose', ar: 'خالٍ من اللاكتوز' },
 ];
 
 const DIFFICULTY = {
-  easy: { de: 'Einfach', en: 'Easy', es: 'Fácil', color: 'text-green-500 bg-green-50 dark:bg-green-900/20' },
-  medium: { de: 'Mittel', en: 'Medium', es: 'Media', color: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' },
-  hard: { de: 'Schwer', en: 'Hard', es: 'Difícil', color: 'text-red-500 bg-red-50 dark:bg-red-900/20' },
+  easy: { de: 'Einfach', en: 'Easy', es: 'Fácil', fr: 'Facile', pt: 'Fácil', ar: 'سهل', color: 'text-green-500 bg-green-50 dark:bg-green-900/20' },
+  medium: { de: 'Mittel', en: 'Medium', es: 'Media', fr: 'Moyen', pt: 'Média', ar: 'متوسط', color: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' },
+  hard: { de: 'Schwer', en: 'Hard', es: 'Difícil', fr: 'Difficile', pt: 'Difícil', ar: 'صعب', color: 'text-red-500 bg-red-50 dark:bg-red-900/20' },
 };
 
 export default function Cookbook({ onBack, onSelectRecipe }) {
