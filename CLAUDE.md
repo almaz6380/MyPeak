@@ -79,6 +79,40 @@ den Merge überstanden haben.
 `pull_request` und lief auf PR #55 grün durch — der Abschnitt „GitHub Actions führt keine
 Jobs mehr aus" weiter unten ist damit **überholt** (Kontingent wieder frei).
 
+### ✅ iOS 1.5.0 eingereicht — 02.09.2026, 19:17 UTC
+
+Einreichung **`7b72598f-5641-43dd-8960-104056318f3a`**, Zustand
+`WAITING_FOR_REVIEW`, Build 9 zugewiesen, Auslieferung nach Freigabe
+(`AFTER_APPROVAL`). Beide Abos stehen auf **APPROVED** und mussten deshalb
+nicht mitgereicht werden — 2.1(b) kann sich hier nicht wiederholen.
+
+⚠️ **Der Blocker war nicht das, wonach es aussah.** `--warum` brach mit
+„Keine offene Version gefunden" ab: 1.0 stand auf `READY_FOR_SALE`, und für
+1.5.0 gab es in ASC **gar keinen Versionseintrag**. Der hochgeladene Build
+allein legt keine Version an. Alle schreibenden Befehle des Skripts holen
+sich aber zuerst die offene Version — ohne sie ging weder Zuweisen noch
+Einreichen.
+
+Neu deshalb **`--version-anlegen`** (Workflow-Modus `version-anlegen`,
+Eingabe `version_nr`): POST auf `appStoreVersions` mit
+`releaseType AFTER_APPROVAL` plus „Neu in dieser Version" (`whatsNew`) für
+de-DE. Läuft ins Leere, wenn schon eine offene Version existiert, statt eine
+zweite anzulegen. **Merksatz: Ein Build in ASC ist noch keine Version.**
+
+Die **Prüfnotiz ist auf 1.5.0 umgeschrieben**. Die alte sprach von der
+Ablehnung vom 14.08. und davon, die Abos seien „jetzt Teil dieser
+Einreichung" — beides falsch für diese Version, und der Prüfer hätte nach
+etwas gesucht, das es nicht gibt. Die neue erklärt vor allem, warum
+`NSHealthUpdateUsageDescription` im Binary steht, obwohl nichts nach Health
+geschrieben wird.
+
+Am Endpunkt gemessen, nicht gemeldet: Build 9 `VALID`,
+`usesNonExemptEncryption: False`, Alterseinstufung gesetzt, nur
+`promotionalText` leer (optional).
+
+⚠️ **Android bleibt offen** — der Upload scheitert weiter am
+Health-Formular, siehe unten. Das ist Josefs Schritt in der Play Console.
+
 ### Version 1.5.0 (iOS Build 9 / Android vc18) — sechs Sprachen + neues Design (02.09.2026)
 
 Zwei Arbeitsstränge in einer Version: **fr/pt/ar als vierte bis sechste Sprache**
