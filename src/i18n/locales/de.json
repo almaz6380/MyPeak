@@ -298,7 +298,8 @@
     "oil_viel": "Viel",
     "confidence_high": "Sicher",
     "confidence_medium": "Geschätzt",
-    "confidence_low": "Unsicher"
+    "confidence_low": "Unsicher",
+    "auto": "Auto"
   },
   "library": {
     "title": "Bibliothek",
@@ -312,7 +313,8 @@
     "nutritionKnowledge": "Ernährungs-Wissen",
     "supplementsKnowledge": "Supplemente-Wissen",
     "bloodworkKnowledge": "Blutwerte-Wissen",
-    "allCategories": "Alle"
+    "allCategories": "Alle",
+    "soon": "Bald"
   },
   "coach": {
     "title": "KI-Coach",

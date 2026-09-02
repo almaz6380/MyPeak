@@ -634,17 +634,17 @@ function GoalEditorModal({ goals, onSave, onClose, t }) {
 
             <div className="flex items-end gap-2">
               <div className="flex-1"><GoalField label={`${t('nutrition.protein')} (g)`} value={protein} onChange={handleProteinChange} color="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 focus:ring-blue-500" /></div>
-              <button onClick={() => autoCalcMacro('protein')} className={`mb-0.5 px-2 py-2.5 rounded-lg text-[10px] font-medium ${autoCalc === 'protein' ? 'bg-blue-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>Auto</button>
+              <button onClick={() => autoCalcMacro('protein')} className={`mb-0.5 px-2 py-2.5 rounded-lg text-[10px] font-medium ${autoCalc === 'protein' ? 'bg-blue-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>{t('nutrition.auto')}</button>
             </div>
 
             <div className="flex items-end gap-2">
               <div className="flex-1"><GoalField label={`${t('nutrition.carbs')} (g)`} value={carbs} onChange={handleCarbsChange} color="bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 focus:ring-emerald-500" /></div>
-              <button onClick={() => autoCalcMacro('carbs')} className={`mb-0.5 px-2 py-2.5 rounded-lg text-[10px] font-medium ${autoCalc === 'carbs' ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>Auto</button>
+              <button onClick={() => autoCalcMacro('carbs')} className={`mb-0.5 px-2 py-2.5 rounded-lg text-[10px] font-medium ${autoCalc === 'carbs' ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>{t('nutrition.auto')}</button>
             </div>
 
             <div className="flex items-end gap-2">
               <div className="flex-1"><GoalField label={`${t('nutrition.fat')} (g)`} value={fat} onChange={handleFatChange} color="bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 focus:ring-rose-500" /></div>
-              <button onClick={() => autoCalcMacro('fat')} className={`mb-0.5 px-2 py-2.5 rounded-lg text-[10px] font-medium ${autoCalc === 'fat' ? 'bg-rose-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>Auto</button>
+              <button onClick={() => autoCalcMacro('fat')} className={`mb-0.5 px-2 py-2.5 rounded-lg text-[10px] font-medium ${autoCalc === 'fat' ? 'bg-rose-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>{t('nutrition.auto')}</button>
             </div>
 
             {/* Macro kcal breakdown */}

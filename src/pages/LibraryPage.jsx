@@ -117,11 +117,11 @@ export default function LibraryPage() {
             onClick={() => section.ready ? setView(section.id) : null}
             className={`karte relative overflow-hidden p-4 flex items-center gap-4 hover:shadow-md transition-shadow text-start ${!section.ready ? 'opacity-50' : ''}`}
           >
-            <CardPhotoMotif src={section.motif} />
-            <span className={`rounded-xl p-3 ${section.color}`}>{section.icon}</span>
-            <span className="font-medium text-lg flex-1">{section.label}</span>
+            <CardPhotoMotif src={section.motif} klein />
+            <span className={`w-[42px] h-[42px] shrink-0 rounded-xl flex items-center justify-center ${section.color}`}>{section.icon}</span>
+            <span className="text-sm font-semibold flex-1">{section.label}</span>
             {section.ready && <ChevronRight className="w-5 h-5 text-slate-300 dark:text-slate-600" />}
-            {!section.ready && <span className="text-xs text-slate-400 dark:text-slate-500 italic">Bald</span>}
+            {!section.ready && <span className="text-xs text-slate-400 dark:text-slate-500 italic">{t('library.soon')}</span>}
           </button>
         ))}
       </div>

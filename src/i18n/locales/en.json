@@ -298,7 +298,8 @@
     "oil_viel": "Much",
     "confidence_high": "Confident",
     "confidence_medium": "Estimated",
-    "confidence_low": "Uncertain"
+    "confidence_low": "Uncertain",
+    "auto": "Auto"
   },
   "library": {
     "title": "Library",
@@ -312,7 +313,8 @@
     "nutritionKnowledge": "Nutrition Knowledge",
     "supplementsKnowledge": "Supplements Knowledge",
     "bloodworkKnowledge": "Blood Work Knowledge",
-    "allCategories": "All"
+    "allCategories": "All",
+    "soon": "Soon"
   },
   "coach": {
     "title": "AI Coach",

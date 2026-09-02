@@ -298,7 +298,8 @@
     "oil_viel": "كثيرة",
     "confidence_high": "موثوق",
     "confidence_medium": "تقديري",
-    "confidence_low": "غير مؤكد"
+    "confidence_low": "غير مؤكد",
+    "auto": "تلقائي"
   },
   "library": {
     "title": "المكتبة",
@@ -312,7 +313,8 @@
     "nutritionKnowledge": "معارف التغذية",
     "supplementsKnowledge": "معارف المكمّلات",
     "bloodworkKnowledge": "معارف فحوص الدم",
-    "allCategories": "الكل"
+    "allCategories": "الكل",
+    "soon": "قريبًا"
   },
   "coach": {
     "title": "مدرب الذكاء الاصطناعي",

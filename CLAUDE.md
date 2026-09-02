@@ -433,6 +433,72 @@ Erlaubt bleiben zwei Ausnahmen, beide mit Kosten:
   DE/EN-Rückfall ist. Zwölfmal derselbe Marker wäre Lärm, den niemand liest —
   und ein Marker, den niemand liest, schützt nichts.
 
+**4i. Neues Design umgesetzt (01.09.2026).** Josefs Übergabe aus einer
+anderen Sitzung, Abschnitte 03 bis 08.
+
+⚠ **Abweichung von Abschnitt 01, bewusst:** Die Übergabe verlangt „erst den
+Sprach-Branch nach main mergen, dann das Design". Gebaut ist es stattdessen
+**auf** dem Sprach-Branch. Der Zweck der Regel ist, dass nicht zwei Stränge
+dieselben Klassenketten parallel neu schreiben — auf dem Branch aufzusetzen ist
+genauso sequenziell und ergibt genauso EINEN Gesamtbuild. Der Merge nach `main`
+deployt Vercel produktiv und ist Josefs Entscheidung, nicht meine.
+
+**Zwei neue Bauteile** (`src/components/`):
+
+- `ProgressRing` — SVG, nicht `conic-gradient`: Der Ring hat runde Enden, und
+  mit `conic-gradient` bekommt man harte Kanten und einen Übergang bei 100 %,
+  der wie ein Fehler aussieht.
+  ⚠ **Bogen und Zahl sind zwei Dinge.** Der Bogen zeigt den Fortschritt
+  (gegessen von Ziel), die Zahl in der Mitte, was noch geht. Der erste Entwurf
+  hatte beides an einem Wert — dann war der Ring morgens voll und abends leer
+  und las sich wie ein Countdown, den man verliert. Im Screenshot aufgefallen.
+- `MacroColumn` + `MAKROS` — die vier Makrofarben an EINER Stelle. Vorher
+  trugen `MacroPill` und `MacroRing` dieselben Töne doppelt. Die Farben kommen
+  als fertige Klassenpaare herein: Tailwind entfernt Klassen, die es nicht
+  wörtlich im Quelltext findet, `bg-${farbe}-500` stünde am Ende nicht im CSS.
+
+**Kein `FillTile`** — von Josef abgewählt, Wasser und Supplemente bleiben wie
+sie waren. Nicht „doch noch" einbauen.
+
+**Zwei Regeln, die am Token statt an den Karten gelöst sind:**
+
+- **Schatten im Dunkelmodus aus.** `shadow-soft` steht 132-mal im Code, keine
+  Stelle hatte eine `dark:`-Entsprechung. Statt 132 Klassen nachzuziehen (und
+  132 Gelegenheiten zu schaffen, eine zu vergessen) setzt `html.dark` das Token
+  `--shadow-soft` auf `none`.
+- **Kartenhülle als `.karte`** in `index.css`, in `@layer components` — sonst
+  gewinnt sie gegen ein `rounded-3xl` auf demselben Element.
+  ⚠ **Nicht blind über `rounded-2xl` ersetzen:** Die Klasse steht 261-mal im
+  Code, die meisten davon sind Knöpfe, Eingabefelder und Modale. Der Ersatz
+  greift nur, wenn alle vier Bestandteile in derselben `className` stehen.
+
+**Drei RTL-Fallen, die nur am Gerät auffallen:**
+
+- **`dir="ltr"` an Zahl-plus-Einheit.** Für den Bidi-Algorithmus sind „75" und
+  „kg" zwei Läufe — auf Arabisch stand „kg 75". Nachgemessen: jetzt „75 kg".
+- **Das Play-Dreieck ist ein SVG mit `rtl:-scale-x-100`.** Ein Abspielknopf
+  zeigt in Leserichtung und muss mitspiegeln.
+- **`CardPhotoMotif` lag auf `-right-3`.** Das Wasserzeichen blieb als
+  Einziges rechts unten kleben, während die Karte spiegelte. Jetzt `-end-3`.
+  Neu ist dort auch `klein` (68 px) für Karten unter halber Breite — bei 96 px
+  übernimmt das Wasserzeichen die Fläche, statt sie zu grundieren.
+
+**Zwei hartkodierte Strings nebenbei gefunden:** „Bald" in der Bibliothek und
+dreimal „Auto" auf der Ernährungsseite. „Auto" ist auf Arabisch nicht „Auto".
+Beide haben jetzt Schlüssel.
+
+**Nicht angefasst, mit Absicht:** die vier Makro-Ringe der Ernährungsseite (06
+sagt ausdrücklich, dass über die Beschriftung dort noch nicht entschieden ist),
+die `MuscleBodyMap`, die Datumsnavigation, das Zyklus-Widget und alles unter
+`src/data/` bis auf das Lesen der Wochenplanung.
+
+**Geprüft:** Playwright im Gastmodus, 15 Seitenaufrufe — alle fünf Tabs je hell,
+dunkel und auf Arabisch, keine Seitenfehler und keine rohen i18n-Schlüssel.
+Dazu Vitest 317, Build, `pruefe-sprachen` ohne Befund, Lint 123 (keine neuen).
+
+⚠ **Von Hand nachzufassen bleibt** (kann kein Skript): Datum vor/zurück,
+Gewicht eintragen, „Heute" starten.
+
 **5. Übungs-Demos: eigene 3D-Animationen statt Fotos** (`tools/uebungs-3d/`).
 
 Josefs Vorgabe nach einem Instagram-Video von `fitonomy.coach`: „erstelle es

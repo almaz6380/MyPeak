@@ -309,7 +309,7 @@ export default function HomePage() {
               onClick={() => navigate('/nutrition')}
               className="karte relative overflow-hidden p-4 text-start hover:shadow-md transition-shadow"
             >
-              <CardPhotoMotif src="/bg-photos/drop-icon.png" />
+              <CardPhotoMotif src="/bg-photos/drop-icon.png" klein />
               <div className="relative flex items-center gap-2 mb-2">
                 <img src="/bg-photos/drop-icon.png" alt="" aria-hidden="true" className="h-5 w-auto object-contain -my-0.5" />
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{t('home.water')}</span>
@@ -326,7 +326,7 @@ export default function HomePage() {
               onClick={() => navigate('/nutrition')}
               className="karte relative overflow-hidden p-4 text-start hover:shadow-md transition-shadow"
             >
-              <CardPhotoMotif src="/bg-photos/supplement-icon.png" />
+              <CardPhotoMotif src="/bg-photos/supplement-icon.png" klein />
               <div className="relative flex items-center gap-2 mb-2">
                 <img src="/bg-photos/supplement-icon.png" alt="" aria-hidden="true" className="h-5 w-auto object-contain -my-0.5" />
                 <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{t('home.supplements')}</span>
