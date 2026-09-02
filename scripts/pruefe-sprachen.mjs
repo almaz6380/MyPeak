@@ -36,9 +36,21 @@ for (const s of SPRACHEN) {
     + (roh ? `  ·  ${roh} noch wörtlich Englisch` : ''));
 }
 
+// Mehrzahlformen: Arabisch hat sechs (zero/one/two/few/many/other), Deutsch
+// zwei. Eine zusätzliche Form in einer Sprache ist deshalb KEIN Schlüssel zu
+// viel, sondern die richtige Übersetzung — solange die Grundform in de.json
+// existiert.
+const FORMEN = /_(zero|one|two|few|many|other)$/;
+const grundform = (k) => k.replace(FORMEN, '');
+const grundformen = new Set([...tabellen.de.keys()].filter((k) => FORMEN.test(k)).map(grundform));
+
 for (const s of SPRACHEN.filter((x) => x !== 'de')) {
   for (const k of tabellen.de.keys()) if (!tabellen[s].has(k)) meckern(`${s}: Schlüssel fehlt — ${k}`);
-  for (const k of tabellen[s].keys()) if (!tabellen.de.has(k)) meckern(`${s}: Schlüssel zu viel — ${k}`);
+  for (const k of tabellen[s].keys()) {
+    if (tabellen.de.has(k)) continue;
+    if (FORMEN.test(k) && grundformen.has(grundform(k))) continue;
+    meckern(`${s}: Schlüssel zu viel — ${k}`);
+  }
   for (const [k, v] of tabellen[s]) {
     if (typeof v === 'string' && !v.trim()) meckern(`${s}: leerer Text — ${k}`);
     const d = tabellen.de.get(k);
@@ -88,6 +100,34 @@ for (const k of benutzt) {
   if (!vorhanden(k)) meckern(`Schlüssel im Code, aber nicht in de.json — ${k}`);
 }
 console.log(`  ${benutzt.size} wörtliche t()-Schlüssel im Code geprüft.`);
+
+// Mehrzahl gegen i18next selbst prüfen, nicht gegen eine Liste im Kopf.
+//
+// ⚠ Die Zahl der Formen ist SPRACHABHÄNGIG: Deutsch braucht zwei, Arabisch
+// sechs. `exerciseCount_one` + `exerciseCount_other` in ar.json sah nach
+// Vollständigkeit aus und bestand jede Schlüsselzählung hier — auf dem Schirm
+// stand bei drei Übungen trotzdem „planBuilder.exerciseCount". Zwei Zeilen
+// darüber ging `home.workoutsToday` gut aus, weil dort zufällig auch der
+// unsuffigierte Schlüssel steht, auf den i18next zurückfällt. Auf so einen
+// Zufall lässt sich nichts stützen — deshalb wird hier wirklich aufgelöst.
+{
+  const { default: i18next } = await import('i18next');
+  const res = Object.fromEntries(SPRACHEN.map((s) =>
+    [s, { translation: JSON.parse(readFileSync(join(WURZEL, `src/i18n/locales/${s}.json`), 'utf8')) }]));
+  // Je eine Zahl aus jeder Klasse, die irgendeine unserer Sprachen unterscheidet.
+  const ZAHLEN = [0, 1, 2, 3, 11, 100];
+  let geprueft = 0;
+  for (const s of SPRACHEN) {
+    await i18next.init({ lng: s, fallbackLng: false, resources: res, interpolation: { escapeValue: false } });
+    for (const b of grundformen) {
+      for (const n of ZAHLEN) {
+        geprueft += 1;
+        if (i18next.t(b, { count: n }) === b) meckern(`${s}: Mehrzahlform fehlt — ${b} bei count=${n}`);
+      }
+    }
+  }
+  console.log(`  ${geprueft} Mehrzahl-Auflösungen geprüft (${grundformen.size} Schlüssel × ${ZAHLEN.length} Zahlen × ${SPRACHEN.length} Sprachen).`);
+}
 
 // Beschriftungstabellen im Code (`{ de: '…', en: '…' }`). Sie stehen bewusst
 // neben i18n — meist weil dieselbe Zeile auch eine Farbe oder ein Symbol trägt.
