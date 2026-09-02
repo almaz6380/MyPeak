@@ -86,6 +86,57 @@ Zwei Arbeitsstränge in einer Version: **fr/pt/ar als vierte bis sechste Sprache
 Design** aus Josefs Übergabe (ProgressRing, MacroColumn, dunkle „Heute"-Karte,
 einheitliche Kartenhülle).
 
+**Stand des Ausrollens (02.09.):**
+
+| | App Store | Google Play |
+|---|---|---|
+| Build | **1.5.0 (9) hochgeladen**, Lauf #12 grün | vc18 gebaut und signiert, **Upload blockiert** |
+| Offen | Build zuweisen und einreichen (ASC) | **Health-Formular in der Play Console** — Josefs Schritt |
+
+### ⚠ Health hat drei Hürden, und alle drei kommen erst beim Ausliefern
+
+1.5.0 ist der **erste Store-Build mit der Health-Anbindung**: Der letzte
+erfolgreiche Android-Lauf (vc17, 01.09.) liegt vor dem Commit, der
+`capacitor-health` hinzugefügt hat, und iOS lief seither nur im Modus
+`nur_kompilieren`. Alle drei Fehler mussten deshalb jetzt kommen — keiner
+hängt am Sprach- oder Designpaket, und keiner ist im Web-Build sichtbar.
+
+**1. Android, Manifest-Merger (nach 2 min Gradle).**
+`androidx.health.connect:connect-client:1.2.0-alpha01` — fest gepinnt in
+`capacitor-health` 8.2.0 — verlangt minSdk 26, das Projekt stand auf 24.
+`android/variables.gradle` jetzt auf **26**. Der Preis: Android 7.0/7.1
+(API 24/25) bekommen keine Updates mehr und bleiben auf vc17. Vertretbar,
+weil Health Connect dort ohnehin nicht läuft (setzt API 28 voraus).
+`tools:overrideLibrary` hätte den Bau durchgelassen und dafür auf genau
+diesen Geräten einen Absturz zur Laufzeit eingebaut.
+
+**2. iOS, Fehler 90683 (nach 4 min macOS, mit fertigem signiertem Archiv).**
+`NSHealthUpdateUsageDescription` fehlte — obwohl FullRep **nichts** nach
+Apple Health schreibt. Apple prüft nicht, was die App tut, sondern was das
+Binary verlinkt; `capacitor-health` bindet die HealthKit-Schreib-API mit ein.
+Apples Wortlaut: *„While your app might not use these APIs, a purpose string
+is still required."* Ergänzt, mit einem Text der die Wahrheit sagt; der
+Dialog erscheint nie, weil die Berechtigung nie angefordert wird.
+
+**3. Google Play, 403 beim Upload — NUR VON HAND ZU LÖSEN.**
+```
+"code": 403,
+"message": "You must let us know whether your app includes any health features.",
+"status": "PERMISSION_DENIED"
+```
+Sobald eine App Health-Connect-Berechtigungen deklariert, verlangt Google die
+**Health-Apps-Erklärung**: Play Console → *App-Inhalte* → *Gesundheits-Apps*.
+Dort ist anzugeben, welche Datentypen gelesen werden (hier: Schritte und
+Gewicht, nur lesend) und wozu. Das ist eine rechtliche Erklärung über die
+eigene App — **die API nimmt sie nicht entgegen**, sie lehnt den Upload
+stattdessen ab. Ohne das Formular scheitert jeder weitere Lauf identisch;
+ein Neustart ist reine Zeitverschwendung.
+
+**Merksatz: Eine neue Berechtigung ist nie nur Code.** Beide Stores wollen
+zusätzlich eine Erklärung, und beide sagen das erst beim Hochladen — nach dem
+vollständigen Bau. Wer eine sensible Schnittstelle einbaut, prüft die
+Store-Formulare in derselben Sitzung, nicht beim nächsten Release.
+
 **Der Fehlertyp, der die Sitzung geprägt hat: die Zweiwegweiche.**
 `lang === 'de' ? deutsch : englisch` — aus jeder Sprache außer Deutsch wird
 Englisch, aus jeder außer Englisch Deutsch. Vier Fundstellen, jede unsichtbar
