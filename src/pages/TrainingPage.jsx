@@ -452,8 +452,8 @@ export default function TrainingPage() {
       {toast && (
         <Toast variant={toast.variant} message={toast.message} onDismiss={() => setToast(null)} />
       )}
-      <div className="flex flex-col items-center pt-6 mb-4">
-        <FullRepLogo size={32} />
+      <div className="flex flex-col items-center pt-12 mb-6">
+        <FullRepLogo size={36} />
         <h1 className="text-2xl font-bold mt-2">{t('training.title')}</h1>
       </div>
 
@@ -556,7 +556,7 @@ export default function TrainingPage() {
       {/* History */}
       <button
         onClick={() => setView('history')}
-        className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 flex items-center gap-4 hover:shadow-md transition-shadow mb-6"
+        className="karte relative overflow-hidden w-full p-4 flex items-center gap-4 hover:shadow-md transition-shadow mb-6"
       >
         <CardPhotoMotif src="/bg-photos/history-icon.png" />
         <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
@@ -625,7 +625,7 @@ function QuickAction({ icon, label, onClick, className = '', vertical = false, m
   return (
     <button
       onClick={onClick}
-      className={`relative bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow overflow-hidden ${
+      className={`relative karte hover:shadow-md transition-shadow overflow-hidden ${
         vertical
           ? 'flex flex-col items-center justify-center gap-1.5 py-4 px-1 text-center min-h-[88px]'
           : 'flex items-center gap-3 p-4 text-start'
@@ -675,7 +675,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
             <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">{t('plans.customPlans')}</h2>
             <div className="flex flex-col gap-4">
               {customPlans.map((plan) => (
-                <div key={plan.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
+                <div key={plan.id} className="karte p-4">
                   <h3 className="font-semibold text-lg mb-3">{plan.name}</h3>
                   <div className="flex flex-col gap-2">
                     {plan.days.map((day, i) => (
@@ -701,7 +701,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
         {visibleDefaultPlans.length > 0 && (
           <div className="flex flex-col gap-4">
             {visibleDefaultPlans.map((plan) => (
-              <div key={plan.id} className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60">
+              <div key={plan.id} className="karte p-4">
                 <h3 className="font-semibold text-lg mb-1">{t(plan.nameKey)}</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">{t(plan.descKey)}</p>
                 <div className="flex flex-col gap-2">
@@ -741,7 +741,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
         <div className="flex flex-col gap-4">
           <button
             onClick={() => setStep('plans')}
-            className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-5 text-start shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
+            className="karte relative overflow-hidden p-5 text-start hover:shadow-md transition-shadow"
           >
             <CardPhotoMotif src="/bg-photos/plan-icon.png" />
             <div className="flex items-center gap-4">
@@ -764,7 +764,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
 
           <button
             onClick={onStartEmpty}
-            className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-5 text-start shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
+            className="karte relative overflow-hidden p-5 text-start hover:shadow-md transition-shadow"
           >
             <CardPhotoMotif src="/bg-photos/training-icon.png" />
             <div className="flex items-center gap-4">
@@ -798,7 +798,7 @@ function WorkoutStartChooser({ onBack, onStartPlan, onViewPlan, onStartEmpty, on
             <button
               key={ex.id}
               onClick={() => onStartCardio(ex)}
-              className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 text-start shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow"
+              className="karte p-4 text-start hover:shadow-md transition-shadow"
             >
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
@@ -921,7 +921,7 @@ function TrainingTypeCard({ icon, motif, label, desc, color, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 text-start shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow flex items-center gap-4"
+      className="karte relative overflow-hidden w-full p-4 text-start hover:shadow-md transition-shadow flex items-center gap-4"
     >
       {motif && <CardPhotoMotif src={motif} />}
       <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${colorClasses[color]}`}>
@@ -1007,7 +1007,7 @@ function HiitSetup({ onBack, onStart, exercises, t }) {
         ))}
       </div>
 
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
+      <div className="karte p-4 mb-4">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <span className="font-medium">{t('training.rounds')}</span>
@@ -1164,7 +1164,7 @@ function CircuitSetup({ onBack, onStart, exercises: circuitExercises, t }) {
         </div>
       )}
 
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
+      <div className="karte p-4 mb-4">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <span className="font-medium">{t('training.rounds')}</span>
@@ -1393,7 +1393,7 @@ function MartialArtsSetup({ onBack, onStart, t }) {
       </div>
 
       {/* Config */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
+      <div className="karte p-4 mb-4">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <span className="font-medium">{t('training.rounds')}</span>

@@ -53,6 +53,16 @@
   }
   html.dark {
     background-color: var(--color-surface-dark);
+
+    /* ⚠ Schatten AUS im Dunkelmodus — und zwar hier am Token, nicht an den
+       Karten. `shadow-soft` steht an 132 Stellen im Code, keine einzige hatte
+       eine `dark:`-Entsprechung: Ein schwarzer Schlagschatten auf fast
+       schwarzem Grund ist unsichtbar, kostet aber Rendering und macht Kanten
+       matschig. 132 Klassen nachzuziehen hätte 132 Gelegenheiten geschaffen,
+       eine zu vergessen — und die 133. Karte hätte den Fehler wieder gehabt.
+       So gilt die Regel für alles, was es schon gibt und für alles, was noch
+       kommt. */
+    --shadow-soft: none;
   }
 
   body {
@@ -65,6 +75,31 @@
   /* Prevent iOS auto-zoom on input focus (requires >= 16px) */
   input, select, textarea {
     font-size: 16px;
+  }
+}
+
+/* ── Kartenhülle ──────────────────────────────────────────────────
+   Die eine Definition, wie eine Karte aussieht: heller Grund, 20 px Radius,
+   feiner Rand, Schatten (der im Dunkelmodus über das Token oben entfällt).
+
+   ⚠ Bewusst EINE Klasse statt der ausgeschriebenen Kette. Die Kette
+   `bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border
+   border-slate-100 dark:border-slate-800/60` stand an über 100 Stellen — mit
+   drei Varianten des Radius und zwei des Randes, weil sie jedes Mal von Hand
+   abgetippt wurde. Wer den Kartenstil ändern will, soll eine Stelle ändern.
+
+   ⚠ NICHT blind über `rounded-2xl` drüberersetzen: Die Klasse steht 261-mal
+   im Code, und die meisten davon sind Knöpfe, Eingabefelder und Modale, keine
+   Karten. Migriert wird von Hand, Karte für Karte.
+
+   ⚠ In `@layer components`, damit Utilities sie SCHLAGEN. Ohne den Layer
+   gewinnt `.karte` gegen ein `rounded-3xl` auf demselben Element (gleiche
+   Spezifität, aber später im Stylesheet) — und wer eine Karte einmal anders
+   runden will, sucht den Grund lange. */
+@layer components {
+  .karte {
+    @apply bg-white dark:bg-surface-dark-alt rounded-[20px] shadow-soft
+           border border-slate-100 dark:border-slate-800/60;
   }
 }
 

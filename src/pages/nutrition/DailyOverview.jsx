@@ -171,7 +171,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
       </div>
 
       {/* Macro Rings */}
-      <div className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-5 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
+      <div className="karte relative overflow-hidden p-5 mb-4">
         <CardPhotoMotif src="/bg-photos/flame-icon.png" />
         <div className="relative flex items-center justify-between mb-3">
           <h2 className="text-xs font-medium text-slate-400 dark:text-slate-500">{t('nutrition.macros')}</h2>
@@ -211,7 +211,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
         const slotCalories = slotEntries.reduce((sum, e) => sum + (e.calories || 0), 0);
 
         return (
-          <div key={slot} className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 mb-3 overflow-hidden">
+          <div key={slot} className="karte mb-3 overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700">
               <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t(`nutrition.${slot}`)}</h3>
               {slotEntries.length > 0 && (
@@ -270,7 +270,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
       })}
 
       {/* Water Tracker */}
-      <div className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4">
+      <div className="karte relative overflow-hidden p-4 mb-4">
         <CardPhotoMotif src="/bg-photos/drop-icon.png" />
         <div className="relative flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -322,7 +322,7 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
       {/* Supplements Card */}
       <button
         onClick={onOpenSupplements}
-        className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 mb-4 flex items-center gap-3 text-start hover:shadow-md transition-shadow"
+        className="karte relative overflow-hidden w-full p-4 mb-4 flex items-center gap-3 text-start hover:shadow-md transition-shadow"
       >
         <CardPhotoMotif src="/bg-photos/supplement-icon.png" />
         <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">

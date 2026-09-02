@@ -171,7 +171,7 @@ export default function ProfilePage() {
 
       {/* User header */}
       {profile?.name && (
-        <div className="relative overflow-hidden flex items-center gap-4 mb-6 p-4 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60">
+        <div className="relative overflow-hidden flex items-center gap-4 mb-6 p-4 karte">
           <CardPhotoMotif src="/bg-photos/profile-icon.png" />
           <div className="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center">
             <img src="/bg-photos/profile-icon.png" alt="" aria-hidden="true" className="h-7 w-auto object-contain" />
@@ -190,7 +190,7 @@ export default function ProfilePage() {
         const golden = hasGoldenFrame(levelInfo.level);
         const lang = appSprache(i18n.language);
         return (
-        <div className={`bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 p-4 mb-4 ${golden ? 'ring-2 ring-primary-400 shadow-primary-400/20 shadow-lg' : ''}`}>
+        <div className={`karte p-4 mb-4 ${golden ? 'ring-2 ring-primary-400 shadow-primary-400/20 shadow-lg' : ''}`}>
           {/* Level + Title */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -266,7 +266,7 @@ export default function ProfilePage() {
       {/* Mein Fortschritt (Fotos) */}
       <Link
         to="/progress"
-        className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 p-4 mb-4 flex items-center justify-between"
+        className="relative overflow-hidden w-full karte p-4 mb-4 flex items-center justify-between"
       >
         <CardPhotoMotif src="/bg-photos/photos-icon.png" />
         <div className="flex items-center gap-3">
@@ -283,7 +283,7 @@ export default function ProfilePage() {
 
       {/* Personal Data */}
       {profile && (
-        <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden mb-4">
+        <div className="karte overflow-hidden mb-4">
           <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 px-4 pt-4 pb-2">
             {t('profile.personalData')}
           </h2>
@@ -333,7 +333,7 @@ export default function ProfilePage() {
       )}
 
       {/* App Settings */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden mb-4">
+      <div className="karte overflow-hidden mb-4">
         <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 px-4 pt-4 pb-2">
           {t('profile.settings')}
         </h2>
@@ -410,7 +410,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Legal */}
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden mb-4">
+      <div className="karte overflow-hidden mb-4">
         <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 px-4 pt-4 pb-2">
           {t('legal.title')}
         </h2>
@@ -439,7 +439,7 @@ export default function ProfilePage() {
       {/* Sign Out */}
       <button
         onClick={() => setShowSignOutConfirm(true)}
-        className="w-full flex items-center justify-center gap-2 py-3.5 text-red-500 hover:text-red-600 font-medium rounded-2xl bg-white dark:bg-surface-dark-alt shadow-soft border border-slate-100 dark:border-slate-800/60 transition-colors"
+        className="karte w-full flex items-center justify-center gap-2 py-3.5 text-red-500 hover:text-red-600 font-medium transition-colors"
       >
         <LogOut className="w-5 h-5" />
         {t('auth.signOut')}

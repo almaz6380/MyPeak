@@ -271,7 +271,7 @@ export default function HomePage() {
           {/* Calories + Macros Card */}
           <button
             onClick={() => navigate('/nutrition')}
-            className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-start hover:shadow-md transition-shadow"
+            className="karte relative overflow-hidden w-full p-4 text-start hover:shadow-md transition-shadow"
           >
             <CardPhotoMotif src="/bg-photos/flame-icon.png" />
             <div className="relative flex items-center justify-between mb-1">
@@ -307,7 +307,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => navigate('/nutrition')}
-              className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-start hover:shadow-md transition-shadow"
+              className="karte relative overflow-hidden p-4 text-start hover:shadow-md transition-shadow"
             >
               <CardPhotoMotif src="/bg-photos/drop-icon.png" />
               <div className="relative flex items-center gap-2 mb-2">
@@ -324,7 +324,7 @@ export default function HomePage() {
 
             <button
               onClick={() => navigate('/nutrition')}
-              className="relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-start hover:shadow-md transition-shadow"
+              className="karte relative overflow-hidden p-4 text-start hover:shadow-md transition-shadow"
             >
               <CardPhotoMotif src="/bg-photos/supplement-icon.png" />
               <div className="relative flex items-center gap-2 mb-2">
@@ -344,7 +344,7 @@ export default function HomePage() {
           {showCycle && cyclePhase && (
             <button
               onClick={() => navigate('/cycle')}
-              className="w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-start hover:shadow-md transition-shadow"
+              className="karte w-full p-4 text-start hover:shadow-md transition-shadow"
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -431,7 +431,7 @@ export default function HomePage() {
             </div>
           </button>
           {/* Weight Chart Card */}
-          <div className="relative bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 overflow-hidden">
+          <div className="relative karte overflow-hidden">
             <CardPhotoMotif src="/bg-photos/weight-icon.png" />
             <div
               role="button"

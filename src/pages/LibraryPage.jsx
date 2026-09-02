@@ -115,7 +115,7 @@ export default function LibraryPage() {
           <button
             key={section.id}
             onClick={() => section.ready ? setView(section.id) : null}
-            className={`relative overflow-hidden bg-white dark:bg-surface-dark-alt rounded-2xl p-4 flex items-center gap-4 shadow-soft border border-slate-100 dark:border-slate-800/60 hover:shadow-md transition-shadow text-start ${!section.ready ? 'opacity-50' : ''}`}
+            className={`karte relative overflow-hidden p-4 flex items-center gap-4 hover:shadow-md transition-shadow text-start ${!section.ready ? 'opacity-50' : ''}`}
           >
             <CardPhotoMotif src={section.motif} />
             <span className={`rounded-xl p-3 ${section.color}`}>{section.icon}</span>
