@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Check, RotateCcw, Sparkles, Info } from 'lucide-react';
 import OilLevelPicker from '../../components/OilLevelPicker';
 import { applyOilAdjustment, itemsToNutritionEntries, itemName } from '../../data/mealPhotoAnalysis';
+import { appSprache } from '../../lib/sprache';
 
 const confidenceColors = {
   high: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400',
@@ -35,9 +36,11 @@ export default function MealAnalysisResult({ result, photo, oilLevel, onOilChang
     onAddAll(entries);
   }
 
-  // es liefert die API seit 1.4.0 mit; fehlt das Feld, Englisch statt nichts.
-  const description = (language?.startsWith('de') && result.meal_description_de)
-    || (language?.startsWith('es') && result.meal_description_es)
+  // Die API liefert die Nutzersprache zusätzlich zu de/en mit; fehlt das Feld
+  // (alte API-Antwort aus dem Cache, unerwartete Sprache), Englisch statt
+  // nichts. Dieselbe Regel wie in `itemName()` — beide über `appSprache`,
+  // damit Regionalcodes wie 'pt-BR' nicht ins Leere laufen.
+  const description = result[`meal_description_${appSprache(language)}`]
     || result.meal_description_en
     || result.meal_description_de;
 

@@ -79,6 +79,9 @@ Sprachwechsler de→en→es. **Auch `analyze-meal` spricht Spanisch**
 auf Englisch zurück, wenn ein Feld fehlt, damit alte App-Versionen unberührt
 bleiben).
 
+⚠ **Der spanische Coach-Prompt war toter Code — behoben am 01.09.2026, siehe 4f.**
+Er stand im Repo, aber kein Aufruf hat ihn je erreicht.
+
 **4b. Die fest verdrahteten de/en-Weichen sind raus (01.09.2026).** Nach dem
 ersten Durchgang war `es.json` zwar vollständig, die Oberfläche aber trotzdem
 zur Hälfte englisch: **306 Ternaries der Form `lang === 'de' ? 'Heute' : 'Today'`
@@ -268,6 +271,68 @@ Schlüssel, `dir="rtl"` nur bei Arabisch, und die farbigen Wirkungs-Kästen dort
 korrekt gespiegelt. Der Build wirft weiterhin **vier getrennte
 `peptide-*.js`-Chunks** aus (240–316 kB): Ein französischer Nutzer lädt das
 arabische Paket nicht.
+
+**4f. Die beiden KI-Endpunkte sprechen alle sechs Sprachen (01.09.2026) — und
+der spanische Coach-Prompt war seit 1.4.0 tot.**
+
+Beim Ergänzen von fr/pt/ar ist aufgefallen, dass der spanische System-Prompt in
+`api/coach.js` **nie erreicht wurde**. Die Kette:
+
+```
+CoachPage:  lang = ['de','es'].find(…) || 'en'      → 'es' geht raus
+coach.js:   outLang = lang === 'en' ? 'en' : 'de'   → 'es' wird zu 'de'
+            systemPrompt('de', …)                    → if (lang === 'es') feuert nie
+```
+
+Ein spanischer Nutzer hat also **deutsche Coach-Antworten** bekommen, während im
+Repo ein fertiger spanischer Prompt lag. Der Fehler ist eine Zeile
+(`? 'en' : 'de'`), aber er ist ein Muster: „alles außer X wird Deutsch" hält
+genau eine Sprache aus.
+
+**Was jetzt anders ist:**
+
+- `api/_sprache.js` — eine `apiSprache()` für beide Endpunkte, Rückfall
+  **Englisch** wie im Client, Regionalcodes (`pt-BR`) inklusive.
+- `coach.js`: die Prompts liegen als **Tabelle** `PROMPTS[lang]`, ein Eintrag je
+  Sprache. Keine Ternary-Kette mehr, in der ein Zweig unerreichbar sein kann.
+- `analyze-meal.js`: der Prompt wird aus `MAHLZEIT[lang]` **gebaut**, das
+  JSON-Gerüst berechnet. Vorher stand es dreimal abgetippt im Code — und in der
+  englischen Fassung war `"meal_description_de": "Short description in German"`
+  stehengeblieben, eine Feldbeschreibung statt eines Beispiels.
+- Die Sprachen werden im Prompt als `de (Deutsch), en (English), fr (français)`
+  genannt. Der **Code** stellt den Bezug zum Feld `name_de` her; ohne ihn muss
+  das Modell raten, welcher Name in welches Feld gehört.
+- `itemName()` und die Beschreibungswahl in `MealAnalysisResult` gehen über
+  `appSprache()` statt über Handlisten.
+
+⚠ **Bewusste Verhaltensänderung:** Ohne `lang` antwortet der Coach jetzt
+**englisch**, nicht mehr deutsch. In der Praxis schickt jede App-Version eine
+Sprache mit; der alte deutsche Catch-all war genau die Falle, die den es-Prompt
+begraben hat. Der Test dazu ist umgeschrieben, nicht gelöscht.
+
+**Was NICHT übersetzt wurde, mit Absicht:** die Coach-Wissensbasis
+(`_coachKnowledge.js`, 39 Einträge) bleibt DE/EN. Sie besteht aus
+Studienzusammenfassungen **mit Quellenangaben**, und eine maschinell übersetzte
+Quelle ist schlechter als eine englische. Der Prompt sagt dem Modell deshalb
+ausdrücklich, dass die Wissensbasis englisch sein darf und trotzdem in der
+Nutzersprache zu antworten ist — ohne diesen Satz antwortet es gern in der
+Sprache der Quelle.
+
+**Zwei neue Prüfungen** (`tests/api/sprache.test.js`,
+`tests/data/mahlzeitFoto.test.js`, zusammen +46 Tests):
+
+- Die Sprachliste in `api/` und die in `src/lib/sprache.js` werden gegeneinander
+  gehalten — sie sind bewusst doppelt (keine `api/`-Datei darf aus `src/`
+  importieren, sonst hängt die Serverless-Funktion am React-Bündel), und der
+  Test ist der Preis dafür.
+- Beide Prompt-Tabellen werden **im Quelltext** darauf geprüft, dass jede
+  Sprache aus der Liste vorkommt. Das ist die eigentliche Lehre aus dem toten
+  es-Prompt: Er stand da, sah richtig aus, und niemand hat gemerkt, dass ihn
+  kein Aufruf erreicht.
+
+Der Test hat beim ersten Lauf gleich etwas gefangen: `mahlzeitPrompt('kl-KL')`
+baute ein Feld `name_kl-KL` ins JSON, weil die Funktion sich auf den Aufrufer
+verlassen hat. Sie normalisiert jetzt selbst.
 
 **5. Übungs-Demos: eigene 3D-Animationen statt Fotos** (`tools/uebungs-3d/`).
 

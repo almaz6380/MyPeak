@@ -215,18 +215,56 @@ describe('/api/coach', () => {
       expect(fetchMock.to('generativelanguage')[0].body.contents[0].role).toBe('user');
     });
 
-    it('antwortet auf Deutsch, wenn keine Sprache angegeben ist', async () => {
+    // ⚠ Bewusste Verhaltensänderung (01.09.2026): Ohne Sprachangabe kommt
+    // ENGLISCH, nicht mehr Deutsch. Vorher hieß die Regel „alles außer 'en'
+    // wird Deutsch" — und genau daran ist der spanische System-Prompt
+    // gestorben, den nie ein Aufruf erreicht hat. Der Rückfall ist jetzt
+    // derselbe wie im Client (`appSprache`): Englisch. In der Praxis schickt
+    // jede App-Version eine Sprache mit; das hier ist der Notnagel.
+    it('fällt ohne Sprachangabe auf Englisch zurück', async () => {
       setEnv(ENV_FULL);
       const fetchMock = installFetch([authRoute(), abo(PREMIUM), nutzung(0), gemini()]);
       await handler(frage(), makeRes());
       expect(fetchMock.to('generativelanguage')[0].body.system_instruction.parts[0].text)
-        .toContain('Antworte auf Deutsch');
+        .toContain('Reply in English');
     });
 
-    it('wechselt bei lang=en auf Englisch', async () => {
+    it.each([
+      ['de', 'Antworte auf Deutsch'],
+      ['en', 'Reply in English'],
+      ['es', 'Responde en español'],
+      ['fr', 'Réponds en français'],
+      ['pt', 'Responda em português'],
+      ['ar', 'أجب بالعربية'],
+    ])('nimmt für lang=%s den passenden System-Prompt', async (lang, satz) => {
       setEnv(ENV_FULL);
       const fetchMock = installFetch([authRoute(), abo(PREMIUM), nutzung(0), gemini()]);
-      await handler(frage(undefined, 'en'), makeRes());
+      await handler(frage(undefined, lang), makeRes());
+      expect(fetchMock.to('generativelanguage')[0].body.system_instruction.parts[0].text)
+        .toContain(satz);
+    });
+
+    // Der Client reicht `i18n.language` durch; das kann ein Regionalcode sein.
+    // Vor der Umstellung landete 'pt-BR' auf Deutsch.
+    it.each([
+      ['de-AT', 'Antworte auf Deutsch'],
+      ['pt-BR', 'Responda em português'],
+      ['ar-EG', 'أجب بالعربية'],
+    ])('erkennt den Regionalcode %s', async (lang, satz) => {
+      setEnv(ENV_FULL);
+      const fetchMock = installFetch([authRoute(), abo(PREMIUM), nutzung(0), gemini()]);
+      await handler(frage(undefined, lang), makeRes());
+      expect(fetchMock.to('generativelanguage')[0].body.system_instruction.parts[0].text)
+        .toContain(satz);
+    });
+
+    // Eine unbekannte Sprache darf nicht in einen leeren Prompt laufen —
+    // `PROMPTS[lang]` wäre dann undefined und der Zugriff auf `.basis` hätte
+    // die Funktion mit 500 abgeschossen.
+    it('fällt bei einer unbekannten Sprache auf Englisch zurück', async () => {
+      setEnv(ENV_FULL);
+      const fetchMock = installFetch([authRoute(), abo(PREMIUM), nutzung(0), gemini()]);
+      await handler(frage(undefined, 'kl-KL'), makeRes());
       expect(fetchMock.to('generativelanguage')[0].body.system_instruction.parts[0].text)
         .toContain('Reply in English');
     });
@@ -234,10 +272,23 @@ describe('/api/coach', () => {
     it('legt passendes Wissen aus der Wissensbasis in den Prompt', async () => {
       setEnv(ENV_FULL);
       const fetchMock = installFetch([authRoute(), abo(PREMIUM), nutzung(0), gemini()]);
-      await handler(frage([{ role: 'user', content: 'Bringt Kreatin wirklich etwas?' }]), makeRes());
+      await handler(frage([{ role: 'user', content: 'Bringt Kreatin wirklich etwas?' }], 'de'), makeRes());
       const sys = fetchMock.to('generativelanguage')[0].body.system_instruction.parts[0].text;
       expect(sys).toContain('WISSENSBASIS');
       expect(sys.toLowerCase()).toContain('kreatin');
+    });
+
+    // Die Wissensbasis selbst gibt es nur auf DE und EN. Für die vier anderen
+    // Sprachen muss sie trotzdem im Prompt landen — mit dem englischen Text und
+    // der ausdrücklichen Ansage, in der Nutzersprache zu antworten. Ohne diesen
+    // Satz antwortet das Modell gern in der Sprache der Quelle.
+    it.each(['es', 'fr', 'pt', 'ar'])('hängt die Wissensbasis auch für %s an', async (lang) => {
+      setEnv(ENV_FULL);
+      const fetchMock = installFetch([authRoute(), abo(PREMIUM), nutzung(0), gemini()]);
+      await handler(frage([{ role: 'user', content: 'Bringt Kreatin wirklich etwas?' }], lang), makeRes());
+      const sys = fetchMock.to('generativelanguage')[0].body.system_instruction.parts[0].text;
+      expect(sys.toLowerCase()).toContain('creatine');
+      expect(sys).toContain('Sources');
     });
   });
 

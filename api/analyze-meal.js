@@ -1,4 +1,138 @@
 import { corsBehandeln } from './_cors.js';
+import { apiSprache } from './_sprache.js';
+
+// ── Prompt je Sprache ─────────────────────────────────────────────
+//
+// Das JSON-Gerüst wird BERECHNET, nicht je Sprache abgetippt. Vorher stand es
+// dreimal im Code, und in der englischen Fassung war
+// `"meal_description_de": "Short description in German"` stehengeblieben —
+// eine Beschreibung des Feldes statt eines Beispiels. Bei sechs Sprachen wäre
+// aus dem Fehler ein Muster geworden.
+//
+// `name_de` und `name_en` kommen IMMER mit, auch für einen arabischen Nutzer:
+// Die Lebensmittelsuche und die gespeicherten Einträge hängen daran, und alte
+// App-Versionen kennen nur diese beiden Felder. Die Sprache des Nutzers kommt
+// als drittes Feld dazu — fehlt sie, fällt der Client sauber auf Englisch
+// zurück.
+const MAHLZEIT = {
+  de: {
+    intro: 'Du bist ein Ernährungsanalyse-Assistent. Analysiere dieses Foto einer Mahlzeit und identifiziere jedes sichtbare Lebensmittel.',
+    schaetze: 'Für jedes Lebensmittel schätze:',
+    felder: ['Portionsgröße in Gramm (basierend auf visueller Größe relativ zum Teller/Schüssel)', 'Kalorien (kcal)', 'Protein (g)', 'Kohlenhydrate (g)', 'Fett (g)', 'Konfidenz (high, medium, low)'],
+    namenZeile: (s) => `Name auf ${s}`,
+    wichtig: 'Wichtig:',
+    regeln: ['Schätze Portionen basierend auf der visuellen Größe', 'Nutze Standard-Nährwertdatenbanken als Referenz', 'Gehe von einer normalen Öl-/Fettmenge bei der Zubereitung aus', 'Falls du ein Lebensmittel nicht identifizieren kannst, beschreibe es und gib deine beste Schätzung', 'Falls das Bild kein Essen zeigt, antworte mit {"error": "no_food_detected"}'],
+    format: 'Antworte NUR mit validem JSON in genau diesem Format, kein anderer Text:',
+    sprachname: 'Deutsch',
+    beispielName: 'Hähnchenbrust',
+    beispielBeschreibung: 'Kurze Beschreibung der Mahlzeit',
+  },
+  en: {
+    intro: 'You are a nutrition analysis assistant. Analyze this meal photo and identify each visible food item.',
+    schaetze: 'For each food item, estimate:',
+    felder: ['Portion size in grams (based on visual size relative to plate/bowl)', 'Calories (kcal)', 'Protein (g)', 'Carbohydrates (g)', 'Fat (g)', 'Confidence level (high, medium, low)'],
+    namenZeile: (s) => `Name in ${s}`,
+    wichtig: 'Important:',
+    regeln: ['Estimate portions based on visual size', 'Use standard nutritional databases as reference', 'Assume normal oil/fat amount in preparation', 'If you cannot identify a food, describe it and provide your best estimate', 'If the image does not show food, return {"error": "no_food_detected"}'],
+    format: 'Return ONLY valid JSON in this exact format, no other text:',
+    sprachname: 'English',
+    beispielName: 'Chicken breast',
+    beispielBeschreibung: 'Short description of the meal',
+  },
+  es: {
+    intro: 'Eres un asistente de análisis nutricional. Analiza esta foto de una comida e identifica cada alimento visible.',
+    schaetze: 'Para cada alimento, estima:',
+    felder: ['Tamaño de la porción en gramos (según el tamaño visual respecto al plato/bol)', 'Calorías (kcal)', 'Proteínas (g)', 'Carbohidratos (g)', 'Grasas (g)', 'Nivel de confianza (high, medium, low)'],
+    namenZeile: (s) => `Nombre en ${s}`,
+    wichtig: 'Importante:',
+    regeln: ['Estima las porciones según el tamaño visual', 'Usa bases de datos nutricionales estándar como referencia', 'Asume una cantidad normal de aceite/grasa en la preparación', 'Si no puedes identificar un alimento, descríbelo y da tu mejor estimación', 'Si la imagen no muestra comida, responde con {"error": "no_food_detected"}'],
+    format: 'Responde SOLO con JSON válido exactamente en este formato, sin ningún otro texto:',
+    sprachname: 'español',
+    beispielName: 'Pechuga de pollo',
+    beispielBeschreibung: 'Breve descripción de la comida',
+  },
+  fr: {
+    intro: 'Tu es un assistant d’analyse nutritionnelle. Analyse cette photo de repas et identifie chaque aliment visible.',
+    schaetze: 'Pour chaque aliment, estime :',
+    felder: ['Taille de la portion en grammes (d’après la taille visuelle par rapport à l’assiette ou au bol)', 'Calories (kcal)', 'Protéines (g)', 'Glucides (g)', 'Lipides (g)', 'Niveau de confiance (high, medium, low)'],
+    namenZeile: (s) => `Nom en ${s}`,
+    wichtig: 'Important :',
+    regeln: ['Estime les portions d’après la taille visuelle', 'Utilise des bases de données nutritionnelles standard comme référence', 'Suppose une quantité normale d’huile ou de matière grasse à la préparation', 'Si tu ne peux pas identifier un aliment, décris-le et donne ta meilleure estimation', 'Si l’image ne montre pas de nourriture, réponds {"error": "no_food_detected"}'],
+    format: 'Réponds UNIQUEMENT avec du JSON valide, exactement dans ce format, sans aucun autre texte :',
+    sprachname: 'français',
+    beispielName: 'Blanc de poulet',
+    beispielBeschreibung: 'Brève description du repas',
+  },
+  pt: {
+    intro: 'Você é um assistente de análise nutricional. Analise esta foto de uma refeição e identifique cada alimento visível.',
+    schaetze: 'Para cada alimento, estime:',
+    felder: ['Tamanho da porção em gramas (conforme o tamanho visual em relação ao prato ou à tigela)', 'Calorias (kcal)', 'Proteínas (g)', 'Carboidratos (g)', 'Gorduras (g)', 'Nível de confiança (high, medium, low)'],
+    namenZeile: (s) => `Nome em ${s}`,
+    wichtig: 'Importante:',
+    regeln: ['Estime as porções conforme o tamanho visual', 'Use bases de dados nutricionais padrão como referência', 'Considere uma quantidade normal de óleo ou gordura no preparo', 'Se não conseguir identificar um alimento, descreva-o e dê sua melhor estimativa', 'Se a imagem não mostrar comida, responda com {"error": "no_food_detected"}'],
+    format: 'Responda APENAS com JSON válido exatamente neste formato, sem nenhum outro texto:',
+    sprachname: 'português',
+    beispielName: 'Peito de frango',
+    beispielBeschreibung: 'Breve descrição da refeição',
+  },
+  ar: {
+    intro: 'أنت مساعد لتحليل التغذية. حلّل صورة الوجبة هذه وحدّد كل طعام ظاهر فيها.',
+    schaetze: 'وقدّر لكل طعام:',
+    felder: ['حجم الحصة بالغرامات (بحسب الحجم المرئي نسبةً إلى الطبق أو الوعاء)', 'السعرات (kcal)', 'البروتين (g)', 'الكربوهيدرات (g)', 'الدهون (g)', 'درجة الثقة (high, medium, low)'],
+    namenZeile: (s) => `الاسم بـ${s}`,
+    wichtig: 'مهم:',
+    regeln: ['قدّر الحصص بحسب الحجم المرئي', 'استعمل قواعد بيانات التغذية المعيارية مرجعًا', 'افترض كمية زيت أو دهن معتادة في التحضير', 'وإن تعذّر عليك تحديد طعام، فصفه وأعطِ أفضل تقدير لديك', 'وإن لم تُظهر الصورة طعامًا، فأجب بـ {"error": "no_food_detected"}'],
+    format: 'أجب فقط بـJSON صالح بهذه الصيغة تمامًا، بلا أي نص آخر:',
+    sprachname: 'العربية',
+    beispielName: 'صدر دجاج',
+    beispielBeschreibung: 'وصف موجز للوجبة',
+  },
+};
+
+export function mahlzeitPrompt(sprache) {
+  // ⚠ Selbst normalisieren, nicht auf den Aufrufer verlassen. Ohne diese Zeile
+  // baut ein roher Code wie 'kl-KL' oder 'pt-BR' ein Feld `name_kl-KL` ins
+  // JSON-Gerüst — der Test hat genau das gefangen.
+  const lang = apiSprache(sprache);
+  const t = MAHLZEIT[lang];
+  // de und en immer, die Nutzersprache zusätzlich — und nur einmal.
+  const codes = [...new Set(['de', 'en', lang])];
+  // `codes` enthält nach der Normalisierung nur bekannte Codes — kein
+  // zusätzlicher Rückfall nötig.
+  //
+  // Die Sprachen werden als `de (Deutsch)` genannt, nicht bloß als „Deutsch":
+  // Der Code stellt den Bezug zum JSON-Feld `name_de` her. Ohne ihn muss das
+  // Modell raten, welcher Name zu welchem Feld gehört — und der Satz „الاسم
+  // بـDeutsch, English" liest sich zudem in keiner Sprache gut.
+  const sprachnamen = codes.map((c) => `${c} (${MAHLZEIT[c].sprachname})`).join(', ');
+  const namensfelder = codes.map((c) => `      "name_${c}": "${MAHLZEIT[c].beispielName}"`).join(',\n');
+  const beschreibungen = codes.map((c) => `  "meal_description_${c}": "${MAHLZEIT[c].beispielBeschreibung}"`).join(',\n');
+
+  return `${t.intro}
+
+${t.schaetze}
+- ${t.namenZeile(sprachnamen)}
+${t.felder.map((f) => `- ${f}`).join('\n')}
+
+${t.wichtig}
+${t.regeln.map((r) => `- ${r}`).join('\n')}
+
+${t.format}
+{
+  "items": [
+    {
+${namensfelder},
+      "portion_g": 150,
+      "calories": 248,
+      "protein": 46.5,
+      "carbs": 0,
+      "fat": 5.4,
+      "confidence": "high"
+    }
+  ],
+${beschreibungen}
+}`;
+}
 
 export default async function handler(req, res) {
   if (corsBehandeln(req, res)) return; // Preflight der nativen App
@@ -52,118 +186,7 @@ export default async function handler(req, res) {
     return res.status(413).json({ error: 'Image too large. Please use a compressed image under 3MB.' });
   }
 
-  // Fuer es kommen name_es/meal_description_es ZUSAETZLICH zu de/en mit —
-  // die Client-Weichen fallen auf en zurueck, wenn ein Feld fehlt (alte
-  // App-Versionen schicken weiter nur de/en und bleiben unberuehrt).
-  const prompt = language === 'es'
-    ? `Eres un asistente de análisis nutricional. Analiza esta foto de una comida e identifica cada alimento visible.
-
-Para cada alimento, estima:
-- Nombre en español, alemán e inglés
-- Tamaño de la porción en gramos (según el tamaño visual respecto al plato/bol)
-- Calorías (kcal)
-- Proteínas (g)
-- Carbohidratos (g)
-- Grasas (g)
-- Nivel de confianza (high, medium, low)
-
-Importante:
-- Estima las porciones según el tamaño visual
-- Usa bases de datos nutricionales estándar como referencia
-- Asume una cantidad normal de aceite/grasa en la preparación
-- Si no puedes identificar un alimento, descríbelo y da tu mejor estimación
-- Si la imagen no muestra comida, responde con {"error": "no_food_detected"}
-
-Responde SOLO con JSON válido exactamente en este formato, sin ningún otro texto:
-{
-  "items": [
-    {
-      "name_es": "Pechuga de pollo",
-      "name_de": "Hähnchenbrust",
-      "name_en": "Chicken breast",
-      "portion_g": 150,
-      "calories": 248,
-      "protein": 46.5,
-      "carbs": 0,
-      "fat": 5.4,
-      "confidence": "high"
-    }
-  ],
-  "meal_description_es": "Breve descripción de la comida",
-  "meal_description_de": "Kurze Beschreibung der Mahlzeit",
-  "meal_description_en": "Short description of the meal"
-}`
-    : language === 'de'
-    ? `Du bist ein Ernährungsanalyse-Assistent. Analysiere dieses Foto einer Mahlzeit und identifiziere jedes sichtbare Lebensmittel.
-
-Für jedes Lebensmittel schätze:
-- Name auf Deutsch und Englisch
-- Portionsgröße in Gramm (basierend auf visueller Größe relativ zum Teller/Schüssel)
-- Kalorien (kcal)
-- Protein (g)
-- Kohlenhydrate (g)
-- Fett (g)
-- Konfidenz (high, medium, low)
-
-Wichtig:
-- Schätze Portionen basierend auf der visuellen Größe
-- Nutze Standard-Nährwertdatenbanken als Referenz
-- Gehe von einer normalen Öl-/Fettmenge bei der Zubereitung aus
-- Falls du ein Lebensmittel nicht identifizieren kannst, beschreibe es und gib deine beste Schätzung
-- Falls das Bild kein Essen zeigt, antworte mit {"error": "no_food_detected"}
-
-Antworte NUR mit validem JSON in genau diesem Format, kein anderer Text:
-{
-  "items": [
-    {
-      "name_de": "Hähnchenbrust",
-      "name_en": "Chicken breast",
-      "portion_g": 150,
-      "calories": 248,
-      "protein": 46.5,
-      "carbs": 0,
-      "fat": 5.4,
-      "confidence": "high"
-    }
-  ],
-  "meal_description_de": "Kurze Beschreibung der Mahlzeit",
-  "meal_description_en": "Short description of the meal"
-}`
-    : `You are a nutrition analysis assistant. Analyze this meal photo and identify each visible food item.
-
-For each food item, estimate:
-- Name in both German and English
-- Portion size in grams (based on visual size relative to plate/bowl)
-- Calories (kcal)
-- Protein (g)
-- Carbohydrates (g)
-- Fat (g)
-- Confidence level (high, medium, low)
-
-Important:
-- Estimate portions based on visual size
-- Use standard nutritional databases as reference
-- Assume normal oil/fat amount in preparation
-- If you cannot identify a food, describe it and provide your best estimate
-- If the image does not show food, return {"error": "no_food_detected"}
-
-Return ONLY valid JSON in this exact format, no other text:
-{
-  "items": [
-    {
-      "name_de": "Hähnchenbrust",
-      "name_en": "Chicken breast",
-      "portion_g": 150,
-      "calories": 248,
-      "protein": 46.5,
-      "carbs": 0,
-      "fat": 5.4,
-      "confidence": "high"
-    }
-  ],
-  "meal_description_de": "Short description in German",
-  "meal_description_en": "Short description of the meal"
-}`;
+  const prompt = mahlzeitPrompt(apiSprache(language));
 
   // ⚠ Modellname synchron mit api/coach.js halten und NIE raten — mit
   // /api/gemini-modelle?probe=<name> nachmessen. 2.0-flash abgeschaltet,

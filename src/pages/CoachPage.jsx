@@ -6,6 +6,7 @@ import { medicalDisclaimerText } from '../components/MedicalDisclaimer';
 import { useAuth } from '../context/AuthContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { askCoach, getCoachUsageToday } from '../data/coachStorage';
+import { appSprache } from '../lib/sprache';
 
 const TRIAL_LIMIT = 5;
 const PREMIUM_LIMIT = 30;
@@ -40,10 +41,13 @@ function speichereVerlauf(userId, messages) {
 
 export default function CoachPage() {
   const { t, i18n } = useTranslation();
-  // es zaehlt mit: der Coach-Server hat seit 1.4.0 auch einen spanischen
-  // System-Prompt. Die restlichen Inline-Texte dieser Seite fallen fuer es
-  // auf Englisch zurueck — bewusst, bis alles auf i18n-Schluessel umzieht.
-  const lang = ['de', 'es'].find((l) => i18n.language?.startsWith(l)) || 'en';
+  // Geht an den Coach-Server, der je Sprache einen eigenen System-Prompt hat.
+  //
+  // ⚠ Hier stand eine eigene Liste `['de', 'es']` — fr, pt und ar fielen
+  // stillschweigend auf Englisch, obwohl die Oberflaeche laengst uebersetzt
+  // war. Solche Handlisten sind genau der Fehler, den `appSprache()` verhindern
+  // soll: Die Liste steht in `src/lib/sprache.js` und nirgends sonst.
+  const lang = appSprache(i18n.language);
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isPremium, isTrial, openPaywall } = useSubscription();

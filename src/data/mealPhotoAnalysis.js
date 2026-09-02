@@ -1,6 +1,7 @@
 import { compressImage } from './exercisePhotos';
 import { supabase } from '../lib/supabase';
 import { API_BASIS } from './apiBasis';
+import { appSprache } from '../lib/sprache';
 
 // Oil level adjustment multipliers (applied to fat content)
 const OIL_MULTIPLIERS = {
@@ -112,12 +113,15 @@ export function applyOilAdjustment(items, oilLevel = 'normal') {
 }
 
 // Name in der App-Sprache; fehlt das Feld (alte API-Antwort, unerwartete
-// Sprache), faellt es auf Englisch zurueck. startsWith, weil i18n.language
-// auch als Regionalcode ankommen kann ('de-AT').
+// Sprache), faellt es auf Englisch zurueck.
+//
+// ⚠ Eine Zeile je Sprache waere hier der falsche Weg gewesen: Genau so ist die
+// Liste bei `es` stehengeblieben und fr/pt/ar bekamen englische Namen, obwohl
+// das Modell sie liefert. `appSprache()` normalisiert Regionalcodes ('de-AT',
+// 'pt-BR') gleich mit.
 export function itemName(item, language = 'de') {
-  if (language?.startsWith('de') && item.name_de) return item.name_de;
-  if (language?.startsWith('es') && item.name_es) return item.name_es;
-  return item.name_en || item.name_de || '';
+  if (!item) return '';
+  return item[`name_${appSprache(language)}`] || item.name_en || item.name_de || '';
 }
 
 /**
