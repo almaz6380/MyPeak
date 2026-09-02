@@ -146,14 +146,29 @@ def commit_edit(tok, eid):
         print(f'  {e.detail.strip()[:400]}')
         print('  Weiter ohne Vorpruefung, Commit ohne Einreichen.')
 
-    if not ohne_pruefung:
-        try:
-            call(tok, 'POST', f'{basis}:commit', fatal=False)
-            print('  committet — im Play-Eintrag jetzt sichtbar.')
-            return
-        except ApiError as e:
-            if not blockiert(e):
-                hart_raus(e, ':commit')
+    # ⚠ Der schlichte :commit wird IMMER versucht, auch nach einer abgelehnten
+    # Vorpruefung. Frueher stand hier `if not ohne_pruefung:` — damit sprang der
+    # Code nach einem Fehlschlag bei :validate direkt zur Parameter-Variante und
+    # uebersprang genau den Aufruf, der fuer diese App der richtige ist:
+    #
+    #   :commit?changesNotSentForReview=true
+    #   → 400 "Changes are sent for review automatically.
+    #          The query parameter changesNotSentForReview must not be set."
+    #
+    # Fuer at.gallab.mypeak reicht Google jede Aenderung automatisch zur
+    # Pruefung ein; der Parameter ist schlicht verboten. Die Reihenfolge ist
+    # deshalb: erst ohne Parameter, und nur wenn Google ihn ausdruecklich
+    # verlangt (der 400er oben), mit.
+    if ohne_pruefung:
+        print('  Versuche Commit ohne Vorpruefung …')
+    try:
+        call(tok, 'POST', f'{basis}:commit', fatal=False)
+        print('  committet — im Play-Eintrag jetzt sichtbar.')
+        return
+    except ApiError as e:
+        if not blockiert(e):
+            hart_raus(e, ':commit')
+        print(f'  Commit abgelehnt ({e.code}): {e.detail.strip()[:300]}')
 
     call(tok, 'POST', f'{basis}:commit?changesNotSentForReview=true')
     print('  committet — ABER NICHT zur Pruefung eingereicht.')
