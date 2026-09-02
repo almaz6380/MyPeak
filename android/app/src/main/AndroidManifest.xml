@@ -86,7 +86,14 @@
     <queries>
         <package android:name="com.google.android.apps.healthdata" />
     </queries>
+    <!-- ⚠ Genau die zwei, die health.js auch wirklich abfragt (schritteHeute,
+         gewichtImportieren). READ_ACTIVE_CALORIES_BURNED stand hier bis 1.5.0
+         mit, wurde aber nirgends gelesen: Google verlangt in der
+         Health-Apps-Erklaerung fuer JEDE angeforderte Berechtigung eine
+         Begruendung, und eine ungenutzte ist ein Ablehnungsgrund. Sie
+         widersprach ausserdem der eigenen Datenschutzerklaerung, die nur
+         Schritte und Gewicht nennt. Wer hier etwas hinzufuegt, muss beides
+         nachziehen — Formular UND Datenschutztext. -->
     <uses-permission android:name="android.permission.health.READ_STEPS" />
     <uses-permission android:name="android.permission.health.READ_WEIGHT" />
-    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" />
 </manifest>

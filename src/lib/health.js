@@ -38,8 +38,11 @@ export async function verbinden(userId) {
       }
       return { ok: false, grund: 'nicht_verfuegbar' };
     }
+    // Nur anfragen, was auch gelesen wird. READ_ACTIVE_CALORIES stand hier bis
+    // 1.5.0 mit, ohne dass es je abgefragt wurde — im Systemdialog erschien
+    // damit eine Zeile, der nie eine Funktion gegenueberstand.
     await Health.requestHealthPermissions({
-      permissions: ['READ_STEPS', 'READ_WEIGHT', 'READ_ACTIVE_CALORIES'],
+      permissions: ['READ_STEPS', 'READ_WEIGHT'],
     });
     // ⚠ iOS verraet NICHT, ob der Nutzer zugestimmt hat (HealthKit-Prinzip:
     // Abgelehnt sieht aus wie „keine Daten"). Die Flagge heisst deshalb
