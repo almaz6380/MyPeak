@@ -92,8 +92,17 @@ export default function BarcodeScanner({ onScanned, onClose }) {
       if (json.status === 1 && json.product) {
         const p = json.product;
         const n = p.nutriments || {};
+        // Open Food Facts führt den Produktnamen je Sprache als
+        // `product_name_<code>`. Gefragt wurde bisher nur nach `_de` und `_en`
+        // — ein französischer Nutzer, der ein französisches Produkt scannt,
+        // bekam den Standardnamen (oft die Sprache des Herkunftslands),
+        // obwohl OFF `product_name_fr` führt. `nameLokal` holt die
+        // eingestellte Sprache dazu; `nameDE`/`nameEN` bleiben, weil
+        // gespeicherte Einträge sie tragen — ohne sie wären alte Datensätze
+        // namenlos.
         setFoundProduct({
           id: `off_${barcode}`,
+          nameLokal: p[`product_name_${lang}`] || '',
           nameDE: p.product_name_de || p.product_name || barcode,
           nameEN: p.product_name_en || p.product_name || barcode,
           brand: p.brands || '',
@@ -390,7 +399,12 @@ function FoundProductScreen({ product, lang, onConfirm, onScanAgain, onClose, t 
   const [imgLoaded, setImgLoaded] = useState(false);
   const [localPhoto, setLocalPhoto] = useState(product.local_photo || null);
   const fileInputRef = useRef(null);
-  const displayName = lang === 'de' ? (product.nameDE || product.nameEN) : (product.nameEN || product.nameDE);
+  // Reihenfolge: eingestellte Sprache, dann Deutsch bzw. Englisch als Netz.
+  // Vorher hiess die Regel „Deutsch oder Englisch" — für die vier anderen
+  // Sprachen war das immer der englische Zweig.
+  const displayName = product.nameLokal
+    // sprachweiche-ok: Netz hinter `nameLokal`; gespeicherte Produkte tragen nur DE/EN.
+    || (lang === 'de' ? (product.nameDE || product.nameEN) : (product.nameEN || product.nameDE));
   const hasAnyImage = imgLoaded || localPhoto;
 
   async function handlePhotoCapture(e) {

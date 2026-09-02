@@ -24,18 +24,27 @@ const QUICK_COLORS = [
   'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border-s-purple-400',
 ];
 
-export default function KnowledgePage({ onBack, data, titleDE, titleEN, titleES, categories = [], disclaimer = 'general', bereich }) {
+// ⚠ Der Titel kam früher als drei Props `titleDE`/`titleEN`/`titleES` herein
+// und wurde mit `lang === 'es' ? … : (lang === 'de' ? … : …)` gewählt. Für fr,
+// pt und ar stand damit die ENGLISCHE Überschrift über einer vollständig
+// übersetzten Liste. Jetzt ein i18n-Schlüssel — der kennt alle sechs Sprachen
+// und wächst mit der siebten mit.
+export default function KnowledgePage({ onBack, data, titelSchluessel, categories = [], disclaimer = 'general', bereich }) {
   const { t, i18n } = useTranslation();
   const lang = appSprache(i18n.language);
-  // Spanisches Inhaltspaket; null, solange es lädt oder die Sprache keines hat.
+  // Inhaltspaket der aktuellen Sprache; null, solange es lädt oder die Sprache
+  // keines hat (de/en lesen direkt aus der Datendatei).
   const paket = useUebersetzung(bereich, i18n.language);
   const [activeCategory, setActiveCategory] = useState('all');
   const [selected, setSelected] = useState(null);
   const [showEbook, setShowEbook] = useState(false);
 
-  const catList = [{ id: 'all', nameDE: 'Alle', nameEN: 'All', nameES: 'Todos' }, ...categories];
-  const catLabel = (c) => (c.id === 'all' ? (lang === 'es' ? c.nameES : (lang === 'de' ? c.nameDE : c.nameEN))
-    : kategorieName(c, lang, paket));
+  // Dieselbe Falle wie beim Titel: Der „Alle"-Chip trug seine Namen als
+  // Datenfelder und kannte nur de/en/es, während alle übrigen Chips aus dem
+  // Sprachpaket kommen. Auf Französisch stand dort „All" zwischen lauter
+  // französischen Kategorien.
+  const catList = [{ id: 'all' }, ...categories];
+  const catLabel = (c) => (c.id === 'all' ? t('library.allCategories') : kategorieName(c, lang, paket));
   const catName = (id) => {
     const c = catList.find((x) => x.id === id);
     return c ? catLabel(c) : id;
@@ -150,7 +159,7 @@ export default function KnowledgePage({ onBack, data, titleDE, titleEN, titleES,
         <button onClick={onBack} className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-2xl font-bold">{lang === 'es' ? (titleES || titleEN) : (lang === 'de' ? titleDE : titleEN)}</h1>
+        <h1 className="text-2xl font-bold">{t(titelSchluessel)}</h1>
       </div>
 
       {categories.length > 0 && (

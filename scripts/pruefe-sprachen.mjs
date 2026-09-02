@@ -116,6 +116,61 @@ for (const d of dateien) {
 }
 console.log(`  ${tabellenGeprueft} Beschriftungstabellen im Code geprüft.`);
 
+// ── Sprachcode-Weichen im Code ───────────────────────────────────
+//
+// Die Tabellenprüfung oben findet fehlende SPALTEN. Sie findet nicht, was
+// dreimal der teurere Fehler war: eine Zweiwegweiche auf dem Sprachcode selbst.
+//
+//   api/coach.js       outLang = lang === 'en' ? 'en' : 'de'
+//                      → 'es' wurde zu 'de', der spanische Prompt war toter Code
+//   CoachPage.jsx      ['de', 'es'].find(…) || 'en'
+//                      → fr/pt/ar fielen still auf Englisch
+//   KnowledgePage.jsx  lang === 'es' ? … : (lang === 'de' ? … : …)
+//                      → englische Überschrift über französischer Liste
+//
+// Alle drei sahen richtig aus und liefen lange mit. Gemeinsames Merkmal: Der
+// Sprachcode wird VERGLICHEN, statt durch `appSprache()` zu gehen und damit
+// eine Tabelle zu indizieren.
+//
+// `lib/sprache.js` ist ausgenommen — dort gehört die Weiche hin. Alles andere
+// muss sich rechtfertigen, auf zwei Wegen:
+//
+//   • Einzelne Zeile:  `// sprachweiche-ok` ans Zeilenende ODER in eine der
+//                      drei Zeilen darüber. Die Zeilen sind hier oft lang;
+//                      ein Marker am Ende wäre nicht mehr zu sehen, und eine
+//                      Begründung passt ohnehin nur darüber.
+//   • Ganze Datei:     `// sprachweichen-ok: <Begründung>` irgendwo in der
+//                      Datei. Die Begründung ist PFLICHT — ohne Text hinter
+//                      dem Doppelpunkt zählt die Ausnahme nicht.
+//
+// Die Dateiausnahme gibt es, weil `uebersetzungen.js` zwölf solche Zeilen hat
+// und ihr ganzer Zweck der DE/EN-Rückfall ist. Zwölfmal derselbe Marker wäre
+// Lärm, den niemand mehr liest — und ein Marker, den niemand liest, schützt
+// nichts. Der Preis: Wer die Datei ausnimmt, muss einen Satz schreiben, warum.
+const WEICHE = /\b(?:lang|language|sprache|locale|lng)\w*\s*===\s*'(?:de|en|es|fr|pt|ar)'|\[\s*'(?:de|en|es|fr|pt|ar)'\s*,\s*'(?:de|en|es|fr|pt|ar)'\s*\]/;
+const WEICHE_OK = [/src[/\\]lib[/\\]sprache\.js$/];
+let weichenGeprueft = 0;
+for (const d of dateien) {
+  if (WEICHE_OK.some((r) => r.test(d))) continue;
+  const roh = readFileSync(d, 'utf8');
+  // Dateiausnahme nur mit Begründung: `sprachweichen-ok:` gefolgt von Text.
+  if (/sprachweichen-ok:\s*\S/.test(roh)) continue;
+  const src = roh.split('\n');
+  for (let i = 0; i < src.length; i += 1) {
+    const z = src[i];
+    const nackt = z.trimStart();
+    if (nackt.startsWith('//') || nackt.startsWith('*')) continue;
+    if (!WEICHE.test(z)) continue;
+    weichenGeprueft += 1;
+    // Marker in der Zeile selbst oder in einer der drei darüber.
+    if (src.slice(Math.max(0, i - 3), i + 1).some((x) => /sprachweiche-ok/.test(x))) continue;
+    meckern(`Zweiwegweiche auf dem Sprachcode — ${d.slice(WURZEL.length + 1)}:${i + 1}`
+      + `\n      ${z.trim().slice(0, 110)}`
+      + '\n      Über appSprache() + Tabelle lösen, oder mit // sprachweiche-ok kennzeichnen.');
+  }
+}
+console.log(`  ${weichenGeprueft} Sprachcode-Weichen im Code geprüft.`);
+
 if (!process.argv.includes('--browser')) {
   console.log(fehler ? `\n${fehler} Fehler.` : '\nAlles in Ordnung.');
   process.exit(fehler ? 1 : 0);

@@ -1,5 +1,17 @@
 // Lokale Lebensmittel-Datenbank (~150 gängige Lebensmittel)
 // Alle Werte pro 100g/100ml sofern nicht anders angegeben
+//
+// ⚠ Diese Datei wird von ZWEI Ladern gelesen: Vite baut sie ins Bündel, und
+// `scripts/pruefe-inhalte.mjs` importiert sie direkt per node. Daraus folgen
+// zwei Regeln, die beide schon zugeschnappt sind:
+//
+// 1. **Kein React.** `../lib/sprache` ist in Ordnung (reine Funktionen),
+//    `./uebersetzungen` wäre es nicht — die zieht React mit, und das
+//    Prüfskript bricht ab.
+// 2. **Import MIT Dateiendung.** Vite löst `'../lib/sprache'` auf, node nicht:
+//    ERR_MODULE_NOT_FOUND, und zwar erst zur Laufzeit des Skripts, nicht beim
+//    Bauen.
+import { appSprache } from '../lib/sprache.js';
 
 const foods = [
   // ── Milchprodukte ──────────────────────────────────────────
@@ -175,6 +187,7 @@ export function searchLocalFoods(query, language = 'de', paket = null) {
   if (!query || query.length < 2) return [];
   const q = query.toLowerCase();
   return foods.filter((f) => {
+    // sprachweiche-ok: Rückfall auf die zwei Datenfelder; die Übersetzung kommt aus `paket`.
     const name = paket?.[f.id] ?? (language === 'de' ? f.nameDE : f.nameEN);
     return name.toLowerCase().includes(q) || (f.brand && f.brand.toLowerCase().includes(q));
   });
@@ -233,7 +246,14 @@ export async function searchOpenFoodFacts(query, language = 'de') {
   if (offCache.has(cacheKey)) return offCache.get(cacheKey);
 
   try {
-    const lc = language === 'de' ? 'de' : 'en';
+    // `lc` sagt Open Food Facts, in welcher Sprache es die Produktnamen
+    // bevorzugt liefern soll. Vorher stand hier „Deutsch oder Englisch" —
+    // spanische, französische, portugiesische und arabische Nutzer bekamen
+    // also englische Namen, obwohl OFF für die großen Sprachen gepflegte
+    // Namen führt. Hat OFF für ein Produkt keinen Namen in der Sprache,
+    // liefert es ohnehin den Standardnamen; ein Rückschritt ist damit
+    // ausgeschlossen.
+    const lc = appSprache(language);
     const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=20&lc=${lc}`;
 
     const controller = new AbortController();

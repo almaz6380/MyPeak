@@ -293,7 +293,12 @@
     "supplements": "المكملات",
     "diets": "الحميات",
     "peptides": "الببتيدات",
-    "bloodwork": "تحاليل الدم"
+    "bloodwork": "تحاليل الدم",
+    "trainingKnowledge": "معارف التدريب",
+    "nutritionKnowledge": "معارف التغذية",
+    "supplementsKnowledge": "معارف المكمّلات",
+    "bloodworkKnowledge": "معارف فحوص الدم",
+    "allCategories": "الكل"
   },
   "coach": {
     "title": "مدرب الذكاء الاصطناعي",

@@ -37,7 +37,6 @@ function ladeStudien() {
     if (roh[i] === '{') tiefe++;
     else if (roh[i] === '}') { tiefe--; if (tiefe === 0) { bis = i + 1; break; } }
   }
-  // eslint-disable-next-line no-new-func
   const studien = new Function(`return ${roh.slice(von, bis)}`)();
   const n = Object.keys(studien).length;
   if (n < 18) throw new Error(`nur ${n} Studien gelesen — Aufbau von peakPrograms.js geaendert?`);

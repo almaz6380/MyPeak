@@ -18,6 +18,11 @@ import { appSprache } from '../lib/sprache';
 //
 // Fehlt ein Eintrag oder ein Feld, fällt es sauber auf DE/EN zurück — eine
 // halb fertige Übersetzung zeigt also gemischt, nie leer.
+// sprachweichen-ok: Die `lang === 'de' ? …DE : …EN`-Zeilen unten sind der
+// RÜCKFALL, wenn das Sprachpaket den Eintrag nicht hat. In den Datendateien
+// gibt es nur diese beiden Felder — eine dritte Sprache kann dort gar nicht
+// stehen. Wer hier `appSprache()` einsetzt, gewinnt nichts und suggeriert eine
+// Auswahl, die es nicht gibt. Die Übersetzung selbst kommt aus `paket`.
 const BEREICHE = {
   peptides: 'peptide',
   diets: 'diaeten',

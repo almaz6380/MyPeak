@@ -293,7 +293,12 @@
     "supplements": "Suplementos",
     "diets": "Dietas",
     "peptides": "Peptídeos",
-    "bloodwork": "Exames de sangue"
+    "bloodwork": "Exames de sangue",
+    "trainingKnowledge": "Conhecimento de treino",
+    "nutritionKnowledge": "Conhecimento de nutrição",
+    "supplementsKnowledge": "Conhecimento de suplementos",
+    "bloodworkKnowledge": "Conhecimento de exames de sangue",
+    "allCategories": "Todos"
   },
   "coach": {
     "title": "Coach de IA",

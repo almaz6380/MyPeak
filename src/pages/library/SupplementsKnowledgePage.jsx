@@ -6,9 +6,7 @@ export default function SupplementsKnowledgePage({ onBack }) {
     <KnowledgePage
       onBack={onBack}
       data={supplementsTopics}
-      titleDE="Supplemente-Wissen"
-      titleEN="Supplements Knowledge"
-      titleES="Conocimiento sobre suplementos"
+      titelSchluessel="library.supplementsKnowledge"
       bereich="supplements"
       categories={supplementsCategories}
       disclaimer="medical"

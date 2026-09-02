@@ -6,9 +6,7 @@ export default function NutritionKnowledgePage({ onBack }) {
     <KnowledgePage
       onBack={onBack}
       data={nutritionTopics}
-      titleDE="Ernährungs-Wissen"
-      titleEN="Nutrition Knowledge"
-      titleES="Conocimiento sobre nutrición"
+      titelSchluessel="library.nutritionKnowledge"
       bereich="nutrition"
       categories={nutritionCategories}
       disclaimer="general"

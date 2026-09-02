@@ -293,7 +293,12 @@
     "supplements": "Supplemente",
     "diets": "Diäten",
     "peptides": "Peptide",
-    "bloodwork": "Blutwerte"
+    "bloodwork": "Blutwerte",
+    "trainingKnowledge": "Training-Wissen",
+    "nutritionKnowledge": "Ernährungs-Wissen",
+    "supplementsKnowledge": "Supplemente-Wissen",
+    "bloodworkKnowledge": "Blutwerte-Wissen",
+    "allCategories": "Alle"
   },
   "coach": {
     "title": "KI-Coach",

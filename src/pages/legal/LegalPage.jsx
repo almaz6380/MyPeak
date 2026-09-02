@@ -17,6 +17,8 @@ export default function LegalPage({ doc }) {
   // Spinner.
   const sprache = appSprache(i18n.language);
   const uebersetzt = useRechtstexte(i18n.language);
+  // sprachweiche-ok: `legalDocs` führt nur de und en; die vier anderen Sprachen
+  // kommen aus `useRechtstexte`. Der Rückfall kann gar nicht mehr treffen.
   const content = uebersetzt?.[doc] || legalDocs[doc]?.[sprache === 'de' ? 'de' : 'en'];
 
   if (!content) return null;

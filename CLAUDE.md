@@ -381,6 +381,58 @@ FR, 38×`tú` in ES, 0×`vous`).
 Store), und ein `play-listing.en-US.json` fehlt — der englische Volltext liegt
 bisher nur in `store-texte.md`.
 
+**4h. Fehlerdurchgang nach dem Sprachpaket (01.09.2026).** Josefs Auftrag:
+„alle Fehler die du findest beheben". Fünf davon waren echt.
+
+**1. `npm run lint` war nicht mehr aussagekräftig — 1332 statt 124 Probleme.**
+`eslint.config.js` ignorierte `dist`, aber nicht die beiden Kopien desselben
+Bündels, die `npx cap sync` nach `ios/App/App/public/` und
+`android/app/src/main/assets/public/` legt. Beide sind gitignored, also auf
+einem frischen Klon nicht da — der Zähler sprang je nachdem, ob jemand vorher
+gebaut hatte. Damit war die Regel „es dürfen keine neuen dazukommen"
+unprüfbar. Jetzt alle drei ignoriert.
+
+**2. `KnowledgePage` zeigte fr/pt/ar den ENGLISCHEN Seitentitel** über einer
+vollständig übersetzten Liste. Der Titel kam als drei Props `titleDE`,
+`titleEN`, `titleES` herein und wurde mit
+`lang === 'es' ? … : (lang === 'de' ? … : …)` gewählt. Jetzt ein
+i18n-Schlüssel (`library.<bereich>Knowledge`).
+
+**3. Derselbe Fehler beim „Alle"-Chip** — er trug seine Namen als Datenfelder
+(`nameDE`/`nameEN`/`nameES`), während alle übrigen Chips aus dem Sprachpaket
+kommen. Auf Französisch stand „All" zwischen lauter französischen Kategorien.
+
+**4. Open Food Facts wurde immer auf Deutsch oder Englisch gefragt.**
+`searchOpenFoodFacts` setzte `lc = language === 'de' ? 'de' : 'en'`, und der
+Barcode-Scanner las nur `product_name_de`/`_en`. Ein französischer Nutzer, der
+ein französisches Produkt scannt, bekam den Standardnamen, obwohl OFF
+`product_name_fr` führt. Beide Stellen nehmen jetzt die eingestellte Sprache;
+`nameDE`/`nameEN` bleiben als Netz, weil gespeicherte Einträge sie tragen.
+
+**5. `foodDatabase.js` brach das Prüfskript**, sobald es `appSprache`
+importierte — ohne `.js`-Endung. Vite löst das auf, node nicht. Die Datei wird
+von beiden geladen; das steht jetzt als Regel in ihrem Kopf.
+
+⚠ **Was ich NICHT angefasst habe:** die 123 verbleibenden Lint-Meldungen. Die
+ernsten Kandidaten (`react-hooks/purity`, `immutability`) habe ich einzeln
+angesehen — es sind hoistete Funktionsdeklarationen, die zur Laufzeit korrekt
+sind. Und `foodDatabase.js:190` sieht aus wie Fehler 4, ist aber keiner: Die
+gespeicherten Sprachcodes sind immer sauber (Kette über `ProfilePage` und
+`user_settings` geprüft), der DE/EN-Zweig ist dort nur der Rückfall.
+
+**Der Prüfer kann diese Fehlerklasse jetzt selbst finden.** `pruefe-sprachen.mjs`
+sucht seit diesem Durchgang **Zweiwegweichen auf dem Sprachcode** — genau das
+Muster hinter dem toten es-Prompt, der CoachPage-Handliste und den beiden
+KnowledgePage-Fehlern. Alle vier sahen richtig aus und liefen lange mit.
+
+Erlaubt bleiben zwei Ausnahmen, beide mit Kosten:
+- `// sprachweiche-ok` an der Zeile oder in einer der drei darüber.
+- `// sprachweichen-ok: <Begründung>` für eine ganze Datei — die Begründung
+  ist Pflicht, ohne Text hinter dem Doppelpunkt zählt sie nicht. Es gibt sie,
+  weil `uebersetzungen.js` zwölf solche Zeilen hat und ihr ganzer Zweck der
+  DE/EN-Rückfall ist. Zwölfmal derselbe Marker wäre Lärm, den niemand liest —
+  und ein Marker, den niemand liest, schützt nichts.
+
 **5. Übungs-Demos: eigene 3D-Animationen statt Fotos** (`tools/uebungs-3d/`).
 
 Josefs Vorgabe nach einem Instagram-Video von `fitonomy.coach`: „erstelle es

@@ -293,7 +293,12 @@
     "supplements": "Supplements",
     "diets": "Diets",
     "peptides": "Peptides",
-    "bloodwork": "Blood Work"
+    "bloodwork": "Blood Work",
+    "trainingKnowledge": "Training Knowledge",
+    "nutritionKnowledge": "Nutrition Knowledge",
+    "supplementsKnowledge": "Supplements Knowledge",
+    "bloodworkKnowledge": "Blood Work Knowledge",
+    "allCategories": "All"
   },
   "coach": {
     "title": "AI Coach",

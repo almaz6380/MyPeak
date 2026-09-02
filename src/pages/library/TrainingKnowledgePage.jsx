@@ -6,9 +6,7 @@ export default function TrainingKnowledgePage({ onBack }) {
     <KnowledgePage
       onBack={onBack}
       data={trainingTopics}
-      titleDE="Training-Wissen"
-      titleEN="Training Knowledge"
-      titleES="Conocimiento sobre entrenamiento"
+      titelSchluessel="library.trainingKnowledge"
       bereich="training"
       categories={trainingCategories}
       disclaimer="general"
