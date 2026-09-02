@@ -28,6 +28,9 @@ i18n.use(initReactI18next).init({
   },
   lng: savedLanguage,
   fallbackLng: 'de',
+  // Nur ein Namespace — ':' in dynamischen Strings (z. B. Custom-Übungsnamen)
+  // darf nie als Namespace-Trenner interpretiert werden.
+  nsSeparator: false,
   interpolation: {
     escapeValue: false,
   },

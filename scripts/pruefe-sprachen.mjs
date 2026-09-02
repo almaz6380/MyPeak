@@ -76,9 +76,16 @@ for (const d of dateien) {
   for (const m of src.matchAll(/\bt\(\s*'([a-zA-Z0-9_.]+)'/g)) benutzt.add(m[1]);
   for (const m of src.matchAll(/\bt\(\s*`([a-zA-Z0-9_.]+)`/g)) benutzt.add(m[1]);
 }
+// Mehrzahl: Seit i18next 4 (JSON v4) gibt es den unsuffigierten Schlüssel bei
+// `{ count }` gar nicht mehr — nachgeschlagen wird `key_one` bzw. `key_other`.
+// Im Code steht trotzdem `t('planBuilder.exerciseCount', { count })`. Ohne diese
+// Ausnahme meldete die Prüfung eine Lücke, die keine ist.
+const vorhanden = (k) =>
+  tabellen.de.has(k) || (tabellen.de.has(`${k}_one`) && tabellen.de.has(`${k}_other`));
+
 for (const k of benutzt) {
   if (k.startsWith('exercises.') || k.startsWith('__custom__')) continue;
-  if (!tabellen.de.has(k)) meckern(`Schlüssel im Code, aber nicht in de.json — ${k}`);
+  if (!vorhanden(k)) meckern(`Schlüssel im Code, aber nicht in de.json — ${k}`);
 }
 console.log(`  ${benutzt.size} wörtliche t()-Schlüssel im Code geprüft.`);
 

@@ -37,12 +37,12 @@ const MA_CATEGORIES = [
   { key: 'wrestling', de: 'Ringen', en: 'Wrestling', es: 'Lucha', fr: 'Lutte', pt: 'Wrestling', ar: 'مصارعة' },
 ];
 
-export default function ExerciseLibrary({ onBack, onSelect, selectionMode = false }) {
+export default function ExerciseLibrary({ onBack, onSelect, selectionMode = false, initialType = null }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const lang = appSprache(i18n.language);
 
-  const [trainingType, setTrainingType] = useState(null); // null = show type chooser
+  const [trainingType, setTrainingType] = useState(initialType); // null = show type chooser
   const [muscleFilter, setMuscleFilter] = useState('all');
   const [equipmentFilter, setEquipmentFilter] = useState('all');
   const [maFilter, setMaFilter] = useState('all');
@@ -145,7 +145,11 @@ export default function ExerciseLibrary({ onBack, onSelect, selectionMode = fals
   return (
     <div className="p-4 pt-16 pb-24">
       <div className="flex items-center gap-3 mb-4">
-        <button onClick={() => { setTrainingType(null); setSearch(''); setMuscleFilter('all'); setEquipmentFilter('all'); setMaFilter('all'); }}
+        <button onClick={() => {
+          // Mit initialType gibt es keinen Typ-Wähler — zurück verlässt die Bibliothek direkt
+          if (initialType && trainingType === initialType) { onBack(); return; }
+          setTrainingType(null); setSearch(''); setMuscleFilter('all'); setEquipmentFilter('all'); setMaFilter('all');
+        }}
           className="p-2 -ms-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
           <ArrowLeft className="w-5 h-5" />
         </button>

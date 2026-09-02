@@ -18,6 +18,67 @@ Inhaltsbibliotheken (siehe 4b und 4c)
 
 ## Aktueller Stand
 
+### ✅ Eigene Wochenpläne: Rest erledigt + Doppelarbeit zusammengeführt (01.09.2026)
+
+Fortsetzung des Abschnitts vom 30.08. (weiter unten). Josefs Bruder war im
+**Gastmodus** an denselben Stellen gescheitert; PR **#55** hat den Rest erledigt.
+
+⚠️ **Die teuerste Lehre dieses Tages: zwei Sitzungen haben dieselben Bugs parallel
+gefixt.** Ein Branch arbeitete an `WeeklyPlanBuilder`/`MyPlans`, während `main` genau
+dasselbe anging — beide bauten unabhängig einen Übungs-Picker, ein
+`updateWeeklySchedule` und ein Aktivieren-ohne-Duplikat, nur unter **verschiedenen
+Namen**. Ergebnis: ein Merge-Konflikt über **acht Dateien**, der von Hand aufgelöst
+werden musste. **Regel daraus: vor einem größeren Fix erst `git fetch` und nachsehen,
+ob `main` das Thema schon anfasst** — ein Blick kostet Sekunden, die Doppelarbeit kostete
+einen halben Tag.
+
+**Namen sind jetzt eindeutig:** `activateWeeklySchedule` und `updateWeeklySchedule`
+(aus `main`, die Tests in `tests/data/weeklySchedules.test.js` hängen daran).
+Ein `setActiveSchedule` gibt es **nicht** — wer den Namen im Kopf hat, sucht falsch.
+
+**Was PR #55 beisteuerte und in `main` gefehlt hat:**
+
+1. **`getExerciseById` löst eigene Übungen auf** (`exercises.js`, localStorage-Lesung
+   mit Raw-String-Cache, weil `useMuscleHeatmap`/`achievements` in Schleifen darüber
+   laufen). `main` löste das nur im Aufrufer `handleStartPlan` — damit fielen eigene
+   Übungen bei **jedem anderen** Aufrufer weiter stillschweigend raus.
+2. **Absturz-Fix im `WorkoutStartChooser`** (`TrainingPage.jsx`): Er rendert alle
+   eigenen Pläne mit `plan.days.map()`, aber HIIT/Cardio/Zirkel-Pläne speichern `days`
+   als **Objekt** → `TypeError` → die **ErrorBoundary ersetzte die ganze App**.
+   Erreichbar im Gastmodus: HIIT-Plan speichern, dann „Training starten → Kraft →
+   Vom Plan". Jetzt lädt die Auswahl nur noch Kraftpläne (`getCustomPlansByType`)
+   plus `Array.isArray`-Absicherung.
+3. **`syncWeeklySchedules` in `resync.js`** — Gast-Wochenpläne wurden nie hochgeladen
+   und waren nach der Registrierung + Abmeldung **endgültig weg** (`clearLocalUserData`).
+   ⚠️ Reihenfolge beachten: Bringt ein lokaler Plan `is_active` mit, werden **zuerst**
+   die Cloud-Pläne des Kontos deaktiviert — sonst stehen nach dem Merge zwei aktive
+   Zeilen da und `getActiveSchedule` wird nichtdeterministisch.
+4. **Sätze/Wdh. je Übung einstellbar** (Stepper, Standard 3×10) statt fest verdrahteter
+   3×10, und **Split-Typ und Übungen am selben Tag kombinierbar** — vorher überschrieben
+   sich die beiden gegenseitig.
+5. **Ersetzen-Dialog** beim Speichern eines neuen Plans, wenn schon ein Programm aktiv
+   ist („Ersetzen & aktivieren" / „Nur speichern", über `saveWeeklySchedule(…, { activate })`).
+6. **i18n statt Ternaries:** neue Schlüssel `planBuilder.*` und `training.split_*`,
+   gepflegt in **allen drei** Sprachen — auch `es.json`. Ohne den spanischen Teil hätten
+   es-Nutzer über `fallbackLng: 'de'` **deutsche** Texte gesehen. Split-Labels liegen als
+   `splitId` in der Datenbank und werden erst zur Renderzeit übersetzt; Alt-Pläne fallen
+   auf das gespeicherte `label` zurück.
+7. Kleinkram: `nsSeparator: false` (Übungsnamen mit Doppelpunkt), „Heute starten"-Knopf
+   in „Meine Pläne", reine Split-Tage öffnen die Trainingsauswahl statt tot zu sein,
+   Gast-Sicherheit `user?.id || 'guest'`.
+
+**Bewusste Verhaltensänderung:** Ein **editierter** Plan aktiviert sich nicht mehr
+selbst — das war vorher eine Nebenwirkung des delete+reinsert, kein gewolltes Verhalten.
+
+**Geprüft:** 262 Tests grün, Build grün, zwei Playwright-Läufe im Gastmodus (32 Checks:
+Plan anlegen mit Katalog- und eigener Übung, Start über die Heute-Karte, Editieren ohne
+Duplikat) plus 6 Regressionschecks, dass `main`s Einzelpläne und die spanische Oberfläche
+den Merge überstanden haben.
+
+⚠️ **Die CI läuft wieder.** `.github/workflows/tests.yml` greift bei `push` **und**
+`pull_request` und lief auf PR #55 grün durch — der Abschnitt „GitHub Actions führt keine
+Jobs mehr aus" weiter unten ist damit **überholt** (Kontingent wieder frei).
+
 ### Version 1.4.0 (iOS Build 8 / Android vc17) — Widget, Health, Spanisch (01.09.2026)
 
 Josefs Auftrag: „alle offenen punkte + Widget", autonom umgesetzt. Alles auf
