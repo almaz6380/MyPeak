@@ -126,11 +126,44 @@ Dialog erscheint nie, weil die Berechtigung nie angefordert wird.
 ```
 Sobald eine App Health-Connect-Berechtigungen deklariert, verlangt Google die
 **Health-Apps-Erklärung**: Play Console → *App-Inhalte* → *Gesundheits-Apps*.
-Dort ist anzugeben, welche Datentypen gelesen werden (hier: Schritte und
-Gewicht, nur lesend) und wozu. Das ist eine rechtliche Erklärung über die
-eigene App — **die API nimmt sie nicht entgegen**, sie lehnt den Upload
-stattdessen ab. Ohne das Formular scheitert jeder weitere Lauf identisch;
-ein Neustart ist reine Zeitverschwendung.
+Das ist eine rechtliche Erklärung über die eigene App — die API nimmt sie
+nicht entgegen, sie lehnt den Upload stattdessen ab.
+
+⚠ **Das Formular hat bei uns nur ZWEI Schritte** (Kategorien ankreuzen →
+„Regionale Anforderungen", das meist leer ist). Die Fragen nach einzelnen
+Berechtigungen und Begründungstexten, die man erwartet, kommen dort **nicht**
+vor. Angekreuzt wurden: Aktivität und Fitness, Ernährungs- und
+Gewichtskontrolle, Periode erfassen (letzteres wegen `CycleDetailPage`).
+Unter *Medizin* nichts — ein Haken dort zieht eine erheblich strengere
+Prüfung nach sich.
+
+⚠⚠ **DIE ERKLÄRUNG ALLEIN REICHT NICHT — vier Läufe am 02.09. sind daran
+gescheitert, nachdem die Console sie als „Abgeschlossen" führte.** Das AAB
+lädt jedes Mal vollständig hoch (26 MB, ~6 min), der Track wird gesetzt, und
+dann kippt der Abschluss. **Alle drei Aufrufe der Kette wurden probiert, alle
+drei mit demselben 403:**
+
+| Aufruf | Antwort |
+|---|---|
+| `:validate` | 403 — Health-Erklärung fehlt |
+| `:commit` | 403 — Health-Erklärung fehlt |
+| `:commit?changesNotSentForReview=true` | 400 — *„Changes are sent for review automatically. The query parameter must not be set."* |
+
+Der letzte Punkt ist eigenständig wichtig: Für `at.gallab.mypeak` reicht
+Google jede Änderung **automatisch** zur Prüfung ein, der Parameter ist
+schlicht verboten. Der Notausgang „speichern ohne einzureichen", den
+`play-upload.py` für andere Fälle hat, existiert für diese App nicht.
+
+**Konsequenz: Bei einem 403 dieser Art NICHT weiter neu starten.** Vier Läufe
+kosteten 25 Minuten und haben nichts bewegt. Der Weg ist dann das AAB aus dem
+Workflow-Artefakt (`FullRep-<version>-vc<n>`, 30 Tage haltbar) und ein Upload
+von Hand in der Play Console — die Oberfläche benennt das fehlende Feld im
+Klartext, die API gibt nur diesen einen Satz zurück.
+
+Was am 02.09. offen blieb: ob zusätzlich die **Datensicherheit**-Erklärung um
+die Gesundheitsdaten ergänzt werden muss (sie liegt unter demselben Menüpunkt
+*App-Inhalte*), oder ob Googles Prüf-Backend die Erklärung nur sehr träge
+übernimmt — 25 Minuten Wartezeit haben jedenfalls nichts geändert.
 
 **Merksatz: Eine neue Berechtigung ist nie nur Code.** Beide Stores wollen
 zusätzlich eine Erklärung, und beide sagen das erst beim Hochladen — nach dem
