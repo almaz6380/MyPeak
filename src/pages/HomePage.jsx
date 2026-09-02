@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { datumsLocale, wochentagKuerzel } from '../lib/datumsformat';
-import { Flame, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Calendar, Plus } from 'lucide-react';
+import { ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Calendar, Plus } from 'lucide-react';
 import FullRepLogo from '../components/FullRepLogo';
 import CardPhotoMotif from '../components/CardPhotoMotif';
+import ProgressRing from '../components/ProgressRing';
+import MacroColumn, { MAKROS } from '../components/MacroColumn';
 import { useAuth } from '../context/AuthContext';
 import { getNutritionEntries, getNutritionGoals, getWaterTotal } from '../data/nutritionStorage';
-import { getWorkouts } from '../data/workoutStorage';
+import { getWorkouts, getActiveSchedule } from '../data/workoutStorage';
+import { resolveScheduledDay } from '../data/programResolver';
 import { getXP } from '../data/socialStorage';
 import { widgetDatenAktualisieren } from '../lib/widgetDaten';
 import { istVerbunden, schritteHeute, gewichtImportieren } from '../lib/health';
@@ -59,6 +62,8 @@ export default function HomePage() {
   const [dayWorkouts, setDayWorkouts] = useState(0);
   const [xpData, setXpData] = useState({ total_xp: 0, level: 1, streak_days: 0 });
   const [suppProgress, setSuppProgress] = useState({ total: 0, taken: 0 });
+  const [todaySession, setTodaySession] = useState(null);
+  const [planName, setPlanName] = useState('');
   const [cyclePhase, setCyclePhase] = useState(null);
   const [showCycle, setShowCycle] = useState(false);
   const [weightEntries, setWeightEntries] = useState([]);
@@ -103,7 +108,7 @@ export default function HomePage() {
 
   async function loadDashboard(isAlive = () => true) {
     try {
-      const [entries, goalsData, waterData, workouts, xp, supps, suppLogs, weights, cycleSettings] = await Promise.all([
+      const [entries, goalsData, waterData, workouts, xp, supps, suppLogs, weights, cycleSettings, schedule] = await Promise.all([
         getNutritionEntries(user.id, selectedDate),
         getNutritionGoals(user.id),
         getWaterTotal(user.id, selectedDate),
@@ -113,6 +118,7 @@ export default function HomePage() {
         getSupplementLogs(user.id, selectedDate),
         getWeightEntries(user.id),
         profile?.gender === 'female' ? getCycleSettings(user.id) : Promise.resolve(null),
+        getActiveSchedule(user.id),
       ]);
 
       if (!isAlive()) return; // veralteter Aufruf — State nicht mehr anfassen
@@ -141,6 +147,27 @@ export default function HomePage() {
       const scheduled = getTodayScheduledSupplements(supps || [], selectedDate);
       const progress = getSupplementProgress(scheduled, suppLogs || []);
       setSuppProgress(progress);
+
+      // Heutige Einheit für die dunkle Startkarte. DIESELBE Auflösung wie auf
+      // der Trainingsseite (`resolveScheduledDay` + `getActiveSchedule`) —
+      // sonst stünde auf zwei Seiten etwas Verschiedenes für denselben Tag.
+      //
+      // ⚠ Nur die ANZEIGE kommt hierher. Die Startlogik bleibt auf
+      // `TrainingPage`: Sie hängt am View-State und am `ActiveWorkoutContext`,
+      // und eine zweite Kopie davon wäre die Sorte Duplikat, die irgendwann
+      // auseinanderläuft. Der Knopf navigiert deshalb nur.
+      setPlanName(schedule?.name || '');
+      if (schedule) {
+        const KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+        const tag = new Date(selectedDate + 'T12:00:00');
+        try {
+          setTodaySession(await resolveScheduledDay(schedule, KEYS[tag.getDay()], tag));
+        } catch {
+          setTodaySession(null);
+        }
+      } else {
+        setTodaySession(null);
+      }
 
       // Weight (prepend profile weight as starting point)
       if (profile?.weight_kg && (weights.length === 0 || weights[0].date > (profile?.updated_at || profile?.created_at || '').split('T')[0])) {
@@ -184,9 +211,14 @@ export default function HomePage() {
     checkAchievements(user.id, { type: 'weight' }).catch(() => {});
   }
 
-  const calPercent = goals.calories > 0 ? Math.min(100, Math.round((nutrition.calories / goals.calories) * 100)) : 0;
+  const kcalUebrig = Math.round((goals.calories || 0) - nutrition.calories);
+  // Veränderung zum ersten Eintrag im gewählten Zeitraum — das ist die Zahl,
+  // die interessiert. `null` bei weniger als zwei Werten: Eine Differenz aus
+  // einem einzigen Messpunkt wäre erfunden.
+  const gewichtsDelta = weightEntries.length >= 2
+    ? weightEntries[weightEntries.length - 1].weight_kg - weightEntries[0].weight_kg
+    : null;
   const waterPercent = (goals.water_ml || 3000) > 0 ? Math.min(100, Math.round((waterTotal / (goals.water_ml || 3000)) * 100)) : 0;
-  const isToday = selectedDate === formatDate(new Date());
 
   return (
     <div className="p-4 pt-16 pb-24">
@@ -201,6 +233,14 @@ export default function HomePage() {
       <h1 className="text-xl font-bold text-slate-900 dark:text-white text-center">
         {getGreeting(t)}, {profile?.name || 'User'}
       </h1>
+      {/* Die Serie stand bisher als Zahl auf der Trainingskarte. Hier oben ist
+          sie das Erste, was man sieht — und die Trainingskarte wird dadurch
+          frei für das, worum es dort geht: die heutige Einheit. */}
+      <p className="text-xs text-slate-400 dark:text-slate-500 text-center mt-0.5">
+        {xpData.streak_days > 0
+          ? t('home.streakDay', { count: xpData.streak_days })
+          : t('home.streakStart')}
+      </p>
 
       {/* Date Navigator */}
       <div className="flex items-center justify-center gap-2 mt-3 mb-6">
@@ -234,30 +274,32 @@ export default function HomePage() {
             className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-start hover:shadow-md transition-shadow"
           >
             <CardPhotoMotif src="/bg-photos/flame-icon.png" />
-            <div className="relative flex items-center justify-between mb-3">
+            <div className="relative flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
                 <img src="/bg-photos/flame-icon.png" alt="" aria-hidden="true" className="h-6 w-auto object-contain -my-1" />
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('home.calories')}</span>
               </div>
-              <div className="flex items-center gap-1">
-                <span className="text-lg font-bold text-primary-600 dark:text-primary-400">{Math.round(nutrition.calories)}</span>
-                <span className="text-sm text-slate-400">/ {goals.calories}</span>
-                <ChevronRight className="w-4 h-4 text-slate-300 ms-1" />
-              </div>
+              <ChevronRight className="w-4 h-4 text-slate-300" />
             </div>
 
-            <div className="relative h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-4">
-              <div
-                className="h-full bg-primary-500 rounded-full transition-all duration-500"
-                style={{ width: `${calPercent}%` }}
+            {/* Die Zahl im Ring ist, was NOCH GEHT — nicht, was schon gegessen
+                ist. Das ist die Zahl, wegen der man auf die Karte schaut.
+                Über dem Ziel zählt sie hoch und die Beschriftung wechselt, statt
+                ins Negative zu laufen. */}
+            <div className="relative flex justify-center py-1">
+              <ProgressRing
+                value={nutrition.calories}
+                goal={goals.calories}
+                zahl={Math.abs(kcalUebrig)}
+                label={kcalUebrig >= 0 ? t('home.caloriesLeft') : t('home.caloriesOver')}
               />
             </div>
 
-            <div className="relative flex gap-2">
-              <MacroPill label="P" value={Math.round(nutrition.protein)} goal={goals.protein} color="bg-blue-500" />
-              <MacroPill label="C" value={Math.round(nutrition.carbs)} goal={goals.carbs} color="bg-emerald-500" />
-              <MacroPill label="F" value={Math.round(nutrition.fat)} goal={goals.fat} color="bg-rose-500" />
-              <MacroPill label="B" value={Math.round(nutrition.fiber)} goal={goals.fiber || 30} color="bg-violet-500" />
+            <div className="relative flex gap-3 mt-3">
+              <MacroColumn label={t('home.macroProtein')} value={nutrition.protein} goal={goals.protein} {...MAKROS.protein} />
+              <MacroColumn label={t('home.macroCarbs')} value={nutrition.carbs} goal={goals.carbs} {...MAKROS.carbs} />
+              <MacroColumn label={t('home.macroFat')} value={nutrition.fat} goal={goals.fat} {...MAKROS.fat} />
+              <MacroColumn label={t('home.macroFiber')} value={nutrition.fiber} goal={goals.fiber || 30} {...MAKROS.fiber} />
             </div>
           </button>
 
@@ -342,43 +384,50 @@ export default function HomePage() {
             </button>
           )}
 
-          {/* Training + Streak Card */}
+          {/* Startkarte „Heute" — die einzige dunkle Karte der Seite.
+              Im Dunkelmodus bekommt sie einen bernsteinfarbenen Rand: Auf
+              Schwarz verschwindet eine dunkle Fläche sonst restlos, und die
+              Karte, auf die es ankommt, wäre die unsichtbarste. */}
           <button
             onClick={() => navigate('/training')}
-            className="relative overflow-hidden w-full bg-white dark:bg-surface-dark-alt rounded-2xl p-4 shadow-soft border border-slate-100 dark:border-slate-800/60 text-start hover:shadow-md transition-shadow"
+            className="relative overflow-hidden w-full bg-slate-900 dark:border dark:border-amber-800 rounded-[20px] p-4 text-start hover:opacity-95 transition-opacity"
           >
             <CardPhotoMotif src="/bg-photos/training-icon.png" />
-            <div className="relative flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <img src="/bg-photos/training-icon.png" alt="" aria-hidden="true" className="h-6 w-auto object-contain -my-1" />
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('home.training')}</span>
+            <div className="relative flex items-center gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] uppercase tracking-[0.09em] font-semibold text-slate-300 dark:text-amber-600">
+                  {t('home.today')}{planName ? ` · ${planName}` : ''}
+                </p>
+                <p className="text-[19px] font-bold text-slate-50 mt-0.5 truncate">
+                  {todaySession
+                    ? [todaySession.label || todaySession.type,
+                       todaySession.exercises?.length
+                         ? t('home.exerciseCount', { count: todaySession.exercises.length })
+                         : null].filter(Boolean).join(' · ')
+                    : (planName ? t('home.restDay') : t('home.noPlan'))}
+                </p>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  {[
+                    t('home.workoutsToday', { count: dayWorkouts }),
+                    // Schritte aus Apple Health / Health Connect — nur wenn die
+                    // Verbindung im Profil aktiv ist und ein Wert lesbar war.
+                    healthSteps !== null
+                      ? `${healthSteps.toLocaleString(datumsLocale(lang))} ${t('home.steps')}`
+                      : null,
+                  ].filter(Boolean).join(' · ')}
+                </p>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-300" />
-            </div>
-            <div className="flex items-center gap-6 mt-3">
-              <div>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">{dayWorkouts}</p>
-                <p className="text-xs text-slate-400">{t('home.workouts')}</p>
-              </div>
-              <div className="w-px h-8 bg-slate-200 dark:bg-slate-700" />
-              <div className="flex items-center gap-2">
-                <Flame className="w-5 h-5 text-orange-500" />
-                <div>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{xpData.streak_days || 0}</p>
-                  <p className="text-xs text-slate-400">{t('home.streak')} ({t('home.days')})</p>
-                </div>
-              </div>
-              {/* Schritte aus Apple Health / Health Connect — nur wenn die
-                  Verbindung im Profil aktiv ist und ein Wert lesbar war. */}
-              {healthSteps !== null && (
-                <>
-                  <div className="w-px h-8 bg-slate-200 dark:bg-slate-700" />
-                  <div>
-                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{healthSteps.toLocaleString(i18n.language)}</p>
-                    <p className="text-xs text-slate-400">{t('home.steps')}</p>
-                  </div>
-                </>
-              )}
+              <span
+                aria-hidden="true"
+                className="w-11 h-11 shrink-0 rounded-[14px] bg-primary-500 flex items-center justify-center"
+              >
+                {/* Dreieck als SVG statt als Icon-Glyphe: Es muss auf Arabisch
+                    MITSPIEGELN — ein Abspielknopf zeigt immer in Leserichtung.
+                    `rtl:-scale-x-100` dreht es mit. */}
+                <svg viewBox="0 0 12 14" className="w-3.5 h-3.5 rtl:-scale-x-100" fill="#1c1917">
+                  <path d="M0 0v14l12-7z" />
+                </svg>
+              </span>
             </div>
           </button>
           {/* Weight Chart Card */}
@@ -390,14 +439,36 @@ export default function HomePage() {
               onClick={() => { const next = !showWeightChart; setShowWeightChart(next); localStorage.setItem('weight_chart_collapsed', (!next).toString()); }}
               className="relative w-full p-4 flex items-center justify-between cursor-pointer"
             >
-              <div className="flex items-center gap-2">
+              {/* Gewicht und Differenz stehen jetzt IMMER da, auch eingeklappt.
+                  Vorher musste man aufklappen, um die eigene Zahl zu sehen —
+                  bei der Karte, die man am häufigsten nur kurz prüft. Eingabe
+                  und Zeitraumwahl bleiben hinter dem Aufklappen. */}
+              <div className="flex items-center gap-2 min-w-0">
                 <img src="/bg-photos/weight-icon.png" alt="" aria-hidden="true" className="h-6 w-auto object-contain -my-1" />
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('home.weight')}</span>
-                {weightEntries.length > 0 && (
-                  <span className="text-sm text-slate-400 ms-1">
-                    {weightEntries[weightEntries.length - 1].weight_kg} kg
-                  </span>
-                )}
+                <div className="min-w-0">
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('home.weight')}</span>
+                  {weightEntries.length > 0 && (
+                    <p className="flex items-baseline gap-1.5 leading-none mt-1">
+                      {/* ⚠ dir="ltr" ist hier Pflicht, kein Feinschliff. Zahl und
+                          Einheit sind für den Bidi-Algorithmus ZWEI Läufe; auf
+                          Arabisch stand ohne das „kg 75" statt „75 kg". Die
+                          Isolation hält das Paar zusammen, ohne die Ausrichtung
+                          der Zeile anzufassen. */}
+                      <span dir="ltr" className="text-lg font-bold text-slate-900 dark:text-white tabular-nums">
+                        {weightEntries[weightEntries.length - 1].weight_kg} kg
+                      </span>
+                      {gewichtsDelta !== null && (
+                        <span dir="ltr" className={`text-xs font-semibold tabular-nums ${
+                          gewichtsDelta === 0 ? 'text-slate-400'
+                            : gewichtsDelta < 0 ? 'text-emerald-600 dark:text-emerald-400'
+                            : 'text-slate-500 dark:text-slate-400'}`}
+                        >
+                          {gewichtsDelta > 0 ? '+' : ''}{gewichtsDelta.toFixed(1)} kg
+                        </span>
+                      )}
+                    </p>
+                  )}
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -503,23 +574,6 @@ export default function HomePage() {
   );
 }
 
-function MacroPill({ label, value, goal, color }) {
-  const percent = goal > 0 ? Math.min(100, Math.round((value / goal) * 100)) : 0;
-  return (
-    <div className="flex-1 bg-slate-50 dark:bg-slate-800 rounded-xl p-2.5">
-      <div className="flex items-center justify-between mb-1">
-        <span className={`w-5 h-5 rounded-md ${color} text-white text-[10px] font-bold flex items-center justify-center`}>
-          {label}
-        </span>
-        <span className="text-xs text-slate-400">{percent}%</span>
-      </div>
-      <p className="text-sm font-bold text-slate-900 dark:text-white">{value}<span className="text-xs font-normal text-slate-400">g</span></p>
-      <div className="h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-1">
-        <div className={`h-full ${color} rounded-full`} style={{ width: `${percent}%` }} />
-      </div>
-    </div>
-  );
-}
 
 function CalendarModal({ selectedDate, onSelect, onClose, lang }) {
   const { t } = useTranslation();

@@ -24,7 +24,21 @@
     "today": "اليوم",
     "yesterday": "أمس",
     "tomorrow": "غدًا",
-    "steps": "الخطوات"
+    "steps": "الخطوات",
+    "caloriesLeft": "سعرة متبقية",
+    "caloriesOver": "سعرة زائدة",
+    "streakDay": "اليوم {{count}} من سلسلتك",
+    "streakStart": "ابدأ سلسلتك اليوم",
+    "restDay": "يوم راحة",
+    "noPlan": "لا خطة نشطة",
+    "exerciseCount": "{{count}} تمرينًا",
+    "startSession": "ابدأ الحصة",
+    "macroProtein": "بروتين",
+    "macroCarbs": "كربوهيدرات",
+    "macroFat": "دهون",
+    "macroFiber": "ألياف",
+    "workoutsToday": "{{count}} تمرين اليوم",
+    "workoutsToday_other": "{{count}} تمارين اليوم"
   },
   "training": {
     "title": "التمرين",

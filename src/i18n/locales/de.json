@@ -24,7 +24,21 @@
     "today": "Heute",
     "yesterday": "Gestern",
     "tomorrow": "Morgen",
-    "steps": "Schritte"
+    "steps": "Schritte",
+    "caloriesLeft": "kcal übrig",
+    "caloriesOver": "kcal drüber",
+    "streakDay": "Tag {{count}} deiner Serie",
+    "streakStart": "Starte heute deine Serie",
+    "restDay": "Ruhetag",
+    "noPlan": "Kein Plan aktiv",
+    "exerciseCount": "{{count}} Übungen",
+    "startSession": "Einheit starten",
+    "macroProtein": "Protein",
+    "macroCarbs": "Kohlenhydrate",
+    "macroFat": "Fett",
+    "macroFiber": "Ballaststoffe",
+    "workoutsToday": "{{count}} Workout heute",
+    "workoutsToday_other": "{{count}} Workouts heute"
   },
   "training": {
     "title": "Training",
