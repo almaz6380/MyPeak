@@ -5,6 +5,7 @@ name: App Store Connect
 # als Umgebungsvariable weitergereicht, nie in eine Datei geschrieben.
 #
 #   status          liest nur
+#   version-anlegen neue App-Store-Version + "Neu in dieser Version"
 #   name            Anzeigename + Untertitel auf FullRep
 #   build           den Build aus "build_nr" der offenen Version zuweisen
 #   screenshots     iPhone- + iPad-Bilder ersetzen
@@ -27,6 +28,7 @@ on:
         type: choice
         options:
           - status
+          - version-anlegen
           - name
           - build
           - screenshots
@@ -46,6 +48,10 @@ on:
         description: 'Nur zeigen, nichts an Apple senden'
         type: boolean
         default: true
+      version_nr:
+        description: 'Versionsnummer fuer "version-anlegen" (z. B. 1.5.0)'
+        type: string
+        default: '1.5.0'
       build_nr:
         description: 'Build-Nummer fuer "build" und "alles" (muss in ASC VALID sein)'
         type: string
@@ -70,6 +76,7 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
           MODE: ${{ inputs.mode }}
+          VERSION_NR: ${{ inputs.version_nr }}
           DRY: ${{ inputs.dry_run }}
           BUILD_NR: ${{ inputs.build_nr }}
           TROTZDEM: ${{ inputs.trotzdem }}
@@ -88,6 +95,7 @@ jobs:
           # Der Trockenlauf gilt nur fuer die schreibenden Befehle;
           # --status kennt ihn nicht.
           case "$MODE" in
+            version-anlegen) ARGS="--version-anlegen $VERSION_NR" ;;
             build) ARGS="--build $BUILD_NR" ;;
             alles) ARGS="--alles --build $BUILD_NR" ;;
             *)     ARGS="--$MODE" ;;
