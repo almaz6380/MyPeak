@@ -112,7 +112,20 @@ def commit_edit(tok, eid):
     basis = f'{API}/applications/{PKG}/edits/{eid}'
 
     def blockiert(e):
-        return e.code == 400 and 'changesNotSentForReview' in e.detail
+        # 400: laufende Richtlinienpruefung — Google sagt es im Klartext.
+        #
+        # 403 PERMISSION_DENIED: eine Pflichterklaerung im Play-Eintrag fehlt
+        # (bei uns am 02.09.: „You must let us know whether your app includes
+        # any health features."). Das ist eine Anforderung an die EINREICHUNG,
+        # nicht an das Bundle — deshalb hat ein Commit ohne Einreichen eine
+        # echte Chance, waehrend :validate zwangslaeufig ablehnt.
+        #
+        # ⚠ Der 403 wird NICHT verschluckt: Er wird gemeldet, und wenn auch der
+        # Commit scheitert, bricht das Skript mit Googles Originaltext ab.
+        # Ohne diesen Zweig verfiel die Edit-Transaktion samt 26-MB-Upload,
+        # obwohl der letzte Aufruf des Skripts genau dafuer gedacht ist.
+        return ('changesNotSentForReview' in e.detail if e.code == 400
+                else e.code == 403)
 
     def hart_raus(e, stufe):
         sys.exit(f'\nFEHLER {e.code} bei {stufe} von Edit {eid}\n{e.detail}\n')
@@ -128,8 +141,10 @@ def commit_edit(tok, eid):
         if not blockiert(e):
             hart_raus(e, ':validate')
         ohne_pruefung = True
-        print('  Vorpruefung uebersprungen — Google laesst gerade kein')
-        print('  automatisches Einreichen zu (laufende Richtlinienpruefung).')
+        print(f'  Vorpruefung abgelehnt ({e.code}) — Google laesst gerade kein')
+        print('  automatisches Einreichen zu. Grund laut API:')
+        print(f'  {e.detail.strip()[:400]}')
+        print('  Weiter ohne Vorpruefung, Commit ohne Einreichen.')
 
     if not ohne_pruefung:
         try:
