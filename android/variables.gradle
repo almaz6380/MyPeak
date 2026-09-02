@@ -1,5 +1,20 @@
 ext {
-    minSdkVersion = 24
+    // ⚠ 26 statt 24 seit 1.5.0, erzwungen von Health Connect:
+    // androidx.health.connect:connect-client:1.2.0-alpha01 (fest gepinnt in
+    // capacitor-health 8.2.0) deklariert minSdk 26. Der Manifest-Merger bricht
+    // sonst ab — „minSdkVersion 24 cannot be smaller than version 26" — und
+    // zwar erst nach zwei Minuten Gradle-Lauf.
+    //
+    // Der Fehler konnte vorher nicht auffallen: Der letzte erfolgreiche
+    // Android-Lauf (vc17, 01.09.) liegt VOR dem Commit, der capacitor-health
+    // hinzugefügt hat. 1.5.0 ist der erste Android-Build mit Health überhaupt.
+    //
+    // Der Preis: Android 7.0 und 7.1 (API 24/25) bekommen keine Updates mehr
+    // und bleiben auf vc17. Vertretbar, weil Health Connect auf diesen
+    // Geräten ohnehin nicht läuft (es setzt API 28 voraus) — die Alternative
+    // wäre tools:overrideLibrary gewesen, also ein Absturz zur Laufzeit statt
+    // eines Fehlers beim Bauen.
+    minSdkVersion = 26
     compileSdkVersion = 36
     targetSdkVersion = 36
     androidxActivityVersion = '1.11.0'
