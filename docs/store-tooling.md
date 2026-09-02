@@ -13,9 +13,24 @@ Trockenlauf ist Vorgabe:
 
 | Modus | ändert | erwartet die Dateien unter |
 |---|---|---|
-| `texte` | Titel, Kurz- und Volltext | `store-assets/play-listing.de-DE.json` |
+| `texte` | Titel, Kurz- und Volltext | `store-assets/play-listing.<lang>.json` |
 | `screenshots` | Telefon-Bilder (ersetzt alle) | `store-assets/android/` |
 | `grafiken` | App-Symbol + Vorstellungsgrafik | s. Workflow-Datei |
+
+**Die Eingabe `lang` wählt die Datei.** Vorhanden sind `de-DE`, `es-ES`,
+`fr-FR`, `pt-BR` und `ar` — jede Sprache braucht einen eigenen Lauf, Play kennt
+keinen Sammelupload. Für Lateinamerika lässt sich `es-419` mit derselben Datei
+bespielen (der spanische Text ist neutral gehalten).
+
+⚠️ **Vorher `node scripts/pruefe-store-texte.mjs` laufen lassen.** Play weist zu
+lange Felder ab, statt sie zu kürzen — und zwar am Ende eines Laufs, der bis
+dahin Minuten gebraucht hat. Das Skript zählt Unicode-Zeichen (nicht Bytes,
+sonst wäre jedes arabische Feld rechnerisch dreimal zu lang), prüft beide
+Store-Quellen und warnt schon ab 95 % der Grenze.
+
+⚠️ **Ein englischer Play-Eintrag fehlt als Datei.** Der englische Volltext steht
+nur in `store-assets/store-texte.md`; wer ihn per API setzen will, braucht
+zuerst ein `play-listing.en-US.json`.
 
 Dahinter steckt `scripts/play-upload.py`; dasselbe Skript lädt auch das AAB
 hoch. Direkt aufrufbar mit `--status`, `--listing`, `--screenshots`, `--icon`,

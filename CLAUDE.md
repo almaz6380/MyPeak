@@ -334,6 +334,53 @@ Der Test hat beim ersten Lauf gleich etwas gefangen: `mahlzeitPrompt('kl-KL')`
 baute ein Feld `name_kl-KL` ins JSON, weil die Funktion sich auf den Aufrufer
 verlassen hat. Sie normalisiert jetzt selbst.
 
+**4g. Store-Texte in ES, FR, PT und AR (01.09.2026).**
+
+Je Sprache eine `store-assets/play-listing.<locale>.json` (`es-ES`, `fr-FR`,
+`pt-BR`, `ar`) — dieselbe Fassung für beide Stores. Die iOS-Felder (Name,
+Untertitel, Keywords, Werbetext) stehen in `store-texte.md`, Abschnitt 2b.
+
+**Die langen Beschreibungen stehen bewusst NUR im JSON**, nicht zusätzlich in
+der Markdown-Datei: ~2400 Zeichen doppelt gepflegt sind nach dem ersten
+Nachtrag zwei verschiedene Fassungen. Das JSON ist zugleich das, was
+`play-listing.yml` hochlädt (Eingabe `lang` wählt die Datei) — also die
+Wahrheit, keine Kopie.
+
+**Zwei Sachfehler, die dabei aufgefallen sind** — beide standen seit Monaten in
+der deutschen und englischen Fassung:
+
+- **„Dunkler und heller Modus, Deutsch und Englisch"** — die App kann sechs
+  Sprachen. Stand so im Play Store.
+- **„Über 220 Übungen"** — es sind 248. Nicht falsch, aber unnötig bescheiden;
+  jetzt „über 240" in allen sechs Fassungen.
+
+**Neu: `node scripts/pruefe-store-texte.mjs`.** Prüft beide Quellen gegen die
+Zeichengrenzen (Play: 30/80/4000, iOS: 30/30/100/170) und meldet ab 95 % der
+Grenze eine Warnung. Zwei Dinge, die es richtig macht:
+
+- **Es zählt Unicode-Zeichen, nicht Bytes.** Beide Stores zählen so. Nach Bytes
+  wäre jedes arabische Feld rechnerisch dreimal zu lang und die Prüfung
+  unbrauchbar.
+- **Es prüft auch Inhalt**, nicht nur Länge: Der Gesundheitshinweis (Verweis auf
+  ärztlichen Rat) muss in JEDER Fassung stehen — Google Play verlangt ihn für
+  Gesundheits-Apps, und er stand schon einmal nur auf Deutsch. Genau darüber ist
+  auch die veraltete Sprachzeile aufgefallen.
+
+⚠ **Play weist zu lange Felder ab, statt sie zu kürzen** — am Ende eines Laufs,
+der bis dahin Minuten gebraucht hat. Deshalb das Skript VOR dem Workflow.
+
+**Zur Wortwahl:** Die Keywords sind keine Übersetzung der deutschen Liste,
+sondern je Sprache neu gewählt. Ein Wort, nach dem in dieser Sprache niemand
+sucht, ist verschenkter Platz — im Portugiesischen heißt das Fitnessstudio
+„academia", eine wörtliche Übersetzung von „Gym" hätte den Suchbegriff
+verfehlt. Der Ton ist überall informell (`tu`/`tú`/`você`), passend zur
+Oberfläche; das ist geprüft, nicht geraten (die UI-Dateien nutzen 70×`tu` in
+FR, 38×`tú` in ES, 0×`vous`).
+
+⚠ **Noch offen:** Screenshots gibt es nur auf Deutsch (je sechs Bilder pro
+Store), und ein `play-listing.en-US.json` fehlt — der englische Volltext liegt
+bisher nur in `store-texte.md`.
+
 **5. Übungs-Demos: eigene 3D-Animationen statt Fotos** (`tools/uebungs-3d/`).
 
 Josefs Vorgabe nach einem Instagram-Video von `fitonomy.coach`: „erstelle es

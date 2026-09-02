@@ -34,7 +34,7 @@ schnell und ohne Überforderung. Egal ob Anfänger oder Fortgeschrittener:
 Du trackst dein Workout, deine Kalorien und deinen Fortschritt an einem Ort.
 
 TRAINING
-• Über 220 Übungen mit Beschreibung: Krafttraining, Cardio, HIIT, Zirkel & Kampfsport
+• Über 240 Übungen mit Beschreibung: Krafttraining, Cardio, HIIT, Zirkel & Kampfsport
 • Sätze, Wiederholungen und Gewicht loggen — mit Rest-Timer
 • Persönliche Rekorde werden automatisch erkannt („Neuer PR!")
 • 21 fertige Trainingsprogramme: Push/Pull/Legs, Oberkörper/Unterkörper, 5er-Split, HIIT u.v.m.
@@ -60,7 +60,7 @@ FORTSCHRITT & MOTIVATION
 AUSSERDEM
 • Supplement-Tracker mit Wochenplan und Einnahme-Übersicht
 • Zyklustracking mit phasengerechten Trainings- und Ernährungsempfehlungen
-• Dunkler und heller Modus, Deutsch und Englisch, kg oder lbs
+• Dunkler und heller Modus, sechs Sprachen (Deutsch, Englisch, Spanisch, Französisch, Portugiesisch, Arabisch), kg oder lbs
 • Gastmodus: Erst ausprobieren, dann registrieren
 • Funktioniert auch offline — deine Daten synchronisieren sich automatisch
 
@@ -77,7 +77,7 @@ clean, fast and clutter-free. Whether you're a beginner or advanced:
 track your workouts, calories and progress in one place.
 
 TRAINING
-• 220+ exercises with descriptions: strength, cardio, HIIT, circuit & martial arts
+• 240+ exercises with descriptions: strength, cardio, HIIT, circuit & martial arts
 • Log sets, reps and weight — with rest timer
 • Personal records detected automatically ("New PR!")
 • 21 ready-made training programs: Push/Pull/Legs, Upper/Lower, 5-day split, HIIT and more
@@ -103,7 +103,7 @@ PROGRESS & MOTIVATION
 ALSO INCLUDED
 • Supplement tracker with weekly schedule
 • Cycle tracking with phase-based training and nutrition tips
-• Dark and light mode, English and German, kg or lbs
+• Dark and light mode, six languages (German, English, Spanish, French, Portuguese, Arabic), kg or lbs
 • Guest mode: try everything before signing up
 • Works offline — your data syncs automatically
 
@@ -205,6 +205,132 @@ Training, Kalorien & Makros tracken — mit Barcode-Scanner & Trainingsplänen
 Login required. Demo account:
 appreview@wellbooked.at / MyPeak-Review#2026
 ```
+
+---
+
+## 2b. Die vier weiteren Sprachen (ES, FR, PT, AR)
+
+**Die langen Beschreibungen stehen NICHT hier, sondern in
+`store-assets/play-listing.<locale>.json`** — je Sprache eine Datei, dieselbe
+Fassung für beide Stores. Grund: Der Volltext hat rund 2400 Zeichen; stünde er
+zusätzlich in dieser Datei, wäre er zweimal zu pflegen und nach dem ersten
+Nachtrag gäbe es zwei verschiedene Fassungen. Die JSON-Datei ist zugleich das,
+was `play-listing.yml` (`mode = texte`, Eingabe `lang`) hochlädt — sie ist die
+Wahrheit, nicht eine Kopie.
+
+| Sprache | Play-Locale (Datei) | App-Store-Locale |
+|---|---|---|
+| Spanisch | `es-ES` | Spanisch (Spanien) — für Lateinamerika dieselbe Datei unter `es-419` |
+| Französisch | `fr-FR` | Französisch (Frankreich) |
+| Portugiesisch | `pt-BR` | Portugiesisch (Brasilien) |
+| Arabisch | `ar` | Arabisch |
+
+⚠ **Portugiesisch ist pt-BR**, wie in der App. Brasilien ist der weitaus
+größte lusophone Markt; Portugal versteht pt-BR. Ein zweiter Eintrag `pt-PT`
+wäre doppelte Pflege ohne Gegenwert.
+
+⚠ **Spanisch ist bewusst neutral gehalten** (kein „vosotros"), damit dieselbe
+Datei für Spanien und Lateinamerika taugt.
+
+### Spanisch — Name (max. 30 Zeichen)
+```
+FullRep: Entreno y Nutrición
+```
+
+### Spanisch — Untertitel (max. 30 Zeichen)
+```
+Entreno, calorías y macros
+```
+
+### Spanisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+fitness,gym,entreno,calorías,macros,adelgazar,músculo,dieta,nutrición,pesas,workout,peso
+```
+
+### Spanisch — Werbetext (max. 170 Zeichen)
+```
+Registra entrenos, controla calorías, mira tu progreso — todo en una app.
+Con escáner de códigos, reconocimiento por foto con IA y 21 programas listos.
+```
+
+### Französisch — Name (max. 30 Zeichen)
+```
+FullRep : Fitness & Nutrition
+```
+
+### Französisch — Untertitel (max. 30 Zeichen)
+```
+Séances, calories & macros
+```
+
+### Französisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+fitness,muscu,musculation,calories,macros,minceur,régime,nutrition,poids,suivi,salle
+```
+
+### Französisch — Werbetext (max. 170 Zeichen)
+```
+Note tes séances, suis tes calories, vois tes progrès — tout dans une app.
+Avec scanner de code-barres, reconnaissance photo par IA et 21 programmes.
+```
+
+### Portugiesisch — Name (max. 30 Zeichen)
+```
+FullRep: Treino e Nutrição
+```
+
+### Portugiesisch — Untertitel (max. 30 Zeichen)
+```
+Treino, calorias e macros
+```
+
+### Portugiesisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+fitness,academia,treino,calorias,macros,emagrecer,músculo,dieta,nutrição,peso,carga
+```
+
+### Portugiesisch — Werbetext (max. 170 Zeichen)
+```
+Registre treinos, controle calorias, veja seu progresso — tudo num só app.
+Com leitor de código de barras, reconhecimento por foto com IA e 21 programas.
+```
+
+### Arabisch — Name (max. 30 Zeichen)
+```
+FullRep: تدريب وتغذية
+```
+
+### Arabisch — Untertitel (max. 30 Zeichen)
+```
+تمارين وسعرات وماكروز
+```
+
+### Arabisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+لياقة,جيم,تدريب,سعرات,ماكروز,تخسيس,عضلات,حمية,تغذية,وزن,تمارين,باركود
+```
+
+### Arabisch — Werbetext (max. 170 Zeichen)
+```
+سجّل تدريباتك وتابع سعراتك وشاهد تقدّمك — كل ذلك في تطبيق واحد.
+مع قارئ الباركود والتعرّف بالصورة بالذكاء الاصطناعي و21 برنامجًا جاهزًا.
+```
+
+⚠ **Die Keywords sind KEINE Übersetzung der deutschen Liste**, sondern je
+Sprache neu gewählt. Ein Wort, nach dem in dieser Sprache niemand sucht, ist
+verschenkter Platz: Im Deutschen sucht man „Muskelaufbau", im Französischen
+„muscu" und „salle" (fürs Fitnessstudio), im Portugiesischen „academia" — das
+ist dort das Wort für Fitnessstudio, eine wörtliche Übersetzung von „Gym"
+hätte es nicht getroffen.
+
+⚠ **Apple zählt Keywords inklusive der Kommas**, Leerzeichen sind verboten
+(sie zählen mit und bringen nichts). Der App-Name muss NICHT in die Keywords —
+Apple indexiert ihn ohnehin.
+
+**Geprüft mit `node scripts/pruefe-store-texte.mjs`** — das Skript zählt
+Unicode-Zeichen, nicht Bytes (sonst wäre jedes arabische Feld rechnerisch
+dreimal zu lang) und schlägt an, bevor ein Upload nach Minuten mit einer
+Längenmeldung abbricht.
 
 ---
 
