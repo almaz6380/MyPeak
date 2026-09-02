@@ -79,6 +79,59 @@ den Merge überstanden haben.
 `pull_request` und lief auf PR #55 grün durch — der Abschnitt „GitHub Actions führt keine
 Jobs mehr aus" weiter unten ist damit **überholt** (Kontingent wieder frei).
 
+### Version 1.5.0 (iOS Build 9 / Android vc18) — sechs Sprachen + neues Design (02.09.2026)
+
+Zwei Arbeitsstränge in einer Version: **fr/pt/ar als vierte bis sechste Sprache**
+(Oberfläche, Inhaltsbibliotheken, KI-Endpunkte, Store-Texte) und das **neue
+Design** aus Josefs Übergabe (ProgressRing, MacroColumn, dunkle „Heute"-Karte,
+einheitliche Kartenhülle).
+
+**Der Fehlertyp, der die Sitzung geprägt hat: die Zweiwegweiche.**
+`lang === 'de' ? deutsch : englisch` — aus jeder Sprache außer Deutsch wird
+Englisch, aus jeder außer Englisch Deutsch. Vier Fundstellen, jede unsichtbar
+im Build und unsichtbar in jedem Test, der nur de und en fährt:
+
+| Wo | Was der Nutzer gesehen hätte |
+|---|---|
+| `api/coach.js` | Der spanische Coach-Prompt war seit 1.4.0 **toter Code** — `outLang = lang === 'en' ? 'en' : 'de'` machte aus 'es' ein 'de' |
+| `CoachPage.jsx` | Handliste `['de','es']` — fr/pt/ar fielen auf Englisch |
+| `KnowledgePage.jsx` | Titel und der „Alle"-Chip zweisprachig durchgereicht |
+| `BarcodeScanner.jsx` | Open Food Facts liefert `product_name_fr`, gelesen wurde es nie |
+
+Alle vier behoben — und wichtiger: **`pruefe-sprachen.mjs` findet sie jetzt
+selbst.** Ein Muster erkennt `lang === '<code>'` und Zweierlisten; wer eine
+Weiche wirklich braucht, schreibt `// sprachweiche-ok` darüber (Zeile oder bis
+drei darüber) oder `// sprachweichen-ok: <Grund>` an den Dateikopf. Ohne Grund
+kein Freibrief.
+
+**Arabisch hat sechs Mehrzahlformen, nicht zwei.** `exerciseCount_one` +
+`_other` sah vollständig aus, bestand jede Schlüsselzählung — und zeigte bei
+drei Übungen den nackten Schlüssel, weil i18next `_few` sucht. Die Prüfung
+löst Mehrzahl jetzt gegen i18next selbst auf (0, 1, 2, 3, 11, 100 × jede
+Sprache), statt Suffixe zu zählen. Zusätzliche Formen gelten dabei nicht mehr
+als „Schlüssel zu viel"; ar.json hat deshalb 1478 statt 1474 Schlüssel.
+
+**Zwei Designentscheidungen an EINER Stelle statt an hunderten:**
+`html.dark { --shadow-soft: none }` schaltet den Schatten für alle 132
+Fundstellen ab und für jede künftige mit; `.karte` in `@layer components`
+ersetzt eine sechsteilige Klassenkette, die an über 100 Stellen von Hand
+abgetippt war (mit drei Radien und zwei Rändern, weil abgetippt).
+
+**⚠ Der Merge, vor dem die Übergabe gewarnt hat, ist eingetreten.** `main`
+hatte parallel die eigenen Wochenpläne repariert — dieselben vier Dateien im
+Trainingsbereich, 18 Konflikte allein im `WeeklyPlanBuilder`. Aufgelöst mit
+beiden Seiten: mains Funktionen, dieser Zweig die Sprachschlüssel und
+logischen Abstände. Beim `WeeklyPlanBuilder` war es richtig, mains Fassung
+KOMPLETT zu nehmen und die vier RTL-Klassen neu zu setzen, statt 18 Hunks
+einzeln aufzulösen — main hatte die Datei ohnehin schon auf `t()` umgestellt,
+mein Zweig hatte dort nur mechanische Ersetzungen.
+
+**⚠ `a2a07ee` hat 41 Schlüssel nur nach de.json und en.json geschrieben**
+(planBuilder.*, training.split_*). Josef zog es für es nach, fr/pt/ar blieben
+offen — auf Französisch hätte im Planbauer `planBuilder.chooseDays` gestanden,
+nicht einmal deutscher Text. Genau der Fehlertyp dieser Version, aus der
+anderen Richtung. **Merksatz: Wer einen Schlüssel anlegt, legt ihn sechsmal an.**
+
 ### Version 1.4.0 (iOS Build 8 / Android vc17) — Widget, Health, Spanisch (01.09.2026)
 
 Josefs Auftrag: „alle offenen punkte + Widget", autonom umgesetzt. Alles auf

@@ -19,7 +19,7 @@ import { Capacitor } from '@capacitor/core';
 import { healthVerfuegbar, istVerbunden, verbinden, trennen, gewichtImportieren } from '../lib/health';
 
 // Sichtbare Build-Kennung — muss bei jedem neuen Store-Build mitgezogen werden (siehe android/app/build.gradle)
-const APP_VERSION = '1.4.0 (8)';
+const APP_VERSION = '1.5.0 (9)';
 
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
