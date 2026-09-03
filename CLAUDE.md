@@ -165,8 +165,25 @@ einheitliche Kartenhülle).
 | | App Store | Google Play |
 |---|---|---|
 | Build | 1.5.0 (9) hochgeladen **und der Version zugewiesen** (`asc.yml`, Modus `build`) | **vc19 im internen Test** (von Hand geladen, 03.09. 13:00). vc18 liegt ebenfalls dort, traegt aber noch die neun Plugin-Berechtigungen — nicht befoerdern |
-| Zustand | **erledigt** — die Ablehnung 3.1.2 ist behoben, `296b5960` steht auf `WAITING_FOR_REVIEW` (siehe Abschnitt oben, 03.09.) | **Gesundheitserklaerung bei Google in Pruefung** (eingereicht 03.09. ~13:20, Stunden bis Tage). Produktionsentwurf mit vc19 wartet darauf — ohne genehmigte Erklaerung laesst er sich nicht speichern |
-| Offen | nichts mehr von hier aus — auf Apples Antwort warten | Nach Genehmigung: Produktion → Entwurf → Speichern → Ueberpruefen und veroeffentlichen, **voller Rollout** |
+| Zustand | **erledigt** — die Ablehnung 3.1.2 ist behoben, `296b5960` steht auf `WAITING_FOR_REVIEW` (siehe Abschnitt oben, 03.09.) | **Produktionsrelease vc19 (voller Rollout) und Gesundheitserklaerung gemeinsam in Googles Pruefung** — eingereicht 03.09. ~13:30 |
+| Offen | nichts mehr von hier aus — auf Apples Antwort warten | nichts mehr — geht es durch, ist vc19 fuer alle live |
+
+Der Produktionsentwurf liess sich speichern, sobald die Erklaerung
+**eingereicht** war, nicht erst nach ihrer Genehmigung — beide laufen als eine
+Einreichung durch die Pruefung.
+
+**Zwei Hinweise aus dem Play-Release-Dashboard, beide NICHT blockierend:**
+
+- **Code-Verschleierung 2 %, Google-Grenzwert 25 %, Frist Februar 2027.**
+  Release-Builds laufen ohne R8/ProGuard (`minifyEnabled`). Einschalten ist
+  ein Schalter in `android/app/build.gradle`, aber mit Nebenwirkung:
+  Capacitor-Plugins arbeiten teils per Reflection, R8 wirft dann Klassen weg,
+  die zur Laufzeit gebraucht werden. Eigenes Release mit Keep-Regeln und
+  Geraetetest — nicht nebenbei.
+- **Randlose Anzeige (Edge-to-Edge, Android 15+):** „veraltete APIs oder
+  Parameter". Empfehlung, kein Fehler. Am Geraet pruefen, ob Inhalte unter der
+  Statusleiste kleben; ggf. `WindowCompat.setDecorFitsSystemWindows` bzw. die
+  Capacitor-Einstellung dazu.
 
 **minSdk 26 ist entschieden (Josef, 03.09.): Android hat derzeit keine
 Nutzer.** Die 1.048 Telefonmodelle ohne Update betreffen also niemanden,
