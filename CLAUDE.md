@@ -166,7 +166,12 @@ einheitliche Kartenhülle).
 |---|---|---|
 | Build | 1.5.0 (9) hochgeladen **und der Version zugewiesen** (`asc.yml`, Modus `build`) | **vc19 im internen Test** (von Hand geladen, 03.09. 13:00). vc18 liegt ebenfalls dort, traegt aber noch die neun Plugin-Berechtigungen — nicht befoerdern |
 | Zustand | **erledigt** — die Ablehnung 3.1.2 ist behoben, `296b5960` steht auf `WAITING_FOR_REVIEW` (siehe Abschnitt oben, 03.09.) | **Gesundheitserklaerung bei Google in Pruefung** (eingereicht 03.09. ~13:20, Stunden bis Tage). Produktionsentwurf mit vc19 wartet darauf — ohne genehmigte Erklaerung laesst er sich nicht speichern |
-| Offen | nichts mehr von hier aus — auf Apples Antwort warten | Nach Genehmigung: Produktion → Entwurf → Speichern → Ueberpruefen und veroeffentlichen. **Gestaffelt** waehlen, solange die Android-7-Frage (minSdk 26, 1.048 Telefonmodelle weniger) nicht geklaert ist |
+| Offen | nichts mehr von hier aus — auf Apples Antwort warten | Nach Genehmigung: Produktion → Entwurf → Speichern → Ueberpruefen und veroeffentlichen, **voller Rollout** |
+
+**minSdk 26 ist entschieden (Josef, 03.09.): Android hat derzeit keine
+Nutzer.** Die 1.048 Telefonmodelle ohne Update betreffen also niemanden,
+Health bleibt auf Android drin, kein gestaffelter Rollout noetig. Die Frage
+ist damit geschlossen — nicht bei jedem Release neu aufmachen.
 
 ⚠ **Die Ablehnung 3.1.2 hatte nichts mit diesem Sprach-/Design-Paket zu tun** —
 sie betraf die Abo-Angaben in der Store-Beschreibung. Behoben am 03.09., siehe
