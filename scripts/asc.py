@@ -287,6 +287,70 @@ def _whats_new(tok, v):
                   f'({len(WHATS_NEW)} Zeichen)')
 
 
+
+# ── Beschreibung + URLs ───────────────────────────────────────────────────
+# Apple hat 1.5.0 am 02.09. automatisch abgelehnt (3.1.2): Bei einem Abo muss
+# ein FUNKTIONIERENDER Link auf die Nutzungsbedingungen in der BESCHREIBUNG
+# stehen, nicht nur in der App. Der Abo-Block unten ist der Fix.
+#
+# Der Fliesstext wird aus store-assets/play-listing.de-DE.json gelesen —
+# dieselbe Quelle, die play-upload.py fuer Google benutzt. Eine zweite Kopie
+# im Skript waere genau der Grund, warum in ASC monatelang noch "MyPeak" und
+# "ueber 220 Uebungen" standen, waehrend Play laengst umgestellt war.
+
+LISTING_DE = 'store-assets/play-listing.de-DE.json'
+SUPPORT_URL = 'https://fullrep.vercel.app/legal/imprint'
+MARKETING_URL = 'https://fullrep.vercel.app'
+BESCHREIBUNG_GRENZE = 4000
+
+ABO_BLOCK = """
+
+ABO — FULLREP PREMIUM
+\u2022 4,99 \u20ac pro Monat oder 44,99 \u20ac pro Jahr, mit automatischer Verl\u00e4ngerung
+\u2022 7 Tage kostenlos testen, danach beginnt das Abo, wenn du nicht k\u00fcndigst
+\u2022 Die Zahlung wird bei Best\u00e4tigung des Kaufs \u00fcber deine Apple-ID abgebucht
+\u2022 Das Abo verl\u00e4ngert sich automatisch, sofern es nicht sp\u00e4testens 24 Stunden vor Ablauf gek\u00fcndigt wird \u2014 verwalten und k\u00fcndigen in den Einstellungen deiner Apple-ID
+\u2022 Nutzungsbedingungen: https://fullrep.vercel.app/legal/terms
+\u2022 Datenschutzerkl\u00e4rung: https://fullrep.vercel.app/legal/privacy"""
+
+
+def beschreibung(tok):
+    """Beschreibung, Support- und Marketing-URL der offenen Version setzen."""
+    with open(LISTING_DE, encoding='utf-8') as f:
+        text = json.load(f)['fullDescription'].rstrip()
+    text += ABO_BLOCK
+    if len(text) > BESCHREIBUNG_GRENZE:
+        sys.exit(f'  Beschreibung {len(text)} Zeichen > {BESCHREIBUNG_GRENZE} — '
+                 f'Apple weist sie ab, statt sie zu kuerzen.')
+    print(f'  Beschreibung: {len(text)} von {BESCHREIBUNG_GRENZE} Zeichen')
+
+    aid = app_id(tok)
+    v = offene_version(tok, aid)
+    print(f'  Version {v["attributes"]["versionString"]} '
+          f'({v["attributes"].get("appStoreState")})')
+    locs = api(tok, f'appStoreVersions/{v["id"]}/appStoreVersionLocalizations')
+    for loc in locs.get('data', []):
+        locale = loc['attributes'].get('locale')
+        if locale != 'de-DE':
+            print(f'  {locale}: uebersprungen (nur de-DE gepflegt)')
+            continue
+        alt = loc['attributes'].get('description') or ''
+        print(f'  {locale}: {len(alt)} -> {len(text)} Zeichen')
+        if TROCKEN:
+            print('  [trocken] wuerde Beschreibung + URLs setzen')
+            continue
+        res = api(tok, f'appStoreVersionLocalizations/{loc["id"]}', 'PATCH', {
+            'data': {'type': 'appStoreVersionLocalizations', 'id': loc['id'],
+                     'attributes': {'description': text,
+                                    'supportUrl': SUPPORT_URL,
+                                    'marketingUrl': MARKETING_URL}},
+        }, fatal=False)
+        if res.get('_fehler'):
+            print(f'  FEHLER: {fehler_text(res)}')
+        else:
+            print('  gesetzt (Beschreibung, Support-URL, Marketing-URL)')
+
+
 def setze_build(tok, nummer):
     aid = app_id(tok)
     v = offene_version(tok, aid)
@@ -1039,6 +1103,8 @@ def main():
                    help='Anzeigename + Untertitel auf FullRep setzen')
     p.add_argument('--version-anlegen', metavar='NR', dest='version_anlegen',
                    help='neue App-Store-Version anlegen (z. B. 1.5.0) + whatsNew')
+    p.add_argument('--beschreibung', action='store_true',
+                   help='Beschreibung + Support-/Marketing-URL setzen (3.1.2)')
     p.add_argument('--build', metavar='NR',
                    help='Diesen Build der offenen Version zuweisen')
     p.add_argument('--screenshots', action='store_true',
@@ -1074,7 +1140,7 @@ def main():
     TROCKEN = a.dry_run
     TROTZDEM = a.trotzdem
 
-    tat = [a.status, a.name, a.build, a.version_anlegen, a.screenshots, a.abo_screenshot,
+    tat = [a.status, a.name, a.build, a.version_anlegen, a.beschreibung, a.screenshots, a.abo_screenshot,
            a.warum, a.einreichungen, a.aufraeumen, a.abo_namen, a.abo_notiz,
            a.inhaberrechte, a.exportfrage, a.pruefnotiz,
            a.einreichen, a.alles]
@@ -1106,6 +1172,8 @@ def main():
         return
     if a.version_anlegen:
         version_anlegen(tok, a.version_anlegen)
+    if a.beschreibung:
+        beschreibung(tok)
     if a.name:
         setze_namen(tok)
     if a.build:
