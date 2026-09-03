@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -96,4 +97,40 @@
          nachziehen — Formular UND Datenschutztext. -->
     <uses-permission android:name="android.permission.health.READ_STEPS" />
     <uses-permission android:name="android.permission.health.READ_WEIGHT" />
+
+    <!-- ⚠⚠ NEUN BERECHTIGUNGEN, DIE WIR NIE ANGEFORDERT HABEN — vom Plugin.
+         `capacitor-health` deklariert in seinem eigenen Manifest ELF
+         Health-Berechtigungen (node_modules/capacitor-health/android/src/main/
+         AndroidManifest.xml). Der Manifest-Merger nimmt sie ungefragt mit; im
+         fertigen AAB stehen sie, obwohl oben nur zwei deklariert sind.
+
+         Aufgefallen ist es erst in Googles Formular „Berechtigungen fuer
+         Gesundheitsdaten": Dort standen 10 Felder statt 2, jedes mit
+         Begruendungspflicht. Google verlangt fuer jede angeforderte
+         Berechtigung einen genehmigten Anwendungsfall — neun davon haetten
+         erfunden werden muessen, und das ist ein Ablehnungsgrund.
+
+         ⚠ Das Formular erscheint ERST, wenn ein Bundle mit
+         Health-Berechtigungen in einem Track liegt. Vorher hat die
+         Health-Apps-Erklaerung nur zwei Schritte und wirkt vollstaendig —
+         genau daran sind am 02.09. vier API-Laeufe gescheitert (403
+         „You must let us know whether your app includes any health
+         features"), waehrend die Console „Abgeschlossen" meldete. Henne und Ei:
+         ohne Bundle kein Formular, ohne Formular kein Bundle. Aufloesen laesst
+         es sich nur ueber die Oberflaeche, nicht ueber die API.
+
+         `tools:node="remove"` wirft sie beim Zusammenfuehren wieder heraus.
+         Wer eine davon wirklich braucht: Zeile loeschen, oben deklarieren,
+         in health.js abfragen, im Play-Formular begruenden UND in der
+         Datenschutzerklaerung ergaenzen — alle vier, sonst passt es nicht
+         mehr zusammen. -->
+    <uses-permission android:name="android.permission.health.READ_EXERCISE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_DISTANCE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_TOTAL_CALORIES_BURNED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_EXERCISE_ROUTE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_HEIGHT" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_BODY_FAT" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_LEAN_BODY_MASS" tools:node="remove" />
 </manifest>
