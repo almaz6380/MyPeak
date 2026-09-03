@@ -79,6 +79,80 @@ den Merge überstanden haben.
 `pull_request` und lief auf PR #55 grün durch — der Abschnitt „GitHub Actions führt keine
 Jobs mehr aus" weiter unten ist damit **überholt** (Kontingent wieder frei).
 
+### ⚠️ iOS 1.5.0: erst abgelehnt (3.1.2), dann neu eingereicht — 03.09.2026
+
+Die Einreichung `7b72598f` vom 02.09. wurde **automatisch abgelehnt**, wenige
+Minuten nach dem Absenden. Wortlaut aus dem Resolution Center:
+
+> „The submission offers auto-renewable subscriptions but does not include a
+> **functional link to the Terms of Use (EULA)** in the app metadata that
+> appears on the app's App Store product page."
+
+**Merksatz: Ein Abo ohne EULA-Link in der BESCHREIBUNG wird automatisch
+abgelehnt** — nicht von einem Prüfer, sondern von einer Vorprüfung, die in
+Minuten antwortet. Der Link in der App genügt nicht; er muss auf der
+Produktseite stehen.
+
+Kein Code- und kein Binary-Problem: **Build 9 blieb zugewiesen.**
+
+⚠️ **Nebenbefund, der eigentliche Skandal:** Die Beschreibung in ASC stand noch
+auf dem Stand vor der Umbenennung — „**MyPeak** vereint Training und Ernährung",
+„Über 220 Übungen", Support- und Marketing-URL auf `my-peak.vercel.app`. Der
+Play-Text wurde am 30.07. umgestellt, der iOS-Text **nie**. Zwei Kopien
+desselben Textes, eine gepflegt, eine vergessen.
+
+Neu deshalb **`--beschreibung`** (Workflow-Modus `beschreibung`): setzt
+`description`, `supportUrl` und `marketingUrl` der offenen Version für de-DE.
+Der Fließtext kommt aus **`store-assets/play-listing.de-DE.json`** — derselben
+Datei, die `play-upload.py` für Google liest. **Eine Quelle, zwei Stores.**
+Angehängt wird ein Abo-Block mit Preis, Laufzeit, Verlängerungsregel und den
+Links auf `/legal/terms` und `/legal/privacy` (2941 von 4000 Zeichen).
+
+⚠️ **Die abgelehnte Einreichung hält die Version besetzt.** `--einreichen` brach
+mit `UNRESOLVED_ISSUES` ab; erst `--aufraeumen` (zieht sie zurück, `CANCELING`),
+dann geht es wieder. Dasselbe Muster wie am 31.07. — es ist kein fehlendes Feld.
+
+**Neu eingereicht:** `296b5960-9c41-433b-b698-6fd6f4dc4e76`,
+`WAITING_FOR_REVIEW`, 03.09.2026, 08:14 UTC.
+
+⚠️ **Noch offen:** Die englische Fassung gibt es in ASC nicht (nur `de-DE`), und
+`play-listing.en-US.json` fehlt weiterhin. Die vier weiteren Sprachen haben
+Store-Texte, aber keine ASC-Lokalisierung.
+
+### ✅ iOS 1.5.0 eingereicht — 02.09.2026, 19:17 UTC
+
+Einreichung **`7b72598f-5641-43dd-8960-104056318f3a`**, Zustand
+`WAITING_FOR_REVIEW`, Build 9 zugewiesen, Auslieferung nach Freigabe
+(`AFTER_APPROVAL`). Beide Abos stehen auf **APPROVED** und mussten deshalb
+nicht mitgereicht werden — 2.1(b) kann sich hier nicht wiederholen.
+
+⚠️ **Der Blocker war nicht das, wonach es aussah.** `--warum` brach mit
+„Keine offene Version gefunden" ab: 1.0 stand auf `READY_FOR_SALE`, und für
+1.5.0 gab es in ASC **gar keinen Versionseintrag**. Der hochgeladene Build
+allein legt keine Version an. Alle schreibenden Befehle des Skripts holen
+sich aber zuerst die offene Version — ohne sie ging weder Zuweisen noch
+Einreichen.
+
+Neu deshalb **`--version-anlegen`** (Workflow-Modus `version-anlegen`,
+Eingabe `version_nr`): POST auf `appStoreVersions` mit
+`releaseType AFTER_APPROVAL` plus „Neu in dieser Version" (`whatsNew`) für
+de-DE. Läuft ins Leere, wenn schon eine offene Version existiert, statt eine
+zweite anzulegen. **Merksatz: Ein Build in ASC ist noch keine Version.**
+
+Die **Prüfnotiz ist auf 1.5.0 umgeschrieben**. Die alte sprach von der
+Ablehnung vom 14.08. und davon, die Abos seien „jetzt Teil dieser
+Einreichung" — beides falsch für diese Version, und der Prüfer hätte nach
+etwas gesucht, das es nicht gibt. Die neue erklärt vor allem, warum
+`NSHealthUpdateUsageDescription` im Binary steht, obwohl nichts nach Health
+geschrieben wird.
+
+Am Endpunkt gemessen, nicht gemeldet: Build 9 `VALID`,
+`usesNonExemptEncryption: False`, Alterseinstufung gesetzt, nur
+`promotionalText` leer (optional).
+
+⚠️ **Android bleibt offen** — der Upload scheitert weiter am
+Health-Formular, siehe unten. Das ist Josefs Schritt in der Play Console.
+
 ### Version 1.5.0 (iOS Build 9 / Android vc18) — sechs Sprachen + neues Design (02.09.2026)
 
 Zwei Arbeitsstränge in einer Version: **fr/pt/ar als vierte bis sechste Sprache**
