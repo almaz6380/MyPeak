@@ -160,13 +160,13 @@ Zwei Arbeitsstränge in einer Version: **fr/pt/ar als vierte bis sechste Sprache
 Design** aus Josefs Übergabe (ProgressRing, MacroColumn, dunkle „Heute"-Karte,
 einheitliche Kartenhülle).
 
-**Stand des Ausrollens (02.09.):**
+**Stand des Ausrollens (03.09., 13:30):**
 
 | | App Store | Google Play |
 |---|---|---|
-| Build | 1.5.0 (9) hochgeladen **und der Version zugewiesen** (`asc.yml`, Modus `build`) | vc18 gebaut und signiert, AAB als Artefakt |
-| Zustand | **erledigt** — die Ablehnung 3.1.2 ist behoben, `296b5960` steht auf `WAITING_FOR_REVIEW` (siehe Abschnitt oben, 03.09.) | Upload laeuft durch, der Abschluss (`:validate`/`:commit`) wird mit 403 verweigert |
-| Offen | nichts mehr von hier aus — auf Apples Antwort warten | Health-Formular in der Play Console, dann AAB hochladen |
+| Build | 1.5.0 (9) hochgeladen **und der Version zugewiesen** (`asc.yml`, Modus `build`) | **vc19 im internen Test** (von Hand geladen, 03.09. 13:00). vc18 liegt ebenfalls dort, traegt aber noch die neun Plugin-Berechtigungen — nicht befoerdern |
+| Zustand | **erledigt** — die Ablehnung 3.1.2 ist behoben, `296b5960` steht auf `WAITING_FOR_REVIEW` (siehe Abschnitt oben, 03.09.) | **Gesundheitserklaerung bei Google in Pruefung** (eingereicht 03.09. ~13:20, Stunden bis Tage). Produktionsentwurf mit vc19 wartet darauf — ohne genehmigte Erklaerung laesst er sich nicht speichern |
+| Offen | nichts mehr von hier aus — auf Apples Antwort warten | Nach Genehmigung: Produktion → Entwurf → Speichern → Ueberpruefen und veroeffentlichen. **Gestaffelt** waehlen, solange die Android-7-Frage (minSdk 26, 1.048 Telefonmodelle weniger) nicht geklaert ist |
 
 ⚠ **Die Ablehnung 3.1.2 hatte nichts mit diesem Sprach-/Design-Paket zu tun** —
 sie betraf die Abo-Angaben in der Store-Beschreibung. Behoben am 03.09., siehe
@@ -225,19 +225,22 @@ Sobald eine App Health-Connect-Berechtigungen deklariert, verlangt Google die
 Das ist eine rechtliche Erklärung über die eigene App — die API nimmt sie
 nicht entgegen, sie lehnt den Upload stattdessen ab.
 
-⚠ **Das Formular hat bei uns nur ZWEI Schritte** (Kategorien ankreuzen →
-„Regionale Anforderungen", das meist leer ist). Die Fragen nach einzelnen
-Berechtigungen und Begründungstexten, die man erwartet, kommen dort **nicht**
-vor. Angekreuzt wurden: Aktivität und Fitness, Ernährungs- und
-Gewichtskontrolle, Periode erfassen (letzteres wegen `CycleDetailPage`).
-Unter *Medizin* nichts — ein Haken dort zieht eine erheblich strengere
-Prüfung nach sich.
+**Aufgelöst am 03.09. — es war ein Henne-Ei-Problem, und die API kann es
+nicht knacken:**
 
-⚠⚠ **DIE ERKLÄRUNG ALLEIN REICHT NICHT — vier Läufe am 02.09. sind daran
-gescheitert, nachdem die Console sie als „Abgeschlossen" führte.** Das AAB
-lädt jedes Mal vollständig hoch (26 MB, ~6 min), der Track wird gesetzt, und
-dann kippt der Abschluss. **Alle drei Aufrufe der Kette wurden probiert, alle
-drei mit demselben 403:**
+Das Formular hat **zwei Gesichter**. Solange KEIN Bundle mit
+Health-Berechtigungen in irgendeinem Track liegt, zeigt es nur zwei Schritte
+(Kategorien → „Regionale Anforderungen", leer) und meldet sich danach als
+„Abgeschlossen". Sobald ein Bundle im Track liegt, erscheint **Schritt 2
+„Berechtigungen für Gesundheitsdaten"** — mit Begründungspflicht je
+Berechtigung. Erst DER zählt für Google.
+
+Die API kommt da nie hin: Sie lädt hoch, setzt den Track und scheitert am
+Abschluss (403 „You must let us know whether your app includes any health
+features"), und weil der Edit verworfen wird, liegt danach **kein** Bundle im
+Track — also erscheint Schritt 2 nicht — also bleibt die Erklärung
+unvollständig — also scheitert der nächste Lauf. Vier Läufe, 25 Minuten,
+nichts bewegt. **Alle drei Abschluss-Aufrufe probiert:**
 
 | Aufruf | Antwort |
 |---|---|
@@ -245,21 +248,49 @@ drei mit demselben 403:**
 | `:commit` | 403 — Health-Erklärung fehlt |
 | `:commit?changesNotSentForReview=true` | 400 — *„Changes are sent for review automatically. The query parameter must not be set."* |
 
-Der letzte Punkt ist eigenständig wichtig: Für `at.gallab.mypeak` reicht
-Google jede Änderung **automatisch** zur Prüfung ein, der Parameter ist
-schlicht verboten. Der Notausgang „speichern ohne einzureichen", den
-`play-upload.py` für andere Fälle hat, existiert für diese App nicht.
+Der letzte Punkt gilt dauerhaft: Für `at.gallab.mypeak` reicht Google jede
+Änderung automatisch zur Prüfung ein, der Parameter ist verboten. Der
+Notausgang „speichern ohne einzureichen" existiert für diese App nicht.
 
-**Konsequenz: Bei einem 403 dieser Art NICHT weiter neu starten.** Vier Läufe
-kosteten 25 Minuten und haben nichts bewegt. Der Weg ist dann das AAB aus dem
-Workflow-Artefakt (`FullRep-<version>-vc<n>`, 30 Tage haltbar) und ein Upload
-von Hand in der Play Console — die Oberfläche benennt das fehlende Feld im
-Klartext, die API gibt nur diesen einen Satz zurück.
+**Der Weg, der funktioniert hat (einmalig, danach läuft die Automatik):**
 
-Was am 02.09. offen blieb: ob zusätzlich die **Datensicherheit**-Erklärung um
-die Gesundheitsdaten ergänzt werden muss (sie liegt unter demselben Menüpunkt
-*App-Inhalte*), oder ob Googles Prüf-Backend die Erklärung nur sehr träge
-übernimmt — 25 Minuten Wartezeit haben jedenfalls nichts geändert.
+1. AAB aus dem Workflow-Artefakt holen (`FullRep-<version>-vc<n>`, die Datei
+   darin heißt seit 03.09. gleich, 30 Tage haltbar)
+2. In der Console von Hand in den **internen Test** laden — das geht OHNE
+   Erklärung durch, nur Produktion und Offener Test sind gesperrt
+3. Jetzt zeigt das Formular Schritt 2. Ausfüllen, Speichern → geht in Googles
+   Prüfung (Stunden bis Tage, nicht Minuten)
+4. Nach Genehmigung: Produktionsrelease speichern; ab dann nimmt auch die API
+   wieder an
+
+⚠ **Beim Handupload die richtige Datei erwischen.** Gradle nennt jedes
+Bundle `app-release.aab`; ein altes aus den Downloads ergibt „Versionscode 1
+wurde bereits verwendet" — die Meldung nennt die Nummer der FALSCHEN Datei,
+nicht das Problem. Deshalb trägt die Datei im Artefakt jetzt die Version im
+Namen.
+
+⚠⚠ **`capacitor-health` schleust ELF Health-Berechtigungen ins Manifest**
+(sein eigenes `AndroidManifest.xml` deklariert sie, der Merger nimmt sie
+mit). Im Formular standen dadurch **10 begründungspflichtige Einträge statt
+2**. Neun davon liest die App nie; sie zu begründen hieße, Anwendungsfälle zu
+erfinden — Ablehnungsgrund. Unser Manifest wirft sie jetzt mit
+`tools:node="remove"` wieder heraus; **vc18 hatte sie noch drin, vc19 nicht
+mehr.** Wer eine davon braucht: Remove-Zeile löschen, oben deklarieren, in
+`health.js` abfragen, im Formular begründen UND Datenschutztext ergänzen.
+
+Begründungstexte, die eingereicht wurden (Schritte / Gewicht, beide nur
+lesend, Opt-in im Profil, keine Weitergabe): siehe Sitzung 03.09.; Kern ist
+„Anzeige der eigenen Werte in der App", Anwendungsfall Fitness und Wellness.
+
+**Konsequenz für künftige Releases mit NEUER sensibler Berechtigung:** Den
+ersten Build von Hand in den internen Test laden, Formular ausfüllen,
+Genehmigung abwarten — dann erst die Automatik. Bei einem 403 dieser Art
+nicht neu starten.
+
+Was offen blieb: ob die **Datensicherheit**-Erklärung (gleicher Menüpunkt)
+die Gesundheitsdaten zusätzlich führen muss. Der Produktionsentwurf
+verlangte am 03.09. nur die Gesundheits-Erklärung; zeigt sich bei der
+Veröffentlichung noch ein Fehler, ist das der nächste Kandidat.
 
 **Merksatz: Eine neue Berechtigung ist nie nur Code.** Beide Stores wollen
 zusätzlich eine Erklärung, und beide sagen das erst beim Hochladen — nach dem
