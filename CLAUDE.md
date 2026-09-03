@@ -165,20 +165,26 @@ einheitliche Kartenhülle).
 | | App Store | Google Play |
 |---|---|---|
 | Build | 1.5.0 (9) hochgeladen **und der Version zugewiesen** (`asc.yml`, Modus `build`) | vc18 gebaut und signiert, AAB als Artefakt |
-| Zustand | **1.5.0 steht auf ABGELEHNT** — Richtlinie **3.1.2 Business: Payments – Subscriptions** | Upload laeuft durch, der Abschluss (`:validate`/`:commit`) wird mit 403 verweigert |
-| Offen | Ablehnung klaeren, dann **„Pruefung aktualisieren"** auf der Versionsseite | AAB von Hand in der Play Console hochladen |
+| Zustand | **erledigt** — die Ablehnung 3.1.2 ist behoben, `296b5960` steht auf `WAITING_FOR_REVIEW` (siehe Abschnitt oben, 03.09.) | Upload laeuft durch, der Abschluss (`:validate`/`:commit`) wird mit 403 verweigert |
+| Offen | nichts mehr von hier aus — auf Apples Antwort warten | Health-Formular in der Play Console, dann AAB hochladen |
 
-⚠ **Die Ablehnung 3.1.2 hat nichts mit diesem Sprach-/Design-Paket zu tun** —
-sie betrifft die Abos und wurde in einer eigenen Sitzung behandelt. Wer hier
-weiterarbeitet: erst den Text im Resolution Center lesen, nicht blind erneut
-einreichen; eine Pruefrunde kostet ein bis drei Tage.
+⚠ **Die Ablehnung 3.1.2 hatte nichts mit diesem Sprach-/Design-Paket zu tun** —
+sie betraf die Abo-Angaben in der Store-Beschreibung. Behoben am 03.09., siehe
+den Abschnitt „iOS 1.5.0: erst abgelehnt (3.1.2), dann neu eingereicht".
 
-⚠ Der Knopf zum erneuten Einreichen heisst **„Pruefung aktualisieren"** und
-sitzt oben rechts auf der VERSIONSSEITE. Auf der Uebermittlungsseite bleibt
-„Erneut zur App-Pruefung uebermitteln" grau, solange das Element auf
-*Abgelehnt* steht. Und: Finger weg von „Uebermittlung abbrechen" — das zieht
-die Kaufprodukte mit zurueck, und die lassen sich per API nicht wieder
-anhaengen.
+⚠ **Zum Wiedereinreichen zwei Wege, und sie sind nicht gleichwertig.** In der
+Oberflaeche heisst der Knopf **„Pruefung aktualisieren"** und sitzt oben rechts
+auf der VERSIONSSEITE; auf der Uebermittlungsseite bleibt „Erneut zur
+App-Pruefung uebermitteln" grau, solange das Element auf *Abgelehnt* steht.
+
+Ueber die API ging es am 03.09. anders: `--einreichen` brach mit
+`UNRESOLVED_ISSUES` ab, weil die abgelehnte Einreichung die Version besetzt
+haelt. Erst `--aufraeumen` (zieht sie zurueck, `CANCELING`), dann `--einreichen`.
+**Das Zurueckziehen war hier gefahrlos, weil beide Abos auf `APPROVED` stehen
+und deshalb gar nicht mitfahren** — nachgemessen im Lauf, beide danach
+unveraendert `APPROVED`. Anders sieht es aus, solange ein Abo noch
+`READY_TO_SUBMIT` ist und mit der Version mitgeht: dann zieht ein Abbruch es
+mit zurueck, und per API laesst es sich nicht wieder anhaengen.
 
 Der Store-Text „Neues in dieser Version" ist fuer 1.5.0 **bereits gefuellt**
 (sechs Sprachen, neue Startseite, Apple Health) — nicht erneut eintragen.
