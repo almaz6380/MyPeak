@@ -90,8 +90,24 @@ einheitliche Kartenhülle).
 
 | | App Store | Google Play |
 |---|---|---|
-| Build | **1.5.0 (9) hochgeladen**, Lauf #12 grün | vc18 gebaut und signiert, **Upload blockiert** |
-| Offen | Build zuweisen und einreichen (ASC) | **Health-Formular in der Play Console** — Josefs Schritt |
+| Build | 1.5.0 (9) hochgeladen **und der Version zugewiesen** (`asc.yml`, Modus `build`) | vc18 gebaut und signiert, AAB als Artefakt |
+| Zustand | **1.5.0 steht auf ABGELEHNT** — Richtlinie **3.1.2 Business: Payments – Subscriptions** | Upload laeuft durch, der Abschluss (`:validate`/`:commit`) wird mit 403 verweigert |
+| Offen | Ablehnung klaeren, dann **„Pruefung aktualisieren"** auf der Versionsseite | AAB von Hand in der Play Console hochladen |
+
+⚠ **Die Ablehnung 3.1.2 hat nichts mit diesem Sprach-/Design-Paket zu tun** —
+sie betrifft die Abos und wurde in einer eigenen Sitzung behandelt. Wer hier
+weiterarbeitet: erst den Text im Resolution Center lesen, nicht blind erneut
+einreichen; eine Pruefrunde kostet ein bis drei Tage.
+
+⚠ Der Knopf zum erneuten Einreichen heisst **„Pruefung aktualisieren"** und
+sitzt oben rechts auf der VERSIONSSEITE. Auf der Uebermittlungsseite bleibt
+„Erneut zur App-Pruefung uebermitteln" grau, solange das Element auf
+*Abgelehnt* steht. Und: Finger weg von „Uebermittlung abbrechen" — das zieht
+die Kaufprodukte mit zurueck, und die lassen sich per API nicht wieder
+anhaengen.
+
+Der Store-Text „Neues in dieser Version" ist fuer 1.5.0 **bereits gefuellt**
+(sechs Sprachen, neue Startseite, Apple Health) — nicht erneut eintragen.
 
 ### ⚠ Health hat drei Hürden, und alle drei kommen erst beim Ausliefern
 
