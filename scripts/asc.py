@@ -202,6 +202,155 @@ def setze_namen(tok):
                 print('    gesetzt')
 
 
+
+# ── Version anlegen ────────────────────────────────────────────────────────
+# Nach einer Freigabe gibt es in ASC keine offene Version mehr; alle
+# schreibenden Befehle hier brauchen aber eine. Die Oberflaeche nennt das
+# "+ Version oder Plattform". Ueber die API ist es ein POST auf
+# appStoreVersions — plus der Text "Neu in dieser Version", der bei einem
+# Update Pflicht ist.
+
+WHATS_NEW = """Sechs Sprachen: Deutsch, Englisch, Spanisch, Französisch, \
+Portugiesisch und Arabisch — die App, die Wissensbibliothek und die Rezepte.
+
+Neue Startseite: Kalorien als Ring, die Makros farbig gekennzeichnet, das \
+heutige Training direkt startbar und der Gewichtsverlauf immer sichtbar.
+
+Apple Health: Schritte und Gewicht werden übernommen, sobald du es im Profil \
+erlaubst. Geschrieben wird nichts.
+
+Homescreen-Widget mit Serie, Level und den Workouts dieser Woche.
+
+Eigene Wochenpläne: Übungen aus dem Katalog und selbst erstellte Übungen \
+lassen sich jetzt zuverlässig hinzufügen und speichern."""
+
+
+def version_anlegen(tok, nummer):
+    """Eine neue App-Store-Version anlegen und "Neu in dieser Version" setzen."""
+    aid = app_id(tok)
+    vers = api(tok, f'apps/{aid}/appStoreVersions?limit=10')
+    fertig = {'READY_FOR_SALE', 'REPLACED_BY_NEW_VERSION',
+              'REMOVED_FROM_SALE', 'DEVELOPER_REMOVED_FROM_SALE'}
+    for v in vers.get('data', []):
+        if v['attributes'].get('appStoreState') not in fertig:
+            print(f'  Version {v["attributes"]["versionString"]} ist schon offen '
+                  f'({v["attributes"].get("appStoreState")}) — nichts anzulegen.')
+            _whats_new(tok, v)
+            return
+    if TROCKEN:
+        print(f'  [trocken] wuerde Version {nummer} anlegen')
+        return
+    res = api(tok, 'appStoreVersions', 'POST', {
+        'data': {'type': 'appStoreVersions',
+                 'attributes': {'platform': 'IOS', 'versionString': str(nummer),
+                                'releaseType': 'AFTER_APPROVAL'},
+                 'relationships': {'app': {
+                     'data': {'type': 'apps', 'id': aid}}}},
+    }, fatal=False)
+    if res.get('_fehler'):
+        sys.exit(f'  Version nicht anlegbar: {fehler_text(res)}')
+    v = res['data']
+    print(f'  Version {nummer} angelegt ({v["id"]})')
+    _whats_new(tok, v)
+
+
+def _whats_new(tok, v):
+    """"Neu in dieser Version" je Sprache setzen. ASC legt die
+    Lokalisierungen beim Anlegen automatisch aus der Vorversion an; fehlt
+    de-DE trotzdem, wird sie erzeugt."""
+    locs = api(tok, f'appStoreVersions/{v["id"]}/appStoreVersionLocalizations',
+               fatal=False)
+    vorhanden = {l['attributes'].get('locale'): l for l in locs.get('data', [])}
+    print(f'  Lokalisierungen: {", ".join(sorted(vorhanden)) or "keine"}')
+    for locale in ('de-DE',):
+        loc = vorhanden.get(locale)
+        if TROCKEN:
+            print(f'  [trocken] wuerde whatsNew fuer {locale} setzen '
+                  f'({len(WHATS_NEW)} Zeichen)')
+            continue
+        if loc:
+            res = api(tok, f'appStoreVersionLocalizations/{loc["id"]}', 'PATCH', {
+                'data': {'type': 'appStoreVersionLocalizations', 'id': loc['id'],
+                         'attributes': {'whatsNew': WHATS_NEW}},
+            }, fatal=False)
+        else:
+            res = api(tok, 'appStoreVersionLocalizations', 'POST', {
+                'data': {'type': 'appStoreVersionLocalizations',
+                         'attributes': {'locale': locale, 'whatsNew': WHATS_NEW},
+                         'relationships': {'appStoreVersion': {
+                             'data': {'type': 'appStoreVersions', 'id': v['id']}}}},
+            }, fatal=False)
+        if res.get('_fehler'):
+            print(f'  {locale}: FEHLER {fehler_text(res)}')
+        else:
+            print(f'  {locale}: "Neu in dieser Version" gesetzt '
+                  f'({len(WHATS_NEW)} Zeichen)')
+
+
+
+# ── Beschreibung + URLs ───────────────────────────────────────────────────
+# Apple hat 1.5.0 am 02.09. automatisch abgelehnt (3.1.2): Bei einem Abo muss
+# ein FUNKTIONIERENDER Link auf die Nutzungsbedingungen in der BESCHREIBUNG
+# stehen, nicht nur in der App. Der Abo-Block unten ist der Fix.
+#
+# Der Fliesstext wird aus store-assets/play-listing.de-DE.json gelesen —
+# dieselbe Quelle, die play-upload.py fuer Google benutzt. Eine zweite Kopie
+# im Skript waere genau der Grund, warum in ASC monatelang noch "MyPeak" und
+# "ueber 220 Uebungen" standen, waehrend Play laengst umgestellt war.
+
+LISTING_DE = 'store-assets/play-listing.de-DE.json'
+SUPPORT_URL = 'https://fullrep.vercel.app/legal/imprint'
+MARKETING_URL = 'https://fullrep.vercel.app'
+BESCHREIBUNG_GRENZE = 4000
+
+ABO_BLOCK = """
+
+ABO — FULLREP PREMIUM
+\u2022 4,99 \u20ac pro Monat oder 44,99 \u20ac pro Jahr, mit automatischer Verl\u00e4ngerung
+\u2022 7 Tage kostenlos testen, danach beginnt das Abo, wenn du nicht k\u00fcndigst
+\u2022 Die Zahlung wird bei Best\u00e4tigung des Kaufs \u00fcber deine Apple-ID abgebucht
+\u2022 Das Abo verl\u00e4ngert sich automatisch, sofern es nicht sp\u00e4testens 24 Stunden vor Ablauf gek\u00fcndigt wird \u2014 verwalten und k\u00fcndigen in den Einstellungen deiner Apple-ID
+\u2022 Nutzungsbedingungen: https://fullrep.vercel.app/legal/terms
+\u2022 Datenschutzerkl\u00e4rung: https://fullrep.vercel.app/legal/privacy"""
+
+
+def beschreibung(tok):
+    """Beschreibung, Support- und Marketing-URL der offenen Version setzen."""
+    with open(LISTING_DE, encoding='utf-8') as f:
+        text = json.load(f)['fullDescription'].rstrip()
+    text += ABO_BLOCK
+    if len(text) > BESCHREIBUNG_GRENZE:
+        sys.exit(f'  Beschreibung {len(text)} Zeichen > {BESCHREIBUNG_GRENZE} — '
+                 f'Apple weist sie ab, statt sie zu kuerzen.')
+    print(f'  Beschreibung: {len(text)} von {BESCHREIBUNG_GRENZE} Zeichen')
+
+    aid = app_id(tok)
+    v = offene_version(tok, aid)
+    print(f'  Version {v["attributes"]["versionString"]} '
+          f'({v["attributes"].get("appStoreState")})')
+    locs = api(tok, f'appStoreVersions/{v["id"]}/appStoreVersionLocalizations')
+    for loc in locs.get('data', []):
+        locale = loc['attributes'].get('locale')
+        if locale != 'de-DE':
+            print(f'  {locale}: uebersprungen (nur de-DE gepflegt)')
+            continue
+        alt = loc['attributes'].get('description') or ''
+        print(f'  {locale}: {len(alt)} -> {len(text)} Zeichen')
+        if TROCKEN:
+            print('  [trocken] wuerde Beschreibung + URLs setzen')
+            continue
+        res = api(tok, f'appStoreVersionLocalizations/{loc["id"]}', 'PATCH', {
+            'data': {'type': 'appStoreVersionLocalizations', 'id': loc['id'],
+                     'attributes': {'description': text,
+                                    'supportUrl': SUPPORT_URL,
+                                    'marketingUrl': MARKETING_URL}},
+        }, fatal=False)
+        if res.get('_fehler'):
+            print(f'  FEHLER: {fehler_text(res)}')
+        else:
+            print('  gesetzt (Beschreibung, Support-URL, Marketing-URL)')
+
+
 def setze_build(tok, nummer):
     aid = app_id(tok)
     v = offene_version(tok, aid)
@@ -315,44 +464,40 @@ def setze_abo_screenshot(tok):
 # "submitted together with this version", die Abos standen aber auf
 # MISSING_METADATA und fuhren nicht mit — genau dafuer kam 2.1(b) ein zweites
 # Mal. Diesen Absatz erst schreiben, wenn beide Abos READY_TO_SUBMIT sind.
-PRUEFNOTIZ = """What changed since the rejected build (1.0 build 4)
+PRUEFNOTIZ = """What is new in 1.5.0 (previous App Store version: 1.0)
 
-Guideline 2.1(b) - Performance, App Completeness (subscription)
-The previous build was rejected because the In-App Purchase products had
-not been submitted for review. Both auto-renewable subscriptions are now
-part of this submission:
+Five languages were added
+The interface, the knowledge library, the recipes and the legal texts are now
+available in German, English, Spanish, French, Portuguese and Arabic. Arabic
+lays out right to left. The language is chosen in Profile > Language.
+
+Apple Health - read only
+FullRep reads two things, and only after the user turns the switch on in
+Profile > Apple Health: step count (shown on the home screen) and body weight
+(added to the existing weight history). The app writes nothing to Health.
+NSHealthUpdateUsageDescription is present because the linked framework
+requires a purpose string, not because the app writes data.
+
+Home screen redesign
+Calories are shown as a ring with the four macros below it; the workout
+scheduled for today can be started from the home screen; the weight trend is
+always visible.
+
+Home screen widget
+Shows the current streak, the level and the number of workouts this week.
+
+Subscriptions (unchanged, already approved)
   mypeak_premium_monthly - EUR 4.99 / month
   mypeak_premium_annual  - EUR 44.99 / year
-Both carry an App Review screenshot of the paywall and complete German and
-English metadata. The annual subscription was missing its price, which is
-why it could not be attached to the previous submission; the price is set.
-The product identifiers still start with "mypeak" because identifiers
-cannot be changed after creation - the app itself is called FullRep.
+Reachable at Profile > "FullRep Premium". A 7-day free trial is offered first.
+Purchases use StoreKit through RevenueCat; there is no external payment path.
+The product identifiers still start with "mypeak" because identifiers cannot
+be changed after creation - the app itself is called FullRep.
 
-How to reach the purchase screen
-  Profile tab > "FullRep Premium" card
-A 7-day free trial is offered first; the purchase buttons and the restore
-link are on the same screen. Purchases use StoreKit through RevenueCat -
-there is no external payment path on iOS.
-
-Guideline 1.4.1 - Safety, Physical Harm (addressed in build 4, unchanged)
-Every health-related article ends with a permanently visible "Sources"
-list - not collapsed, no tap required. Links open in Safari. Coverage is
-complete: 24 knowledge articles (training, nutrition, supplements, blood
-markers), 20 peptide articles and 8 diet articles. Starting from Library:
-  Library > Training / Nutrition / Supplements / Blood values > any topic
-  Library > Peptides > any substance
-  Library > Diets > any diet
-The TDEE calculator cites Mifflin-St Jeor (1990) next to its result. All
-references are real and verified (PubMed, NIH, WHO, NEJM and similar).
-Entries without a stable public link are listed bibliographically without
-a URL rather than linked to an unreliable page. The AI coach is instructed
-to name its sources and never to invent one.
-
-Medical disclaimer
-FullRep does not replace medical advice. A disclaimer appears on every
-health-related screen, and a dedicated page is reachable at
-Profile > Health notice.
+Health and medical content (unchanged since the approved build)
+Every health-related article ends with a permanently visible "Sources" list,
+and a medical disclaimer appears on every health-related screen. A dedicated
+page is reachable at Profile > Health notice.
 
 Demo account (not required - the app is fully usable as a guest):
 appreview@wellbooked.at / MyPeak-Review#2026
@@ -956,6 +1101,10 @@ def main():
                    help='Zeigt Name, Versionen, Builds, Abos, Screenshots')
     p.add_argument('--name', action='store_true',
                    help='Anzeigename + Untertitel auf FullRep setzen')
+    p.add_argument('--version-anlegen', metavar='NR', dest='version_anlegen',
+                   help='neue App-Store-Version anlegen (z. B. 1.5.0) + whatsNew')
+    p.add_argument('--beschreibung', action='store_true',
+                   help='Beschreibung + Support-/Marketing-URL setzen (3.1.2)')
     p.add_argument('--build', metavar='NR',
                    help='Diesen Build der offenen Version zuweisen')
     p.add_argument('--screenshots', action='store_true',
@@ -991,7 +1140,7 @@ def main():
     TROCKEN = a.dry_run
     TROTZDEM = a.trotzdem
 
-    tat = [a.status, a.name, a.build, a.screenshots, a.abo_screenshot,
+    tat = [a.status, a.name, a.build, a.version_anlegen, a.beschreibung, a.screenshots, a.abo_screenshot,
            a.warum, a.einreichungen, a.aufraeumen, a.abo_namen, a.abo_notiz,
            a.inhaberrechte, a.exportfrage, a.pruefnotiz,
            a.einreichen, a.alles]
@@ -1021,6 +1170,10 @@ def main():
             print(f'\n═══ {titel} ═══')
             fn()
         return
+    if a.version_anlegen:
+        version_anlegen(tok, a.version_anlegen)
+    if a.beschreibung:
+        beschreibung(tok)
     if a.name:
         setze_namen(tok)
     if a.build:
