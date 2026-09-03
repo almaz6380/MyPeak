@@ -164,9 +164,9 @@ einheitliche Kartenhülle).
 
 | | App Store | Google Play |
 |---|---|---|
-| Build | 1.5.0 (9) hochgeladen **und der Version zugewiesen** (`asc.yml`, Modus `build`) | **vc19 im internen Test** (von Hand geladen, 03.09. 13:00). vc18 liegt ebenfalls dort, traegt aber noch die neun Plugin-Berechtigungen — nicht befoerdern |
-| Zustand | **FREIGEGEBEN** — Apple hat `296b5960` (1.5.0, Build 9) am 03.09. genehmigt. Die alte Einreichung `7b72598f` vom 02.09. steht auf „Entfernt": von uns per `--aufraeumen` zurueckgezogen, weil ihre 3.1.2-Ablehnung die Version blockierte — das ist gewollt und folgenlos | **Produktionsrelease vc19 (voller Rollout) und Gesundheitserklaerung gemeinsam in Googles Pruefung** — eingereicht 03.09. ~13:30 |
-| Offen | nichts — im Store | nichts mehr — geht es durch, ist vc19 fuer alle live. **vc20 = erster R8-Build**, nur als Artefakt (`upload: false`), s. u. |
+| Build | 1.5.0 (9) hochgeladen **und der Version zugewiesen** (`asc.yml`, Modus `build`) | **vc20 (erster R8-Build)** — im internen Test UND in Produktion eingereicht (03.09. ~16:15). vc18/vc19 liegen noch im internen Test; vc18 traegt die neun Plugin-Berechtigungen — nicht befoerdern |
+| Zustand | **FREIGEGEBEN** — Apple hat `296b5960` (1.5.0, Build 9) am 03.09. genehmigt. Die alte Einreichung `7b72598f` vom 02.09. steht auf „Entfernt": von uns per `--aufraeumen` zurueckgezogen, weil ihre 3.1.2-Ablehnung die Version blockierte — das ist gewollt und folgenlos | **Produktionsrelease vc20 (voller Rollout) in Googles Pruefung.** Gesundheitserklaerung ist DURCH: Formular zeigt genau READ_STEPS + READ_WEIGHT, beide begruendet (1/1, 1/1). vc19 wurde durch vc20 ersetzt, nicht abgebrochen — die Erklaerung blieb dabei erhalten |
+| Offen | nichts — im Store | nichts von Josefs Seite. Nach Freigabe live fuer alle. **Geraetetest fuer R8 steht aus** (Anzeige, Kauf, Health, Widget, Benachrichtigung) — bei null Android-Nutzern bewusst parallel zur Pruefung statt davor |
 
 Der Produktionsentwurf liess sich speichern, sobald die Erklaerung
 **eingereicht** war, nicht erst nach ihrer Genehmigung — beide laufen als eine
