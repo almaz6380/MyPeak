@@ -35,7 +35,16 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            // R8 an (03.09.2026): Google verlangt >= 25 % Verschleierung, Frist
+            // Februar 2027 — wir lagen bei 2 %. Die Keep-Regeln stehen in
+            // proguard-rules.pro samt Begruendung. shrinkResources entfernt
+            // ungenutzte Ressourcen der Plugins gleich mit.
+            // ⚠ Fehler durch R8 zeigen sich NICHT beim Bauen, sondern am
+            // Geraet — den ersten Build damit im internen Test durchklicken
+            // (Anzeigen, Kauf, Health, Widget, Benachrichtigung), bevor er in
+            // die Produktion geht. mapping.txt liegt als Workflow-Artefakt.
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             if (keystorePropsFile.exists()) {
                 signingConfig signingConfigs.release

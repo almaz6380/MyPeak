@@ -174,12 +174,19 @@ Einreichung durch die Pruefung.
 
 **Zwei Hinweise aus dem Play-Release-Dashboard, beide NICHT blockierend:**
 
-- **Code-Verschleierung 2 %, Google-Grenzwert 25 %, Frist Februar 2027.**
-  Release-Builds laufen ohne R8/ProGuard (`minifyEnabled`). Einschalten ist
-  ein Schalter in `android/app/build.gradle`, aber mit Nebenwirkung:
-  Capacitor-Plugins arbeiten teils per Reflection, R8 wirft dann Klassen weg,
-  die zur Laufzeit gebraucht werden. Eigenes Release mit Keep-Regeln und
-  Geraetetest — nicht nebenbei.
+- **Code-Verschleierung: R8 ist seit 03.09. EINGESCHALTET** (`minifyEnabled`
+  + `shrinkResources` in `android/app/build.gradle`, Keep-Regeln mit
+  Begruendung in `android/app/proguard-rules.pro`). Google verlangte >= 25 %,
+  wir lagen bei 2 %, Frist Februar 2027. Capacitor liefert seine Keep-Regeln
+  als consumerProguardFiles selbst mit; keines der sechs Plugins bringt
+  eigene, keines braucht sie. Der Workflow legt `mapping.txt` als Artefakt ab
+  (90 Tage) — ohne sie sind Stacktraces aus der Play Console unlesbar.
+  ⚠ **Der NAECHSTE Android-Build (vc20) ist der erste mit R8. R8-Fehler
+  zeigen sich nicht beim Bauen, sondern am Geraet.** Ihn zuerst in den
+  internen Test und durchklicken: Anzeige laden, Kaufdialog oeffnen, Health
+  verbinden, Widget aktualisieren, Benachrichtigung ausloesen. Erst dann
+  Produktion. Kippt etwas, ist die erste Massnahme eine Keep-Regel fuer das
+  betroffene Paket, nicht das Abschalten von R8.
 - **Randlose Anzeige (Edge-to-Edge, Android 15+):** „veraltete APIs oder
   Parameter". Empfehlung, kein Fehler. Am Geraet pruefen, ob Inhalte unter der
   Statusleiste kleben; ggf. `WindowCompat.setDecorFitsSystemWindows` bzw. die

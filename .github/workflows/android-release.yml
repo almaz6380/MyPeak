@@ -186,6 +186,19 @@ jobs:
           path: FullRep-${{ env.VN }}-vc${{ env.VC }}.aab
           retention-days: 30
 
+      # Seit R8 aktiv ist (minifyEnabled), sind Stacktraces aus Play Console
+      # ohne diese Datei unlesbar (a.b.c statt Klassennamen). Play nimmt die
+      # mapping.txt auch direkt am Release entgegen (Bundle-Explorer →
+      # Downloads → Mapping-Datei hochladen); hier liegt sie 90 Tage bereit.
+      - name: R8-Mapping als Artefakt ablegen
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: FullRep-${{ env.VN }}-vc${{ env.VC }}-mapping
+          path: android/app/build/outputs/mapping/release/mapping.txt
+          retention-days: 90
+          if-no-files-found: warn
+
       - name: Zu Google Play hochladen
         if: ${{ inputs.upload }}
         env:
