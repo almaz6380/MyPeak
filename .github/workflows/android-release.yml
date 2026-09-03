@@ -165,11 +165,25 @@ jobs:
       - name: AAB bauen
         run: cd android && ./gradlew --no-daemon bundleRelease
 
+      # Die Datei IM Artefakt traegt die Version, nicht nur der Artefaktname.
+      #
+      # ⚠ Gradle nennt jedes Bundle `app-release.aab` — jedes Projekt, jede
+      # Version, seit Jahren. Wer zwei davon in den Downloads liegen hat, laedt
+      # bei Play die falsche hoch, und die Meldung lautet dann „Versionscode 1
+      # wurde bereits verwendet" statt „falsche Datei". Am 02.09. genau so
+      # passiert. Mit `FullRep-1.5.0-vc18.aab` steht die Nummer im Dateinamen
+      # und die Verwechslung faellt vor dem Hochladen auf.
+      - name: AAB benennen
+        run: |
+          cp android/app/build/outputs/bundle/release/app-release.aab \
+             "FullRep-${VN}-vc${VC}.aab"
+          ls -l "FullRep-${VN}-vc${VC}.aab"
+
       - name: AAB als Artefakt ablegen
         uses: actions/upload-artifact@v4
         with:
           name: FullRep-${{ env.VN }}-vc${{ env.VC }}
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          path: FullRep-${{ env.VN }}-vc${{ env.VC }}.aab
           retention-days: 30
 
       - name: Zu Google Play hochladen
