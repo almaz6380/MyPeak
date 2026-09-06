@@ -20,8 +20,10 @@ Inhaltsbibliotheken (siehe 4b und 4c)
 
 ### iOS-Werbung: ATT nativ + volle SKAdNetwork-Liste (06.09.2026, 1.5.1 / Build 10)
 
-**Kompilierlauf grün** (`ios-release.yml` #13, `nur_kompilieren`, 3,5 min) — der
-Swift-Teil baut. Version 1.5.1, `WHATS_NEW` in `asc.py` auf den Werbe-Fix umgeschrieben
+**Eingereicht 06.09., 15:56 UTC** — Einreichung `ee64a99b-…`, `WAITING_FOR_REVIEW`,
+Build 10 `VALID` und zugewiesen, beide Abos `APPROVED` (fahren nicht mit). Ablauf komplett
+über Workflows: `ios-release.yml` #13 (`nur_kompilieren`, grün) → #14 (Upload, 4:45 min) →
+`asc.yml` `version-anlegen` → `build` → `einreichen`. Version 1.5.1, `WHATS_NEW` in `asc.py` auf den Werbe-Fix umgeschrieben
 (der alte Text beschrieb 1.5.0). Android bleibt auf vc20: die Änderung ist rein iOS.
 
 Anlass war Josefs Frage nach den eCPM-Unterschieden zwischen den vier Apps.
