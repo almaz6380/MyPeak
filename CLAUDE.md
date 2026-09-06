@@ -18,6 +18,46 @@ Inhaltsbibliotheken (siehe 4b und 4c)
 
 ## Aktueller Stand
 
+### iOS-Werbung: ATT nativ + volle SKAdNetwork-Liste (06.09.2026, 1.5.1 / Build 10)
+
+**Eingereicht 06.09., 15:56 UTC** — Einreichung `ee64a99b-…`, `WAITING_FOR_REVIEW`,
+Build 10 `VALID` und zugewiesen, beide Abos `APPROVED` (fahren nicht mit). Ablauf komplett
+über Workflows: `ios-release.yml` #13 (`nur_kompilieren`, grün) → #14 (Upload, 4:45 min) →
+`asc.yml` `version-anlegen` → `build` → `einreichen`. Version 1.5.1, `WHATS_NEW` in `asc.py` auf den Werbe-Fix umgeschrieben
+(der alte Text beschrieb 1.5.0). Android bleibt auf vc20: die Änderung ist rein iOS.
+
+Anlass war Josefs Frage nach den eCPM-Unterschieden zwischen den vier Apps.
+Befund am AdMob-Konto: Es gibt keine Anomalie, es gibt Apps ohne Nutzer
+(Swaply iOS: 2 Impressionen in 7 Tagen) und eine App mit ein paar Nutzern,
+deren Android-Spieler Rewarded-Videos schauen (Mahjong Android 21 € eCPM bei
+30 Impressionen). **Unter 1.000 Impressionen den eCPM nicht deuten** — die
+Zahl schwankt mit jedem einzelnen Klick um 30 %.
+
+Zwei Dinge waren trotzdem strukturell falsch und sind seit Build 10 behoben:
+
+1. **Der ATT-Dialog kam wahrscheinlich nie.** `ads.js` rief
+   `AdMob.requestTrackingAuthorization()` 1,5 s nach dem Start über die
+   Capacitor-Brücke. Das Plugin ruft `ATTrackingManager` auf Capacitors
+   Hintergrund-Warteschlange auf, und die App war zu dem Zeitpunkt oft noch
+   nicht `.active` — iOS antwortet dann still mit notDetermined. Apple hat
+   exakt dieses Muster bei Anigosha am 12.08. beanstandet. Ohne ATT keine
+   IDFA, also jede iOS-Anzeige nicht-personalisiert (halber eCPM).
+   Jetzt: `frageNachTracking()` im `AppDelegate` bei `applicationDidBecomeActive`
+   (Hauptthread, aktive App, Vorlage Anigosha `b534db5`); `ads.js` wartet nur
+   noch bis 6 s auf die Antwort, bevor UMP und SDK-Start folgen.
+2. **Nur eine SKAdNetwork-ID in der Info.plist** (Googles eigene). Bieter,
+   deren ID fehlt, können auf der App nichts attribuieren und bieten nicht.
+   Jetzt 59 Einträge: Googles aktuelle Liste (developers.google.com/admob/ios/
+   ios14, 50 IDs) plus die neun älteren aus Swaply. **Bei jedem Plugin-Update
+   gegen Googles Liste abgleichen** — sie wächst.
+
+Erwartung ehrlich: Das hebt den iOS-Interstitial von ~3,7 € Richtung 6 bis
+8 € eCPM. Bei 17 Impressionen pro Woche sind das Cents. Der Hebel ist die
+Nutzerzahl, nicht der Preis.
+
+Prüfbar am Gerät: Einstellungen → Datenschutz → Tracking muss
+FullRep listen, sobald der Dialog einmal erschienen ist.
+
 ### ✅ Eigene Wochenpläne: Rest erledigt + Doppelarbeit zusammengeführt (01.09.2026)
 
 Fortsetzung des Abschnitts vom 30.08. (weiter unten). Josefs Bruder war im
