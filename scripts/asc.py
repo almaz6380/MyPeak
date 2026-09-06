@@ -210,19 +210,10 @@ def setze_namen(tok):
 # appStoreVersions — plus der Text "Neu in dieser Version", der bei einem
 # Update Pflicht ist.
 
-WHATS_NEW = """Sechs Sprachen: Deutsch, Englisch, Spanisch, Französisch, \
-Portugiesisch und Arabisch — die App, die Wissensbibliothek und die Rezepte.
-
-Neue Startseite: Kalorien als Ring, die Makros farbig gekennzeichnet, das \
-heutige Training direkt startbar und der Gewichtsverlauf immer sichtbar.
-
-Apple Health: Schritte und Gewicht werden übernommen, sobald du es im Profil \
-erlaubst. Geschrieben wird nichts.
-
-Homescreen-Widget mit Serie, Level und den Workouts dieser Woche.
-
-Eigene Wochenpläne: Übungen aus dem Katalog und selbst erstellte Übungen \
-lassen sich jetzt zuverlässig hinzufügen und speichern."""
+WHATS_NEW = """Technische Verbesserungen an der Werbeeinbindung: Die Tracking-Abfrage \
+erscheint jetzt zuverlässig beim Start, und die App ist für alle gängigen \
+Werbenetzwerke korrekt eingetragen. Für Premium-Nutzer ändert sich nichts — \
+sie sehen weiterhin keine Werbung."""
 
 
 def version_anlegen(tok, nummer):

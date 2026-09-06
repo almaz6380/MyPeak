@@ -18,7 +18,11 @@ Inhaltsbibliotheken (siehe 4b und 4c)
 
 ## Aktueller Stand
 
-### iOS-Werbung: ATT nativ + volle SKAdNetwork-Liste (06.09.2026, Build 10)
+### iOS-Werbung: ATT nativ + volle SKAdNetwork-Liste (06.09.2026, 1.5.1 / Build 10)
+
+**Kompilierlauf grün** (`ios-release.yml` #13, `nur_kompilieren`, 3,5 min) — der
+Swift-Teil baut. Version 1.5.1, `WHATS_NEW` in `asc.py` auf den Werbe-Fix umgeschrieben
+(der alte Text beschrieb 1.5.0). Android bleibt auf vc20: die Änderung ist rein iOS.
 
 Anlass war Josefs Frage nach den eCPM-Unterschieden zwischen den vier Apps.
 Befund am AdMob-Konto: Es gibt keine Anomalie, es gibt Apps ohne Nutzer
@@ -49,9 +53,7 @@ Erwartung ehrlich: Das hebt den iOS-Interstitial von ~3,7 € Richtung 6 bis
 8 € eCPM. Bei 17 Impressionen pro Woche sind das Cents. Der Hebel ist die
 Nutzerzahl, nicht der Preis.
 
-⚠ **Der Swift-Teil ist nicht kompiliert** — in der Cloud gibt es kein Xcode.
-Vor dem echten Release erst `ios-release.yml` im Modus `nur_kompilieren`
-laufen lassen. Prüfbar am Gerät: Einstellungen → Datenschutz → Tracking muss
+Prüfbar am Gerät: Einstellungen → Datenschutz → Tracking muss
 FullRep listen, sobald der Dialog einmal erschienen ist.
 
 ### ✅ Eigene Wochenpläne: Rest erledigt + Doppelarbeit zusammengeführt (01.09.2026)
