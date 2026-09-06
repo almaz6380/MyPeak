@@ -1,11 +1,17 @@
 import UIKit
 import Capacitor
 import WidgetKit
+import AppTrackingTransparency
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+
+    /// Merker, damit zwei Vordergrund-Wechsel kurz hintereinander nicht zwei
+    /// Dialoge anfordern. Wird in der Rueckmeldung wieder geloescht: Kam kein
+    /// Dialog, soll der naechste Wechsel es erneut versuchen duerfen.
+    private var trackingAbfrageLaeuft = false
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -43,7 +49,46 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        frageNachTracking()
+    }
+
+    // MARK: - App Tracking Transparency
+    //
+    //  Der ATT-Dialog wird NATIV angefordert, nicht mehr aus src/lib/ads.js.
+    //  Gleiche Vorlage wie bei Anigosha (Commit b534db5 dort), gleicher Grund:
+    //  `AdMob.requestTrackingAuthorization()` aus @capacitor-community/admob
+    //  ruft `ATTrackingManager` direkt in der Plugin-Methode auf, und Capacitor
+    //  fuehrt Plugin-Aufrufe auf einer eigenen Hintergrund-Warteschlange aus.
+    //  Ein UIKit-Dialog gehoert auf den Hauptthread. Dazu kam der Zeitpunkt:
+    //  ads.js lief 1,5 s nach dem Start, waehrend die App oft noch nicht
+    //  `.active` war — dann beantwortet iOS die Anfrage still mit
+    //  notDetermined, ohne etwas zu zeigen. Apple hat genau das bei Anigosha
+    //  am 12.08.2026 beanstandet (Richtlinie 2.1).
+    //
+    //  Ohne erteiltes ATT gibt es keine IDFA, und jede Anzeige ist
+    //  nicht-personalisiert — das ist der halbe bis dreiviertel eCPM.
+    //  Hier ist beides ausgeschlossen: `applicationDidBecomeActive` heisst
+    //  aktiv, `DispatchQueue.main` heisst Hauptthread. ads.js wartet auf die
+    //  Antwort, bevor es das AdMob-SDK startet — so verlangt es Google.
+    private func frageNachTracking() {
+        guard !trackingAbfrageLaeuft else { return }
+        // Schon beantwortet (auch „abgelehnt") — iOS zeigt den Dialog dann
+        // ohnehin kein zweites Mal, die Antwort aendert man in den Einstellungen.
+        guard ATTrackingManager.trackingAuthorizationStatus == .notDetermined else { return }
+        trackingAbfrageLaeuft = true
+
+        // Kleiner Abstand: Beim Kaltstart kommt didBecomeActive, waehrend das
+        // Fenster noch aufgebaut wird. Ein Dialog in genau diesem Moment hat
+        // niemanden, der ihn zeigen koennte.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard UIApplication.shared.applicationState == .active else {
+                self?.trackingAbfrageLaeuft = false
+                return
+            }
+            ATTrackingManager.requestTrackingAuthorization { _ in
+                self?.trackingAbfrageLaeuft = false
+            }
+        }
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
