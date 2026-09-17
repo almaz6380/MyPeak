@@ -52,9 +52,20 @@ Neue i18n-Schlüssel ×6: `onboarding.healthConsentHeading/-Text/-Accept`,
 `consentGate.title/deleteHint`; `privacyText1` umformuliert. `pruefe-sprachen`
 grün, 317 Tests, Build grün, Lint ohne neue Meldungen.
 
-**Reihenfolge beim Ausrollen:** erst die Migration im Supabase SQL Editor
-(oder `supabase db push --linked`), dann mergen. Ohne die Spalte scheitert
-das Onboarding-Upsert und der Gate-Update — jeder neue Nutzer hinge fest.
+**Ausgerollt am 17.09.2026:** Migration in der Cloud-Datenbank eingespielt
+(Spalte `profiles.health_consent_at` nachgezählt), danach nach `main` gemergt.
+Weg: **Supabase-Management-API** (`POST /v1/projects/jntzqlrakmsyzyqckwgn/
+database/query`, Token `SUPABASE_ACCESS_ALMAZ` aus der Claude-Umgebung), erst
+als `begin … rollback`, dann echt. ⚠ Damit ist die Notiz weiter unten
+(„Der Management-API-Weg ist aus der Claude-Umgebung zu, 403 error 1010")
+**überholt** — am 17.09. antwortete `api.supabase.com` mit 200. Nebenbefund:
+Das Projekt liegt in **eu-north-1 (Stockholm)**; die Datenschutzerklärung nennt
+keine Region, passt also.
+
+Alle **9 bestehenden Konten** (inklusive `appreview@wellbooked.at`) haben
+`health_consent_at = NULL` und sehen beim nächsten Öffnen das Gate — ein Häkchen,
+ein Knopf. Für Apples Prüfkonto ist das bewusst NICHT vorab gesetzt: Eine
+Einwilligung, die niemand erteilt hat, gehört nicht in die Tabelle.
 
 **Offen bei Josef, nicht im Code lösbar:** (a) AVVs ablegen — Supabase, Vercel,
 Google (Gemini UND AdMob), Anthropic, RevenueCat, Sentry; (b) **Gemini-API-Stufe
