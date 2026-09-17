@@ -931,6 +931,10 @@
     "terms": "Termos de uso",
     "fullDocuments": "Documentos completos"
   },
+  "consentGate": {
+    "title": "Consentimento pendente",
+    "deleteHint": "Sem este consentimento não podemos continuar a tratar seus dados de saúde. Se não quiser consentir, escreva para kontakt@wellbooked.at — excluiremos sua conta com todos os dados. Mais informações na"
+  },
   "onboarding": {
     "step": "Etapa {{current}} de {{total}}",
     "next": "Avançar",
@@ -979,8 +983,11 @@
     "termsHeading": "Termos de uso",
     "termsText1": "Ao usar o FullRep, você concorda em usar o aplicativo de forma responsável. Ele não substitui orientação médica. Consulte sempre um médico para questões de saúde.",
     "privacyHeading": "Privacidade",
-    "privacyText1": "Seus dados são armazenados com segurança e não são compartilhados com terceiros. Você pode excluir sua conta e todos os dados a qualquer momento.",
+    "privacyText1": "Seus dados ficam armazenados com nossos operadores Supabase e Vercel. Para funções específicas, dados vão para o Google (análise de fotos, coach de IA, anúncios nos apps), Anthropic (coach de IA) e RevenueCat (Premium). Os detalhes estão na política de privacidade. Você pode excluir sua conta e todos os dados a qualquer momento.",
     "termsAccept": "Aceito os termos de uso e a política de privacidade",
+    "healthConsentHeading": "Dados de saúde",
+    "healthConsentText": "Peso, medidas corporais, dados de nutrição e treino e – se você ativar – dados do ciclo e Apple Health/Health Connect são dados de saúde (art. 9 do RGPD). Para isso precisamos do seu consentimento explícito. Você pode retirá-lo a qualquer momento excluindo sua conta.",
+    "healthConsentAccept": "Consinto expressamente com o tratamento dos meus dados de saúde",
     "letsGo": "Vamos lá!",
     "saveError": "Erro ao salvar os dados. Tente novamente."
   },

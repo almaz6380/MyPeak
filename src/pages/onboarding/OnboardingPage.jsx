@@ -24,6 +24,7 @@ export default function OnboardingPage() {
     activity_level: '',
     experience: '',
     terms_accepted: false,
+    health_consent: false,
   });
 
   function updateField(field, value) {
@@ -49,7 +50,7 @@ export default function OnboardingPage() {
       case 5: return !!data.goal;
       case 6: return !!data.activity_level;
       case 7: return !!data.experience;
-      case 8: return data.terms_accepted;
+      case 8: return data.terms_accepted && data.health_consent;
       default: return false;
     }
   }
@@ -69,6 +70,10 @@ export default function OnboardingPage() {
         activity_level: data.activity_level,
         experience: data.experience,
         onboarding_completed: true,
+        // Ausdrückliche Einwilligung nach Art. 9 Abs. 2 lit. a DSGVO — der Zeitpunkt
+        // ist der Nachweis (Art. 7 Abs. 1); ohne ihn wäre die Verarbeitung von
+        // Gewicht, Zyklus und Health-Import ohne Rechtsgrundlage.
+        health_consent_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
 
@@ -130,7 +135,14 @@ export default function OnboardingPage() {
           {step === 5 && <GoalStep value={data.goal} onChange={(v) => updateField('goal', v)} />}
           {step === 6 && <ActivityStep value={data.activity_level} onChange={(v) => updateField('activity_level', v)} />}
           {step === 7 && <ExperienceStep value={data.experience} onChange={(v) => updateField('experience', v)} />}
-          {step === 8 && <TermsStep value={data.terms_accepted} onChange={(v) => updateField('terms_accepted', v)} />}
+          {step === 8 && (
+            <TermsStep
+              value={data.terms_accepted}
+              onChange={(v) => updateField('terms_accepted', v)}
+              healthValue={data.health_consent}
+              onHealthChange={(v) => updateField('health_consent', v)}
+            />
+          )}
         </div>
       </div>
 
@@ -533,7 +545,38 @@ function ExperienceStep({ value, onChange }) {
 }
 
 // ── Step 8: Terms & Privacy ─────────────────────────────────────
-function TermsStep({ value, onChange }) {
+// Zwei GETRENNTE Häkchen, mit Absicht: Das erste ist die Zustimmung zu AGB und
+// Datenschutzerklärung (Vertrag). Das zweite ist die ausdrückliche Einwilligung
+// in die Verarbeitung von Gesundheitsdaten nach Art. 9 Abs. 2 lit. a DSGVO —
+// die darf nicht in einer Sammelzustimmung untergehen, sonst ist sie keine.
+function ConsentToggle({ value, onChange, label }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!value)}
+      className={`w-full p-5 rounded-2xl border-2 transition-all flex items-center gap-4 ${
+        value
+          ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark-alt'
+      }`}
+    >
+      <div className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all ${
+        value
+          ? 'border-primary-500 bg-primary-500'
+          : 'border-slate-300 dark:border-slate-600'
+      }`}>
+        {value && <Check className="w-4 h-4 text-white" />}
+      </div>
+      <span className={`text-sm font-medium flex-1 text-start ${
+        value ? 'text-primary-600 dark:text-primary-400' : 'text-slate-700 dark:text-slate-300'
+      }`}>
+        {label}
+      </span>
+    </button>
+  );
+}
+
+function TermsStep({ value, onChange, healthValue, onHealthChange }) {
   const { t } = useTranslation();
 
   return (
@@ -541,16 +584,18 @@ function TermsStep({ value, onChange }) {
       <h1 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-2">
         {t('onboarding.termsTitle')}
       </h1>
-      <p className="text-slate-500 dark:text-slate-400 text-center mb-8">
+      <p className="text-slate-500 dark:text-slate-400 text-center mb-6">
         {t('onboarding.termsSubtitle')}
       </p>
 
-      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl border border-slate-200 dark:border-slate-700 p-5 mb-6">
-        <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 max-h-48 overflow-y-auto">
+      <div className="bg-white dark:bg-surface-dark-alt rounded-2xl border border-slate-200 dark:border-slate-700 p-5 mb-4">
+        <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 max-h-40 overflow-y-auto">
           <p className="font-semibold text-slate-900 dark:text-white">{t('onboarding.termsHeading')}</p>
           <p>{t('onboarding.termsText1')}</p>
           <p className="font-semibold text-slate-900 dark:text-white">{t('onboarding.privacyHeading')}</p>
           <p>{t('onboarding.privacyText1')}</p>
+          <p className="font-semibold text-slate-900 dark:text-white">{t('onboarding.healthConsentHeading')}</p>
+          <p>{t('onboarding.healthConsentText')}</p>
         </div>
         <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700 flex flex-wrap items-center gap-2 text-xs">
           <span className="text-slate-400 dark:text-slate-500">{t('legal.fullDocuments')}:</span>
@@ -562,27 +607,10 @@ function TermsStep({ value, onChange }) {
         </div>
       </div>
 
-      <button
-        onClick={() => onChange(!value)}
-        className={`w-full p-5 rounded-2xl border-2 transition-all flex items-center gap-4 ${
-          value
-            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark-alt'
-        }`}
-      >
-        <div className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all ${
-          value
-            ? 'border-primary-500 bg-primary-500'
-            : 'border-slate-300 dark:border-slate-600'
-        }`}>
-          {value && <Check className="w-4 h-4 text-white" />}
-        </div>
-        <span className={`text-sm font-medium flex-1 text-start ${
-          value ? 'text-primary-600 dark:text-primary-400' : 'text-slate-700 dark:text-slate-300'
-        }`}>
-          {t('onboarding.termsAccept')}
-        </span>
-      </button>
+      <div className="space-y-3">
+        <ConsentToggle value={value} onChange={onChange} label={t('onboarding.termsAccept')} />
+        <ConsentToggle value={healthValue} onChange={onHealthChange} label={t('onboarding.healthConsentAccept')} />
+      </div>
     </div>
   );
 }

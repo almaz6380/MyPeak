@@ -14,7 +14,7 @@ export const legalDocs = {
   imprint: {
     de: {
       title: 'Impressum',
-      updated: 'Stand: Juli 2026',
+      updated: 'Stand: 17. September 2026',
       sections: [
         {
           heading: 'Angaben gemäß § 5 ECG und § 25 MedienG',
@@ -30,7 +30,7 @@ export const legalDocs = {
         },
         {
           heading: 'Verbraucherstreitbeilegung',
-          body: 'Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen. Die EU-Plattform zur Online-Streitbeilegung ist unter https://ec.europa.eu/consumers/odr erreichbar.',
+          body: 'Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen. Die frühere EU-Plattform zur Online-Streitbeilegung wurde am 20. Juli 2025 eingestellt.',
         },
         {
           heading: 'Haftung für Inhalte',
@@ -40,7 +40,7 @@ export const legalDocs = {
     },
     en: {
       title: 'Legal Notice',
-      updated: 'Last updated: July 2026',
+      updated: 'Last updated: 17 September 2026',
       sections: [
         {
           heading: 'Information pursuant to § 5 ECG and § 25 MedienG (Austria)',
@@ -56,7 +56,7 @@ export const legalDocs = {
         },
         {
           heading: 'Consumer dispute resolution',
-          body: 'We are neither willing nor obliged to participate in dispute resolution proceedings before a consumer arbitration board. The EU online dispute resolution platform is available at https://ec.europa.eu/consumers/odr.',
+          body: 'We are neither willing nor obliged to participate in dispute resolution proceedings before a consumer arbitration board. The former EU online dispute resolution platform was discontinued on 20 July 2025.',
         },
         {
           heading: 'Liability for content',
@@ -69,7 +69,7 @@ export const legalDocs = {
   privacy: {
     de: {
       title: 'Datenschutzerklärung',
-      updated: 'Stand: Juli 2026',
+      updated: 'Stand: 17. September 2026',
       sections: [
         {
           heading: '1. Verantwortlicher',
@@ -77,15 +77,15 @@ export const legalDocs = {
         },
         {
           heading: '2. Welche Daten wir verarbeiten',
-          body: 'Kontodaten: E-Mail-Adresse und Passwort (verschlüsselt) für die Registrierung.\n\nProfildaten: Name, Alter, Geschlecht, Größe, Gewicht, Trainingsziel, Aktivitätslevel und Erfahrung — von dir im Onboarding angegeben.\n\nNutzungsdaten: deine Trainings (Übungen, Sätze, Gewichte), Ernährungseinträge (Lebensmittel, Kalorien, Makros), Wassereinträge, Supplements, Gewichtsverlauf, Trainingspläne, Freundschaften und Erfahrungspunkte.\n\nGesundheitsdaten (Art. 9 DSGVO): Körpergewicht, Zyklusdaten und Symptomtagebuch (falls du das Zyklustracking aktivierst). Diese Daten verarbeiten wir ausschließlich auf Grundlage deiner ausdrücklichen Einwilligung, die du im Onboarding erteilst und jederzeit durch Löschen deines Kontos widerrufen kannst.\n\nApple Health / Health Connect (optional): Wenn du die Verbindung im Profil einschaltest, liest FullRep Schrittzahl und Gewicht aus Apple Health (iOS) bzw. Google Health Connect (Android), um sie in der App anzuzeigen und in deinen Gewichtsverlauf zu übernehmen. Die Freigabe erteilst du im System-Dialog und kannst sie dort jederzeit entziehen; abschalten kannst du die Verbindung außerdem im Profil. FullRep schreibt keine Daten nach Apple Health oder Health Connect.\n\nFotos: Übungs- und Produktfotos werden ausschließlich lokal auf deinem Gerät gespeichert (IndexedDB) und nicht an uns übertragen. Mahlzeitenfotos für die KI-Analyse werden an Google (Gemini API) übermittelt — siehe Punkt 4.',
+          body: 'Kontodaten: E-Mail-Adresse und Passwort (verschlüsselt) für die Registrierung.\n\nProfildaten: Name, Alter, Geschlecht, Größe, Gewicht, Trainingsziel, Aktivitätslevel und Erfahrung — von dir im Onboarding angegeben.\n\nNutzungsdaten: deine Trainings (Übungen, Sätze, Gewichte), Ernährungseinträge (Lebensmittel, Kalorien, Makros), Wassereinträge, Supplements, Gewichtsverlauf, Trainingspläne, Freundschaften und Erfahrungspunkte.\n\nGesundheitsdaten (Art. 9 DSGVO): Körpergewicht und Körpermaße, Ernährungs- und Trainingsdaten, Zyklusdaten und Symptomtagebuch (falls du das Zyklustracking aktivierst), Schritte und Gewicht aus Apple Health / Health Connect (falls du die Verbindung einschaltest) sowie alles, was du dem KI-Coach schreibst — etwa Blutwerte. Diese Daten verarbeiten wir ausschließlich auf Grundlage deiner ausdrücklichen Einwilligung, die du im Onboarding in einem eigenen Schritt erteilst (den Zeitpunkt halten wir in deinem Profil fest) und jederzeit durch Löschen deines Kontos widerrufen kannst.\n\nApple Health / Health Connect (optional): Wenn du die Verbindung im Profil einschaltest, liest FullRep Schrittzahl und Gewicht aus Apple Health (iOS) bzw. Google Health Connect (Android), um sie in der App anzuzeigen und in deinen Gewichtsverlauf zu übernehmen. Die Freigabe erteilst du im System-Dialog und kannst sie dort jederzeit entziehen; abschalten kannst du die Verbindung außerdem im Profil. FullRep schreibt keine Daten nach Apple Health oder Health Connect und verwendet diese Daten nie für Werbung.\n\nFotos: Übungs- und Produktfotos werden ausschließlich lokal auf deinem Gerät gespeichert (IndexedDB) und nicht an uns übertragen. Mahlzeitenfotos für die KI-Analyse werden an Google (Gemini API) übermittelt — siehe Punkt 4.\n\nWerbe- und Kaufdaten (nur in den Apps für iOS und Android): Für die Anzeige von Werbung verarbeitet Google AdMob die Werbe-ID deines Geräts, deine IP-Adresse und technische Geräteangaben. Für das Premium-Abo übermitteln wir eine App-interne Nutzerkennung und den Kaufbeleg des Stores an RevenueCat. Die Web-App zeigt keine Werbung.\n\nFehlerberichte: Stürzt die App ab, senden wir eine technische Fehlermeldung mit App-Version und Gerätetyp an Sentry — ohne Name, E-Mail oder Inhalte (sofern die Fehlererfassung im jeweiligen Build eingeschaltet ist).',
         },
         {
           heading: '3. Zwecke und Rechtsgrundlagen',
-          body: 'Wir verarbeiten deine Daten zur Bereitstellung der App-Funktionen (Art. 6 Abs. 1 lit. b DSGVO — Vertragserfüllung) sowie — bei Gesundheitsdaten — auf Grundlage deiner ausdrücklichen Einwilligung (Art. 9 Abs. 2 lit. a DSGVO). Es findet kein Tracking zu Werbezwecken statt; wir verwenden keine Werbe-Cookies und keine Analyse-Tools.',
+          body: 'Bereitstellung der App-Funktionen: Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung).\n\nGesundheitsdaten: ausschließlich deine ausdrückliche Einwilligung, Art. 9 Abs. 2 lit. a DSGVO.\n\nWerbung in den Apps: Personalisierte Werbung zeigen wir nur mit deiner Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die wir vor der ersten Anzeige über Googles Einwilligungsdialog einholen — auf iOS zusätzlich über Apples Dialog zur App-Tracking-Transparenz. Lehnst du ab, siehst du nur nicht personalisierte Werbung; Rechtsgrundlage dafür ist unser berechtigtes Interesse an der Finanzierung der kostenlosen Version (Art. 6 Abs. 1 lit. f DSGVO). Deine Entscheidung kannst du jederzeit im Profil unter „Werbe-Einwilligung ändern“ anpassen. Mit einem Premium-Abo entfällt die Werbung vollständig. Deine Gesundheits- und Nutzungsdaten werden nie für Werbung verwendet oder an Werbepartner weitergegeben.\n\nFehlerberichte und Sicherheit: berechtigtes Interesse an einer stabilen und sicheren App (Art. 6 Abs. 1 lit. f DSGVO).\n\nDie Web-App zeigt keine Werbung und verwendet weder Werbe-Cookies noch Analyse-Tools.',
         },
         {
           heading: '4. Empfänger und Auftragsverarbeiter',
-          body: 'Supabase Inc. (Datenbank und Login-System): speichert deine Konto-, Profil- und Nutzungsdaten.\n\nVercel Inc. (Hosting): liefert die App aus; dabei fallen technisch notwendige Server-Logs (z. B. IP-Adresse) an.\n\nGoogle LLC (Gemini API): Nur wenn du die Mahlzeiten-Fotoanalyse nutzt, wird das aufgenommene Foto zur Auswertung an Google übermittelt. Das Foto wird nicht dauerhaft bei uns gespeichert.\n\nOpen Food Facts (Lebensmitteldatenbank): Bei der Lebensmittelsuche und beim Barcode-Scan werden Suchbegriff bzw. Barcode (keine persönlichen Daten) an Open Food Facts übermittelt.\n\nMit den Anbietern bestehen, soweit erforderlich, Auftragsverarbeitungsverträge; bei Übermittlungen in Drittländer (USA) stützen sich die Anbieter auf EU-Standardvertragsklauseln bzw. das EU-US Data Privacy Framework.',
+          body: 'Supabase, Inc. (USA; Datenbank und Login-System): speichert deine Konto-, Profil- und Nutzungsdaten.\n\nVercel, Inc. (USA; Hosting): liefert die App und unsere Serverfunktionen aus; dabei fallen technisch notwendige Server-Logs (z. B. IP-Adresse) an.\n\nGoogle LLC / Google Ireland Ltd.: (1) Gemini API — nur wenn du die Mahlzeiten-Fotoanalyse nutzt, wird das aufgenommene Foto zur Auswertung an Google übermittelt; nur wenn du den KI-Coach nutzt, gehen deine Nachrichten an ihn samt dem Verlauf der aktuellen Unterhaltung an Google. Wir senden dabei weder Name, E-Mail-Adresse noch Konto-ID mit; Fotos und Nachrichten speichern wir nicht auf unseren Servern. (2) AdMob — Werbung in den Apps für iOS und Android (siehe Punkt 2 und 3).\n\nAnthropic, PBC (USA; KI-Coach): Für Antworten des KI-Coachs setzen wir alternativ zu Gemini Modelle von Anthropic ein — mit denselben Daten wie oben, ebenfalls ohne Name, E-Mail oder Konto-ID.\n\nRevenueCat, Inc. (USA; Premium-Abo): erhält eine App-interne Nutzerkennung und die Kaufbestätigung des Stores, um dein Abo zu verwalten und auf einem neuen Gerät wiederherzustellen. Die Zahlung selbst wickeln Apple bzw. Google ab; wir sehen keine Zahlungsdaten.\n\nFunctional Software, Inc. (Sentry, USA; Fehlerberichte): erhält technische Fehlermeldungen ohne Personenbezug, sofern die Fehlererfassung eingeschaltet ist.\n\nOpen Food Facts (Lebensmitteldatenbank): Bei der Lebensmittelsuche und beim Barcode-Scan werden Suchbegriff bzw. Barcode (keine persönlichen Daten) an Open Food Facts übermittelt.\n\nMit allen Auftragsverarbeitern bestehen Verträge nach Art. 28 DSGVO. Bei Übermittlungen in die USA stützen wir uns auf die EU-Standardvertragsklauseln bzw. das EU-US Data Privacy Framework, soweit der Anbieter dort zertifiziert ist.',
         },
         {
           heading: '5. Lokale Speicherung auf deinem Gerät',
@@ -93,7 +93,7 @@ export const legalDocs = {
         },
         {
           heading: '6. Speicherdauer',
-          body: 'Wir speichern deine Daten, solange dein Konto besteht. Löschst du dein Konto, werden alle deine Daten unverzüglich und dauerhaft aus unserer Datenbank gelöscht.',
+          body: 'Wir speichern deine Daten, solange dein Konto besteht. Löschst du dein Konto, werden alle deine Daten sofort aus unserer Datenbank gelöscht. Zur Absicherung gegen Datenverlust legen wir täglich eine Sicherungskopie der Datenbank an, die nach 14 Tagen automatisch gelöscht wird — bis dahin kann ein gelöschtes Konto noch in einer Sicherung enthalten sein; diese Kopien dienen ausschließlich der Wiederherstellung nach einem Ausfall.\n\nDer Verlauf deiner Unterhaltungen mit dem KI-Coach liegt nur auf deinem Gerät (die letzten 60 Nachrichten); auf unseren Servern zählen wir lediglich, wie viele Fragen du pro Tag gestellt hast.',
         },
         {
           heading: '7. Konto und Daten löschen',
@@ -107,7 +107,7 @@ export const legalDocs = {
     },
     en: {
       title: 'Privacy Policy',
-      updated: 'Last updated: July 2026',
+      updated: 'Last updated: 17 September 2026',
       sections: [
         {
           heading: '1. Controller',
@@ -115,15 +115,15 @@ export const legalDocs = {
         },
         {
           heading: '2. What data we process',
-          body: 'Account data: email address and password (encrypted) for registration.\n\nProfile data: name, age, gender, height, weight, training goal, activity level and experience — provided by you during onboarding.\n\nUsage data: your workouts (exercises, sets, weights), nutrition entries (foods, calories, macros), water intake, supplements, weight history, training plans, friendships and experience points.\n\nHealth data (Art. 9 GDPR): body weight, cycle data and symptom diary (if you enable cycle tracking). We process this data exclusively based on your explicit consent, which you give during onboarding and can revoke at any time by deleting your account.\n\nApple Health / Health Connect (optional): If you enable the connection in your profile, FullRep reads step count and weight from Apple Health (iOS) or Google Health Connect (Android) to display them in the app and add them to your weight history. You grant access in the system dialog and can revoke it there at any time; you can also switch the connection off in your profile. FullRep does not write any data to Apple Health or Health Connect.\n\nPhotos: exercise and product photos are stored exclusively on your device (IndexedDB) and are not transmitted to us. Meal photos for AI analysis are transmitted to Google (Gemini API) — see section 4.',
+          body: 'Account data: email address and password (encrypted) for registration.\n\nProfile data: name, age, gender, height, weight, training goal, activity level and experience — provided by you during onboarding.\n\nUsage data: your workouts (exercises, sets, weights), nutrition entries (foods, calories, macros), water intake, supplements, weight history, training plans, friendships and experience points.\n\nHealth data (Art. 9 GDPR): body weight and body measurements, nutrition and training data, cycle data and symptom diary (if you enable cycle tracking), steps and weight from Apple Health / Health Connect (if you enable the connection), and everything you write to the AI coach — for example blood values. We process this data exclusively on the basis of your explicit consent, which you give in a separate step during onboarding (we record the time in your profile) and can withdraw at any time by deleting your account.\n\nApple Health / Health Connect (optional): If you enable the connection in your profile, FullRep reads step count and weight from Apple Health (iOS) or Google Health Connect (Android) to display them in the app and add them to your weight history. You grant access in the system dialog and can revoke it there at any time; you can also switch the connection off in your profile. FullRep does not write any data to Apple Health or Health Connect and never uses this data for advertising.\n\nPhotos: exercise and product photos are stored exclusively on your device (IndexedDB) and are not transmitted to us. Meal photos for AI analysis are transmitted to Google (Gemini API) — see section 4.\n\nAdvertising and purchase data (iOS and Android apps only): To display ads, Google AdMob processes your device\'s advertising ID, your IP address and technical device information. For the Premium subscription we transmit an app-internal user identifier and the store\'s purchase receipt to RevenueCat. The web app shows no ads.\n\nCrash reports: If the app crashes, we send a technical error message with app version and device type to Sentry — without name, email or content (if error reporting is enabled in the respective build).',
         },
         {
           heading: '3. Purposes and legal bases',
-          body: 'We process your data to provide the app features (Art. 6(1)(b) GDPR — performance of contract) and — for health data — based on your explicit consent (Art. 9(2)(a) GDPR). There is no advertising tracking; we use no advertising cookies and no analytics tools.',
+          body: 'Providing the app features: Art. 6(1)(b) GDPR (performance of contract).\n\nHealth data: exclusively your explicit consent, Art. 9(2)(a) GDPR.\n\nAdvertising in the apps: We show personalised ads only with your consent (Art. 6(1)(a) GDPR), which we obtain before the first ad via Google\'s consent dialog — on iOS additionally via Apple\'s App Tracking Transparency prompt. If you decline, you only see non-personalised ads; the legal basis for those is our legitimate interest in financing the free version (Art. 6(1)(f) GDPR). You can change your decision at any time in your profile under "Change ad consent". With a Premium subscription, ads are removed entirely. Your health and usage data is never used for advertising or shared with advertising partners.\n\nCrash reports and security: legitimate interest in a stable and secure app (Art. 6(1)(f) GDPR).\n\nThe web app shows no ads and uses neither advertising cookies nor analytics tools.',
         },
         {
           heading: '4. Recipients and processors',
-          body: 'Supabase Inc. (database and login system): stores your account, profile and usage data.\n\nVercel Inc. (hosting): delivers the app; technically necessary server logs (e.g. IP address) are generated.\n\nGoogle LLC (Gemini API): only if you use the meal photo analysis, the captured photo is transmitted to Google for evaluation. The photo is not permanently stored by us.\n\nOpen Food Facts (food database): when searching for foods or scanning barcodes, the search term or barcode (no personal data) is transmitted to Open Food Facts.\n\nWhere required, data processing agreements are in place with these providers; for transfers to third countries (USA), the providers rely on EU standard contractual clauses or the EU-US Data Privacy Framework.',
+          body: 'Supabase, Inc. (USA; database and login system): stores your account, profile and usage data.\n\nVercel, Inc. (USA; hosting): delivers the app and our server functions; technically necessary server logs (e.g. IP address) are generated.\n\nGoogle LLC / Google Ireland Ltd.: (1) Gemini API — only if you use the meal photo analysis, the captured photo is transmitted to Google for evaluation; only if you use the AI coach, your messages to it, including the history of the current conversation, go to Google. We do not send your name, email address or account ID; photos and messages are not stored on our servers. (2) AdMob — advertising in the iOS and Android apps (see sections 2 and 3).\n\nAnthropic, PBC (USA; AI coach): For AI coach answers we use Anthropic models as an alternative to Gemini — with the same data as above, likewise without name, email or account ID.\n\nRevenueCat, Inc. (USA; Premium subscription): receives an app-internal user identifier and the store\'s purchase confirmation to manage your subscription and restore it on a new device. Payment itself is handled by Apple or Google; we never see payment details.\n\nFunctional Software, Inc. (Sentry, USA; crash reports): receives technical error messages without personal reference, if error reporting is enabled.\n\nOpen Food Facts (food database): when searching for foods or scanning barcodes, the search term or barcode (no personal data) is transmitted to Open Food Facts.\n\nData processing agreements under Art. 28 GDPR are in place with all processors. For transfers to the USA we rely on the EU standard contractual clauses or the EU-US Data Privacy Framework where the provider is certified.',
         },
         {
           heading: '5. Local storage on your device',
@@ -131,7 +131,7 @@ export const legalDocs = {
         },
         {
           heading: '6. Storage period',
-          body: 'We store your data for as long as your account exists. If you delete your account, all your data is immediately and permanently deleted from our database.',
+          body: 'We store your data for as long as your account exists. If you delete your account, all your data is immediately deleted from our database. To protect against data loss we create a daily backup of the database, which is automatically deleted after 14 days — until then a deleted account may still be contained in a backup; these copies are used solely for recovery after an outage.\n\nThe history of your conversations with the AI coach is stored only on your device (the last 60 messages); on our servers we only count how many questions you asked per day.',
         },
         {
           heading: '7. Deleting your account and data',
@@ -148,7 +148,7 @@ export const legalDocs = {
   terms: {
     de: {
       title: 'Nutzungsbedingungen (AGB)',
-      updated: 'Stand: Juli 2026',
+      updated: 'Stand: 17. September 2026',
       sections: [
         {
           heading: '1. Geltungsbereich',
@@ -182,7 +182,7 @@ export const legalDocs = {
     },
     en: {
       title: 'Terms of Use',
-      updated: 'Last updated: July 2026',
+      updated: 'Last updated: 17 September 2026',
       sections: [
         {
           heading: '1. Scope',
@@ -223,7 +223,7 @@ export const legalDocs = {
   health: {
     de: {
       title: 'Gesundheitshinweis',
-      updated: 'Stand: Juli 2026',
+      updated: 'Stand: 17. September 2026',
       sections: [
         {
           heading: 'FullRep ersetzt keine ärztliche Beratung',
@@ -253,7 +253,7 @@ export const legalDocs = {
     },
     en: {
       title: 'Health Notice',
-      updated: 'Last updated: July 2026',
+      updated: 'Last updated: 17 September 2026',
       sections: [
         {
           heading: 'FullRep does not replace medical advice',
