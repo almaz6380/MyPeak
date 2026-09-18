@@ -102,6 +102,49 @@ const AUFHAENGER = {
 const esc = (s) => String(s ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 const b64 = (p) => readFileSync(p).toString('base64');
 
+/**
+ * Die kleine Zeile ueber der Schlagzeile — fuer ALLE Stile an einer Stelle.
+ *
+ * ⚠ Sie stand frueher dreimal verstreut, und zwei der drei Fassungen nahmen
+ * `o.marke`. Bei `studien-fakt` sind `marke` und `haken` aber DERSELBE String
+ * (siehe inhalt(): beides `p.titel`) — `poster` und `premium` druckten die
+ * Schlagzeile dadurch zweimal untereinander, einmal klein und einmal gross.
+ * Nur `mix` entkam dem, weil es hier schon den rotierenden Aufhaenger nahm.
+ *
+ * Deshalb: EINE Quelle, und am Ende die stumpfe Gegenprobe. Faellt die Zeile
+ * mit der Schlagzeile zusammen, entfaellt sie lieber ganz — eine leere Stelle
+ * ist kein Fehler, eine Dopplung sieht nach einem aus.
+ *
+ * ⚠ Der wechselnde Aufhaenger gilt weiterhin NUR fuer Studien. Ueber einer
+ * Uebungskarte stand sonst „Was die Forschung sagt" ueber einer reinen
+ * Bewegungsbeschreibung — das behauptet eine Studienaussage, die es nicht
+ * gibt. Uebung und Rezept tragen ihre eigene, sachliche Zeile.
+ */
+function augenbraueFuer(o, schlagzeile, kandidat = null) {
+  const k = kandidat ?? (o.art === 'uebung' ? (o.marke ?? T.uebung)
+    : o.art === 'rezept' ? T.rezept
+    : o.art === 'wissen' ? (o.augenbraue || T.wissen)
+    : AUFHAENGER[SEED % AUFHAENGER.length]);
+  const gleich = (a, b) => String(a ?? '').trim().toLowerCase()
+    === String(b ?? '').trim().toLowerCase();
+  return gleich(k, schlagzeile) ? '' : k;
+}
+
+/**
+ * Naehrwerte — frueher NUR im Stil `premium`.
+ *
+ * ⚠ Der Tageslauf baut alles im Stil `mix` (motoren.mjs ruft ohne --stil auf),
+ * also ging bis zum 18.09.2026 jedes Rezept OHNE Makros raus: Name, ein Satz
+ * Prosa, sonst nichts. Bei einem Fitnessrezept ist die Eiweisszahl das
+ * Interessanteste, das die Karte zu bieten hat. Sie stand berechnet in `o`
+ * und wurde weggeworfen.
+ */
+function makrosHtml(o) {
+  if (!o.makros?.length) return '';
+  return `<div class="makros">${o.makros.map(([v, l]) =>
+    `<div><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>`;
+}
+
 // --- Inhalt waehlen ---------------------------------------------------------
 function inhalt(format, w) {
   const zieh = (m) => m[Math.floor(w() * m.length)];
@@ -220,25 +263,17 @@ function baueHtml(o, stil) {
   if (stil === 'mix') {
     // Der Dreiklang. Aufhaenger wechselt nach Seed, Ueberschrift skaliert nach
     // Laenge, der Studienblock faellt weg, wenn es keinen Wert gibt.
-    //
-    // ⚠ Der wechselnde Aufhaenger gilt NUR fuer Wissen und Studien. Ueber
-    // einer Uebungskarte stand sonst „Was die Forschung sagt" ueber einer
-    // reinen Bewegungsbeschreibung — das behauptet eine Studienaussage, die es
-    // nicht gibt, und beschaedigt genau das Vertrauen, von dem dieser Kanal
-    // lebt. Uebung und Rezept tragen deshalb ihre eigene, sachliche Zeile:
-    // bei der Uebung die Muskelgruppe, beim Rezept das Wort „Rezept".
-    const auge = o.art === 'uebung' ? (o.marke ?? T.uebung)
-      : o.art === 'rezept' ? T.rezept
-      : AUFHAENGER[SEED % AUFHAENGER.length];
     const kurz = o.art === 'wissen' ? o.marke : o.haken;
+    const auge = augenbraueFuer(o, kurz);
     const lang = o.art === 'wissen' ? o.haken : o.text;
     const wert = o.studienwert ?? null;
     const px = kurz.length > 26 ? 60 : kurz.length > 16 ? 74 : 96;
     mitte = `
       <div class="mixText">
-        <div class="augenbraue">${esc(auge)}</div>
+        ${auge ? `<div class="augenbraue">${esc(auge)}</div>` : ''}
         <h1 class="anton" style="font-size:${px}px">${esc(kurz)}</h1>
         ${lang ? `<p class="text">${esc(lang)}</p>` : ''}
+        ${makrosHtml(o)}
         ${wert ? `
         <div class="studie">
           <div class="kante"></div>
@@ -253,7 +288,7 @@ function baueHtml(o, stil) {
     // Aussage darunter im Fliesstext.
     const kurz = o.art === 'wissen' ? o.marke : o.haken;
     const lang = o.art === 'wissen' ? o.haken : o.text;
-    const auge = o.art === 'wissen' ? (o.augenbraue ?? '') : o.marke;
+    const auge = augenbraueFuer(o, kurz);
     // Schriftgroesse folgt der Laenge — sonst bricht ein langer Rezeptname um
     // und schiebt den Fuss aus dem Bild.
     const px = kurz.length > 26 ? 68 : kurz.length > 16 ? 86 : 116;
@@ -263,11 +298,17 @@ function baueHtml(o, stil) {
         <h1 class="anton" style="font-size:${px}px">${esc(kurz)}</h1>
         <div class="kante"></div>
         ${lang ? `<p class="text">${esc(lang)}</p>` : ''}
+        ${makrosHtml(o)}
       </div>`;
   } else if (stil === 'zahl') {
+    // ⚠ Hier traegt die ZAHL das Bild, nicht `marke`. Die Zeile darunter
+    // (`zahl.label`) ist das, wogegen die Augenbraue sich abgrenzen muss —
+    // bei einer Wissenskarte ohne eigenes Label waeren sonst beide der
+    // Themenname.
+    const auge = augenbraueFuer(o, o.zahl.label, o.art === 'wissen' ? o.marke : null);
     mitte = `
       <div class="zahlBlock">
-        <div class="augenbraue">${esc(o.marke)}</div>
+        ${auge ? `<div class="augenbraue">${esc(auge)}</div>` : ''}
         <div class="grosseZahl"><b class="anton">${esc(o.zahl.wert)}</b><i>${esc(o.zahl.einheit)}</i></div>
         <div class="zahlLabel">${esc(o.zahl.label)}</div>
         ${o.haken ? `<p class="text">${esc(o.haken)}</p>` : ''}
@@ -280,17 +321,18 @@ function baueHtml(o, stil) {
           <figure><img src="data:image/jpeg;base64,${b64(f)}">
           <figcaption>${i === 0 ? T.start : T.ende}</figcaption></figure>`).join('')}</div>`
       : '';
-    const makros = o.makros
-      ? `<div class="makros">${o.makros.map(([v, l]) =>
-          `<div><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>`
-      : '';
+    // ⚠ Die Pille traegt hier `marke`, nicht den Aufhaenger — das ist ihre
+    // eigene Rolle. Sie muss sich aber gegen `haken` abgrenzen: bei einer
+    // Studienkarte sind beide derselbe String, und die Pille wiederholte
+    // wortgleich die Ueberschrift darunter.
+    const pille = augenbraueFuer(o, o.haken, o.marke);
     mitte = `
-      <div class="marke">${esc(o.marke)}</div>
+      ${pille ? `<div class="marke">${esc(pille)}</div>` : ''}
       ${o.augenbraue ? `<div class="augenbraue">${esc(o.augenbraue)}</div>` : ''}
       <h1${o.art === 'wissen' ? ' class="aussage"' : ''}>${esc(o.haken)}</h1>
       ${fotos}
       ${o.text ? `<p class="text">${esc(o.text)}</p>` : ''}
-      ${makros}`;
+      ${makrosHtml(o)}`;
   }
 
   return `<!doctype html><meta charset="utf-8">
@@ -386,6 +428,11 @@ p.text{font-size:32px;line-height:1.38;color:#e7e5e4}
 .fotos img{width:100%;height:340px;object-fit:cover;border-radius:20px;
   border:1px solid rgba(251,191,36,.22)}
 .fotos figcaption{font-size:22px;font-weight:700;color:#fbbf24;letter-spacing:.16em;text-transform:uppercase}
+
+/* --- Makros: in JEDEM Stil, nicht nur in premium ---
+   Seit 18.09.2026 rendern auch mix und poster den Block (makrosHtml).
+   Der Selektor war immer global, nur der Aufrufer fehlte.
+   (Keine Backticks in diesem Block — er steht in einem Template-Literal.) */
 .makros{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .makros div{background:rgba(251,191,36,.09);border:1px solid rgba(251,191,36,.2);
   border-radius:18px;padding:20px 12px;text-align:center}
@@ -446,12 +493,17 @@ await seite.evaluate(() => document.fonts.ready);
 await seite.screenshot({ path: ziel, type: 'jpeg', quality: 92 });
 await browser.close();
 
+// ⚠ HOECHSTENS FUENF (Josef, 18.09.2026), und die Reihenfolge entscheidet,
+// welche fuenf es sind: Marke zuerst, dann das Enge, dann das Breite.
+// Gekuerzt wird zusaetzlich zentral in
+// wellapps-social/tools/social/beschreibung.mjs — hier stehen sie trotzdem
+// schon richtig, weil das Beiblatt zugleich die Kopiervorlage fuer einen
+// Beitrag von Hand ist und dort niemand automatisch abschneidet.
 const tags = {
-  uebung: ['fullrep', 'fitness', 'gym', 'training', 'uebung', 'muskelaufbau', 'krafttraining', 'workout'],
-  rezept: ['fullrep', 'fitness', 'meal', 'protein', 'rezept', 'ernaehrung', 'mealprep', 'highprotein'],
-  wissen: ['fullrep', 'fitness', 'wissen', 'training', 'gym', 'muskelaufbau', 'gymtok', 'fitnesstips'],
-  studie: ['fullrep', 'fitness', 'evidenzbasiert', 'training', 'gym', 'wissenschaft',
-    'muskelaufbau', 'fitnesstips'],
+  uebung: ['fullrep', 'krafttraining', 'muskelaufbau', 'training', 'fitness'],
+  rezept: ['fullrep', 'highprotein', 'mealprep', 'rezept', 'ernaehrung'],
+  wissen: ['fullrep', 'fitnesstips', 'gymtok', 'muskelaufbau', 'fitness'],
+  studie: ['fullrep', 'evidenzbasiert', 'wissenschaft', 'muskelaufbau', 'fitness'],
 }[o.art] ?? ['fullrep', 'fitness', 'training', 'gym'];
 
 // ⚠ `o.fotos` ist seit dem 30.08.2026 ein LEERES Array, kein null — und ein
@@ -473,7 +525,11 @@ ${tags.map((h) => `#${h}`).join(' ')}
 
 ## Beim Hochladen
 
-- Kein Store-Link in der Caption, nur „Link in der Bio".
+- Der App-Link gehoert in die Beschreibung (Josef, 18.09.2026). Der
+  Tageslauf haengt ihn selbst an; wer von Hand postet, nimmt die Landeseite
+  aus apps.json (linkInBio), NICHT die rohe App-Store- oder Play-Adresse.
+- Hoechstens fuenf Hashtags. Oben stehen genau fuenf, in der Reihenfolge,
+  in der sie zaehlen.
 - Im Bild stehen die Download-Badges fuer App Store und Google Play.
 
 ## Inhalt

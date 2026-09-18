@@ -284,14 +284,17 @@ ${daten.titel}${daten.beschreibung ? `\n\n${daten.beschreibung}` : ''}
 ## Hashtags
 
 ${(daten.art === 'uebung'
-  ? ['fullrep', 'fitness', 'gym', 'uebung', 'training', 'muskelaufbau', 'krafttraining', 'workout']
-  : ['fullrep', 'fitness', 'wissen', 'evidenzbasiert', 'training', 'studie', 'gym', 'ernaehrung'])
+  ? ['fullrep', 'krafttraining', 'muskelaufbau', 'training', 'fitness']
+  : ['fullrep', 'evidenzbasiert', 'wissenschaft', 'muskelaufbau', 'fitness'])
   .map((h) => `#${h}`).join(' ')}
 
 ## Beim Hochladen
 
 - Das Video ist STUMM. Ton legst du selbst darueber.
-- Kein Store-Link in der Caption, nur „Link in der Bio".
+- Der App-Link gehoert in die Beschreibung (Josef, 18.09.2026). Der
+  Tageslauf haengt ihn selbst an; wer von Hand postet, nimmt die Landeseite
+  aus apps.json (linkInBio), NICHT die rohe Store-Adresse.
+- Hoechstens fuenf Hashtags. Oben stehen genau fuenf.
 - Im Video stehen die Download-Badges fuer App Store und Google Play.
 
 ## Inhalt
