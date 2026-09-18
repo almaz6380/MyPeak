@@ -18,6 +18,104 @@ Inhaltsbibliotheken (siehe 4b und 4c)
 
 ## Aktueller Stand
 
+### DSGVO-Nachzug: Art.-9-Einwilligung, ehrliche Datenschutzerklärung (17.09.2026)
+
+Anlass war ein Datenfluss-Inventar über alle Repos. In FullRep waren drei
+Dinge nicht in Ordnung, alle auf `claude/apps-question-yisd4b` behoben:
+
+1. **Die Datenschutzerklärung widersprach dem Code.** Sie sagte „kein Tracking
+   zu Werbezwecken, keine Werbe-Cookies" — während `ads.js` seit dem Launch
+   echte AdMob-Interstitials mit UMP und ATT ausliefert. AdMob, RevenueCat,
+   Sentry und **Anthropic** (KI-Coach!) kamen gar nicht vor; Google stand nur
+   für die Fotoanalyse, nicht für den Coach, der laut eigenem Prompt Blutwerte
+   einordnet. Alle sechs Sprachfassungen (DE/EN in `legalContent.js`,
+   ES/FR/PT/AR in `uebersetzungen/`) neu geschrieben: Abschnitte 2, 3, 4, 6
+   und die Verbraucherstreitbeilegung (ODR-Plattform seit 20.07.2025
+   eingestellt, Link raus). Neu drin: die 14-Tage-Backups aus `api/backup.js`
+   — „unverzüglich gelöscht" stimmte für bis zu 14 Tage nicht.
+2. **Die Art.-9-Einwilligung existierte nicht.** Das Onboarding hatte EIN
+   Häkchen „Ich akzeptiere AGB und Datenschutzerklärung"; die DSE behauptete,
+   die Gesundheits-Einwilligung werde „im Onboarding erteilt". Eine gebündelte
+   Vertragszustimmung ist keine ausdrückliche Einwilligung. Jetzt: zweites,
+   getrenntes Häkchen (`ConsentToggle` in `OnboardingPage`), beide Pflicht,
+   Zeitstempel in **`profiles.health_consent_at`** (Migration
+   `20260917100000_health_consent.sql`). Der Onboarding-Satz „nicht an Dritte
+   weitergegeben" war falsch und ist ersetzt.
+3. **Bestandskonten holen die Einwilligung nach.** `HealthConsentGate`
+   (App.jsx, vor `AppShell`) blockiert eingeloggte Konten mit
+   `health_consent_at = NULL`, bis sie einwilligen — Gäste nie, deren Daten
+   liegen nur auf dem Gerät. Wer nicht will, bekommt den Weg zur Löschung
+   genannt. Das ist bewusst hart: Ohne Einwilligung dürfen wir die vorhandenen
+   Gesundheitsdaten nicht weiterverarbeiten.
+
+Neue i18n-Schlüssel ×6: `onboarding.healthConsentHeading/-Text/-Accept`,
+`consentGate.title/deleteHint`; `privacyText1` umformuliert. `pruefe-sprachen`
+grün, 317 Tests, Build grün, Lint ohne neue Meldungen.
+
+**Ausgerollt am 17.09.2026:** Migration in der Cloud-Datenbank eingespielt
+(Spalte `profiles.health_consent_at` nachgezählt), danach nach `main` gemergt.
+Weg: **Supabase-Management-API** (`POST /v1/projects/jntzqlrakmsyzyqckwgn/
+database/query`, Token `SUPABASE_ACCESS_ALMAZ` aus der Claude-Umgebung), erst
+als `begin … rollback`, dann echt. ⚠ Damit ist die Notiz weiter unten
+(„Der Management-API-Weg ist aus der Claude-Umgebung zu, 403 error 1010")
+**überholt** — am 17.09. antwortete `api.supabase.com` mit 200. Nebenbefund:
+Das Projekt liegt in **eu-north-1 (Stockholm)**; die Datenschutzerklärung nennt
+keine Region, passt also.
+
+Alle **9 bestehenden Konten** (inklusive `appreview@wellbooked.at`) haben
+`health_consent_at = NULL` und sehen beim nächsten Öffnen das Gate — ein Häkchen,
+ein Knopf. Für Apples Prüfkonto ist das bewusst NICHT vorab gesetzt: Eine
+Einwilligung, die niemand erteilt hat, gehört nicht in die Tabelle.
+
+**Offen bei Josef, nicht im Code lösbar:** (a) AVVs ablegen — Supabase, Vercel,
+Google (Gemini UND AdMob), Anthropic, RevenueCat, Sentry; (b) **Gemini-API-Stufe
+prüfen:** Bei der kostenlosen Stufe nutzt Google Eingaben zur
+Produktverbesserung — für Blutwerte im Coach ist das nicht tragbar, es braucht
+den bezahlten Pfad mit DPA oder Anthropic mit Zero-Data-Retention; (c) ob
+`VITE_SENTRY_DSN` in Vercel gesetzt ist — die DSE sagt „sofern eingeschaltet";
+(d) Apple Privacy Labels und Play-Datensicherheit gegen die neue DSE abgleichen
+(AdMob-Tracking, Gesundheitsdaten, KI-Anbieter).
+
+### iOS-Werbung: ATT nativ + volle SKAdNetwork-Liste (06.09.2026, 1.5.1 / Build 10)
+
+**Eingereicht 06.09., 15:56 UTC** — Einreichung `ee64a99b-…`, `WAITING_FOR_REVIEW`,
+Build 10 `VALID` und zugewiesen, beide Abos `APPROVED` (fahren nicht mit). Ablauf komplett
+über Workflows: `ios-release.yml` #13 (`nur_kompilieren`, grün) → #14 (Upload, 4:45 min) →
+`asc.yml` `version-anlegen` → `build` → `einreichen`. Version 1.5.1, `WHATS_NEW` in `asc.py` auf den Werbe-Fix umgeschrieben
+(der alte Text beschrieb 1.5.0). Android bleibt auf vc20: die Änderung ist rein iOS.
+
+Anlass war Josefs Frage nach den eCPM-Unterschieden zwischen den vier Apps.
+Befund am AdMob-Konto: Es gibt keine Anomalie, es gibt Apps ohne Nutzer
+(Swaply iOS: 2 Impressionen in 7 Tagen) und eine App mit ein paar Nutzern,
+deren Android-Spieler Rewarded-Videos schauen (Mahjong Android 21 € eCPM bei
+30 Impressionen). **Unter 1.000 Impressionen den eCPM nicht deuten** — die
+Zahl schwankt mit jedem einzelnen Klick um 30 %.
+
+Zwei Dinge waren trotzdem strukturell falsch und sind seit Build 10 behoben:
+
+1. **Der ATT-Dialog kam wahrscheinlich nie.** `ads.js` rief
+   `AdMob.requestTrackingAuthorization()` 1,5 s nach dem Start über die
+   Capacitor-Brücke. Das Plugin ruft `ATTrackingManager` auf Capacitors
+   Hintergrund-Warteschlange auf, und die App war zu dem Zeitpunkt oft noch
+   nicht `.active` — iOS antwortet dann still mit notDetermined. Apple hat
+   exakt dieses Muster bei Anigosha am 12.08. beanstandet. Ohne ATT keine
+   IDFA, also jede iOS-Anzeige nicht-personalisiert (halber eCPM).
+   Jetzt: `frageNachTracking()` im `AppDelegate` bei `applicationDidBecomeActive`
+   (Hauptthread, aktive App, Vorlage Anigosha `b534db5`); `ads.js` wartet nur
+   noch bis 6 s auf die Antwort, bevor UMP und SDK-Start folgen.
+2. **Nur eine SKAdNetwork-ID in der Info.plist** (Googles eigene). Bieter,
+   deren ID fehlt, können auf der App nichts attribuieren und bieten nicht.
+   Jetzt 59 Einträge: Googles aktuelle Liste (developers.google.com/admob/ios/
+   ios14, 50 IDs) plus die neun älteren aus Swaply. **Bei jedem Plugin-Update
+   gegen Googles Liste abgleichen** — sie wächst.
+
+Erwartung ehrlich: Das hebt den iOS-Interstitial von ~3,7 € Richtung 6 bis
+8 € eCPM. Bei 17 Impressionen pro Woche sind das Cents. Der Hebel ist die
+Nutzerzahl, nicht der Preis.
+
+Prüfbar am Gerät: Einstellungen → Datenschutz → Tracking muss
+FullRep listen, sobald der Dialog einmal erschienen ist.
+
 ### ✅ Eigene Wochenpläne: Rest erledigt + Doppelarbeit zusammengeführt (01.09.2026)
 
 Fortsetzung des Abschnitts vom 30.08. (weiter unten). Josefs Bruder war im

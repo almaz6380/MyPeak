@@ -20,7 +20,7 @@ const VORRANG = {
 export default {
   imprint: {
     title: 'Aviso legal',
-    updated: 'Actualizado: julio de 2026',
+    updated: 'Actualizado: 17 de septiembre de 2026',
     sections: [
       VORRANG,
       {
@@ -37,7 +37,7 @@ export default {
       },
       {
         heading: 'Resolución de litigios con consumidores',
-        body: 'No estamos dispuestos ni obligados a participar en procedimientos de resolución de litigios ante una junta arbitral de consumo. La plataforma europea de resolución de litigios en línea está disponible en https://ec.europa.eu/consumers/odr',
+        body: 'No estamos dispuestos ni obligados a participar en procedimientos de resolución de litigios ante una junta arbitral de consumo. La antigua plataforma europea de resolución de litigios en línea se cerró el 20 de julio de 2025.',
       },
       {
         heading: 'Responsabilidad por los contenidos',
@@ -48,7 +48,7 @@ export default {
 
   privacy: {
     title: 'Política de privacidad',
-    updated: 'Actualizado: julio de 2026',
+    updated: 'Actualizado: 17 de septiembre de 2026',
     sections: [
       VORRANG,
       {
@@ -57,15 +57,15 @@ export default {
       },
       {
         heading: '2. Qué datos tratamos',
-        body: 'Datos de la cuenta: dirección de correo electrónico y contraseña (cifrada) para el registro.\n\nDatos del perfil: nombre, edad, sexo, altura, peso, objetivo de entrenamiento, nivel de actividad y experiencia — indicados por ti durante la configuración inicial.\n\nDatos de uso: tus entrenamientos (ejercicios, series, pesos), registros de nutrición (alimentos, calorías, macros), registros de agua, suplementos, evolución del peso, planes de entrenamiento, amistades y puntos de experiencia.\n\nDatos de salud (art. 9 RGPD): peso corporal, datos del ciclo y diario de síntomas (si activas el seguimiento del ciclo). Tratamos estos datos exclusivamente sobre la base de tu consentimiento expreso, que otorgas en la configuración inicial y que puedes revocar en cualquier momento eliminando tu cuenta.\n\nApple Health / Health Connect (opcional): si activas la conexión en tu perfil, FullRep lee el número de pasos y el peso de Apple Health (iOS) o de Google Health Connect (Android) para mostrarlos en la aplicación e incorporarlos a tu evolución de peso. El permiso lo concedes en el diálogo del sistema y puedes retirarlo allí en cualquier momento; además puedes desactivar la conexión en tu perfil. FullRep no escribe datos en Apple Health ni en Health Connect.\n\nFotos: las fotos de ejercicios y de productos se guardan exclusivamente en tu dispositivo (IndexedDB) y no se transmiten a nosotros. Las fotos de comidas para el análisis con IA se envían a Google (Gemini API) — véase el punto 4.',
+        body: 'Datos de la cuenta: dirección de correo electrónico y contraseña (cifrada) para el registro.\n\nDatos del perfil: nombre, edad, sexo, estatura, peso, objetivo de entrenamiento, nivel de actividad y experiencia — indicados por ti en el onboarding.\n\nDatos de uso: tus entrenamientos (ejercicios, series, pesos), registros de nutrición (alimentos, calorías, macros), registros de agua, suplementos, historial de peso, planes de entrenamiento, amistades y puntos de experiencia.\n\nDatos de salud (art. 9 RGPD): peso y medidas corporales, datos de nutrición y entrenamiento, datos del ciclo y diario de síntomas (si activas el seguimiento del ciclo), pasos y peso de Apple Health / Health Connect (si activas la conexión) y todo lo que escribas al coach de IA — por ejemplo, valores sanguíneos. Tratamos estos datos exclusivamente sobre la base de tu consentimiento explícito, que otorgas en un paso propio del onboarding (guardamos el momento en tu perfil) y que puedes retirar en cualquier momento eliminando tu cuenta.\n\nApple Health / Health Connect (opcional): si activas la conexión en el perfil, FullRep lee el número de pasos y el peso de Apple Health (iOS) o Google Health Connect (Android) para mostrarlos en la app e incorporarlos a tu historial de peso. El permiso lo concedes en el diálogo del sistema y puedes revocarlo allí en cualquier momento; también puedes desactivar la conexión en el perfil. FullRep no escribe datos en Apple Health ni en Health Connect y nunca usa estos datos para publicidad.\n\nFotos: las fotos de ejercicios y productos se guardan exclusivamente en tu dispositivo (IndexedDB) y no se nos transmiten. Las fotos de comidas para el análisis de IA se transmiten a Google (Gemini API) — véase el punto 4.\n\nDatos de publicidad y compras (solo en las apps para iOS y Android): para mostrar publicidad, Google AdMob trata el identificador publicitario de tu dispositivo, tu dirección IP y datos técnicos del dispositivo. Para la suscripción Premium transmitimos un identificador de usuario interno de la app y el recibo de compra de la tienda a RevenueCat. La app web no muestra publicidad.\n\nInformes de errores: si la app se bloquea, enviamos un mensaje de error técnico con la versión de la app y el tipo de dispositivo a Sentry — sin nombre, correo ni contenidos (si el registro de errores está activado en la compilación correspondiente).',
       },
       {
         heading: '3. Finalidades y bases jurídicas',
-        body: 'Tratamos tus datos para prestar las funciones de la aplicación (art. 6 apdo. 1 letra b RGPD — ejecución de un contrato) y, en el caso de los datos de salud, sobre la base de tu consentimiento expreso (art. 9 apdo. 2 letra a RGPD). No se realiza ningún seguimiento con fines publicitarios; no utilizamos cookies publicitarias ni herramientas de análisis.',
+        body: 'Prestación de las funciones de la app: art. 6, apdo. 1, letra b) RGPD (ejecución del contrato).\n\nDatos de salud: exclusivamente tu consentimiento explícito, art. 9, apdo. 2, letra a) RGPD.\n\nPublicidad en las apps: solo mostramos publicidad personalizada con tu consentimiento (art. 6, apdo. 1, letra a) RGPD), que solicitamos antes del primer anuncio mediante el diálogo de consentimiento de Google — en iOS, además, mediante el diálogo de transparencia de seguimiento de Apple. Si lo rechazas, solo verás publicidad no personalizada; su base jurídica es nuestro interés legítimo en financiar la versión gratuita (art. 6, apdo. 1, letra f) RGPD). Puedes cambiar tu decisión en cualquier momento en el perfil, en «Cambiar consentimiento publicitario». Con una suscripción Premium la publicidad desaparece por completo. Tus datos de salud y de uso nunca se usan para publicidad ni se comparten con socios publicitarios.\n\nInformes de errores y seguridad: interés legítimo en una app estable y segura (art. 6, apdo. 1, letra f) RGPD).\n\nLa app web no muestra publicidad y no utiliza cookies publicitarias ni herramientas de análisis.',
       },
       {
         heading: '4. Destinatarios y encargados del tratamiento',
-        body: 'Supabase Inc. (base de datos y sistema de acceso): almacena los datos de tu cuenta, tu perfil y tu uso.\n\nVercel Inc. (alojamiento): sirve la aplicación; en el proceso se generan registros de servidor técnicamente necesarios (p. ej. la dirección IP).\n\nGoogle LLC (Gemini API): solo si utilizas el análisis de comidas por foto, la imagen tomada se transmite a Google para su evaluación. La foto no se almacena de forma permanente en nuestros sistemas.\n\nOpen Food Facts (base de datos de alimentos): al buscar alimentos o escanear un código de barras se transmite el término de búsqueda o el código (ningún dato personal) a Open Food Facts.\n\nCon los proveedores existen, en la medida necesaria, contratos de encargo del tratamiento; para las transferencias a terceros países (EE. UU.), los proveedores se basan en las cláusulas contractuales tipo de la UE o en el Marco de Privacidad de Datos UE-EE. UU.',
+        body: 'Supabase, Inc. (EE. UU.; base de datos y sistema de inicio de sesión): almacena tus datos de cuenta, perfil y uso.\n\nVercel, Inc. (EE. UU.; alojamiento): entrega la app y nuestras funciones de servidor; se generan registros de servidor técnicamente necesarios (p. ej. dirección IP).\n\nGoogle LLC / Google Ireland Ltd.: (1) Gemini API — solo si usas el análisis de fotos de comidas, la foto tomada se transmite a Google para su evaluación; solo si usas el coach de IA, tus mensajes, incluido el historial de la conversación actual, van a Google. No enviamos tu nombre, correo ni ID de cuenta; no guardamos fotos ni mensajes en nuestros servidores. (2) AdMob — publicidad en las apps para iOS y Android (véanse los puntos 2 y 3).\n\nAnthropic, PBC (EE. UU.; coach de IA): para las respuestas del coach de IA usamos, como alternativa a Gemini, modelos de Anthropic — con los mismos datos que arriba, igualmente sin nombre, correo ni ID de cuenta.\n\nRevenueCat, Inc. (EE. UU.; suscripción Premium): recibe un identificador de usuario interno de la app y la confirmación de compra de la tienda para gestionar tu suscripción y restaurarla en un dispositivo nuevo. El pago lo gestionan Apple o Google; nosotros no vemos datos de pago.\n\nFunctional Software, Inc. (Sentry, EE. UU.; informes de errores): recibe mensajes de error técnicos sin referencia personal, si el registro de errores está activado.\n\nOpen Food Facts (base de datos de alimentos): al buscar alimentos o escanear códigos de barras, el término de búsqueda o el código de barras (sin datos personales) se transmite a Open Food Facts.\n\nCon todos los encargados del tratamiento existen contratos conforme al art. 28 RGPD. En las transferencias a EE. UU. nos basamos en las cláusulas contractuales tipo de la UE o en el Marco de Privacidad de Datos UE-EE. UU., si el proveedor está certificado.',
       },
       {
         heading: '5. Almacenamiento local en tu dispositivo',
@@ -73,7 +73,7 @@ export default {
       },
       {
         heading: '6. Plazo de conservación',
-        body: 'Conservamos tus datos mientras exista tu cuenta. Si eliminas tu cuenta, todos tus datos se borran de nuestra base de datos de forma inmediata y permanente.',
+        body: 'Conservamos tus datos mientras exista tu cuenta. Si eliminas tu cuenta, todos tus datos se borran de inmediato de nuestra base de datos. Para protegernos contra la pérdida de datos hacemos una copia de seguridad diaria de la base de datos, que se elimina automáticamente a los 14 días — hasta entonces, una cuenta eliminada puede seguir en una copia de seguridad; estas copias se usan exclusivamente para la recuperación tras una avería.\n\nEl historial de tus conversaciones con el coach de IA se guarda solo en tu dispositivo (los últimos 60 mensajes); en nuestros servidores solo contamos cuántas preguntas has hecho por día.',
       },
       {
         heading: '7. Eliminar la cuenta y los datos',
@@ -88,7 +88,7 @@ export default {
 
   terms: {
     title: 'Condiciones de uso',
-    updated: 'Actualizado: julio de 2026',
+    updated: 'Actualizado: 17 de septiembre de 2026',
     sections: [
       VORRANG,
       {
@@ -124,7 +124,7 @@ export default {
 
   health: {
     title: 'Aviso de salud',
-    updated: 'Actualizado: julio de 2026',
+    updated: 'Actualizado: 17 de septiembre de 2026',
     sections: [
       VORRANG,
       {

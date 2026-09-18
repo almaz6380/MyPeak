@@ -21,11 +21,12 @@ import CoachPage from './pages/CoachPage';
 import AuthPage from './pages/auth/AuthPage';
 import UpdatePasswordPage from './pages/auth/UpdatePasswordPage';
 import OnboardingPage from './pages/onboarding/OnboardingPage';
+import HealthConsentGate from './components/HealthConsentGate';
 import LegalPage from './pages/legal/LegalPage';
 import { useTextrichtung } from './hooks/useTextrichtung';
 
 export default function App() {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, isGuestMode } = useAuth();
   const { t } = useTranslation();
   // Setzt lang/dir am <html>. Steht bewusst hier oben und nicht in `AppShell`:
   // Dort griffe es erst NACH dem Login, Splash, Anmeldung und Onboarding
@@ -70,6 +71,9 @@ export default function App() {
             <AuthPage />
           ) : !profile?.onboarding_completed ? (
             <OnboardingPage />
+          ) : !isGuestMode && !profile?.health_consent_at ? (
+            // Bestandskonto ohne ausdrückliche Art.-9-Einwilligung: erst nachholen.
+            <HealthConsentGate />
           ) : (
             <AppShell />
           )

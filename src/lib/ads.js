@@ -40,7 +40,7 @@ let AdMob = null;
 let ready = false;
 
 // ---------------------------------------------------------------------------
-//  DSGVO-Einwilligung (Google UMP) + iOS App-Tracking-Transparency.
+//  DSGVO-Einwilligung (Google UMP). iOS-Tracking (ATT) fragt der AppDelegate.
 //  Die Einwilligungs-Nachricht selbst wird in AdMob konfiguriert
 //  (Datenschutz & Mitteilungen → DSGVO). Ohne veröffentlichte Nachricht
 //  meldet UMP NOT_REQUIRED und es erscheint kein Dialog.
@@ -49,23 +49,41 @@ async function runConsentFlow() {
   try {
     const info = await AdMob.requestConsentInfo();
 
-    if (Capacitor.getPlatform() === 'ios') {
-      try {
-        const tracking = await AdMob.trackingAuthorizationStatus();
-        if (tracking.status === 'notDetermined') {
-          await AdMob.requestTrackingAuthorization();
-        }
-      } catch (e) {
-        console.warn('ATT-Abfrage fehlgeschlagen:', e);
-      }
-    }
-
     if (info.isConsentFormAvailable && info.status === 'REQUIRED') {
       await AdMob.showConsentForm();
     }
   } catch (e) {
     console.warn('Consent-Flow fehlgeschlagen:', e);
   }
+}
+
+/**
+ * Wartet auf die Antwort zum iOS-Tracking-Dialog (ATT) — fragt aber selbst NICHT.
+ *
+ * Gefragt wird nativ im AppDelegate (`frageNachTracking`, ab Build 10). Von
+ * hier aus ging es nicht: Capacitor führt Plugin-Aufrufe auf einer
+ * Hintergrund-Warteschlange aus, und `ATTrackingManager` zeigt dort nichts an;
+ * dazu lief der Aufruf 1,5 s nach dem Start, oft bevor die App aktiv war.
+ * Beides ließ den Status still auf notDetermined — ohne IDFA, also ohne
+ * Personalisierung, für jede Anzeige. Die Begründung steht im AppDelegate.
+ *
+ * Gewartet wird, weil Google die ATT-Antwort VOR dem Start des Anzeigen-SDK
+ * verlangt. Nach spätestens sechs Sekunden geht es ohnehin weiter — ein
+ * hängender Dialog darf die Werbung nicht dauerhaft blockieren.
+ */
+async function warteAufTrackingAntwort() {
+  if (Capacitor.getPlatform() !== 'ios') return;
+  for (let versuch = 0; versuch < 20; versuch += 1) {
+    try {
+      const { status } = await AdMob.trackingAuthorizationStatus();
+      if (status !== 'notDetermined') return;
+    } catch (e) {
+      console.warn('ATT-Status nicht lesbar:', e);
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 300));
+  }
+  console.warn('ATT blieb unbeantwortet — Werbung startet ohne Personalisierung.');
 }
 
 // Für die Einstellungen: Einwilligung nachträglich ändern (DSGVO-Pflicht).
@@ -92,6 +110,7 @@ export async function initAds() {
     const mod = await import('@capacitor-community/admob');
     AdMob = mod.AdMob;
 
+    await warteAufTrackingAntwort();
     await runConsentFlow();
     await AdMob.initialize({ initializeForTesting: USE_TEST_ADS });
     ready = true;
