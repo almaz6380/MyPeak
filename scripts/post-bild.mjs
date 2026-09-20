@@ -145,11 +145,34 @@ const T = {
 
 // Wechselnde Aufhaenger. Ein Kanal, auf dem jeder Post mit demselben Wort
 // anfaengt, wirkt nach zwei Wochen wie eine Vorlage.
+//
+// ⚠ VERLAENGERT AM 20.09.2026, auf Josefs Zuruf „nicht immer noch wusstest
+// du". Es waren SECHS Eintraege, und sie waren brav: „Studien zeigen" und
+// „Niemand sagt dir, dass" halten im Feed an, „Kurz erklaert" nicht.
+//
+// ⚠ UND EINE FALSCHE DIAGNOSE, DIE HIER STEHEN BLEIBT, damit sie niemand
+// wiederholt. Drei von vier Probekarten trugen „Wusstest du"; ich hielt
+// `SEED % laenge` fuer die Ursache und ersetzte es durch einen eigenen
+// mulberry32. Die Gegenprobe ueber 200 Seeds hat das widerlegt: Modulo
+// verteilte exakt gleichmaessig (10× je 20), der Hash dagegen zwischen 8 und
+// 29. Modulo ueber fortlaufenden Zahlen IST die perfekte Gleichverteilung.
+//
+// Die drei Treffer kamen daher, dass ich die Seeds von Hand ausgesucht hatte
+// (24, 6, 8, 12) — und 24, 6 und 12 sind alle durch 6 teilbar, bei sechs
+// Eintraegen also dreimal Index 0. Ein Artefakt meiner Probe, kein Fehler im
+// Code. Die echten Seeds kommen aus `saat(...) % 100000` und haben dieses
+// Muster nicht.
+//
+// Geblieben ist deshalb nur, was wirklich half: mehr und bessere Eintraege.
 const AUFHAENGER = {
-  de: ['Wusstest du …', 'Mythos oder Wahrheit?', 'Der häufigste Fehler',
-       'Kurz erklärt', 'Zahlen, die zählen', 'Was die Forschung sagt'],
-  en: ['Did you know …', 'Myth or truth?', 'The most common mistake',
-       'Briefly explained', 'Numbers that matter', 'What the research says'],
+  de: ['Studien zeigen', 'Niemand sagt dir, dass …', 'Was kaum jemand weiß',
+       'Der häufigste Fehler', 'Mythos oder Wahrheit?', 'Die Zahl, die zählt',
+       'Überraschend, aber belegt', 'Wusstest du …', 'Das ändert alles',
+       'Was die Forschung sagt'],
+  en: ['Research shows', 'Nobody tells you this', 'What almost nobody knows',
+       'The most common mistake', 'Myth or truth?', 'The number that counts',
+       'Surprising, but proven', 'Did you know …', 'This changes everything',
+       'What the research says'],
 }[LANG];
 
 const esc = (s) => String(s ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
@@ -227,6 +250,61 @@ function studienSatz(wirkung, hoechstens = 3, max = 120) {
 }
 
 /**
+ * Aus dem Studienwert die eine Zahl machen, die das Bild traegt.
+ *
+ * Die Werte sind uneinheitlich gewachsen:
+ *
+ *   „~27 % geringeres Gesamtsterblichkeitsrisiko"  → 27 % · geringeres …
+ *   „2× pro Woche"                                 → 2× · pro Woche
+ *   „28 %"                                         → 28 % · <Titel>
+ *   „10+ Saetze pro Muskelgruppe und Woche"        → 10+ · Saetze pro …
+ *
+ * ⚠ Die Tilde und das „ca." fallen weg, die ZAHL nicht. „~27 %" gross zu
+ * setzen saehe nach einem Tippfehler aus; der Vorbehalt steht ohnehin im
+ * Erklaertext darunter, wo der Wert unveraendert erscheint.
+ *
+ * ⚠ Gibt es keine fuehrende Zahl, kommt null zurueck — und der Stil faellt
+ * auf `premium` zurueck, statt eine zu erfinden. Zwei der 26 Eintraege haben
+ * gar keinen Wert („Frequenz ist zweitrangig", „HIIT fuer die Ausdauer"),
+ * und Spannen wie „1,6–2,2 g pro kg" sind bewusst KEINE grosse Zahl: Ein
+ * Bereich in 250 px liest sich nicht.
+ */
+function studienZahl(wert, titel) {
+  const roh = String(wert ?? '').replace(/\s+/g, ' ').trim()
+    .replace(/^(?:ca\.|etwa|rund|~|≈)\s*/i, '');
+  // ⚠ SPANNEN ZUERST AUSSCHLIESSEN, nicht per Lookahead im Muster.
+  // Mit `(?![–-]\s*\d)` hinter der Zahl backtrackt die Regex: Bei
+  // „1,6–2,2 g pro kg" scheitert der Lookahead nach „1,6", die Engine nimmt
+  // dann „1" — und heraus kam die Zahl 1 mit dem Label „6–2,2 g pro kg".
+  // Eine falsche Zahl, gross auf dem Bild. Eine eigene Probe vorweg kann
+  // nicht backtracken.
+  if (/\d\s*[–\-−]\s*\d/.test(roh)) return null;
+
+  // ⚠ Symbole und Wort-Einheiten brauchen VERSCHIEDENE Grenzen.
+  //   `%` und `×` sind keine Wortzeichen — ein `\b` dahinter schlaegt fehl,
+  //     und „2× pro Woche" wurde zu „2" mit dem Label „× pro Woche".
+  //   `min`, `g`, `h` brauchen das `\b` dagegen zwingend: Ohne es frass die
+  //     Einheit den Wortanfang, und aus „4 Minuten Ganzkoerper-Intervalle"
+  //     wurde „4 Min" ueber „uten Ganzkoerper-Intervalle".
+  // Deshalb zwei Gruppen statt einer Alternativenliste.
+  const t = /^(\d+(?:[.,]\d+)?)(\+)?\s*(?:(%|×|x)|(ml\/kg\/min|mg|kg|min|IE|g|h)\b)?/i
+    .exec(roh);
+  if (!t || !t[1]) return null;
+  const einheit = (t[3] ?? t[4] ?? '').replace(/^x$/i, '×');
+  const rest = roh.slice(t[0].length).replace(/^[\s.,;:–—-]+/, '').trim();
+  return {
+    wert: `${t[1]}${t[2] ?? ''}`,
+    einheit,
+    // Ohne Rest traegt der Titel das Label — sonst stuende unter einer
+    // nackten „28" nichts, was sie erklaert.
+    label: rest || titel,
+    // Der Titel wandert unter die Zahl, wie der Peptidname. Faellt er mit dem
+    // Label zusammen, entfaellt er: eine Dopplung sieht nach einem Fehler aus.
+    titel: rest ? titel : null,
+  };
+}
+
+/**
  * Naehrwerte — frueher NUR im Stil `premium`.
  *
  * ⚠ Der Tageslauf baut alles im Stil `mix` (motoren.mjs ruft ohne --stil auf),
@@ -268,6 +346,15 @@ function inhalt(format, w) {
       // im Kontrollteil des Beiblatts — zur Hand, wenn in den Kommentaren
       // jemand nachfragt.
       studie: p.studie,
+      // ⚠ Bis zum 20.09.2026 hatte `studien-fakt` den Stil `zahl` NICHT, mit
+      // der Begruendung „studien-fakt liefert keine Zahl". Das stimmte nie:
+      // `wert` ist bei 24 von 26 Eintraegen gefuellt, und es sind die
+      // staerksten Zahlen der ganzen App — „~27 % geringeres
+      // Gesamtsterblichkeitsrisiko", „28 %", „~50 % weniger
+      // Trainingsvolumen". Sie standen bisher klein im Studienblock unter der
+      // Karte, wo sie niemand zuerst sieht.
+      zahl: studienZahl(p.wert ? (p.wert[LANG] ?? p.wert.de) : null,
+        p.titel[LANG] ?? p.titel.de),
       autoFoto: FOTO_BEREICHE.has(p.bereich) || p.bereich === 'cardio'
         ? trainingsFoto(w) : null,
     };
@@ -433,13 +520,27 @@ function baueHtml(o, stil) {
     // bei einer Wissenskarte ohne eigenes Label waeren sonst beide der
     // Themenname.
     const auge = augenbraueFuer(o, o.zahl.label, o.art === 'wissen' ? o.marke : null);
+    // ⚠ Der Fliesstext ist `text`, WO ES IHN GIBT — sonst `haken`.
+    //
+    // Bei `studien-fakt` sind `marke` und `haken` derselbe String (beides
+    // `p.titel`, siehe inhalt()); die Aussage steht in `text`. Mit `haken`
+    // stand der Titel zweimal untereinander: einmal gross als Schlagzeile,
+    // einmal klein als Erklaerung. Dieselbe Dopplung hat schon einmal
+    // `poster` und `premium` getroffen — der Kommentar bei augenbraueFuer()
+    // haelt sie fest. Deshalb hier zusaetzlich die stumpfe Gegenprobe: Faellt
+    // der Text mit der Schlagzeile zusammen, entfaellt er.
+    const rohText = o.text || o.haken;
+    const gleichWie = (a, b) => String(a ?? '').trim().toLowerCase()
+      === String(b ?? '').trim().toLowerCase();
+    const zahlText = gleichWie(rohText, o.zahl.titel) || gleichWie(rohText, o.zahl.label)
+      ? '' : rohText;
     mitte = `
       <div class="zahlBlock">
         ${auge ? `<div class="augenbraue">${esc(auge)}</div>` : ''}
         <div class="grosseZahl"><b class="anton">${esc(o.zahl.wert)}</b><i>${esc(o.zahl.einheit)}</i></div>
         <div class="zahlLabel">${esc(o.zahl.label)}</div>
         ${o.zahl.titel ? `<h1 class="anton zahlTitel">${esc(o.zahl.titel)}</h1>` : ''}
-        ${o.haken ? `<p class="text">${esc(o.haken)}</p>` : ''}
+        ${zahlText ? `<p class="text">${esc(zahlText)}</p>` : ''}
       </div>`;
   } else {
     // `o.fotos?.length`, nicht `o.fotos`: Das Array ist heute leer, und ein
