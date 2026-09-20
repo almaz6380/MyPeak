@@ -941,6 +941,53 @@ if (stil === 'premium' && o.art === 'uebung' && !o.fotos?.length) {
   stil = 'mix';
 }
 
+// ⚠ EINE QUELLE FUER BILD UND REEL (20.09.2026).
+//
+// Josef will jeden App-Schau-Post zusaetzlich als Reel. Der Reel-Generator
+// liegt in wellapps-social (er baut fuer alle drei Marken) und braucht
+// dieselben Texte, Bildschirme und Markenfarben.
+//
+// Sie DORT abzuschreiben waere die sichere Methode, sie auseinanderlaufen zu
+// lassen: Wer hier eine Schlagzeile aendert, aendert sie im Reel nicht mit,
+// und es faellt erst auf, wenn beide nebeneinander im Feed stehen. Genau
+// dieser Fehler steckt in der Geschichte dieses Repos mehrfach — die
+// Sprachweiche stand einmal viermal verstreut im Code.
+//
+// Deshalb gibt dieses Skript die Daten auf Anforderung als JSON heraus und
+// rendert nichts. Der Reel-Generator ruft es als Kindprozess auf; damit ist
+// diese Datei die einzige Quelle, ueber Repo-Grenzen hinweg.
+if (process.argv.includes('--schau-json')) {
+  if (o.art !== 'app') {
+    console.error(`✗ --schau-json gibt es nur fuer --format app-schau (hier: ${FORMAT}).`);
+    process.exit(1);
+  }
+  process.stdout.write(JSON.stringify({
+    marke: 'FullRep',
+    kurz: o.kurz, text: o.text, punkte: o.punkte,
+    schirme: o.schirme,
+    fuss: T.fuss,
+    // Die Farben stehen im CSS dieser Datei; der Reel-Generator soll sie
+    // nicht ein zweites Mal kennen.
+    optik: {
+      grund: '#0a0a0a',
+      verlauf: 'radial-gradient(120% 80% at 15% 0%,#1a1a1a 0%,#0a0a0a 62%)',
+      tinte: '#fff8e7', tinteLeise: '#d6d3d1', akzent: '#fbbf24',
+      flaeche: 'rgba(251,191,36,.10)', flaecheRand: 'rgba(251,191,36,.26)',
+      schrift: 'anton',
+    },
+    // Die Schriftdateien liegen je Repo woanders. Der Reel-Generator soll
+    // sie nicht suchen muessen — sonst raet er, und das Reel rendert in
+    // DejaVu, ohne dass irgendetwas fehlschlaegt.
+    schriften: {
+      schlagzeile: join(WURZEL, 'scripts', 'schriften', 'anton.woff2'),
+      text: join(WURZEL, 'node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2'),
+      fett: join(WURZEL, 'node_modules/@fontsource/inter/files/inter-latin-700-normal.woff2'),
+    },
+    logo: join(WURZEL, 'public', 'favicon.svg'),
+  }));
+  process.exit(0);
+}
+
 mkdirSync(OUT, { recursive: true });
 const basis = NAME ?? `fullrep-${FORMAT}-${stil}-${LANG}-s${SEED}`;
 const ziel = join(OUT, `${basis}.jpg`);
