@@ -513,6 +513,12 @@ function baueHtml(o, stil) {
         <div class="kante"></div>
         ${lang ? `<p class="text">${esc(lang)}</p>` : ''}
         ${makrosHtml(o)}
+        ${o.studienwert ? `
+        <div class="studie">
+          <div class="kante"></div>
+          <div class="studieLabel">${LANG === 'de' ? 'Laut Studien' : 'Research says'}</div>
+          <div class="studieWert">${esc(o.studienwert)}</div>
+        </div>` : ''}
       </div>`;
   } else if (stil === 'zahl') {
     // ⚠ Hier traegt die ZAHL das Bild, nicht `marke`. Die Zeile darunter
@@ -561,7 +567,13 @@ function baueHtml(o, stil) {
       <h1${o.art === 'wissen' ? ' class="aussage"' : ''}>${esc(o.haken)}</h1>
       ${fotos}
       ${o.text ? `<p class="text">${esc(o.text)}</p>` : ''}
-      ${makrosHtml(o)}`;
+      ${makrosHtml(o)}
+      ${o.studienwert ? `
+      <div class="studie">
+        <div class="kante"></div>
+        <div class="studieLabel">${LANG === 'de' ? 'Laut Studien' : 'Research says'}</div>
+        <div class="studieWert">${esc(o.studienwert)}</div>
+      </div>` : ''}`;
   }
 
   return `<!doctype html><meta charset="utf-8">
@@ -743,11 +755,48 @@ mkdirSync(OUT, { recursive: true });
 const basis = NAME ?? `fullrep-${FORMAT}-${stil}-${LANG}-s${SEED}`;
 const ziel = join(OUT, `${basis}.jpg`);
 
+const html = baueHtml(o, stil);
+
+/**
+ * ⚠ EINE FRAGE OHNE ANTWORT VERLAESST DIESES SKRIPT NICHT (20.09.2026).
+ *
+ * Josef hat im TikTok-Editor eine fertige Karte aufgemacht: „Wie viel
+ * Kreatin?" gross, darunter drei Saetze darueber, WIE GUT Kreatin erforscht
+ * ist — und nirgends, wie viel. Die Antwort („3–5 g Monohydrat taeglich")
+ * stand die ganze Zeit in den Daten und wurde weggeworfen.
+ *
+ * Ursache: `poster` war der EINZIGE der vier Stile ohne Block fuer
+ * `studienwert`. Fuenf der 26 Studienkarten haben einen Frage-Titel — „Wie
+ * viele Saetze?", „Wie oft pro Woche?", „Wie viel Protein?", „Wie viel
+ * Kreatin?", „Wie viel Koffein?" —, und bei jeder steht die Antwort NUR im
+ * Wert. Traf eine davon auf `poster`, kam eine Karte heraus, die sich selbst
+ * laecherlich macht.
+ *
+ * Der fehlende Block ist eine Zeile weiter oben behoben. Diese Probe steht
+ * daneben, weil derselbe Fehler auf zehn anderen Wegen zurueckkommen kann:
+ * ein neuer Stil, ein umbenanntes Feld, ein Datensatz mit Frage im Titel und
+ * ohne Wert.
+ *
+ * ⚠ ABBRUCH, kein stiller Wechsel auf einen anderen Stil. Genau die Sorte
+ * „faellt still zurueck" hat den Fehler ueberhaupt erst unsichtbar gemacht
+ * (siehe die Formatpruefung weiter oben, gleicher Tag, gleiche Ursache).
+ * lauf.mjs faengt den Abbruch und schreibt den Grund in den Bericht: Eine
+ * fehlende Karte faellt auf, eine sinnlose nicht.
+ */
+if (String(o.haken ?? '').trim().endsWith('?') && o.studienwert) {
+  if (!html.includes(esc(o.studienwert))) {
+    console.error(`✗ „${o.haken}" ist eine Frage, und die Antwort steht nicht auf der Karte.`);
+    console.error(`  Die Antwort waere: ${o.studienwert}`);
+    console.error(`  Der Stil \`${stil}\` zeigt den Studienwert nicht — hier fehlt ein Block.`);
+    process.exit(1);
+  }
+}
+
 const browser = await chromium.launch(
   process.env.CHROMIUM_PFAD ? { executablePath: process.env.CHROMIUM_PFAD } : {},
 );
 const seite = await browser.newPage({ viewport: { width: B, height: H }, deviceScaleFactor: 1 });
-await seite.setContent(baueHtml(o, stil), { waitUntil: 'load' });
+await seite.setContent(html, { waitUntil: 'load' });
 await seite.evaluate(() => document.fonts.ready);
 await seite.screenshot({ path: ziel, type: 'jpeg', quality: 92 });
 await browser.close();
