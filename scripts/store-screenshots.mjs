@@ -15,6 +15,7 @@
 import { chromium } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const BASE = process.env.PREVIEW_URL || 'http://localhost:4173';
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -32,7 +33,7 @@ const today = new Date().toISOString().slice(0, 10);
 const daysAgo = (n) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
 
 // Demo-Daten im Stil der bisherigen Screenshots (Alex, ~1970 kcal, 2,3 L Wasser).
-function demoData(date) {
+export function demoData(date) {
   const meal = (slot, name, kcal, p, c, f) => ({
     id: `demo-${slot}-${name}`, date, meal_slot: slot, food_name: name,
     serving_size: '1 Portion', calories: kcal, protein: p, carbs: c, fat: f, source: 'demo',
@@ -139,6 +140,38 @@ const SHOTS = [
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * Gastmodus-Artefakte kaschieren: Das Hinweisbanner und der Platzhaltername
+ * "Gast" sind Folgen der fehlenden Anmeldung, nicht des Produkts. Im echten
+ * Betrieb steht dort der Name des Nutzers und kein Banner.
+ *
+ * ⚠ Seit 20.09.2026 eine exportierte Fabrik statt einer inneren Funktion —
+ * social-schirme.mjs nimmt Bildschirme auf, die im Store NICHT vorkommen, und
+ * braucht dieselbe Kaschierung. Eine zweite Kopie waere in dem Moment falsch,
+ * in dem sich der Gastmodus-Banner aendert, und niemand haette es gemerkt:
+ * Das Bild saehe nur einmal anders aus.
+ */
+export function tidyMacher(page, DEMO_NAME = 'Alex') {
+  return async function tidy() {
+    await page.addStyleTag({ content: '[class*="amber-50"]:has-text("Gastmodus"){display:none}' }).catch(() => {});
+    await page.evaluate((name) => {
+      document.querySelectorAll('*').forEach((el) => {
+        if (el.children.length === 0 && /Gastmodus/.test(el.textContent || '')) {
+          const banner = el.closest('div');
+          if (banner) banner.style.display = 'none';
+        }
+      });
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      let n;
+      while ((n = walker.nextNode())) {
+        if (n.nodeValue && n.nodeValue.includes('Gast') && !n.nodeValue.includes('Gastmodus')) {
+          n.nodeValue = n.nodeValue.replace(/\bGast\b/g, name);
+        }
+      }
+    }, DEMO_NAME).catch(() => {});
+  };
+}
+
 async function shoot(browser, device) {
   const outDir = path.join(ROOT, 'store-assets', device.dir);
   fs.mkdirSync(outDir, { recursive: true });
@@ -160,28 +193,7 @@ async function shoot(browser, device) {
   const page = await ctx.newPage();
   const results = [];
 
-  // Gastmodus-Artefakte kaschieren: Das Hinweisbanner und der Platzhaltername
-  // "Gast" sind Folgen der fehlenden Anmeldung, nicht des Produkts. Im echten
-  // Betrieb steht dort der Name des Nutzers und kein Banner.
-  const DEMO_NAME = 'Alex';
-  async function tidy() {
-    await page.addStyleTag({ content: '[class*="amber-50"]:has-text("Gastmodus"){display:none}' }).catch(() => {});
-    await page.evaluate((name) => {
-      document.querySelectorAll('*').forEach((el) => {
-        if (el.children.length === 0 && /Gastmodus/.test(el.textContent || '')) {
-          const banner = el.closest('div');
-          if (banner) banner.style.display = 'none';
-        }
-      });
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-      let n;
-      while ((n = walker.nextNode())) {
-        if (n.nodeValue && n.nodeValue.includes('Gast') && !n.nodeValue.includes('Gastmodus')) {
-          n.nodeValue = n.nodeValue.replace(/\bGast\b/g, name);
-        }
-      }
-    }, DEMO_NAME).catch(() => {});
-  }
+  const tidy = tidyMacher(page);
 
   for (const shot of SHOTS) {
     await page.goto(BASE + shot.route, { waitUntil: 'networkidle' }).catch(() => {});
@@ -209,10 +221,16 @@ async function shoot(browser, device) {
   return results;
 }
 
-const browser = await chromium.launch({ executablePath: CHROME, args: ['--no-sandbox'] });
-for (const device of DEVICES) {
-  console.log(`\n■ ${device.label} → store-assets/${device.dir}`);
-  for (const line of await shoot(browser, device)) console.log(line);
+// ⚠ Nur bei DIREKTEM Aufruf laufen. social-schirme.mjs importiert demoData
+// und tidyMacher aus dieser Datei; ohne diese Pruefung wuerde jeder Import
+// alle achtzehn Store-Bilder neu erzeugen — und ein Renderunterschied waere
+// still in den Store gewandert, ohne dass jemand danach gefragt hat.
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  const browser = await chromium.launch({ executablePath: CHROME, args: ['--no-sandbox'] });
+  for (const device of DEVICES) {
+    console.log(`\n■ ${device.label} → store-assets/${device.dir}`);
+    for (const line of await shoot(browser, device)) console.log(line);
+  }
+  await browser.close();
+  console.log('\nFertig.');
 }
-await browser.close();
-console.log('\nFertig.');

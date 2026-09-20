@@ -44,6 +44,8 @@ import trainingTopics from '../src/data/trainingKnowledge.js';
 import nutritionTopics from '../src/data/nutritionKnowledge.js';
 import supplementsTopics from '../src/data/supplementsKnowledge.js';
 import peptide from '../src/data/peptidesData.js';
+// ⚠ Named import: der Default von peakPrograms.js ist NICHT die Programmliste.
+import { peakPrograms } from '../src/data/peakPrograms.js';
 import bloodworkTopics from '../src/data/bloodworkKnowledge.js';
 
 const HIER = dirname(fileURLToPath(import.meta.url));
@@ -264,6 +266,31 @@ export function quelleKurz(q) {
 // --- Rezepte ----------------------------------------------------------------
 export function rezepteMitMakros() {
   return (rezepte ?? []).filter((r) => r.nutrition?.protein != null);
+}
+
+// --- Was die App enthaelt, in Zahlen ----------------------------------------
+/**
+ * Fuer den Winkel `app-schau`: eine Karte, die zeigt, worum es in der App
+ * geht, statt einen einzelnen Inhalt daraus.
+ *
+ * ⚠ JEDE ZAHL WIRD GEZAEHLT, KEINE GETIPPT. Eine Werbekarte, die „244
+ * Uebungen" behauptet, waehrend 248 drin sind, ist in dem Moment falsch, in
+ * dem jemand eine hinzufuegt — und es faellt keinem auf, weil die Zahl im
+ * Bild steht und nicht im Code. Genau so stand es am 20.09.2026 in CLAUDE.md:
+ * „244 Uebungen", gemessen waren es 248.
+ *
+ * ⚠ `peakPrograms` ist ein NAMED export neben `peakCategories`. Der Default
+ * dieser Datei waere die Kategorienliste — vier Eintraege, und die Karte
+ * behauptete „4 Programme" statt 21.
+ */
+export function bestandszahlen() {
+  return {
+    uebungen: exercises.length,
+    rezepte: rezepteMitMakros().length,
+    programme: peakPrograms.length,
+    wissen: wissensthemen().length,
+    peptide: peptide.length,
+  };
 }
 
 export { rezepte, exercises };

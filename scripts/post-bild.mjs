@@ -49,6 +49,7 @@ import { chromium } from 'playwright';
 import {
   WURZEL, uebungenMitFotos, uebungTexte, wissensthemen, rezepteMitMakros,
   peptidePosts, peptideGesamt, quelleKurz, WASSERZEICHEN_CSS, WASSERZEICHEN_HTML, trainingsFoto, FOTO_BEREICHE,
+  bestandszahlen,
 } from './social-daten.mjs';
 import { studienPosts } from './studien.mjs';
 
@@ -106,7 +107,7 @@ if (!['mix', 'poster', 'premium', 'zahl'].includes(STIL)) {
 // der Ausnahme heraus und schreibt sie in den Bericht. Lieber ein Post, der
 // sichtbar fehlt, als einer, der unbemerkt etwas anderes zeigt.
 const FORMATE = ['uebung-karte', 'studien-fakt', 'peptid-karte', 'rezept-karte',
-  'naehrstoff', 'wissens-karte'];
+  'naehrstoff', 'wissens-karte', 'app-schau'];
 if (!FORMATE.includes(FORMAT)) {
   console.error(`✗ unbekanntes Format: ${FORMAT}\n  Bekannt: ${FORMATE.join(', ')}`);
   process.exit(1);
@@ -409,6 +410,99 @@ function inhalt(format, w) {
     };
   }
 
+  // ⚠ DIE EINZIGE KARTE, DIE DIE APP SELBST ZEIGT (Josef, 20.09.2026: „Es
+  // sollen generell Posts sein, die zeigen, worum es in der App geht").
+  // Jeder andere Winkel zeigt einen INHALT — eine Studie, ein Rezept, ein
+  // Peptid. Wer den Kanal drei Wochen verfolgt, weiss danach, dass es um
+  // Fitness geht, aber nicht, dass es eine App dazu gibt.
+  //
+  // Die Bilder sind die ECHTEN Store-Screenshots aus store-assets/ios/. Kein
+  // Nachbau: Ein gezeichneter Screenshot waere eine Behauptung ueber die
+  // Oberflaeche, und er veraltet still, sobald sich die App aendert. Diese
+  // hier liegen im Store und sind damit genau das, was der Nutzer bekommt.
+  //
+  // ⚠ Sie enthalten KEINE Uebungsdemofotos — geprueft am 20.09.2026 an allen
+  // sechs. Die duerfen seit dem 30.08. nicht in Werbung (Rechtekette nicht
+  // belegt, siehe Kopf von social-daten.mjs); ein Screenshot, auf dem eines
+  // zu sehen waere, faellt unter dieselbe Regel wie das Foto selbst.
+  if (format === 'app-schau') {
+    const z = bestandszahlen();
+    // Drei Aufzuege, damit der Winkel bei Wiederholung nicht gleich aussieht.
+    // Jeder nennt einen anderen Teil der App und zeigt die dazu passenden
+    // Bildschirme — die Bilder folgen der Schlagzeile, nicht umgekehrt.
+    const aufzuege = [
+      {
+        kurz: { de: ['Training und Ernährung.', 'Eine App.'],
+                en: ['Training and nutrition.', 'One app.'] },
+        text: { de: 'Kalorien, Makros, Gewicht und Trainingsplan an einem Ort — '
+                  + 'ohne dass du zwischen drei Apps wechselst.',
+                en: 'Calories, macros, weight and your training plan in one place — '
+                  + 'no switching between three apps.' },
+        bilder: ['01-dashboard.png', '02-ernaehrung.png', '04-training.png'],
+        punkte: { de: [`${z.uebungen} Übungen`, `${z.rezepte} Rezepte`, `${z.programme} Programme`],
+                  en: [`${z.uebungen} exercises`, `${z.rezepte} recipes`, `${z.programme} programs`] },
+      },
+      {
+        kurz: { de: ['Nicht raten.', 'Nachlesen.'], en: ['Stop guessing.', 'Look it up.'] },
+        text: { de: `Eine Bibliothek aus ${z.wissen} Wissensthemen und ${z.peptide} Peptiden — `
+                  + 'jede Aussage mit der Studie dahinter, nicht mit einer Meinung.',
+                en: `A library of ${z.wissen} knowledge topics and ${z.peptide} peptides — `
+                  + 'every claim with the study behind it, not an opinion.' },
+        bilder: ['06-uebungen.png', '01-dashboard.png', '03-kochbuch.png'],
+        punkte: { de: [`${z.wissen} Themen`, `${z.peptide} Peptide`, 'mit Quellen'],
+                  en: [`${z.wissen} topics`, `${z.peptide} peptides`, 'with sources'] },
+      },
+      // ⚠ Die drei HAUPTBEREICHE der App, so wie die Leiste unten sie fuehrt
+      // (Josef, 20.09.2026). Das ist der Aufzug, der am direktesten
+      // beantwortet, worum es geht — die anderen zeigen einen Ausschnitt.
+      {
+        kurz: { de: ['Drei Bereiche.', 'Eine App.'], en: ['Three sections.', 'One app.'] },
+        text: { de: 'Training planen, Ernährung tracken, alles nachlesen — '
+                  + 'was du brauchst, liegt hinter drei Knöpfen.',
+                en: 'Plan your training, track your nutrition, look everything up — '
+                  + 'what you need sits behind three buttons.' },
+        bilder: ['04-training.png', '02-ernaehrung.png', '07-bibliothek.png'],
+        punkte: { de: ['Training', 'Ernährung', 'Bibliothek'],
+                  en: ['Training', 'Nutrition', 'Library'] },
+      },
+      {
+        kurz: { de: [`${z.programme} Programme.`, 'Such dir eines aus.'],
+                en: [`${z.programme} programs.`, 'Pick one.'] },
+        text: { de: 'Vom Wiedereinstieg bis zur Wettkampfvorbereitung — jedes Programm '
+                  + 'mit Wochenplan, Übungen und Sätzen.',
+                en: 'From getting back in shape to contest prep — each program with a '
+                  + 'weekly plan, exercises and sets.' },
+        bilder: ['05-peak-programme.png', '04-training.png', '06-uebungen.png'],
+        punkte: { de: [`${z.uebungen} Übungen`, `${z.programme} Programme`, 'ohne Abo'],
+                  en: [`${z.uebungen} exercises`, `${z.programme} programs`, 'no subscription'] },
+      },
+    ];
+    const a = zieh(aufzuege);
+    // ⚠ ZWEI Ordner. Die sechs Store-Bilder liegen in store-assets/ios/ —
+    // dort fehlt aber die BIBLIOTHEK, weil sie im Store-Eintrag nicht
+    // vorkommt (die sechs zeigen Training, Ernaehrung und deren
+    // Unterseiten). Was dort fehlt, nimmt scripts/social-schirme.mjs auf und
+    // legt es nach store-assets/social/schirme/ — getrennt, damit ein Lauf
+    // fuer Social nie die Bilder anfasst, die bei Apple und Google haengen.
+    const schirmPfad = (datei) => {
+      for (const o of [['store-assets', 'ios'], ['store-assets', 'social', 'schirme']]) {
+        const p = join(WURZEL, ...o, datei);
+        if (existsSync(p)) return p;
+      }
+      return null;
+    };
+    return {
+      art: 'app', schluessel: a.bilder[0].replace(/\.png$/, ''),
+      marke: T.fuss,
+      kurz: a.kurz[LANG] ?? a.kurz.de,
+      haken: (a.kurz[LANG] ?? a.kurz.de).join(' '),
+      text: a.text[LANG] ?? a.text.de,
+      punkte: a.punkte[LANG] ?? a.punkte.de,
+      schirme: a.bilder.map(schirmPfad).filter(Boolean),
+      autoFoto: trainingsFoto(w),
+    };
+  }
+
   // wissens-karte und naehrstoff teilen sich das Layout; naehrstoff zieht
   // ausschliesslich aus dem Ernaehrungsbereich.
   const themen = wissensthemen().filter(
@@ -484,7 +578,24 @@ function baueHtml(o, stil) {
 
   // --- Mitte je Stil --------------------------------------------------------
   let mitte = '';
-  if (stil === 'mix') {
+  // ⚠ Die App-Schau hat KEINEN Stil und darf keinen haben. Die vier Stile sind
+  // Varianten EINES Aufbaus (Aufhaenger, Schlagzeile, Text); diese Karte hat
+  // einen anderen — drei Bildschirme tragen sie, und Text ist Beiwerk. Sie
+  // durch die Stilweiche zu schicken hiesse, dass `--stil zahl` eine grosse
+  // Zahl ohne Zahl verlangt und `poster` eine 104-px-Schlagzeile ueber die
+  // Screenshots legt. Deshalb steht sie VOR der Weiche und ignoriert `stil`.
+  if (o.art === 'app') {
+    mitte = `
+      <div class="schau">
+        <div class="schauKopf">
+          <h1 class="anton schauZeile">${esc(o.kurz[0])}<br><i>${esc(o.kurz[1] ?? '')}</i></h1>
+          <p class="text schauText">${esc(o.text)}</p>
+        </div>
+        <div class="schirme">${o.schirme.map((s, i) => `
+          <img class="schirm s${i}" src="data:image/png;base64,${b64(s)}">`).join('')}</div>
+        <div class="punkte">${o.punkte.map((p) => `<span>${esc(p)}</span>`).join('')}</div>
+      </div>`;
+  } else if (stil === 'mix') {
     // Der Dreiklang. Aufhaenger wechselt nach Seed, Ueberschrift skaliert nach
     // Laenge, der Studienblock faellt weg, wenn es keinen Wert gibt.
     const kurz = o.art === 'wissen' ? o.marke : o.haken;
@@ -594,7 +705,7 @@ function baueHtml(o, stil) {
   }
 
   return `<!doctype html><meta charset="utf-8">
-<body class="stil-${stil}${KI_MENSCHEN ? ' mitKi' : ''}${hatFoto ? ' mitFoto' : ''}${hatWz ? ' mitWz' : ''}"><style>
+<body class="stil-${stil}${o.art === 'app' ? ' hatSchau' : ''}${KI_MENSCHEN ? ' mitKi' : ''}${hatFoto ? ' mitFoto' : ''}${hatWz ? ' mitWz' : ''}"><style>
 @font-face{font-family:'Inter';font-weight:400;src:url(data:font/woff2;base64,${inter400}) format('woff2')}
 @font-face{font-family:'Inter';font-weight:700;src:url(data:font/woff2;base64,${inter700}) format('woff2')}
 ${anton ? `@font-face{font-family:'Anton';font-weight:400;src:url(data:font/woff2;base64,${anton}) format('woff2')}` : ''}
@@ -697,6 +808,63 @@ p.text{font-size:32px;line-height:1.38;color:#e7e5e4}
   border:1px solid rgba(251,191,36,.22)}
 .fotos figcaption{font-size:22px;font-weight:700;color:#fbbf24;letter-spacing:.16em;text-transform:uppercase}
 
+/* --- app-schau: die App selbst ---
+   Der Aufbau ist von oben nach unten gelesen: Schlagzeile, ein Satz dazu, die
+   drei Bildschirme, darunter drei Zahlen. Die Bildschirme sind das Motiv —
+   sie bekommen den meisten Platz und stehen gefaechert, damit man drei sieht
+   und nicht einen mit zwei Raendern.
+   ⚠ Die Karte ueberlappen die Bildschirme ABSICHTLICH nach unten aus dem
+   Raster heraus (overflow:hidden am Rahmen): Ein Handy, das unten aus dem
+   Bild laeuft, wirkt wie ein Ausschnitt aus etwas Groesserem. Vollstaendig
+   hineingesetzt waeren sie briefmarkengross — 1320x2868 auf 1080x1350.
+   (Keine Backticks in diesem Block — er steht in einem Template-Literal.) */
+.schau{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:22px}
+.schauKopf{display:flex;flex-direction:column;gap:14px;flex:0 0 auto}
+.schauZeile{font-size:76px;line-height:.96;color:#fff}
+/* Die ZWEITE Zeile traegt die Farbe, nicht die ganze Schlagzeile. Eine
+   komplett goldene Zeile auf dunklem Grund liest sich schlechter als weiss
+   und nimmt dem Akzent jede Wirkung.
+   ⚠ Es muss ein Element sein, kein Geschwisterselektor auf <br>: "br + *"
+   greift nur, wenn nach dem Umbruch ein ELEMENT folgt — nackter Text waere
+   kein Treffer, und die Regel liefe ins Leere, ohne dass es auffaellt. */
+.schauZeile i{font-style:normal;color:#fbbf24}
+/* 26 statt 28 px: Bei drei Zeilen schob der Satz die Handys so weit nach
+   unten, dass von den aeusseren nur noch die Haelfte im Bild stand. Der Text
+   ist hier Beiwerk — die Bildschirme sind das Argument. */
+.schauText{font-size:26px;line-height:1.32;color:#d6d3d1;max-width:94%}
+/* ⚠ Weicher Auslauf statt harter Kante. Ohne Maske endet das Ueberlaufen
+   unten in einer rasiermesserglatten Linie quer durchs Bild, und die liest
+   sich als Fehler, nicht als Ausschnitt. Am JPEG gemessen — im HTML sieht
+   beides gleich aus. */
+.schirme{flex:1 1 0;min-height:0;position:relative;overflow:hidden;
+  display:flex;justify-content:center;align-items:flex-start;padding-top:8px;
+  -webkit-mask-image:linear-gradient(180deg,#000 78%,transparent 99%);
+  mask-image:linear-gradient(180deg,#000 78%,transparent 99%)}
+.schirm{position:absolute;width:300px;border-radius:26px;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 34px 70px rgba(0,0,0,.62),0 4px 14px rgba(0,0,0,.5);
+  object-fit:cover;object-position:top}
+/* Mitte vorn und gerade, die beiden aussen dahinter und leicht gekippt —
+   dieselbe Staffelung wie in der Vorlage, aber gespiegelt gebaut, damit die
+   mittlere Karte die Schlagzeile stuetzt statt sie zu verdecken. */
+.schirm.s0{left:22px;top:44px;transform:rotate(-5deg);height:640px;opacity:.94}
+.schirm.s1{top:4px;height:700px;z-index:3}
+.schirm.s2{right:22px;top:44px;transform:rotate(5deg);height:640px;opacity:.94}
+.punkte{flex:0 0 auto;display:flex;gap:12px}
+.punkte span{flex:1 1 0;text-align:center;background:rgba(251,191,36,.10);
+  border:1px solid rgba(251,191,36,.26);border-radius:16px;padding:14px 8px;
+  font-size:25px;font-weight:700;color:#fbbf24}
+/* Ueber den Screenshots muss der Hintergrund weg — sie sind hell und bringen
+   ihre eigene Flaeche mit; ein Foto dahinter ergaebe Unruhe hinter Unruhe. */
+body.hatSchau .hgSchleier{background:linear-gradient(180deg,rgba(10,10,10,.90) 0%,
+  rgba(10,10,10,.82) 40%,rgba(10,10,10,.93) 100%)}
+/* ⚠ Der Ring geht hier GANZ weg, nicht nur leiser. Er sitzt oben rechts und
+   laeuft quer ueber die Handys — bei jeder Deckkraft ueber null zeichnen sich
+   seine Symbole durch die hellen Screenshots. Auf den anderen Karten ist er
+   das einzige grafische Element; hier sind es die drei Bildschirme, und zwei
+   Motive uebereinander sind eines zu viel. */
+body.hatSchau .markenRing{display:none}
+
 /* --- Makros: in JEDEM Stil, nicht nur in premium ---
    Seit 18.09.2026 rendern auch mix und poster den Block (makrosHtml).
    Der Selektor war immer global, nur der Aufrufer fehlte.
@@ -754,6 +922,11 @@ const o = inhalt(FORMAT, mulberry32(SEED));
 // Zahl — die faellt sofort auf und beschaedigt genau das Vertrauen, von dem
 // dieser Kanal lebt.
 let stil = STIL;
+// ⚠ Die App-Schau ignoriert `--stil` (siehe baueHtml). Damit Protokoll und
+// Dateiname nicht `mix` behaupten, waehrend etwas anderes gerendert wird,
+// heisst der Stil hier, was er ist. `schau` ist in der Stilpruefung oben
+// BEWUSST nicht zugelassen — er ist kein Stil, den man waehlt.
+if (o.art === 'app') stil = 'schau';
 if (stil === 'zahl' && !o.zahl) {
   console.log('  (kein Zahlenwert im Inhalt — Stil faellt auf `premium` zurueck)');
   stil = 'premium';
