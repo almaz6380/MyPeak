@@ -21,16 +21,21 @@ export const supplementsTopics = [
     summaryDE: 'Kreatin ist das am besten erforschte und wirksamste Supplement für Kraft und Muskelaufbau. Es ist sicher, günstig und verbessert nachweislich die Leistung bei kurzen, intensiven Belastungen. Kreatin-Monohydrat ist die bevorzugte Form.',
     summaryEN: 'Creatine is the most researched and effective supplement for strength and muscle building. It is safe, inexpensive and demonstrably improves performance in short, intense efforts. Creatine monohydrate is the preferred form.',
     quickDE: [
-      { label: 'Dosierung', text: '3–5 g Monohydrat täglich, dauerhaft — Timing egal. Ladephase optional.' },
+      { label: 'Dosierung', text: '3–5 g Monohydrat täglich, dauerhaft — Timing egal. Ladephase optional. Mehr Muskelmasse heisst eher oberes Ende der Spanne.' },
       { label: 'Wirkung', text: 'Mehr Kraft und Wiederholungen, unterstützt Muskelaufbau, gut belegt und sicher.' },
     ],
     quickEN: [
-      { label: 'Dosage', text: '3–5 g monohydrate daily, ongoing — timing irrelevant. Loading phase optional.' },
+      { label: 'Dosage', text: '3–5 g monohydrate daily, ongoing — timing irrelevant. Loading phase optional. More muscle mass means the upper end of the range.' },
       { label: 'Effect', text: 'More strength and reps, supports muscle growth, well-evidenced and safe.' },
     ],
     references: [
       { authors: 'Kreider, R.B. et al.', year: 2017, title: 'International Society of Sports Nutrition position stand: safety and efficacy of creatine supplementation in exercise, sport, and medicine',
         source: 'Journal of the International Society of Sports Nutrition 14:18', url: 'https://www.tandfonline.com/doi/abs/10.1186/s12970-017-0173-z' },
+      // Zum Abschnitt „Kreatin fuers Gehirn" (ergaenzt 20.09.2026).
+      { authors: 'Sandkühler, J.F. et al.', year: 2023, title: 'The effects of creatine supplementation on cognitive performance — a randomised controlled study',
+        source: 'BMC Medicine 21:440', url: 'https://link.springer.com/article/10.1186/s12916-023-03146-5' },
+      { authors: 'Solis, M.Y. et al.', year: 2017, title: 'Effect of age, diet, and tissue type on PCr response to creatine supplementation',
+        source: 'Journal of Applied Physiology 123(2):407–414', url: 'https://pubmed.ncbi.nlm.nih.gov/28572498/' },
     ],
     sections: [
       {
@@ -54,12 +59,12 @@ Through supplementation, muscle creatine content can be raised by about 20–40%
 
 Die Effekte sind gut messbar: In Kombination mit Krafttraining erhöht Kreatin die Kraftzuwächse und die fettfreie Masse deutlich stärker als Training allein. Der Nutzen zeigt sich über nahezu alle Altersgruppen und Leistungsniveaus hinweg.
 
-Über den Sport hinaus wird Kreatin zunehmend für mögliche kognitive und gesundheitliche Vorteile untersucht, etwa bei geistiger Erschöpfung oder im Alter. Diese Forschung ist vielversprechend, aber noch nicht so eindeutig wie die Datenlage zur körperlichen Leistung.`,
+Über den Sport hinaus wird Kreatin zunehmend für mögliche kognitive und gesundheitliche Vorteile untersucht, etwa bei geistiger Erschöpfung oder im Alter. Diese Forschung ist vielversprechend, aber noch nicht so eindeutig wie die Datenlage zur körperlichen Leistung — der eigene Abschnitt weiter unten sagt, was dort belegt ist und was nicht.`,
         contentEN: `No supplement for strength athletes is better studied than creatine. A position stand of the International Society of Sports Nutrition (Kreider et al., 2017, Journal of the International Society of Sports Nutrition) summarises: creatine monohydrate is the most effective supplement for increasing high-intensity performance and supporting muscle building.
 
 The effects are clearly measurable: combined with strength training, creatine increases strength gains and lean mass considerably more than training alone. The benefit shows across almost all age groups and performance levels.
 
-Beyond sport, creatine is increasingly studied for possible cognitive and health benefits, such as in mental fatigue or ageing. This research is promising but not yet as clear-cut as the evidence on physical performance.`,
+Beyond sport, creatine is increasingly studied for possible cognitive and health benefits, such as in mental fatigue or ageing. This research is promising but not yet as clear-cut as the evidence on physical performance — the separate section below sets out what is established there and what is not.`,
       },
       {
         titleDE: 'Dosierung und Anwendung',
@@ -68,12 +73,44 @@ Beyond sport, creatine is increasingly studied for possible cognitive and health
 
 Optional gibt es eine Ladephase: etwa 20 g pro Tag (auf vier Portionen verteilt) über fünf bis sieben Tage, um die Speicher schneller zu füllen. Danach folgt die normale Erhaltungsdosis. Die Ladephase beschleunigt nur den Effekt; ohne sie sind die Speicher nach etwa drei bis vier Wochen ebenfalls voll.
 
-Kreatin-Monohydrat ist die am besten untersuchte und preiswerteste Form — teurere Varianten (z. B. Kre-Alkalyn, Kreatin-HCl) bieten keinen belegten Zusatznutzen. Es empfiehlt sich, auf ein Produkt mit Qualitätssiegel wie Creapure zu achten.`,
+Kreatin-Monohydrat ist die am besten untersuchte und preiswerteste Form — teurere Varianten (z. B. Kre-Alkalyn, Kreatin-HCl) bieten keinen belegten Zusatznutzen. Es empfiehlt sich, auf ein Produkt mit Qualitätssiegel wie Creapure zu achten.
+
+Die Spanne von 3 bis 5 g ist dabei kein Zufall, sondern hängt an der Muskelmasse: Die Positionsstellungnahme der ISSN rechnet mit etwa 0,03 g pro Kilogramm Körpergewicht täglich. Wer schwer und muskulös ist, liegt eher am oberen Ende der Spanne, wer leicht ist, am unteren. Ein Grund, für den Muskel deutlich über 5 g hinauszugehen, ergibt sich daraus nicht.`,
         contentEN: `Use is straightforward. The most common approach is a daily maintenance dose of 3–5 g creatine monohydrate. Timing plays no significant role — what matters is daily, ongoing intake, since the stores fill over time.
 
 Optionally there is a loading phase: about 20 g per day (split into four portions) over five to seven days to fill the stores faster. This is followed by the normal maintenance dose. The loading phase only speeds up the effect; without it, the stores are also full after about three to four weeks.
 
-Creatine monohydrate is the most studied and cheapest form — more expensive variants (e.g. Kre-Alkalyn, creatine HCl) offer no proven additional benefit. It is advisable to choose a product with a quality seal such as Creapure.`,
+Creatine monohydrate is the most studied and cheapest form — more expensive variants (e.g. Kre-Alkalyn, creatine HCl) offer no proven additional benefit. It is advisable to choose a product with a quality seal such as Creapure.
+
+The 3-to-5-gram range is not arbitrary — it tracks muscle mass. The ISSN position stand works with roughly 0.03 g per kilogram of body weight per day. Heavier, more muscular people sit towards the upper end of the range, lighter people towards the lower end. For the muscle, none of this gives a reason to go well beyond 5 g.`,
+      },
+      {
+        // ⚠ NEUER ABSCHNITT (20.09.2026). Anlass: die Frage, ob die
+        // „eigentlich beste" Kreatinmenge weit ueber 3–5 g liegt. Sie kursiert
+        // breit, und die ehrliche Antwort ist ein Unterschied zwischen Muskel
+        // und Gehirn — nicht eine hoehere Zahl.
+        //
+        // ⚠ HIER WIRD BEWUSST KEINE HOEHERE DOSIS EMPFOHLEN. Hinter 3–5 g
+        // steht ein Positionspapier, hinter „10 g fuers Gehirn" eine offene
+        // Forschungsfrage. Wer daraus eine Empfehlung macht, verkauft eine
+        // Hypothese als Wissen — in einer App mit medizinischem Haftungs-
+        // hinweis und in sechs Sprachen.
+        titleDE: 'Kreatin fürs Gehirn — was belegt ist und was nicht',
+        titleEN: 'Creatine for the brain — what is established and what is not',
+        contentDE: `Kreatin sitzt nicht nur im Muskel, sondern auch im Gehirn, und dort erfüllt es dieselbe Aufgabe: ATP schnell nachliefern. Daraus ist die verbreitete Annahme entstanden, höhere Dosen brächten kognitive Vorteile — und dass die „eigentlich richtige" Menge weit über 3–5 g liege.
+
+Die Datenlage gibt das bisher nicht her. Zwei Befunde sind wichtig. Erstens lässt sich Kreatin im Gehirn viel schwerer anheben als im Muskel: Während der Muskelgehalt um 20–40 % steigt, kommen Übersichtsarbeiten für das Gehirn auf etwa 3–10 %. Die Blut-Hirn-Schranke bremst die Aufnahme, und das Gehirn stellt einen Teil seines Kreatins selbst her. Zweitens ist die optimale Menge schlicht unbekannt — erst eine gute Handvoll Studien hat den Zusammenhang zwischen Dosis und Hirn-Kreatin überhaupt untersucht.
+
+Wie wenig linear das ist, zeigt eine Arbeit, die Vegetariern und Mischköstlern 0,3 g pro Kilogramm über sieben Tage gab — bei 80 kg also rund 24 g täglich. Der Muskelwert stieg deutlich, der Hirnwert nicht messbar.
+
+Untersucht werden höhere Dosen durchaus: Studien mit 10 und 20 g täglich über mehrere Wochen laufen, ebenso Einzeldosen bei Schlafentzug. Das ist ein aktives Forschungsfeld mit plausibler Begründung — aber es ist kein gesichertes Wissen. Für Kraft und Muskelaufbau bleiben 3–5 g der belegte Standard. Wer aus Interesse an den kognitiven Effekten höher dosieren will, sollte wissen, dass er damit einer Hypothese folgt und nicht einer Empfehlung.`,
+        contentEN: `Creatine is found not only in muscle but also in the brain, where it does the same job: rapidly replenishing ATP. This has given rise to the widespread assumption that higher doses bring cognitive benefits — and that the "actually correct" amount is far above 3–5 g.
+
+So far the evidence does not support that. Two findings matter. First, brain creatine is far harder to raise than muscle creatine: while muscle content rises by 20–40 %, reviews put the brain at roughly 3–10 %. The blood-brain barrier slows uptake, and the brain produces part of its creatine itself. Second, the optimal amount is simply unknown — only a handful of studies have examined the relationship between dose and brain creatine at all.
+
+How non-linear this is was shown by a study giving vegetarians and omnivores 0.3 g per kilogram over seven days — around 24 g daily at 80 kg. Muscle content rose clearly; brain content did not measurably change.
+
+Higher doses are indeed being studied: trials with 10 and 20 g daily over several weeks are under way, as are single doses during sleep deprivation. This is an active field with a plausible rationale — but it is not established knowledge. For strength and muscle building, 3–5 g remains the evidenced standard. Anyone wanting to dose higher out of interest in the cognitive effects should know they are following a hypothesis, not a recommendation.`,
       },
       {
         titleDE: 'Sicherheit und Mythen',
@@ -92,12 +129,12 @@ Hair loss is also occasionally linked to creatine, based on a single study. This
       {
         titleDE: 'Zusammenfassung',
         titleEN: 'Summary',
-        contentDE: `Kreatin ist das wirksamste und am besten belegte Supplement für Kraft und Muskelaufbau — sicher, günstig und einfach anzuwenden. 3–5 g Monohydrat täglich, dauerhaft, sind alles, was du brauchst.
+        contentDE: `Kreatin ist das wirksamste und am besten belegte Supplement für Kraft und Muskelaufbau — sicher, günstig und einfach anzuwenden. Für Kraft und Muskelaufbau sind 3–5 g Monohydrat täglich, dauerhaft, alles, was du brauchst; höhere Dosen fürs Gehirn werden erforscht, sind aber noch keine Empfehlung.
 
 Der Zeitpunkt ist egal, eine Ladephase optional. Wähle reines Monohydrat; teurere Formen bringen keinen Mehrwert. Die verbreiteten Warnungen vor Nieren- oder Haarschäden sind bei gesunden Menschen nicht belegt.
 
 Wenn du nur ein einziges Supplement zur Leistungssteigerung wählen würdest, wäre Kreatin die naheliegendste Wahl. Bei gesundheitlichen Vorerkrankungen ist wie immer eine ärztliche Rücksprache sinnvoll.`,
-        contentEN: `Creatine is the most effective and best-evidenced supplement for strength and muscle building — safe, cheap and easy to use. 3–5 g of monohydrate daily, ongoing, is all you need.
+        contentEN: `Creatine is the most effective and best-evidenced supplement for strength and muscle building — safe, cheap and easy to use. For strength and muscle building, 3–5 g of monohydrate daily, ongoing, is all you need; higher doses for the brain are being researched but are not yet a recommendation.
 
 Timing is irrelevant, a loading phase optional. Choose pure monohydrate; more expensive forms add no value. The common warnings about kidney or hair damage are not supported in healthy people.
 
