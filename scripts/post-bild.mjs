@@ -89,6 +89,29 @@ if (!['mix', 'poster', 'premium', 'zahl'].includes(STIL)) {
   process.exit(1);
 }
 
+// ⚠ WARUM DIESE LISTE SEIT DEM 20.09.2026 EXISTIERT.
+//
+// `inhalt()` prueft das Format mit einer Kette von `if`s und hat am Ende einen
+// Default-Zweig (die Wissenskarte). Ein unbekanntes Format landete dort still
+// — es sah nicht wie ein Fehler aus, sondern wie ein anderer Inhalt, und der
+// Lauf blieb gruen.
+//
+// Gefunden wurde es an `naehrstoff`: Der Winkel trug in
+// wellapps-social/tools/social/ideen/fullrep.json das Format `wissen-karte`,
+// das es hier nie gab. Der Filter auf den Ernaehrungsbereich (weiter unten in
+// inhalt()) hat deshalb NIE gegriffen; statt eines Mikronaehrstoffs kam
+// irgendeines der 24 Wissensthemen. Dasselbe traf drei weitere Winkel.
+//
+// Ein Abbruch ist der sichere Weg: lauf.mjs faengt ihn, zieht die Kopfzeile
+// der Ausnahme heraus und schreibt sie in den Bericht. Lieber ein Post, der
+// sichtbar fehlt, als einer, der unbemerkt etwas anderes zeigt.
+const FORMATE = ['uebung-karte', 'studien-fakt', 'peptid-karte', 'rezept-karte',
+  'naehrstoff', 'wissens-karte'];
+if (!FORMATE.includes(FORMAT)) {
+  console.error(`✗ unbekanntes Format: ${FORMAT}\n  Bekannt: ${FORMATE.join(', ')}`);
+  process.exit(1);
+}
+
 // ⚠ Store-Verfuegbarkeit steht HIER, nicht im Text. Beide Plattformen sind
 // seit 29.08.2026 live — steht eine spaeter wieder nicht bereit, wird hier
 // umgeschaltet und der zugehoerige Badge verschwindet von selbst.

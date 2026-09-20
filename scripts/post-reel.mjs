@@ -57,6 +57,24 @@ const HINTERGRUND = arg('hintergrund', null);
 // bekommen keines; das waere genauso falsch wie ein ungekennzeichnetes KI-Bild.
 const KI_MENSCHEN = process.argv.includes('--ki');
 
+// ⚠ Nur ZWEI Formate — und der zweite Zweig weiter unten ist kein Default aus
+// Versehen: Er IST das Wissens-Reel. Er hatte bloss nie einen Namen, gegen den
+// sich pruefen liess.
+//
+// Genau daran sind in wellapps-social drei Winkel vorbeigelaufen:
+// `quick-fakt`, `mythos-check` und `programm-woche` tragen alle
+// `format: "wissen-reel"` und liefern deshalb ALLE dasselbe — ein zufaelliges
+// Wissensthema. Drei Winkel, ein Ergebnis. Solange jeder Name still hier
+// hereinfaellt, merkt das niemand (gefunden am 20.09.2026).
+//
+// Die Liste aendert nichts am Verhalten. Sie macht einen Tippfehler sichtbar,
+// statt ihn wie einen anderen Inhalt aussehen zu lassen.
+const FORMATE = ['uebung-loop', 'wissen-reel'];
+if (!FORMATE.includes(FORMAT)) {
+  console.error(`✗ unbekanntes Format: ${FORMAT}\n  Bekannt: ${FORMATE.join(', ')}`);
+  process.exit(1);
+}
+
 const B = 1080, H = 1920, FPS = 30;
 const STORES = { ios: true, android: true };
 
