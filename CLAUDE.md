@@ -2089,6 +2089,7 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
 - **i18n:** react-i18next (DE + EN)
 - **Backend:** Supabase (Auth + PostgreSQL-Datenbank)
 - **Hosting:** Vercel (automatisches Deployment über GitHub)
+- **Besucherzählung:** Vercel Web Analytics — **nur Web**, `src/analytics.js` (siehe unten)
 - **Datenspeicherung:** Supabase (Cloud) + localStorage (Cache/Fallback)
 - **Barcode-Scanner:** Quagga2 (Open Source, optimiert für 1D-Barcodes)
 - **Lebensmittel-API:** Open Food Facts (kostenlos, keine API-Keys)
@@ -2096,6 +2097,55 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
 - **Icons:** Lucide React
 - **KI-Foto-Erkennung:** Google Gemini 2.0 Flash (kostenlos, Vision API via Vercel Serverless Function)
 - **Schrift:** Inter (Google Fonts)
+
+### Besucherzählung: Vercel Web Analytics (20.09.2026)
+
+Josef hat einen Screenshot des Vercel-Dashboards geschickt: Für `fullrep.vercel.app`
+stand dort weiterhin **„Get Started"** — gezählt wurde also nie etwas. Mahjong Royale
+und Anigosha hatten es längst, FullRep und Swaply nicht.
+
+`src/analytics.js` ist die Fassung von Mahjong, samt **zwei Sperren**:
+
+| Sperre | wozu |
+|---|---|
+| `Capacitor.isNativePlatform()` | Capacitor kopiert das Web-Bundle unverändert in die Store-Apps. Ohne diese Zeile sendeten iOS und Android Aufrufe an Vercel — eine neue Datenweitergabe, die dann in **beiden** Store-Datenschutzangaben stehen müsste |
+| `localhost`/`127.0.0.1` | `/_vercel/insights/` gibt es nur auf einem Vercel-Deployment. Lokal wäre es eine 404-Flut in der Konsole |
+
+**Alle drei Zweige gemessen** (Chromium gegen `vite preview`, nicht behauptet):
+
+```
+localhost              → 0 Aufrufe an /_vercel/insights
+192.0.2.2 (echter Host) → 1 Aufruf  — inject() läuft an
+nachgestellte iOS-WebView → Plattform „ios", 0 Aufrufe
+```
+
+⚠ **Die iOS-WebView nachzustellen ging erst im zweiten Anlauf**, und der erste Versuch
+sah aus wie ein Befund: `window.Capacitor` zu setzen bringt nichts — das legt
+`@capacitor/core` beim Start selbst an und überschreibt es. Die Erkennung sitzt in
+`getPlatformId()` und sieht nach `window.androidBridge` bzw.
+`window.webkit.messageHandlers.bridge`. Mit dem falschen Stub meldete die Probe
+„Plattform web, 1 Aufruf" — also scheinbar eine kaputte Sperre. **Eine misslungene
+Nachstellung ist kein Befund.**
+
+⚠ **`initAnalytics()` steht VOR `createRoot(...).render(...)`.** Gemessen: Wirft der
+Supabase-Client beim Start (fehlende Umgebungsvariablen → `supabaseUrl is required`),
+bleibt die Seite weiß. Stand der Aufruf hinter `render()`, wurde der Besuch nicht
+einmal gezählt — ausgerechnet die kaputten Ladevorgänge fehlten in der Statistik.
+
+⚠ **Sichtbar wird es erst, wenn im Vercel-Projekt unter Analytics der Schalter
+umgelegt ist.** Vorher liefert `/_vercel/insights/` einen 404 und es wird schlicht
+nichts gezählt — genau der Zustand auf dem Screenshot.
+
+**Die Datenschutzerklärung ist mitgezogen** (`src/pages/legal/legalContent.js` +
+`uebersetzungen/{es,fr,pt,ar}.js`): Vercel heißt jetzt „Hosting und Besucherzählung",
+der Absatz nennt die erhobenen Felder, „ohne Cookies und ohne geräteübergreifende
+Kennung", Art. 6 Abs. 1 lit. f und den Satz, dass die Zählung in den Apps **nicht**
+stattfindet. `updated` steht im **privacy**-Block auf dem 20.09.2026 — Impressum, AGB
+und Gesundheitshinweis behalten den 17.09., weil sich dort nichts geändert hat.
+Geprüft am **gerenderten** `/legal/privacy`, nicht am Quelltext.
+
+⚠ **Swaply hat dieselbe Lücke** (kein `@vercel/analytics`, Capacitor-App). Dort ist
+nichts geändert.
 
 ### Dateistruktur (Kernkomponenten)
 ```
