@@ -43,6 +43,7 @@ import rezepte from '../src/data/recipesData.js';
 import trainingTopics from '../src/data/trainingKnowledge.js';
 import nutritionTopics from '../src/data/nutritionKnowledge.js';
 import supplementsTopics from '../src/data/supplementsKnowledge.js';
+import peptide from '../src/data/peptidesData.js';
 import bloodworkTopics from '../src/data/bloodworkKnowledge.js';
 
 const HIER = dirname(fileURLToPath(import.meta.url));
@@ -94,18 +95,30 @@ export function text(schluessel, sprache = 'de') {
 // Das dunkle, halbdurchsichtige Plaettchen liegt bewusst NICHT auf weissem
 // Grund: Es muss sowohl ueber einem hellen Foto als auch auf dem dunklen
 // Kartenhintergrund lesbar bleiben.
+//
+// ⚠ NUR „AI", ohne die Zeile „KI-Bild" daneben (Josef, 20.09.2026). Das ist
+// KEIN Versehen und wird nicht „wiederhergestellt": Es ist dieselbe Form, die
+// Meta und TikTok verwenden, bleibt damit eine Kennzeichnung im Sinne von
+// Art. 50, und ein Zweitwort neben dem Kuerzel erklaert niemandem etwas, den
+// „AI" nicht schon erreicht hat.
 export const WASSERZEICHEN_CSS = `
 .kiMarke{position:absolute;right:22px;bottom:16px;z-index:9;
-  display:flex;align-items:center;gap:7px;
+  display:flex;align-items:center;
   padding:7px 13px;border-radius:9px;
   background:rgba(10,10,10,.62);border:1px solid rgba(255,255,255,.28);
   backdrop-filter:blur(6px)}
-.kiMarke b{font-size:21px;font-weight:700;letter-spacing:.1em;color:#fff;line-height:1}
-.kiMarke span{font-size:15px;color:rgba(255,255,255,.72);line-height:1}`;
+/* Das negative margin nimmt den Sperrabstand HINTER dem letzten Buchstaben
+   wieder weg. Ohne das steht „AI" im Plaettchen sichtbar links — bei zwei
+   Buchstaben faellt auf, was neben einem zweiten Wort nie auffiel. */
+.kiMarke b{font-size:21px;font-weight:700;letter-spacing:.1em;margin-right:-.1em;
+  color:#fff;line-height:1}`;
 
+// ⚠ Beide Sprachen sagen dasselbe — das bleiben trotzdem ZWEI Eintraege. Die
+// Form `{de, en}` ist der Vertrag mit post-bild.mjs, und eine Sprache mit
+// eigenem Kuerzel (im Spanischen etwa „IA") haette sonst keinen Platz.
 export const WASSERZEICHEN_HTML = {
-  de: '<div class="kiMarke"><b>AI</b><span>KI-Bild</span></div>',
-  en: '<div class="kiMarke"><b>AI</b><span>AI image</span></div>',
+  de: '<div class="kiMarke"><b>AI</b></div>',
+  en: '<div class="kiMarke"><b>AI</b></div>',
 };
 
 // --- Uebungen ---------------------------------------------------------------
@@ -254,3 +267,100 @@ export function rezepteMitMakros() {
 }
 
 export { rezepte, exercises };
+
+// --- Peptide ----------------------------------------------------------------
+//
+// ⚠ WARUM ES DIESE FUNKTION GIBT: `peptidesData.js` liegt seit jeher in der
+// App (20 Eintraege, BPC-157 bis Semax), und der Bildgenerator hat sie nie
+// angefasst — er zog nur aus den vier WISSEN_QUELLEN. Josef hat am 20.09.2026
+// genau danach gefragt („BPC ist ein Peptid aus so und so vielen
+// Aminosaeuren"), und die Antwort lag die ganze Zeit im Repo.
+//
+// ⚠ DIE ZAHL WIRD NICHT ERFUNDEN, sondern aus dem Wort gelesen, das die App
+// selbst benutzt: „Pentadecapeptid" heisst 15, „Tripeptid" heisst 3. Neun der
+// zwanzig Eintraege nennen ihre Kettenlaenge so. Die uebrigen elf bekommen
+// keine Zahlenkarte — lieber ein Peptid weniger als eine Zahl, die niemand
+// belegen kann. Dieselbe Regel wie bei `studien.mjs`, wo jeder Wert woertlich
+// im Quelltext vorkommen muss.
+const KETTE = {
+  mono: 1, di: 2, tri: 3, tetra: 4, penta: 5, hexa: 6, hepta: 7,
+  octa: 8, nona: 9, deca: 10, undeca: 11, dodeca: 12, trideca: 13,
+  tetradeca: 14, pentadeca: 15, hexadeca: 16,
+};
+
+// ⚠ ZWEI FALLEN AUF EINMAL, beide am 20.09.2026 gemessen:
+//
+// 1. `tri` ist ein Praefix von `trideca`. Wer kurz vor lang prueft, macht aus
+//    Melanotan I (Tridecapeptid) ein Tripeptid. Deshalb steht die Alternative
+//    im Muster absteigend nach Laenge.
+// 2. Ein Text kann ZWEI Laengen nennen, und nur die erste gehoert zum Stoff:
+//    „Selank ist ein Heptapeptid, abgeleitet von Tuftsin (Tetrapeptid)".
+//    Deshalb zaehlt der erste Treffer im TEXTFLUSS — nicht der erste in einer
+//    Wortliste, denn dort entschiede die Sortierung statt des Satzes.
+const KETTE_MUSTER = new RegExp(
+  `(${Object.keys(KETTE).sort((a, b) => b.length - a.length).join('|')})peptid`,
+  'i',
+);
+
+/** Kettenlaenge aus einem Text, oder null. */
+export function kettenLaenge(text) {
+  const t = KETTE_MUSTER.exec(String(text ?? '').toLowerCase());
+  return t ? KETTE[t[1]] : null;
+}
+
+/**
+ * Peptide, die eine belegte Kettenlaenge tragen.
+ *
+ * ⚠ Gelesen wird aus `summaryDE` und, falls die Zusammenfassung schweigt, aus
+ * dem ERSTEN Kapitel („Was ist X?") — dem Absatz, der den Stoff definiert.
+ * Nicht aus der ganzen Datei: Spaetere Kapitel nennen Laengen ANDERER Stoffe
+ * (Selank ist ein Heptapeptid und stammt von Tuftsin, einem Tetrapeptid).
+ * Mit `summaryDE` allein waeren es nur drei Peptide gewesen.
+ */
+/**
+ * ⚠ Nicht jedes Peptid aus der App gehoert auf einen oeffentlichen Kanal.
+ *
+ * Die App ist ein Nachschlagewerk: Dort steht alles, sachlich und mit Quellen.
+ * Ein TikTok-Beitrag ist Werbung — und Werbung fuer eine nicht zugelassene
+ * Spritze zum Braeunen oder zur Libidosteigerung ist etwas anderes als ein
+ * Lexikoneintrag darueber. Die drei Melanocortin-Peptide bleiben deshalb in
+ * der App, aber nicht in den Posts.
+ *
+ * Das ist eine VORSICHTSENTSCHEIDUNG von Claude, keine Vorgabe von Josef.
+ * Wer sie aufheben will, leert diese Menge.
+ */
+const NICHT_SOZIAL = new Set(['pt141', 'melanotan1', 'melanotan2']);
+
+/**
+ * Wie viele Peptide die App-Bibliothek fuehrt — ALLE, auch die, die nicht in
+ * einen Post duerfen, und die ohne belegte Kettenlaenge. Der Hinweis auf der
+ * Karte wirbt fuer die Bibliothek, nicht fuer die Auswahl daraus.
+ *
+ * ⚠ Gezaehlt, nicht getippt. „es wird keine Zahl erfunden" gilt auch fuer eine
+ * Zahl, die heute stimmt: Kommt ein Peptid dazu, zaehlt die Karte es mit,
+ * ohne dass jemand daran denken muss.
+ */
+export function peptideGesamt() {
+  return peptide.length;
+}
+
+export function peptidePosts() {
+  return peptide
+    .filter((p) => !NICHT_SOZIAL.has(p.id))
+    .map((p) => ({
+      p,
+      laenge: kettenLaenge(p.summaryDE)
+        ?? kettenLaenge(p.sections?.[0]?.contentDE),
+    }))
+    .filter(({ laenge }) => laenge !== null)
+    .map(({ p, laenge }) => ({
+      id: p.id,
+      bereich: p.category,
+      name: { de: p.nameDE, en: p.nameEN },
+      zusammenfassung: { de: p.summaryDE ?? '', en: p.summaryEN ?? '' },
+      laenge,
+      wirkung: { de: p.quickDE?.wirkung ?? '', en: p.quickEN?.wirkung ?? '' },
+      nebenwirkungen: { de: p.quickDE?.nebenwirkungen ?? '', en: p.quickEN?.nebenwirkungen ?? '' },
+      quellen: p.references ?? [],
+    }));
+}

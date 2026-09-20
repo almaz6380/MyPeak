@@ -48,7 +48,7 @@ import { chromium } from 'playwright';
 
 import {
   WURZEL, uebungenMitFotos, uebungTexte, wissensthemen, rezepteMitMakros,
-  WASSERZEICHEN_CSS, WASSERZEICHEN_HTML, trainingsFoto, FOTO_BEREICHE,
+  peptidePosts, peptideGesamt, quelleKurz, WASSERZEICHEN_CSS, WASSERZEICHEN_HTML, trainingsFoto, FOTO_BEREICHE,
 } from './social-daten.mjs';
 import { studienPosts } from './studien.mjs';
 
@@ -60,7 +60,27 @@ const SEED = Number(arg('seed', 1));
 const NAME = arg('name', null);
 const OUT = join(WURZEL, arg('out', 'out/social'));
 const HINTERGRUND = arg('hintergrund', null);
-const KI_MENSCHEN = process.argv.includes('--ki');
+// ⚠ `--wz` ist NICHT dasselbe wie `--hintergrund`. Ein Hintergrundfoto ist das
+// Motiv der Karte und braucht den Schleier, damit die Schrift darauf liest. Ein
+// Wasserzeichen ist eine Struktur: stark abgedunkelt, entfaerbt, nur die
+// Silhouette bleibt. Deshalb zwei Wege und nicht ein Regler.
+const WZ = arg('wz', null);
+// ⚠ Querformat-Bilder ueberleben `cover` im Hochformat nicht immer: Die Karte
+// ist 1080×1350, ein 1408×768-Bild wird dafuer auf 2475 Breite hochgezogen und
+// zu 56 % horizontal weggeschnitten. Eine stehende Figur bleibt dabei stehen,
+// eine LIEGENDE (Bankdruecken) verliert Kopf und Beine und ist als Uebung
+// nicht mehr zu erkennen. `--wz-fit contain` legt das ganze Bild als Streifen
+// in die Mitte; der Rand bleibt schwarz, was bei 17 % Deckkraft ohnehin die
+// Kartenfarbe ist.
+const WZ_FIT = arg('wz-fit', 'cover');
+const WZ_POS = arg('wz-pos', 'center');
+// ⚠ `--wz` setzt die KI-Kennzeichnung MIT. Die Wasserzeichenbilder sind
+// ausnahmslos KI-erzeugte Menschen (fal.ai, siehe scripts/fal-bilder.mjs), und
+// die Regel im Kopf dieser Datei kennt keine Ausnahme fuer „aber nur ganz
+// leise". Sie an `--ki` zu haengen hiesse, sich darauf zu verlassen, dass
+// jeder Aufrufer daran denkt — der Tageslauf ruft dieses Skript aus
+// motoren.mjs auf, und dort denkt niemand.
+const KI_MENSCHEN = process.argv.includes('--ki') || Boolean(arg('wz', null));
 
 const B = 1080, H = 1350;
 
@@ -84,10 +104,20 @@ function mulberry32(s) {
 }
 
 const T = {
-  de: { wissen: 'Wusstest du?', uebung: 'Übung', rezept: 'Rezept',
-        start: 'Start', ende: 'Ende', pro: 'pro Portion', fuss: 'FullRep · Training & Ernährung' },
-  en: { wissen: 'Did you know?', uebung: 'Exercise', rezept: 'Recipe',
-        start: 'Start', ende: 'End', pro: 'per serving', fuss: 'FullRep · Workout & Nutrition' },
+  de: { wissen: 'Wusstest du?', uebung: 'Übung', rezept: 'Rezept', peptid: 'Peptid',
+        start: 'Start', ende: 'Ende', pro: 'pro Portion', fuss: 'FullRep · Training & Ernährung',
+        // ⚠ Die App fuehrt den Bereich als „Peptide" (Bibliothek → Peptide),
+        // nicht als „Peptide-Book". Ein Post darf nichts versprechen, das
+        // unter diesem Namen nirgends steht — wer danach sucht, findet es
+        // sonst nicht. Die Zahl kommt aus peptideGesamt(), nicht von Hand.
+        peptidFuss: (n) => `Alle ${n} Peptide in der App-Bibliothek`,
+        peptidZeile: (n) => `Die ganze Peptid-Bibliothek mit allen ${n} Einträgen, `
+          + 'Wirkung, Nebenwirkungen und Quellen steht in der App.' },
+  en: { wissen: 'Did you know?', uebung: 'Exercise', rezept: 'Recipe', peptid: 'Peptide',
+        start: 'Start', ende: 'End', pro: 'per serving', fuss: 'FullRep · Workout & Nutrition',
+        peptidFuss: (n) => `All ${n} peptides in the app library`,
+        peptidZeile: (n) => `The full peptide library — all ${n} entries with effects, `
+          + 'side effects and references — is in the app.' },
 }[LANG];
 
 // Wechselnde Aufhaenger. Ein Kanal, auf dem jeder Post mit demselben Wort
@@ -124,10 +154,53 @@ function augenbraueFuer(o, schlagzeile, kandidat = null) {
   const k = kandidat ?? (o.art === 'uebung' ? (o.marke ?? T.uebung)
     : o.art === 'rezept' ? T.rezept
     : o.art === 'wissen' ? (o.augenbraue || T.wissen)
+    // Peptidkarten tragen ihre Gattung, nicht den rotierenden Aufhaenger:
+    // „Mythos oder Wahrheit?" ueber einer Stoffbeschreibung kuendigt eine
+    // Richtigstellung an, die auf der Karte gar nicht kommt.
+    : o.art === 'peptid' ? T.peptid
     : AUFHAENGER[SEED % AUFHAENGER.length]);
   const gleich = (a, b) => String(a ?? '').trim().toLowerCase()
     === String(b ?? '').trim().toLowerCase();
   return gleich(k, schlagzeile) ? '' : k;
+}
+
+/**
+ * Aus der Wirkungsliste eines Peptids einen Satz machen, den man vorlesen kann.
+ *
+ * ⚠ „Studien zeigen …" — die einzelne Studie wird NICHT genannt (Josef,
+ * 20.09.2026). Dieselbe Regel gilt schon fuer `studien-fakt`: Der Name der
+ * Arbeit steht nur im Kontrollteil des Beiblatts, falls in den Kommentaren
+ * jemand nachfragt.
+ *
+ * Die Daten sind uneinheitlich: mal ganze Saetze („Beschleunigte Heilung von
+ * Sehnen, Baendern, Muskeln und Gelenken."), mal eine Stichwortkette aus
+ * sieben Gliedern. Sieben Stichwoerter auf einer Karte sind keine Aussage,
+ * sondern ein Schlagwortfeld — deshalb wird gekuerzt.
+ *
+ * ⚠ Gekuerzt wird aber NUR bei echten Stichwortketten. Enthaelt ein Glied ein
+ * „und", ist es das Ende einer Aufzaehlung („Muskeln und Gelenken") — dort
+ * abzuschneiden ergaebe einen halben Satz. Die Probe kostet eine Zeile und
+ * rettet genau den haeufigsten Fall.
+ */
+const STUDIEN_VORSPANN = { de: 'Studien zeigen: ', en: 'Research shows: ' }[LANG];
+const UND = { de: ' und ', en: ' and ' }[LANG];
+
+function studienSatz(wirkung, hoechstens = 3, max = 120) {
+  const roh = String(wirkung ?? '').replace(/\s+/g, ' ').trim();
+  if (!roh) return '';
+  let kern = roh.split(/(?<=[.!?])\s+/)[0].replace(/[.;,\s]+$/, '');
+
+  const teile = kern.split(/,\s*/);
+  if (teile.length > hoechstens && !teile.some((t) => t.includes(UND))) {
+    kern = teile.slice(0, hoechstens).join(', ');
+  }
+  if (kern.length > max) {
+    kern = `${kern.slice(0, max - 1).replace(/[\s,;:–—-]+$/, '')}…`;
+  }
+  // ⚠ Die Grossschreibung bleibt, wie sie ist. „Studien zeigen:
+  // kollagenproduktion" waere falsch (Substantiv), „beschleunigte Heilung"
+  // waere richtig — welches von beidem vorliegt, kann hier niemand wissen.
+  return `${STUDIEN_VORSPANN}${kern}${kern.endsWith('…') ? '' : '.'}`;
 }
 
 /**
@@ -174,6 +247,27 @@ function inhalt(format, w) {
       studie: p.studie,
       autoFoto: FOTO_BEREICHE.has(p.bereich) || p.bereich === 'cardio'
         ? trainingsFoto(w) : null,
+    };
+  }
+
+  if (format === 'peptid-karte') {
+    const p = zieh(peptidePosts());
+    return {
+      art: 'peptid', schluessel: p.id,
+      marke: p.name[LANG] ?? p.name.de,
+      haken: studienSatz(p.wirkung[LANG] || p.wirkung.de),
+      text: null,
+      // ⚠ Die Kettenlaenge steht NICHT als Zahl im Datensatz. Sie kommt aus
+      // dem Wort, das die App selbst benutzt: „Pentadecapeptid" heisst 15.
+      // Siehe kettenLaenge() in social-daten.mjs — Peptide ohne dieses Wort
+      // fallen dort weg, statt hier eine Zahl zu bekommen.
+      zahl: {
+        wert: String(p.laenge), einheit: '',
+        label: LANG === 'de' ? 'Aminosäuren' : 'amino acids',
+        titel: p.name[LANG] ?? p.name.de,
+      },
+      // Nur fuers Beiblatt, nicht fuer das Bild — wie bei `studien-fakt`.
+      quellen: p.quellen,
     };
   }
 
@@ -253,9 +347,19 @@ function baueHtml(o, stil) {
   const antonPfad = join(WURZEL, 'scripts', 'schriften', 'anton.woff2');
   const anton = existsSync(antonPfad) ? b64(antonPfad) : null;
   const logo = b64(join(WURZEL, 'public/favicon.svg'));
+  // ⚠ Fuer den Hintergrund muss die Platte raus. favicon.svg traegt als erstes
+  // ein deckendes #0a0a0a-Rechteck mit rx=100 — bei jeder Deckkraft ueber ~.08
+  // zeichnet sich dessen Kante als dunkles Viereck quer ueber die Karte ab.
+  // Ohne das Rechteck bleiben nur die goldenen Striche, und genau die sollen
+  // sichtbar sein. Im Kopf bleibt das Logo MIT Platte — dort ist das gerundete
+  // Quadrat das Icon.
+  const logoRing = Buffer.from(
+    readFileSync(join(WURZEL, 'public/favicon.svg'), 'utf8').replace(/<rect\b[^>]*\/>/, ''),
+  ).toString('base64');
 
   const hgPfad = HINTERGRUND ?? o.autoFoto ?? (o.fotos?.[1] ?? null);
   const hatFoto = hgPfad && existsSync(hgPfad);
+  const hatWz = WZ && existsSync(WZ);
   const kiMarke = KI_MENSCHEN ? (WASSERZEICHEN_HTML[LANG] ?? WASSERZEICHEN_HTML.de) : '';
 
   // --- Mitte je Stil --------------------------------------------------------
@@ -311,6 +415,7 @@ function baueHtml(o, stil) {
         ${auge ? `<div class="augenbraue">${esc(auge)}</div>` : ''}
         <div class="grosseZahl"><b class="anton">${esc(o.zahl.wert)}</b><i>${esc(o.zahl.einheit)}</i></div>
         <div class="zahlLabel">${esc(o.zahl.label)}</div>
+        ${o.zahl.titel ? `<h1 class="anton zahlTitel">${esc(o.zahl.titel)}</h1>` : ''}
         ${o.haken ? `<p class="text">${esc(o.haken)}</p>` : ''}
       </div>`;
   } else {
@@ -336,7 +441,7 @@ function baueHtml(o, stil) {
   }
 
   return `<!doctype html><meta charset="utf-8">
-<body class="stil-${stil}${KI_MENSCHEN ? ' mitKi' : ''}${hatFoto ? ' mitFoto' : ''}"><style>
+<body class="stil-${stil}${KI_MENSCHEN ? ' mitKi' : ''}${hatFoto ? ' mitFoto' : ''}${hatWz ? ' mitWz' : ''}"><style>
 @font-face{font-family:'Inter';font-weight:400;src:url(data:font/woff2;base64,${inter400}) format('woff2')}
 @font-face{font-family:'Inter';font-weight:700;src:url(data:font/woff2;base64,${inter700}) format('woff2')}
 ${anton ? `@font-face{font-family:'Anton';font-weight:400;src:url(data:font/woff2;base64,${anton}) format('woff2')}` : ''}
@@ -353,8 +458,14 @@ body{font-family:'Inter',system-ui,sans-serif;color:#fef3c7;
 /* Das echte App-Icon als grosses, sehr leises Markenzeichen im Hintergrund.
    Es wird NICHT nachgezeichnet — favicon.svg ist die einzige Quelle, und die
    Symbole darin sind 1:1 die Lucide-Pfade aus BottomNav.jsx. */
-.markenRing{position:absolute;width:1180px;height:1180px;right:-380px;top:-260px;
-  opacity:.07;pointer-events:none}
+/* ⚠ Bis zum 20.09.2026 stand hier opacity:.07 — Josef: „das Logo ist nicht
+   gross im Hintergrund". Es WAR da, nur unter der Wahrnehmungsschwelle: sieben
+   Prozent Gold auf Schwarz sind auf einem Handybildschirm nichts. Seit die
+   Uebungsfotos raus sind (30.08.2026), ist dieser Ring das einzige grafische
+   Element der Karte — er muss tragen, nicht fluestern.
+   Gemessen am gerenderten JPEG, nicht am CSS. */
+.markenRing{position:absolute;width:1460px;height:1460px;right:-500px;top:-60px;
+  opacity:.20;pointer-events:none}
 /* Ueber einem Foto ist das Markenzeichen kein Zeichen, sondern ein Schmierer —
    die Symbole zeichnen sich als Umrisse ab und stoeren das Motiv. Dort bleibt
    es weg; der Kopf traegt die Marke ohnehin. */
@@ -420,6 +531,10 @@ p.text{font-size:32px;line-height:1.38;color:#e7e5e4}
 .grosseZahl b{font-size:250px;line-height:.82;font-weight:400}
 .grosseZahl i{font-style:normal;font-size:76px;font-weight:700}
 .zahlLabel{font-size:38px;font-weight:700;color:#fff8e7;letter-spacing:-.01em}
+/* Die Zahl traegt das Bild, der Name steht direkt darunter — „15 /
+   Aminosäuren / BPC-157" liest sich als eine Zeile. Enger an das Label
+   gerueckt als der Rest, damit die beiden zusammengehoeren. */
+.zahlTitel{font-size:72px;line-height:1.02;color:#fff8e7;margin-top:10px}
 .stil-zahl p.text{font-size:28px;color:#d6d3d1;margin-top:8px}
 
 /* --- premium --- */
@@ -445,17 +560,37 @@ p.text{font-size:32px;line-height:1.38;color:#e7e5e4}
 /* Badges nie verzerren — Apple und Google geben die Form vor. Feste Hoehe,
    Breite folgt dem 3:1-Verhaeltnis von selbst. */
 .badges img{height:58px;width:auto;display:block}
+/* Der Fuss ist sonst eine Signatur und darf grau bleiben. Auf der Peptidkarte
+   steht dort eine Aufforderung — die muss man lesen koennen, sonst steht sie
+   umsonst da. Heller und fett, aber nicht in Amber: Das Gold traegt auf dieser
+   Karte schon die Zahl, und zwei goldene Stellen heben sich gegenseitig auf. */
+.fussRuf{color:#d6d3d1;font-weight:700}
 /* Traegt der Post ein KI-Wasserzeichen, rueckt der Fuss hoch — sonst stossen
    Store-Badge und Plaettchen in der Ecke aneinander. */
 body.mitKi .fuss{margin-bottom:40px}
+
+/* Das Trainingsbild als WASSERZEICHEN — nicht als Motiv.
+   Entfaerbt, angehoben im Kontrast, stark abgedunkelt: Was uebrig bleibt, ist
+   die Silhouette. Deshalb braucht es hier auch keinen Schleier; das Bild ist
+   schon leiser als jeder Schleier es machen koennte. Und deshalb sind die
+   Prompts andere als fuer --hintergrund: Bei dieser Deckkraft ueberlebt nur
+   die Form, kein Hantelprofil und kein Detail im Gesicht. */
+.wzFoto{position:absolute;inset:0;background-repeat:no-repeat;
+  opacity:.17;filter:grayscale(1) contrast(1.45) brightness(1.15);pointer-events:none}
+/* Ring UND Silhouette auf voller Staerke sind zwei Bilder uebereinander. Traegt
+   die Karte ein Wasserzeichen, tritt der Ring zurueck und rahmt nur noch. */
+body.mitWz .markenRing{opacity:.09}
 </style>
+${hatWz ? `<div class="wzFoto" style="background-image:url(data:image/jpeg;base64,${b64(WZ)});background-size:${WZ_FIT};background-position:${WZ_POS}"></div>` : ''}
 ${hatFoto ? `<div class="hgFoto" style="background-image:url(data:image/jpeg;base64,${b64(hgPfad)})"></div>
 <div class="hgSchleier"></div>` : ''}
-<img class="markenRing" src="data:image/svg+xml;base64,${logo}" alt="">
+<img class="markenRing" src="data:image/svg+xml;base64,${logoRing}" alt="">
 <div class="korn"></div>
 <div class="kopf"><img src="data:image/svg+xml;base64,${logo}"><span>FULLREP</span></div>
 <div class="inhalt">${mitte}</div>
-<div class="fuss"><span>${T.fuss}</span><span class="badges">${badgesHtml()}</span></div>
+<div class="fuss"><span${o.art === 'peptid' ? ' class="fussRuf"' : ''}>${
+  o.art === 'peptid' ? esc(T.peptidFuss(peptideGesamt())) : T.fuss
+}</span><span class="badges">${badgesHtml()}</span></div>
 ${kiMarke}`;
 }
 
@@ -504,6 +639,7 @@ const tags = {
   rezept: ['fullrep', 'highprotein', 'mealprep', 'rezept', 'ernaehrung'],
   wissen: ['fullrep', 'fitnesstips', 'gymtok', 'muskelaufbau', 'fitness'],
   studie: ['fullrep', 'evidenzbasiert', 'wissenschaft', 'muskelaufbau', 'fitness'],
+  peptid: ['fullrep', 'peptide', 'regeneration', 'biohacking', 'fitness'],
 }[o.art] ?? ['fullrep', 'fitness', 'training', 'gym'];
 
 // ⚠ `o.fotos` ist seit dem 30.08.2026 ein LEERES Array, kein null — und ein
@@ -516,7 +652,12 @@ writeFileSync(join(OUT, `${basis}.txt`),
 
 ## Caption (kopieren)
 
-${o.haken}${o.text ? `\n\n${o.text}` : ''}${
+${o.art === 'peptid'
+  ? `${o.marke} — ${LANG === 'de'
+      ? `ein Peptid aus ${o.zahl.wert} Aminosäuren.`
+      : `a peptide of ${o.zahl.wert} amino acids.`}\n\n${o.haken}`
+  : o.haken}${o.art === 'peptid' ? `\n\n${T.peptidZeile(peptideGesamt())}` : ''}${
+  o.text ? `\n\n${o.text}` : ''}${
   o.studienwert ? `\n\n${LANG === 'de' ? 'Laut Studien' : 'Research says'}: ${o.studienwert}` : ''}
 
 ## Hashtags
@@ -547,6 +688,13 @@ ${o.studie ? `
 Die Aussage stammt aus: ${o.studie.name}${o.studie.jahr ? ` ${o.studie.jahr}` : ''}.
 Im Bild steht bewusst nur „Laut Studien" — die Angabe hier ist fuer den
 Kommentarbereich gedacht, falls jemand nach der Quelle fragt.
+` : ''}${o.quellen?.length ? `
+## Falls jemand nachfragt (NICHT posten)
+
+Im Bild steht nur „Studien zeigen" (Josef, 20.09.2026). Die Arbeiten dazu
+stehen in der App unter dem Eintrag „${o.marke}":
+
+${o.quellen.slice(0, 5).map((q) => `- ${quelleKurz(q)}`).join('\n')}
 ` : ''}`);
 
 console.log(`✓ ${ziel}`);
