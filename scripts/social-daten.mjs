@@ -344,6 +344,48 @@ export function peptideGesamt() {
   return peptide.length;
 }
 
+/**
+ * Die ersten ganzen Saetze eines Textes — fuer den Erklaerteil der Karte.
+ *
+ * ⚠ WARUM NICHT `quick.wirkung`. Die Karte zog ihren Text bis zum 20.09.2026
+ * von dort, und dort stehen Stichwortketten: „GH-Freisetzung ohne
+ * Cortisol/Prolaktin-Anstieg, besserer Schlaf, Fettabbau." Josef am fertigen
+ * Post: „Ganze Saetze und nicht nur Stichwoerter." Das ERSTE KAPITEL jedes
+ * Peptids ist dagegen Fliesstext und sagt, was der Stoff ueberhaupt ist —
+ * genau das, was auf einer Karte fehlt, die nur eine Wirkung aufzaehlt.
+ *
+ * ⚠ ABKUERZUNGEN SIND DER GANZE TRICK. Ein Punkt beendet nicht immer einen
+ * Satz. Ohne die Ausnahmeliste endete GHK-Cu mitten im Satz bei „Es wurde
+ * 1973 von Dr." — ein abgeschnittener Halbsatz auf einem fertigen Post.
+ * Gemessen an allen sieben Peptiden, nicht an einem.
+ */
+const ABKUERZUNG = 'Dr|Prof|ca|bzw|usw|etc|z|B|u|a|d|h|Nr|Abb|vgl|ggf|inkl|Mio|Mrd|St|Jh';
+const SATZENDE = new RegExp(`(?<!\\b(?:${ABKUERZUNG}))\\.\\s+(?=[A-ZÄÖÜ])`);
+
+export function ersteSaetze(text, anzahl = 2, hoechstens = 260) {
+  const roh = String(text ?? '').replace(/\s+/g, ' ').trim();
+  if (!roh) return '';
+  // ⚠ `split` mit einer Lookbehind-Regex verliert den Punkt. Deshalb ueber
+  // die Trennstellen laufen und die Saetze selbst zusammensetzen.
+  const teile = [];
+  let rest = roh;
+  while (teile.length < anzahl) {
+    const t = SATZENDE.exec(rest);
+    if (!t) { teile.push(rest); break; }
+    teile.push(rest.slice(0, t.index + 1));
+    rest = rest.slice(t.index + t[0].length);
+  }
+  let aus = '';
+  for (const s of teile) {
+    const naechst = aus ? `${aus} ${s}` : s;
+    // ⚠ Lieber EIN Satz als anderthalb. Passt der zweite nicht mehr, faellt
+    // er ganz weg, statt mitten im Wort abgeschnitten zu werden.
+    if (naechst.length > hoechstens) break;
+    aus = naechst;
+  }
+  return aus || `${roh.slice(0, hoechstens - 1).replace(/\s+\S*$/, '')}…`;
+}
+
 export function peptidePosts() {
   return peptide
     .filter((p) => !NICHT_SOZIAL.has(p.id))
@@ -360,6 +402,12 @@ export function peptidePosts() {
       zusammenfassung: { de: p.summaryDE ?? '', en: p.summaryEN ?? '' },
       laenge,
       wirkung: { de: p.quickDE?.wirkung ?? '', en: p.quickEN?.wirkung ?? '' },
+      // Der Erklaerteil: ganze Saetze aus dem ersten Kapitel („Was ist X?"),
+      // nicht die Stichwortkette aus `wirkung` — siehe ersteSaetze().
+      erklaerung: {
+        de: ersteSaetze(p.sections?.[0]?.contentDE),
+        en: ersteSaetze(p.sections?.[0]?.contentEN),
+      },
       nebenwirkungen: { de: p.quickDE?.nebenwirkungen ?? '', en: p.quickEN?.nebenwirkungen ?? '' },
       quellen: p.references ?? [],
     }));

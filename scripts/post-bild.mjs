@@ -366,7 +366,17 @@ function inhalt(format, w) {
       art: 'peptid', schluessel: p.id,
       marke: p.name[LANG] ?? p.name.de,
       haken: studienSatz(p.wirkung[LANG] || p.wirkung.de),
-      text: null,
+      // ⚠ ZWEI Textbloecke, nicht einer (Josef am fertigen Post, 20.09.2026:
+      // „Ganze Saetze und nicht nur Stichwoerter"). Die Karte zeigte bis
+      // dahin nur die Wirkung, und die steht in den Daten als Stichwortkette.
+      // `erklaerung` ist Fliesstext aus dem ersten Kapitel und sagt, was der
+      // Stoff ueberhaupt IST — die Frage, die eine Wirkungsliste offen laesst.
+      text: p.erklaerung[LANG] || p.erklaerung.de,
+      // Der zweite Absatz auf der Karte. Inhaltsgleich mit `haken` — den
+      // braucht die Bildunterschrift (unten) und die Frage-Probe, und beide
+      // duerfen sich nicht darauf verlassen, welchen Stil das Bild gerade
+      // traegt. Nur `zahl` wertet `nachsatz` aus.
+      nachsatz: studienSatz(p.wirkung[LANG] || p.wirkung.de),
       // ⚠ Die Kettenlaenge steht NICHT als Zahl im Datensatz. Sie kommt aus
       // dem Wort, das die App selbst benutzt: „Pentadecapeptid" heisst 15.
       // Siehe kettenLaenge() in social-daten.mjs — Peptide ohne dieses Wort
@@ -526,27 +536,34 @@ function baueHtml(o, stil) {
     // bei einer Wissenskarte ohne eigenes Label waeren sonst beide der
     // Themenname.
     const auge = augenbraueFuer(o, o.zahl.label, o.art === 'wissen' ? o.marke : null);
-    // ⚠ Der Fliesstext ist `text`, WO ES IHN GIBT — sonst `haken`.
-    //
-    // Bei `studien-fakt` sind `marke` und `haken` derselbe String (beides
-    // `p.titel`, siehe inhalt()); die Aussage steht in `text`. Mit `haken`
-    // stand der Titel zweimal untereinander: einmal gross als Schlagzeile,
-    // einmal klein als Erklaerung. Dieselbe Dopplung hat schon einmal
-    // `poster` und `premium` getroffen — der Kommentar bei augenbraueFuer()
-    // haelt sie fest. Deshalb hier zusaetzlich die stumpfe Gegenprobe: Faellt
-    // der Text mit der Schlagzeile zusammen, entfaellt er.
-    const rohText = o.text || o.haken;
     const gleichWie = (a, b) => String(a ?? '').trim().toLowerCase()
       === String(b ?? '').trim().toLowerCase();
-    const zahlText = gleichWie(rohText, o.zahl.titel) || gleichWie(rohText, o.zahl.label)
-      ? '' : rohText;
+    // ⚠ ZWEI Absaetze, wo es zwei gibt (Josef am fertigen Post, 20.09.2026:
+    // „Ganze Saetze und nicht nur Stichwoerter"). `text` sagt, was der Stoff
+    // IST, `nachsatz` was Studien dazu zeigen. Nur Formate, die `nachsatz`
+    // setzen, bekommen den zweiten Block — Rezept, Wissen und Studie bleiben
+    // unveraendert bei einem.
+    //
+    // Der Fliesstext ist `text`, WO ES IHN GIBT — sonst `haken`.
+    const absaetze = [o.text || o.haken, o.nachsatz]
+      .map((s) => String(s ?? '').trim())
+      .filter(Boolean)
+      // ⚠ Gegen die Schlagzeile und das Label: Bei `studien-fakt` sind `marke`
+      // und `haken` derselbe String (beides `p.titel`, siehe inhalt()), und
+      // der steht schon gross als `zahlTitel` darueber. Ohne diese Probe stand
+      // der Titel zweimal untereinander — einmal gross als Schlagzeile, einmal
+      // klein als Erklaerung. Dieselbe Dopplung hat schon `poster` und
+      // `premium` getroffen; der Kommentar bei augenbraueFuer() haelt sie fest.
+      .filter((s) => !gleichWie(s, o.zahl.titel) && !gleichWie(s, o.zahl.label))
+      // und gegeneinander
+      .filter((s, i, alle) => alle.findIndex((x) => gleichWie(x, s)) === i);
     mitte = `
       <div class="zahlBlock">
         ${auge ? `<div class="augenbraue">${esc(auge)}</div>` : ''}
         <div class="grosseZahl"><b class="anton">${esc(o.zahl.wert)}</b><i>${esc(o.zahl.einheit)}</i></div>
         <div class="zahlLabel">${esc(o.zahl.label)}</div>
         ${o.zahl.titel ? `<h1 class="anton zahlTitel">${esc(o.zahl.titel)}</h1>` : ''}
-        ${zahlText ? `<p class="text">${esc(zahlText)}</p>` : ''}
+        ${absaetze.map((s) => `<p class="text">${esc(s)}</p>`).join('')}
       </div>`;
   } else {
     // `o.fotos?.length`, nicht `o.fotos`: Das Array ist heute leer, und ein
