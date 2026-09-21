@@ -81,7 +81,19 @@ const WZ_POS = arg('wz-pos', 'center');
 // leise". Sie an `--ki` zu haengen hiesse, sich darauf zu verlassen, dass
 // jeder Aufrufer daran denkt — der Tageslauf ruft dieses Skript aus
 // motoren.mjs auf, und dort denkt niemand.
-const KI_MENSCHEN = process.argv.includes('--ki') || Boolean(arg('wz', null));
+// --- Die Randfigur (Josef, 21.09.2026) --------------------------------------
+//
+// „Ich will einen Prompt fuer eine Figur fuer FullRep (Fitnessmann) … Diese
+// sollen immer so am Rand des Bildes sein." Anders als `--wz`, das als
+// entfaerbte Silhouette HINTER der Karte liegt, steht die Figur freigestellt
+// NEBEN dem Text. Anigosha und Swaply bekommen dasselbe System.
+//
+// ⚠ Der Pfad ist RELATIV ZUR REPO-WURZEL, wie bei `--wz` auch: Der Tageslauf
+// ruft dieses Skript aus wellapps-social auf, ein Pfad relativ zum
+// Arbeitsverzeichnis zeigte dort ins Leere.
+const FIGUR = arg('figur', null);
+const KI_MENSCHEN = process.argv.includes('--ki')
+  || Boolean(arg('wz', null)) || Boolean(FIGUR);
 
 const B = 1080, H = 1350;
 
@@ -574,6 +586,7 @@ function baueHtml(o, stil) {
   const hgPfad = HINTERGRUND ?? o.autoFoto ?? (o.fotos?.[1] ?? null);
   const hatFoto = hgPfad && existsSync(hgPfad);
   const hatWz = WZ && existsSync(WZ);
+  const hatFigur = FIGUR && existsSync(FIGUR);
   const kiMarke = KI_MENSCHEN ? (WASSERZEICHEN_HTML[LANG] ?? WASSERZEICHEN_HTML.de) : '';
 
   // --- Mitte je Stil --------------------------------------------------------
@@ -705,7 +718,7 @@ function baueHtml(o, stil) {
   }
 
   return `<!doctype html><meta charset="utf-8">
-<body class="stil-${stil}${o.art === 'app' ? ' hatSchau' : ''}${KI_MENSCHEN ? ' mitKi' : ''}${hatFoto ? ' mitFoto' : ''}${hatWz ? ' mitWz' : ''}"><style>
+<body class="stil-${stil}${o.art === 'app' ? ' hatSchau' : ''}${KI_MENSCHEN ? ' mitKi' : ''}${hatFoto ? ' mitFoto' : ''}${hatWz ? ' mitWz' : ''}${hatFigur ? ' mitFigur' : ''}"><style>
 @font-face{font-family:'Inter';font-weight:400;src:url(data:font/woff2;base64,${inter400}) format('woff2')}
 @font-face{font-family:'Inter';font-weight:700;src:url(data:font/woff2;base64,${inter700}) format('woff2')}
 ${anton ? `@font-face{font-family:'Anton';font-weight:400;src:url(data:font/woff2;base64,${anton}) format('woff2')}` : ''}
@@ -901,8 +914,33 @@ body.mitKi .fuss{margin-bottom:40px}
 /* Ring UND Silhouette auf voller Staerke sind zwei Bilder uebereinander. Traegt
    die Karte ein Wasserzeichen, tritt der Ring zurueck und rahmt nur noch. */
 body.mitWz .markenRing{opacity:.09}
+
+/* --- Die Randfigur ---
+   Freigestellt, klebt an der RECHTEN Kante, unten vom Kartenrand
+   angeschnitten. Das PNG zeigt die ganze Figur; angeschnitten wird hier,
+   damit sich der Anschnitt nachstellen laesst, ohne ein neues Bild zu
+   erzeugen.
+
+   ⚠ Das Bild MUSS beschnitten sein (freisteller.py macht das): Mit
+   durchsichtigen Raendern passt die Figur nach Breite hinein und wird nur
+   halb so hoch — eine kleine Gestalt in der Ecke statt einer Figur am Rand. */
+.figurRand{position:absolute;right:0;bottom:0;z-index:2;
+  width:300px;height:70%;
+  background-size:contain;background-repeat:no-repeat;
+  background-position:bottom center;pointer-events:none}
+/* ⚠ OHNE DIESE ZEILEN STEHT DIE FIGUR IM TEXT UND AUF DEN STORE-ABZEICHEN.
+   Das ist der eigentliche Eingriff, nicht das Einfuegen des Bildes. */
+body.mitFigur .inhalt{padding-right:250px}
+body.mitFigur .fuss{padding-right:250px}
+/* Das AI-Plaettchen sitzt sonst rechts unten — also genau auf der Figur. */
+body.mitFigur .kiMarke{right:auto;left:22px}
+/* Der Fusstext brach mit dem schmaleren Platz auf zwei Zeilen um
+   („FullRep · Training & / Ernaehrung") — am gerenderten JPEG gesehen. Eine
+   Nummer kleiner, und er steht wieder in einer Zeile. */
+body.mitFigur .fuss>span:first-child{font-size:20px;white-space:nowrap}
 </style>
 ${hatWz ? `<div class="wzFoto" style="background-image:url(data:image/jpeg;base64,${b64(WZ)});background-size:${WZ_FIT};background-position:${WZ_POS}"></div>` : ''}
+${hatFigur ? `<div class="figurRand" style="background-image:url(data:image/png;base64,${b64(FIGUR)})"></div>` : ''}
 ${hatFoto ? `<div class="hgFoto" style="background-image:url(data:image/jpeg;base64,${b64(hgPfad)})"></div>
 <div class="hgSchleier"></div>` : ''}
 <img class="markenRing" src="data:image/svg+xml;base64,${logoRing}" alt="">
