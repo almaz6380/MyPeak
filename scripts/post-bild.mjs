@@ -349,9 +349,18 @@ function studienZahl(wert, titel) {
  * Interessanteste, das die Karte zu bieten hat. Sie stand berechnet in `o`
  * und wurde weggeworfen.
  */
-function makrosHtml(o) {
+/**
+ * @param {object} o
+ * @param {?string} ausser  Beschriftung, die weggelassen wird — fuer den Stil
+ *   `zahl`, wo einer der Werte schon als grosse Zahl darueber steht.
+ */
+function makrosHtml(o, ausser = null) {
   if (!o.makros?.length) return '';
-  return `<div class="makros">${o.makros.map(([v, l]) =>
+  const zeigen = ausser
+    ? o.makros.filter(([, l]) => l.toLowerCase() !== String(ausser).toLowerCase())
+    : o.makros;
+  if (!zeigen.length) return '';
+  return `<div class="makros makros-${zeigen.length}">${zeigen.map(([v, l]) =>
     `<div><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>`;
 }
 
@@ -403,15 +412,23 @@ function rezeptFolien(o, stufe = 0) {
       <h1 class="folienTitel">${esc(o.haken)}</h1>
       <div class="folienBeiwerk">${esc(beiwerk)}</div>`;
 
+  // ⚠ Die Kalorien stehen auf JEDER Folie, nicht nur auf dem Plakat. Im
+  // Karussell wischt man einzeln weiter, und die Zutatenfolie wird ohne sie
+  // genauso zur Behauptung ohne Zahl wie die Karte, die Josef am 22.09.
+  // geloescht hat.
+  const kcal = o.makros?.find(([, l]) => l === 'kcal')?.[0];
+  const beiwerk = (...teile) => [...teile, kcal ? `${kcal} kcal` : null]
+    .filter(Boolean).join(' · ');
+
   return [
     {
-      mitte: `${kopf(t.zutaten, `${t.fuer(o.portionen)} · ${t.min(o.zeit)}`)}
+      mitte: `${kopf(t.zutaten, beiwerk(t.fuer(o.portionen), t.min(o.zeit)))}
       <ul class="zutaten${stufe >= 1 ? ' zweiSpalten' : ''}${stufe >= 2 ? ' engZutaten' : ''}">
         ${o.zutaten.map((z) => `<li>${esc(z)}</li>`).join('')}
       </ul>`,
     },
     {
-      mitte: `${kopf(t.zubereitung, `${t.min(o.zeit)} · ${t.fuer(o.portionen)}`)}
+      mitte: `${kopf(t.zubereitung, beiwerk(t.min(o.zeit), t.fuer(o.portionen)))}
       <div class="schritte${stufe >= 2 ? ' engSchritte' : ''}">
         ${o.schritte.map((s, i) => `
         <div class="schritt"><b class="anton">${i + 1}</b><p>${esc(s)}</p></div>`).join('')}
@@ -823,6 +840,23 @@ function baueHtml(o, stil, folge = null) {
         <div class="zahlLabel">${esc(o.zahl.label)}</div>
         ${o.zahl.titel ? `<h1 class="anton zahlTitel">${esc(o.zahl.titel)}</h1>` : ''}
         ${absaetze.map((s) => `<p class="text">${esc(s)}</p>`).join('')}
+        ${
+          // ⚠ DIE NAEHRWERTE FEHLTEN HIER GANZ (Josef, 22.09.2026, vor einem
+          // veroeffentlichten Beitrag: „bei so einem post sollte … auch die
+          // gesamtkalorien draufstehen … habe ihn deshalb wieder geloescht").
+          //
+          // Der Stil `zahl` zeigte nur die grosse Zahl und den Text. Bei einer
+          // Rezeptkarte hiess das: Eiweiss gross, und sonst KEIN einziger
+          // Naehrwert — keine Kalorien, keine Kohlenhydrate, kein Fett. Die
+          // Werte standen berechnet in `o.makros` und wurden weggeworfen.
+          // Genau derselbe Fehler wie bei „Wie viel Kreatin?" am 20.09. und
+          // beim Rezepttext am 22.09.: Die Daten waren da, der Stil hatte
+          // keinen Block dafuer.
+          //
+          // ⚠ Der Wert, der schon oben gross steht, faellt raus. Sonst stuende
+          // „38 g Eiweiss" zweimal auf derselben Karte.
+          o.art === 'rezept' ? makrosHtml(o, o.zahl.label.split(' ')[0]) : ''
+        }
       </div>`;
   } else {
     // `o.fotos?.length`, nicht `o.fotos`: Das Array ist heute leer, und ein
@@ -1022,6 +1056,10 @@ body.hatSchau .markenRing{display:none}
   border-radius:18px;padding:20px 12px;text-align:center}
 .makros b{display:block;font-size:38px;color:#fbbf24}
 .makros span{font-size:20px;color:#d6d3d1}
+/* Bleibt einer weg, weil er schon als grosse Zahl darueber steht, fuellen die
+   drei anderen die Breite — statt drei Kacheln und einer Luecke. */
+.makros-3{grid-template-columns:repeat(3,1fr)}
+.stil-zahl .makros{margin-top:14px}
 
 /* --- Rezept-Folgefolien: Zutaten und Zubereitung ---------------------------
    (Keine Backticks in diesem Block — er steht in einem Template-Literal.)
