@@ -355,6 +355,71 @@ function makrosHtml(o) {
     `<div><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>`;
 }
 
+// --- Die Folgefolien eines Rezepts ------------------------------------------
+//
+// Folie 1 ist das Plakat (Name, Beschreibung, Makros, Figur) — sie bleibt,
+// wie sie war, und entscheidet im Feed, ob jemand weiterwischt. Folie 2 und 3
+// liefern dann, was Folie 1 verspricht.
+//
+// ⚠ Zwei Folien, nicht eine. Zusammengelegt waeren es im Hoechstfall zwoelf
+// Zutaten UND sechs Schritte zu je 146 Zeichen auf einer Karte — gemessen am
+// 22.09. ueber alle 25 Rezepte. Das passt nur bei einer Schriftgroesse, bei
+// der es auf dem Telefon niemand liest.
+//
+// ⚠ Die Nummern der Schritte stehen im Markup, nicht in <ol>. Ein <ol> zaehlt
+// selbst, aber es laesst die Ziffer nicht gesondert gestalten — und die Ziffer
+// ist hier das, was die Folie ordnet.
+//
+// ⚠ DIE STUFE WIRD GEMESSEN, NICHT GERATEN. Hier stand zuerst „ab neun
+// Zutaten zwei Spalten, ab fuenf Schritten enger" — zwei Schwellen nach
+// Augenmass. Sie sagen nichts ueber die LAENGE der Eintraege: vier sehr lange
+// Schritte brauchen mehr Platz als sechs kurze. Und sie setzen auch dann eng,
+// wenn Platz da waere: kleine Schrift ueber leerem Drittel.
+//
+// Der Aufrufer rendert deshalb Stufe 0, MISST den Ueberlauf und geht nur dann
+// eine Stufe weiter. Dieselbe Regel wie bei den Bestandszahlen der App-Schau:
+// jede Zahl gezaehlt, keine getippt.
+//
+// | Stufe | Zutaten | Zubereitung |
+// |---|---|---|
+// | 0 | eine Spalte, gross | grosse Schrift |
+// | 1 | ZWEI Spalten, gleiche Groesse | (unveraendert) |
+// | 2 | zwei Spalten, kleiner | kleinere Schrift |
+//
+// ⚠ Stufe 1 ist der Grund, warum es drei Stufen sind und nicht zwei. Zuerst
+// sprang die Liste von „eine Spalte gross" direkt auf „zwei Spalten klein" —
+// zwei Aenderungen auf einmal. Die Lasagne lief einspaltig um 46px ueber und
+// landete dadurch bei einer Fassung, die ein Drittel der Karte leer liess.
+// Eine Stufe aendert eine Sache.
+function rezeptFolien(o, stufe = 0) {
+  const t = LANG === 'de'
+    ? { zutaten: 'Zutaten', zubereitung: 'Zubereitung',
+        fuer: (n) => `für ${n} Portion${n === 1 ? '' : 'en'}`, min: (n) => `${n} Min` }
+    : { zutaten: 'Ingredients', zubereitung: 'Method',
+        fuer: (n) => `for ${n} serving${n === 1 ? '' : 's'}`, min: (n) => `${n} min` };
+
+  const kopf = (rubrik, beiwerk) => `
+      <div class="marke">${esc(rubrik)}</div>
+      <h1 class="folienTitel">${esc(o.haken)}</h1>
+      <div class="folienBeiwerk">${esc(beiwerk)}</div>`;
+
+  return [
+    {
+      mitte: `${kopf(t.zutaten, `${t.fuer(o.portionen)} · ${t.min(o.zeit)}`)}
+      <ul class="zutaten${stufe >= 1 ? ' zweiSpalten' : ''}${stufe >= 2 ? ' engZutaten' : ''}">
+        ${o.zutaten.map((z) => `<li>${esc(z)}</li>`).join('')}
+      </ul>`,
+    },
+    {
+      mitte: `${kopf(t.zubereitung, `${t.min(o.zeit)} · ${t.fuer(o.portionen)}`)}
+      <div class="schritte${stufe >= 2 ? ' engSchritte' : ''}">
+        ${o.schritte.map((s, i) => `
+        <div class="schritt"><b class="anton">${i + 1}</b><p>${esc(s)}</p></div>`).join('')}
+      </div>`,
+    },
+  ];
+}
+
 // --- Inhalt waehlen ---------------------------------------------------------
 function inhalt(format, w) {
   const zieh = (m) => m[Math.floor(w() * m.length)];
@@ -434,6 +499,23 @@ function inhalt(format, w) {
       art: 'rezept', schluessel: r.id,
       marke: T.rezept, haken: LANG === 'de' ? r.nameDE : r.nameEN,
       text: LANG === 'de' ? r.descDE : r.descEN,
+      // ⚠ DAS REZEPT SELBST. Bis zum 22.09.2026 endete dieser Block bei Name,
+      // Beschreibung und Makros — die Karte nannte ein Gericht und hielt die
+      // Anleitung zurueck, obwohl sie vollstaendig danebenlag.
+      //
+      // Josef am 22.09. vor der fertigen Karte: „was fuer lasagne?! entweder
+      // du schreibst das exakte rezept oder du laesst es". Er hat recht: Ein
+      // Beitrag, der einen Namen zeigt und nichts dahinter hat, ist eine
+      // Ankuendigung ohne Ware — und auf einem Kanal, der von Vertrauen lebt,
+      // kostet das mehr, als er einbringt.
+      //
+      // Gemessen am 22.09.: alle 25 Rezepte sind vollstaendig — 4 bis 12
+      // Zutaten, 3 bis 6 Schritte, jedes mit Zeit und Portionen. Es gab also
+      // nie einen Grund, sie wegzulassen.
+      zutaten: LANG === 'de' ? r.ingredientsDE : r.ingredientsEN,
+      schritte: LANG === 'de' ? r.stepsDE : r.stepsEN,
+      zeit: r.prepTime,
+      portionen: r.servings,
       makros: [
         [`${n.calories}`, 'kcal'], [`${n.protein} g`, LANG === 'de' ? 'Eiweiß' : 'protein'],
         [`${n.carbs} g`, LANG === 'de' ? 'Kohlenhydrate' : 'carbs'], [`${n.fat} g`, LANG === 'de' ? 'Fett' : 'fat'],
@@ -590,7 +672,24 @@ const KORN = Buffer.from(
 ).toString('base64');
 
 // --- Die Karte --------------------------------------------------------------
-function baueHtml(o, stil) {
+/**
+ * @param {object} o     Der Inhalt
+ * @param {string} stil  Einer der vier Stile
+ * @param {?object} folge  Nur fuer die FOLGEFOLIEN eines Karussells:
+ *   `{ mitte }` ersetzt den Mittelteil. Alles andere — Kopf, Fuss, Ring,
+ *   Korn, Schriften — bleibt gleich, damit die Folien wie ein Satz aussehen
+ *   und nicht wie drei Karten.
+ *
+ *   ⚠ AUF DEN FOLGEFOLIEN STEHT KEINE FIGUR. Sie kostet 250 px rechte
+ *   Polsterung (`body.mitFigur`), und genau die braucht eine Liste mit zwoelf
+ *   Zutaten. Die Figur begruesst auf Folie 1, danach zaehlt der Inhalt.
+ *
+ *   ⚠ UND DAMIT AUCH KEIN KI-KENNZEICHEN. Das Kennzeichen gehoert an das
+ *   Bild, das KI-erzeugte Menschen ZEIGT. Auf einer reinen Textfolie waere es
+ *   eine Aussage ueber nichts — und ein Kennzeichen, das ueberall steht, sagt
+ *   nirgends mehr etwas.
+ */
+function baueHtml(o, stil, folge = null) {
   const inter400 = b64(join(WURZEL, 'node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2'));
   const inter700 = b64(join(WURZEL, 'node_modules/@fontsource/inter/files/inter-latin-700-normal.woff2'));
   const antonPfad = join(WURZEL, 'scripts', 'schriften', 'anton.woff2');
@@ -607,23 +706,33 @@ function baueHtml(o, stil) {
   ).toString('base64');
 
   const hgPfad = HINTERGRUND ?? o.autoFoto ?? (o.fotos?.[1] ?? null);
-  const hatFoto = hgPfad && existsSync(hgPfad);
-  const hatWz = WZ && existsSync(WZ);
+  // ⚠ Auf den Folgefolien bleibt der Untergrund leer — aus demselben Grund
+  // wie bei der Figur. Ein Foto oder Wasserzeichen unter einer Liste aus
+  // zwoelf Zutaten nimmt genau die Ruhe weg, von der sie lebt. Und weil damit
+  // kein KI-Bild mehr auf der Folie liegt, faellt auch das Kennzeichen weg.
+  const hatFoto = hgPfad && existsSync(hgPfad) && !folge;
+  const hatWz = WZ && existsSync(WZ) && !folge;
   // Die Datei ist oben schon geprueft; fehlt sie, laeuft dieses Skript gar
   // nicht bis hierher. Ein zweites `existsSync` waere die Gelegenheit, den
   // Fall doch wieder still zu machen.
-  const hatFigur = Boolean(FIGUR);
-  const kiMarke = KI_MENSCHEN ? (WASSERZEICHEN_HTML[LANG] ?? WASSERZEICHEN_HTML.de) : '';
+  const hatFigur = Boolean(FIGUR) && !folge;
+  const kiMarke = KI_MENSCHEN && !folge
+    ? (WASSERZEICHEN_HTML[LANG] ?? WASSERZEICHEN_HTML.de) : '';
 
   // --- Mitte je Stil --------------------------------------------------------
   let mitte = '';
+  // Eine Folgefolie bringt ihren Mittelteil selbst mit und geht an der
+  // Stilweiche vorbei. `--stil` beschreibt den Aufbau der ERSTEN Folie; auf
+  // eine Zutatenliste angewandt waere er sinnlos (`zahl` verlangt eine grosse
+  // Zahl, `poster` eine 104-px-Schlagzeile ueber der Liste).
+  if (folge) mitte = folge.mitte;
   // ⚠ Die App-Schau hat KEINEN Stil und darf keinen haben. Die vier Stile sind
   // Varianten EINES Aufbaus (Aufhaenger, Schlagzeile, Text); diese Karte hat
   // einen anderen — drei Bildschirme tragen sie, und Text ist Beiwerk. Sie
   // durch die Stilweiche zu schicken hiesse, dass `--stil zahl` eine grosse
   // Zahl ohne Zahl verlangt und `poster` eine 104-px-Schlagzeile ueber die
   // Screenshots legt. Deshalb steht sie VOR der Weiche und ignoriert `stil`.
-  if (o.art === 'app') {
+  else if (o.art === 'app') {
     mitte = `
       <div class="schau">
         <div class="schauKopf">
@@ -744,7 +853,7 @@ function baueHtml(o, stil) {
   }
 
   return `<!doctype html><meta charset="utf-8">
-<body class="stil-${stil}${o.art === 'app' ? ' hatSchau' : ''}${KI_MENSCHEN ? ' mitKi' : ''}${hatFoto ? ' mitFoto' : ''}${hatWz ? ' mitWz' : ''}${hatFigur ? ' mitFigur' : ''}"><style>
+<body class="stil-${stil}${folge ? ' folge' : ''}${o.art === 'app' ? ' hatSchau' : ''}${KI_MENSCHEN && !folge ? ' mitKi' : ''}${hatFoto ? ' mitFoto' : ''}${hatWz ? ' mitWz' : ''}${hatFigur ? ' mitFigur' : ''}"><style>
 @font-face{font-family:'Inter';font-weight:400;src:url(data:font/woff2;base64,${inter400}) format('woff2')}
 @font-face{font-family:'Inter';font-weight:700;src:url(data:font/woff2;base64,${inter700}) format('woff2')}
 ${anton ? `@font-face{font-family:'Anton';font-weight:400;src:url(data:font/woff2;base64,${anton}) format('woff2')}` : ''}
@@ -913,6 +1022,55 @@ body.hatSchau .markenRing{display:none}
   border-radius:18px;padding:20px 12px;text-align:center}
 .makros b{display:block;font-size:38px;color:#fbbf24}
 .makros span{font-size:20px;color:#d6d3d1}
+
+/* --- Rezept-Folgefolien: Zutaten und Zubereitung ---------------------------
+   (Keine Backticks in diesem Block — er steht in einem Template-Literal.)
+
+   Der Titel steht auf jeder Folie noch einmal, kleiner als auf Folie 1. Im
+   Karussell wischt man einzeln weiter, und eine Folie ohne Titel ist eine
+   Liste ohne Gericht.
+
+   Die zwei eng-Klassen sind KEINE Feinabstimmung nach Augenmass, sondern die
+   Antwort auf die gemessenen Hoechstwerte: 12 Zutaten und 6 Schritte. Wer
+   die Schwellen verschiebt, misst vorher nach — der Ueberlaufwaechter beim
+   Rendern bricht sonst ab, und das ist die gute Variante. */
+.folienTitel{font-size:46px;line-height:1.08;font-weight:700;letter-spacing:-.02em;
+  color:#fff8e7}
+.folienBeiwerk{font-size:24px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:#fbbf24;margin-top:-10px}
+
+.zutaten{list-style:none;display:grid;gap:12px;margin-top:4px}
+.zutaten li{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.18);
+  border-radius:16px;padding:17px 24px;font-size:31px;line-height:1.2;color:#f5f5f4}
+/* Stufe 1: zwei Spalten, SONST NICHTS. Die laengste gemessene Zutat hat 55
+   Zeichen und passt bei dieser Groesse in eine halbe Breite. */
+.zweiSpalten{grid-template-columns:1fr 1fr;gap:12px}
+/* Stufe 2: erst jetzt wird es auch kleiner. */
+.engZutaten li{padding:14px 18px;font-size:26px;border-radius:14px}
+
+.schritte{display:flex;flex-direction:column;gap:20px;margin-top:4px}
+.schritt{display:flex;gap:20px;align-items:flex-start}
+.schritt b{flex:0 0 auto;width:52px;height:52px;border-radius:14px;
+  background:rgba(251,191,36,.14);border:1px solid rgba(251,191,36,.3);
+  color:#fbbf24;font-size:30px;display:flex;align-items:center;
+  justify-content:center;line-height:1}
+.schritt p{font-size:28px;line-height:1.32;color:#e7e5e4}
+.engSchritte{gap:15px}
+.engSchritte .schritt b{width:46px;height:46px;font-size:26px;border-radius:12px}
+.engSchritte .schritt p{font-size:25px;line-height:1.3}
+
+/* ⚠ Die Folgefolie erbt den Stil NICHT in der Ausrichtung. Der Stil mix
+   schiebt den Inhalt an den unteren Rand (dort steht die Schlagzeile als
+   Plakat) — unter einer Zutatenliste ergab das ein leeres oberes Drittel.
+   Genau der Fehler, der auf den Swaply-Karten und auf Anigoshas
+   Startbildschirm schon zweimal Zeit gekostet hat. Hier traegt der Inhalt die
+   Folie, also steht er mittig und die Luft verteilt sich oben und unten.
+   (Keine Backticks in diesem Block — er steht in einem Template-Literal.) */
+body.folge .inhalt{justify-content:center;gap:20px}
+/* Und der Markenring tritt zurueck: Bei .20 lief er als Kante mitten durch
+   die Kacheln. Auf Folie 1 ist er Schmuck neben wenig Text, hier stoert er
+   das Lesen. */
+body.folge .markenRing{opacity:.07}
 
 .fuss{display:flex;justify-content:space-between;align-items:center;gap:20px;
   font-size:23px;color:#78716c}
@@ -1093,14 +1251,72 @@ if (String(o.haken ?? '').trim().endsWith('?') && o.studienwert) {
   }
 }
 
+// --- Rendern ----------------------------------------------------------------
+//
+// Ein Rezept wird zum KARUSSELL: Plakat, Zutaten, Zubereitung. Erkannt wird
+// das Karussell weiter unten in der Kette an den nummerierten Dateien
+// (`<stamm>-1.jpg`, `-2.jpg`, …) — nicht an einem Feld im Ledger. Was auf der
+// Platte liegt, ist die Wahrheit ueber das, was gerendert wurde.
+//
+// ⚠ DESHALB ENTSTEHT BEIM KARUSSELL KEIN `<stamm>.jpg` MEHR. Laegen beide da,
+// zeigte die Merkliste eine Datei, die im Beitrag gar nicht vorkommt
+// (posten.mjs nimmt beim Karussell die erste Folie), und das Aufraeumen
+// uebersaehe sie.
+const istKarussell = o.art === 'rezept';
+const seiten = istKarussell
+  ? [{ html, ziel: join(OUT, `${basis}-1.jpg`) },
+     ...rezeptFolien(o).map((f, i) => ({
+       html: baueHtml(o, stil, f),
+       ziel: join(OUT, `${basis}-${i + 2}.jpg`),
+       // Dieselbe Folie eine Stufe enger, falls die vorige ueberlaeuft.
+       enger: (stufe) => baueHtml(o, stil, rezeptFolien(o, stufe)[i]),
+     }))]
+  : [{ html, ziel }];
+
 const browser = await chromium.launch(
   process.env.CHROMIUM_PFAD ? { executablePath: process.env.CHROMIUM_PFAD } : {},
 );
 const seite = await browser.newPage({ viewport: { width: B, height: H }, deviceScaleFactor: 1 });
-await seite.setContent(html, { waitUntil: 'load' });
-await seite.evaluate(() => document.fonts.ready);
-await seite.screenshot({ path: ziel, type: 'jpeg', quality: 92 });
-await browser.close();
+const erzeugt = [];
+try {
+  // ⚠ Gemessen wird `.inhalt`, NICHT der Body. Der Body hat feste Hoehe und
+  // `overflow:hidden` — er meldet nie einen Ueberlauf, auch wenn die Liste
+  // laengst unten heraushaengt. Genau deshalb faellt eine abgeschnittene
+  // Folie im Protokoll nicht auf, sondern erst im veroeffentlichten
+  // Karussell, wo sie niemand mehr korrigieren kann.
+  const ueberlauf = () => seite.evaluate(() => {
+    const el = document.querySelector('.inhalt');
+    return el ? el.scrollHeight - el.clientHeight : 0;
+  });
+  const aufbauen = async (h) => {
+    await seite.setContent(h, { waitUntil: 'load' });
+    await seite.evaluate(() => document.fonts.ready);
+    return ueberlauf();
+  };
+
+  for (const [i, s] of seiten.entries()) {
+    let ueber = await aufbauen(s.html);
+    // Passt es nicht, EINE Stufe weiter — und nach jeder Stufe neu messen.
+    for (let stufe = 1; ueber > 0 && s.enger && stufe <= 2; stufe += 1) {
+      console.log(`  (Folie ${i + 1}: ${ueber}px zu viel, Stufe ${stufe})`);
+      ueber = await aufbauen(s.enger(stufe));
+    }
+    // ⚠ ABBRECHEN STATT ABSCHNEIDEN. Lieber ein roter Lauf mit Grund im
+    // Bericht als eine halbe Zutat im Feed.
+    if (ueber > 0) {
+      await browser.close();
+      console.error(`✗ Folie ${i + 1} laeuft um ${ueber}px ueber — auch auf der engsten Stufe.`);
+      console.error(`  Rezept: ${o.schluessel} (${o.zutaten?.length} Zutaten, ${o.schritte?.length} Schritte)`);
+      console.error('  Hier braucht es eine weitere Stufe im CSS, keine kleinere Schwelle.');
+      process.exit(1);
+    }
+
+    await seite.screenshot({ path: s.ziel, type: 'jpeg', quality: 92 });
+    erzeugt.push(s.ziel);
+  }
+} finally {
+  await browser.close();
+}
 
 // ⚠ HOECHSTENS FUENF (Josef, 18.09.2026), und die Reihenfolge entscheidet,
 // welche fuenf es sind: Marke zuerst, dann das Enge, dann das Breite.
@@ -1121,8 +1337,21 @@ const tags = {
 // Foto" ueber einer rein typografischen Karte.
 const hatFoto = Boolean(HINTERGRUND ?? o.autoFoto ?? o.fotos?.length);
 
+// ⚠ Das Rezept gehoert AUCH in die Caption, nicht nur auf die Folien.
+// Gespeichert und weitergeschickt wird ein Beitrag ueber den Text; wer die
+// Lasagne nachkochen will, hat die Bilder in dem Moment nicht mehr offen.
+// Und wer den Ton aus hat oder nur ueberfliegt, liest hier, dass es wirklich
+// ein Rezept ist und keine Ankuendigung.
+const rezeptText = o.art === 'rezept' && o.zutaten?.length
+  ? `\n\n${LANG === 'de' ? 'ZUTATEN' : 'INGREDIENTS'} (${
+      LANG === 'de' ? `für ${o.portionen} Portionen` : `for ${o.portionen} servings`})\n`
+    + o.zutaten.map((z) => `· ${z}`).join('\n')
+    + `\n\n${LANG === 'de' ? 'ZUBEREITUNG' : 'METHOD'} (${o.zeit} ${LANG === 'de' ? 'Min' : 'min'})\n`
+    + o.schritte.map((s, i) => `${i + 1}. ${s}`).join('\n')
+  : '';
+
 writeFileSync(join(OUT, `${basis}.txt`),
-`# ${basis}.jpg
+`# ${erzeugt.map((d) => d.split('/').pop()).join(', ')}
 
 ## Caption (kopieren)
 
@@ -1132,7 +1361,7 @@ ${o.art === 'peptid'
       : `a peptide of ${o.zahl.wert} amino acids.`}\n\n${o.haken}`
   : o.haken}${o.art === 'peptid' ? `\n\n${T.peptidZeile(peptideGesamt())}` : ''}${
   o.text ? `\n\n${o.text}` : ''}${
-  o.studienwert ? `\n\n${LANG === 'de' ? 'Laut Studien' : 'Research says'}: ${o.studienwert}` : ''}
+  o.studienwert ? `\n\n${LANG === 'de' ? 'Laut Studien' : 'Research says'}: ${o.studienwert}` : ''}${rezeptText}
 
 ## Hashtags
 
@@ -1171,5 +1400,6 @@ stehen in der App unter dem Eintrag „${o.marke}":
 ${o.quellen.slice(0, 5).map((q) => `- ${quelleKurz(q)}`).join('\n')}
 ` : ''}`);
 
-console.log(`✓ ${ziel}`);
-console.log(`  ${B}×${H} · ${stil} · ${o.art} · ${o.schluessel} · ${LANG}`);
+for (const d of erzeugt) console.log(`✓ ${d}`);
+console.log(`  ${B}×${H} · ${stil} · ${o.art} · ${o.schluessel} · ${LANG}${
+  erzeugt.length > 1 ? ` · Karussell mit ${erzeugt.length} Folien` : ''}`);
