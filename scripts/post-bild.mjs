@@ -529,6 +529,26 @@ function inhalt(format, w) {
       // Gemessen am 22.09.: alle 25 Rezepte sind vollstaendig — 4 bis 12
       // Zutaten, 3 bis 6 Schritte, jedes mit Zeit und Portionen. Es gab also
       // nie einen Grund, sie wegzulassen.
+      // ⚠ DAS FOTO SUCHT SICH DIE KARTE SELBST, und zwar hier.
+      //
+      // Josef am 22.09.2026: „bei so einem post sollte ein bild von dem
+      // fertigen meal im hintergrund sein". Der Tageslauf kann es nicht
+      // mitgeben — `motoren.mjs` weiss gar nicht, welches Rezept der Wuerfel
+      // gleich zieht. Es waere also entweder ein falsches Bild oder gar
+      // keines.
+      //
+      // Der Dateiname IST die Rezept-Id. Damit gehoeren Bild und Text
+      // zwangslaeufig zusammen; eine Zuordnungstabelle waere eine zweite
+      // Wahrheit, die eines Tages auseinanderlaeuft.
+      //
+      // ⚠ Fehlt das Bild, bleibt die Karte rein typografisch — KEIN Abbruch.
+      // Anders als bei der Figur: Die ist eine ausdrueckliche Ansage
+      // („nimm trainer.png"), das Foto ist eine Beigabe. Ein neues Rezept ohne
+      // Bild soll den Tageslauf nicht rot faerben.
+      autoFoto: (() => {
+        const p = join(WURZEL, 'store-assets', 'social', 'fotos', 'rezepte', `${r.id}.jpg`);
+        return existsSync(p) ? p : null;
+      })(),
       zutaten: LANG === 'de' ? r.ingredientsDE : r.ingredientsEN,
       schritte: LANG === 'de' ? r.stepsDE : r.stepsEN,
       zeit: r.prepTime,

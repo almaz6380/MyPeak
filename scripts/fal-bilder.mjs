@@ -32,12 +32,22 @@ import { writeFileSync, appendFileSync, mkdirSync, existsSync, readFileSync } fr
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { rezepteMitMakros } from './social-daten.mjs';
+
 const WURZEL = join(dirname(fileURLToPath(import.meta.url)), '..');
-const ZIEL = join(WURZEL, 'store-assets', 'social', 'fotos');
 
 const arg = (n, s) => { const i = process.argv.indexOf(`--${n}`); return i === -1 ? s : process.argv[i + 1]; };
 const WAS = arg('was', 'probe');
 const LOS = process.argv.includes('--los');
+
+// ⚠ Die Rezeptbilder liegen in einem EIGENEN Ordner. Sie sind etwas anderes
+// als die Motive darueber: Die tragen einen Bereich (`training`,
+// `supplements`) und sind austauschbar; ein Rezeptbild gehoert zu genau einem
+// Rezept und wird ueber dessen `id` gefunden. In einen Topf geworfen faende
+// niemand mehr das Bild zur Lasagne.
+const ZIEL = WAS === 'rezepte'
+  ? join(WURZEL, 'store-assets', 'social', 'fotos', 'rezepte')
+  : join(WURZEL, 'store-assets', 'social', 'fotos');
 
 // Knapp unter 1 MP — siehe Kopf. 832*1152 = 958.464 Pixel = 0,96 MP.
 const BREITE = 832, HOEHE = 1152;
@@ -112,9 +122,72 @@ if (WAS === 'probe') {
     const m = MOTIVE[i % MOTIVE.length];
     return { ...m, modell: k, seed: SEED_BASIS + 100 + i, datei: `${m.id}-${String(i + 1).padStart(2, '0')}.jpg` };
   });
+} else if (WAS === 'rezepte') {
+  // --- Ein Bild je Rezept ---------------------------------------------------
+  //
+  // Josef am 22.09.2026, nachdem er einen veroeffentlichten Beitrag wieder
+  // geloescht hatte: „bei so einem post sollte ein bild von dem fertigen meal
+  // im hintergrund sein".
+  //
+  // ⚠ Der Prompt wird AUS DEN DATEN gebaut, nicht getippt. 25 von Hand
+  // geschriebene Prompts waeren 25 Gelegenheiten, ein Gericht zu beschreiben,
+  // das nicht dem Rezept entspricht — und die Karte zeigt daneben die echten
+  // Zutaten. Name und die ersten vier Zutaten kommen aus derselben Quelle wie
+  // die Karte, also stimmen Bild und Text zwangslaeufig ueberein.
+  //
+  // ⚠ ENGLISCH, auch wenn die Karte deutsch ist: `ingredientsEN` steht
+  // danebem, und flux versteht englische Prompts deutlich zuverlaessiger.
+  //
+  // ⚠ Die Mengenangaben fliegen raus („300g Hähnchenbrust" → „chicken
+  // breast"). Eine Zahl im Prompt landet sonst als erfundener Schriftzug im
+  // Bild — genau das, was „no text" verhindern soll.
+  const k = arg('modell', 'dev');
+  if (!MODELLE[k]) { console.error(`✗ unbekanntes Modell: ${k}`); process.exit(1); }
+  const nur = Number(arg('anzahl', 0));
+  const rezepte = rezepteMitMakros();
+  auftrag = (nur > 0 ? rezepte.slice(0, nur) : rezepte).map((r, i) => {
+    const zutaten = (r.ingredientsEN ?? []).slice(0, 4)
+      .map((z) => z.replace(/^[\d.,/]+\s*\w*\s+/, '').replace(/\(.*?\)/g, '').trim())
+      .filter(Boolean).join(', ');
+    return {
+      id: r.id,
+      bereich: 'rezepte',
+      // Dieselben drei Vorgaben wie oben, aus denselben Gruenden — dazu die
+      // Aufsicht, weil ein Teller von schraeg oben erkennbar bleibt, auch wenn
+      // spaeter der Schleier darueberliegt.
+      prompt: `overhead food photography of ${r.nameEN.toLowerCase()}, `
+        + `made with ${zutaten}, plated on a dark slate surface, `
+        + 'warm amber side light, deep shadows filling the upper third of the frame, '
+        + 'moody appetising restaurant food photography, photorealistic, '
+        + 'no people, no hands, no text, no logos, no watermarks',
+      modell: k,
+      seed: SEED_BASIS + 300 + i,
+      datei: `${r.id}.jpg`,
+    };
+  });
 } else {
-  console.error(`✗ unbekannt: --was ${WAS}\n  Bekannt: probe, voll`);
+  console.error(`✗ unbekannt: --was ${WAS}\n  Bekannt: probe, voll, rezepte`);
   process.exit(1);
+}
+
+// ⚠ WAS SCHON DA IST, WIRD NICHT NOCH EINMAL BEZAHLT.
+//
+// Ohne das kostet jeder Wiederholungslauf den vollen Preis, und zwar
+// unbemerkt: Die Datei wird ueberschrieben, das Bild sieht gleich aus, und
+// auffallen wuerde es erst auf der Abrechnung. Genau die Sorte Fehler, vor der
+// der Kopf dieser Datei bei der Bildgroesse warnt.
+//
+// `--neu` erzwingt das Ueberschreiben, wenn ein Motiv wirklich misslungen ist.
+const NEU = process.argv.includes('--neu');
+const schonDa = NEU ? [] : auftrag.filter((a) => existsSync(join(ZIEL, a.datei)));
+if (schonDa.length) {
+  auftrag = auftrag.filter((a) => !schonDa.some((s) => s.datei === a.datei));
+  console.log(`${schonDa.length} Bild(er) liegen schon da und werden uebersprungen`);
+  console.log(`  (mit --neu ueberschreiben, kostet dann wieder)\n`);
+}
+if (!auftrag.length) {
+  console.log('Nichts zu tun — alle Bilder sind vorhanden.');
+  process.exit(0);
 }
 
 const kosten = auftrag.reduce((s, a) => s + MODELLE[a.modell].proMP * MP, 0);
