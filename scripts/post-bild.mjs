@@ -91,7 +91,30 @@ const WZ_POS = arg('wz-pos', 'center');
 // ⚠ Der Pfad ist RELATIV ZUR REPO-WURZEL, wie bei `--wz` auch: Der Tageslauf
 // ruft dieses Skript aus wellapps-social auf, ein Pfad relativ zum
 // Arbeitsverzeichnis zeigte dort ins Leere.
-const FIGUR = arg('figur', null);
+// ⚠ DER DATEINAME WIRD AUFGELOEST, NICHT ROH BENUTZT — und ein Fehlgriff
+// bricht ab, statt die Figur wegzulassen.
+//
+// Gemessen am 22.09.2026 am fertigen Beitrag: Der Tageslauf schickte
+// `--figur trainer.png` (so steht es in apps.json, so machen es auch die
+// Generatoren von Anigosha und Swaply), hier stand aber ein blosses
+// `existsSync(FIGUR)` gegen das Arbeitsverzeichnis. Das war falsch, und
+// zwar STILL: `hatFigur` wurde false, die Karte lief durch, das Protokoll
+// blieb gruen — und in der Freigabe-App stand eine Rezeptkarte ohne Figur,
+// waehrend Anigosha und Swaply ihre trugen.
+//
+// Ein absoluter Pfad geht weiterhin (so ruft man es von Hand auf); ein
+// blosser Dateiname wird unter store-assets/social/figuren/ gesucht.
+const FIGUR_ROH = arg('figur', null);
+const FIGUR = FIGUR_ROH
+  ? (FIGUR_ROH.includes('/') ? join(WURZEL, FIGUR_ROH)
+    : join(WURZEL, 'store-assets', 'social', 'figuren', FIGUR_ROH))
+  : null;
+if (FIGUR && !existsSync(FIGUR)) {
+  console.error(`✗ Figur nicht gefunden: ${FIGUR_ROH}`);
+  console.error('  Erwartet unter store-assets/social/figuren/ (oder als Pfad');
+  console.error('  relativ zur Repo-Wurzel).');
+  process.exit(1);
+}
 const KI_MENSCHEN = process.argv.includes('--ki')
   || Boolean(arg('wz', null)) || Boolean(FIGUR);
 
@@ -586,7 +609,10 @@ function baueHtml(o, stil) {
   const hgPfad = HINTERGRUND ?? o.autoFoto ?? (o.fotos?.[1] ?? null);
   const hatFoto = hgPfad && existsSync(hgPfad);
   const hatWz = WZ && existsSync(WZ);
-  const hatFigur = FIGUR && existsSync(FIGUR);
+  // Die Datei ist oben schon geprueft; fehlt sie, laeuft dieses Skript gar
+  // nicht bis hierher. Ein zweites `existsSync` waere die Gelegenheit, den
+  // Fall doch wieder still zu machen.
+  const hatFigur = Boolean(FIGUR);
   const kiMarke = KI_MENSCHEN ? (WASSERZEICHEN_HTML[LANG] ?? WASSERZEICHEN_HTML.de) : '';
 
   // --- Mitte je Stil --------------------------------------------------------
