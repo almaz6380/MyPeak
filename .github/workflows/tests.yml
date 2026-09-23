@@ -1,11 +1,16 @@
-# Prüft die api/-Endpunkte bei jedem Push. Die Tests brauchen weder Netz noch
-# Secrets — global fetch ist im Prüfstand ersetzt, alle Umgebungsvariablen sind
-# Attrappen. Der Lauf dauert Sekunden und kostet nichts.
+# Prüft die api/-Endpunkte bei jedem Pull Request und jedem Push auf main. Die Tests
+# brauchen weder Netz noch Secrets — global fetch ist im Prüfstand ersetzt, alle
+# Umgebungsvariablen sind Attrappen.
+#
+# Nicht mehr bei jedem Push auf jeden Zweig: GitHub rechnet jeden Lauf auf volle
+# Minuten auf, und ein Push auf einen Zweig mit offenem Pull Request lief doppelt
+# (push + pull_request). Das hat das Actions-Kontingent des Kontos mit aufgebraucht,
+# das sich alle privaten Projekte teilen.
 name: Tests
 
 on:
   push:
-    branches: ['**']
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
