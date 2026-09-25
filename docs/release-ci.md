@@ -73,3 +73,30 @@ steht — sonst liefe im Store eine Version mit Google-Test-Anzeigen.
 
 Upload-Schalter **aus**stellen. Läuft der Build durch und liegt das Artefakt bereit,
 stimmt die Signierung — dann noch einmal mit Upload starten.
+
+## Eigener Mac als Läufer (keine GitHub-Minuten, seit 25.09.2026)
+
+„iOS Release" und „Android Release" haben die Eingabe **`laeufer`**: `github`
+(Standard, kostet Minuten — macOS zählt zehnfach) oder `mac` = Josefs MacBook als
+*Self-hosted Runner*. Dieselbe Einrichtung läuft schon für Anigosha, Mahjong und
+Swaply; Runner sind bei einem persönlichen GitHub-Konto **je Repo** anzumelden.
+
+**Einmal einrichten (am Mac, ~5 Minuten):**
+1. GitHub → dieses Repo → Settings → Actions → Runners → **New self-hosted runner**
+   → **macOS**, **ARM64**.
+2. Im Terminal einen EIGENEN Ordner: `mkdir ~/actions-runner-mypeak && cd ~/actions-runner-mypeak`
+3. Von der GitHub-Seite nur `curl …`, `tar xzf …` und `./config.sh …` kopieren,
+   bei jeder Rückfrage Enter.
+4. Statt `./run.sh`: `./svc.sh install && ./svc.sh start`
+
+**Voraussetzungen am Mac:** Xcode ≥ 26 (wird geprüft), Android-SDK unter
+`~/Library/Android/sdk`. CocoaPods braucht MyPeak nicht (Swift Package Manager).
+Der Mac muss während des Builds wach sein (MacBook: aufgeklappt, am Strom).
+
+**Nichts Eigenes wird angefasst:** Wegwerf-Schlüsselbund unter `$RUNNER_TEMP`
+(Suchliste wird wiederhergestellt), die beiden Profile als
+`mypeak-ci-app/-widget.mobileprovision` (danach gelöscht), API- und
+Play-Schlüssel nur unter `$RUNNER_TEMP`, nie `~/.appstoreconnect` oder `/tmp`.
+Die Artefakt-Ablage läuft mit `continue-on-error` — am 25.09. war GitHubs
+Artefakt-Speicher voll und hätte sonst den Store-Upload blockiert.
+⚠ Das Repo darf nie öffentlich werden, solange der Runner angemeldet ist.

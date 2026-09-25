@@ -5,6 +5,10 @@
 # Einmalige Einrichtung: siehe docs/release-ci.md (fuenf Android-Secrets).
 # WICHTIG: versionCode in android/app/build.gradle vorher erhoehen — Play lehnt
 # einen bereits benutzten versionCode ab.
+#
+# Laeufer „mac" = Josefs eigener Mac als Self-hosted Runner: kostet keine
+# GitHub-Minuten, braucht dort aber das Android-SDK (~/Library/Android/sdk).
+# Schluessel und Hilfsdateien liegen nur unter $RUNNER_TEMP, nie unter /tmp.
 name: Android Release
 
 on:
@@ -28,13 +32,18 @@ on:
         description: 'Wirklich zu Play hochladen? (aus = nur bauen und als Artefakt ablegen)'
         type: boolean
         default: true
+      laeufer:
+        description: 'Wo bauen? github = GitHub-Rechner (kostet Minuten), mac = eigener Mac (Self-hosted Runner)'
+        type: choice
+        default: 'github'
+        options: ['github', 'mac']
 
 permissions:
   contents: read
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.laeufer == 'mac' && fromJSON('["self-hosted", "macOS"]') || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -47,6 +56,22 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'   # Capacitor 8 / AGP 8.13 brauchen JDK 21
+
+      - name: Android-SDK finden
+        # GitHubs Ubuntu-Rechner setzen ANDROID_HOME selbst; auf dem eigenen Mac
+        # liegt das SDK dort, wohin Android Studio es installiert.
+        run: |
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+          if [ -z "$SDK" ] && [ -d "$HOME/Library/Android/sdk" ]; then
+            SDK="$HOME/Library/Android/sdk"
+          fi
+          if [ -z "$SDK" ] || [ ! -d "$SDK" ]; then
+            echo "ABBRUCH: Kein Android-SDK gefunden (erwartet unter ~/Library/Android/sdk)."
+            exit 1
+          fi
+          echo "Android-SDK: $SDK"
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
 
       - name: Abhaengigkeiten
         run: npm ci
@@ -106,15 +131,15 @@ jobs:
           SAUBER=$(printf '%s' "$KEYSTORE_B64" | tr -cd 'A-Za-z0-9+/=')
           echo "davon base64-tauglich: ${#SAUBER} Zeichen"
 
-          printf '%s' "$SAUBER" | base64 -d > android/upload-keystore.jks 2>/tmp/b64.err
+          printf '%s' "$SAUBER" | base64 -d > android/upload-keystore.jks 2>"$RUNNER_TEMP/b64.err"
           RC=$?
           echo "base64 -d: Rueckgabewert $RC, Datei $(wc -c < android/upload-keystore.jks) Bytes"
           if [ "$RC" -ne 0 ] || [ ! -s android/upload-keystore.jks ]; then
             echo "::error::Der Keystore konnte nicht aus ANDROID_KEYSTORE_BASE64 entpackt werden."
-            head -3 /tmp/b64.err 2>/dev/null
+            head -3 "$RUNNER_TEMP/b64.err" 2>/dev/null
             exit 1
           fi
-          rm -f /tmp/b64.err
+          rm -f "$RUNNER_TEMP/b64.err"
 
           # ACHTUNG: build.gradle liest diese Datei mit Properties.load(). Dort ist der
           # Backslash ein Escape-Zeichen — aus a\b wird ab. Ein Passwort mit \ kaeme also
@@ -145,22 +170,22 @@ jobs:
           # Mit dem ROHEN Wert aus der Umgebung, nicht ueber keystore.properties —
           # so trennt der Test das Secret selbst vom Schreiben der Properties-Datei.
           if ! "$JAVA_HOME/bin/keytool" -list -keystore "$KS" \
-                 -storepass "$STORE_PASSWORD" > /tmp/kt.out 2>&1; then
+                 -storepass "$STORE_PASSWORD" > "$RUNNER_TEMP/kt.out" 2>&1; then
             echo "::error::Keystore laesst sich mit ANDROID_KEYSTORE_PASSWORD nicht oeffnen."
             echo "Entweder stimmt das Passwort nicht, oder die Datei ist beschaedigt."
-            head -5 /tmp/kt.out
+            head -5 "$RUNNER_TEMP/kt.out"
             exit 1
           fi
           echo "Store-Passwort ok"
 
-          if ! grep -qiF "$KEY_ALIAS," /tmp/kt.out; then
+          if ! grep -qiF "$KEY_ALIAS," "$RUNNER_TEMP/kt.out"; then
             echo "::error::Alias aus ANDROID_KEY_ALIAS ist nicht in diesem Keystore."
             echo "Vorhandene Eintraege:"
-            grep -i "PrivateKeyEntry\|trustedCertEntry" /tmp/kt.out | cut -d, -f1
+            grep -i "PrivateKeyEntry\|trustedCertEntry" "$RUNNER_TEMP/kt.out" | cut -d, -f1
             exit 1
           fi
           echo "Alias gefunden"
-          rm -f /tmp/kt.out
+          rm -f "$RUNNER_TEMP/kt.out"
 
       - name: AAB bauen
         run: cd android && ./gradlew --no-daemon bundleRelease
@@ -181,6 +206,9 @@ jobs:
 
       - name: AAB als Artefakt ablegen
         uses: actions/upload-artifact@v4
+        # Nur Bequemlichkeit: Ist GitHubs Artefakt-Speicher voll (so am 25.09.
+        # passiert), darf das den Store-Upload danach nicht verhindern.
+        continue-on-error: true
         with:
           name: FullRep-${{ env.VN }}-vc${{ env.VC }}
           path: FullRep-${{ env.VN }}-vc${{ env.VC }}.aab
@@ -193,6 +221,9 @@ jobs:
       - name: R8-Mapping als Artefakt ablegen
         if: always()
         uses: actions/upload-artifact@v4
+        # Nur Bequemlichkeit: Ist GitHubs Artefakt-Speicher voll (so am 25.09.
+        # passiert), darf das den Store-Upload danach nicht verhindern.
+        continue-on-error: true
         with:
           name: FullRep-${{ env.VN }}-vc${{ env.VC }}-mapping
           path: android/app/build/outputs/mapping/release/mapping.txt
@@ -208,17 +239,20 @@ jobs:
           TRACK: ${{ inputs.track || 'production' }}
         run: |
           # Eigene venv: Ubuntu-Runner erlauben kein pip3 install ins System-Python.
-          python3 -m venv /tmp/venv
-          /tmp/venv/bin/pip install --quiet pyjwt cryptography
-          printf '%s' "$PLAY_KEY_JSON" > /tmp/play-key.json
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet pyjwt cryptography
+          printf '%s' "$PLAY_KEY_JSON" > "$RUNNER_TEMP/play-key.json"
           # Ein gestaffelter Rollout gilt nur fuer production; im internen Test
           # gibt es keine Fraktionen — dort immer complete.
           if [ "$TRACK" != "production" ] || [ "$ROLLOUT" = "complete" ]; then ARG="--complete"; else ARG="--fraction $ROLLOUT"; fi
-          PLAY_KEY=/tmp/play-key.json /tmp/venv/bin/python scripts/play-upload.py \
+          PLAY_KEY="$RUNNER_TEMP/play-key.json" "$RUNNER_TEMP/venv/bin/python" scripts/play-upload.py \
             --aab android/app/build/outputs/bundle/release/app-release.aab \
             --track "$TRACK" $ARG --notes "$NOTES"
-          rm -f /tmp/play-key.json
+          rm -f "$RUNNER_TEMP/play-key.json"
 
       - name: Schluessel aufraeumen
         if: always()
-        run: rm -f android/upload-keystore.jks android/keystore.properties /tmp/play-key.json
+        run: |
+          rm -f android/upload-keystore.jks android/keystore.properties "$RUNNER_TEMP/play-key.json"
+          rm -rf "$RUNNER_TEMP/venv"
+          rm -f "$RUNNER_TEMP/b64.err" "$RUNNER_TEMP/kt.out"
