@@ -22,22 +22,30 @@ import { readdirSync, mkdirSync, existsSync, writeFileSync, statSync } from 'fs'
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { execFileSync } from 'child_process';
-import ffmpegPfad from 'ffmpeg-static';
 import { zuordnung, direkt, ausnahmen } from './zuordnung.mjs';
 
 const HIER = dirname(fileURLToPath(import.meta.url));
 const WURZEL = join(HIER, '../..');
 const ZIEL = join(WURZEL, 'public/exercise-demos-anim');
 
-const quelle = process.argv[2];
-if (!quelle || !existsSync(quelle)) {
+// `--nur-karte` (26.09.2026): nur src/data/exerciseAnimations.js aus den schon
+// vorhandenen Ordnern neu schreiben — ohne Quellvideos, ohne Umkodieren. Die
+// Quell-MP4s liegen nicht im Repo; eine geaenderte `ausnahmen`-Liste waere
+// sonst nicht einzuspielen.
+const NUR_KARTE = process.argv.includes('--nur-karte');
+// Erst hier laden: Der Karten-Modus braucht kein ffmpeg, und `ffmpeg-static`
+// ist keine feste Abhaengigkeit der App.
+const ffmpegPfad = NUR_KARTE ? null : (await import('ffmpeg-static')).default;
+const quelle = NUR_KARTE ? null : process.argv[2];
+if (!NUR_KARTE && (!quelle || !existsSync(quelle))) {
   console.error('Quellordner fehlt. Aufruf: node tools/anim-import/import.mjs <ordner>');
+  console.error('Nur die Zuordnung neu schreiben: node tools/anim-import/import.mjs --nur-karte');
   process.exit(1);
 }
 
 // Datei je ID finden — mit oder ohne Upload-Praefix.
 const dateien = {};
-for (const n of readdirSync(quelle)) {
+for (const n of quelle ? readdirSync(quelle) : []) {
   const m = n.match(/(?:^|-)(\d{4})\.mp4$/i);
   if (m) dateien[m[1]] = join(quelle, n);
 }
@@ -45,7 +53,7 @@ for (const n of readdirSync(quelle)) {
 mkdirSync(ZIEL, { recursive: true });
 let ok = 0, fehlend = [], gesamt = 0;
 
-const auftraege = [
+const auftraege = NUR_KARTE ? [] : [
   ...Object.entries(zuordnung),
   ...Object.entries(direkt), // Ordnername = Uebungs-ID
 ];

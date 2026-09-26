@@ -80,13 +80,27 @@ export const direkt = {
 //
 // ⚠ Diese Liste ist noetig, weil mehrere Uebungs-IDs auf denselben Fotoordner
 // zeigen. Ohne sie bekaeme „einbeinige Beinpresse" die beidbeinige Animation.
-// Bei blossem Unterschied in der Last (Step-Ups mit/ohne Gewicht) bleibt sie
-// drin — die Bewegung ist dieselbe.
+//
+// ⚠ REGEL (26.09.2026): Ausfuehrung (sitzend/stehend/liegend) UND Geraet
+// (Koerpergewicht, Kurzhantel, Langhantel, Scheibe, Maschine, Kabel) muessen
+// zur Uebung passen. Hier stand bis dahin „bei blossem Unterschied in der
+// Last bleibt sie drin" — daraus wurden Step-Ups ohne Gewicht MIT Kurzhanteln.
+// Und „Schulterdruecken sitzend" bekam den stehenden Clip, weil es sich den
+// Fotoordner mit der stehenden Variante teilt; Josef sah es am geposteten
+// FullRep-Reel. Danach wurden alle 42 Clips am Kontaktblatt geprueft — die
+// letzten sieben Eintraege unten sind das Ergebnis.
 export const ausnahmen = new Set([
   'machine-hip-thrust',    // Animation zeigt Langhantel, nicht die Maschine
   'single-leg-press',      // Animation zeigt BEIDE Beine
   'leg-press-wide',        // weiter Stand ist der Kern der Uebung, Animation zeigt Standard
   'rear-delt-fly-machine', // Animation zeigt Kabelzug, nicht die Maschine
+  'dumbbell-shoulder-press-seated', // Clip 0090 ist STEHEND, die Uebung sitzend
+  'reverse-flyes',         // Uebung Kurzhantel, Clip 0099 zeigt die Reverse-Maschine
+  'reverse-lunges',        // Uebung Kurzhantel, Clip 0059 zeigt Langhantel
+  'jump-squats',           // Uebung Koerpergewicht, Clip 0066 mit Kurzhanteln
+  'chest-squeeze-press',   // Uebung Kurzhanteln, Clip 0052 ist Svend Press mit Scheibe
+  'stiff-leg-deadlift',    // Uebung freie Langhantel, Clip 0084 an der Smith-Maschine
+  'step-ups',              // Uebung Koerpergewicht, Clip 0081 mit Kurzhanteln (step-up-weighted passt)
 ]);
 
 // Bewusst OHNE Entsprechung — hier zur Nachvollziehbarkeit, damit niemand
