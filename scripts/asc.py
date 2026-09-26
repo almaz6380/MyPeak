@@ -210,10 +210,10 @@ def setze_namen(tok):
 # appStoreVersions — plus der Text "Neu in dieser Version", der bei einem
 # Update Pflicht ist.
 
-WHATS_NEW = """Technische Verbesserungen an der Werbeeinbindung: Die Tracking-Abfrage \
-erscheint jetzt zuverlässig beim Start, und die App ist für alle gängigen \
-Werbenetzwerke korrekt eingetragen. Für Premium-Nutzer ändert sich nichts — \
-sie sehen weiterhin keine Werbung."""
+WHATS_NEW = """Übungsanimationen korrigiert: Einige Übungen zeigten eine falsche \
+Ausführung (zum Beispiel stehend statt sitzend) — sie zeigen jetzt wieder die \
+passenden Bilder. Neu: eine ausdrückliche Einwilligung für Gesundheitsdaten \
+und ein erweiterter Kreatin-Abschnitt."""
 
 
 def version_anlegen(tok, nummer):
