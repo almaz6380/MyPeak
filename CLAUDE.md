@@ -89,8 +89,9 @@ den bezahlten Pfad mit DPA oder Anthropic mit Zero-Data-Retention; (c) ob
   Vermutlich blendet Google sitzungsspezifisch verarbeitete Daten aus. Richtig ist
   „sitzungsspezifisch = Ja“ trotzdem: Laut DSE liegt der Verlauf nur auf dem Gerät.
 
-  Noch offen: Die Datenschutz-URL im Play-Eintrag zeigt auf die Alt-Domain
-  `my-peak.vercel.app`. Sie funktioniert, sollte aber auf `fullrep.vercel.app`.
+  Die Datenschutz-URL im Play-Eintrag (App-Inhalte → Datenschutzerklärung) zeigte
+  bis zum 27.09. auf die Alt-Domain `my-peak.vercel.app`. Seitdem steht dort
+  `https://fullrep.vercel.app/legal/privacy`, von Josef von Hand umgestellt.
 
 ### 1.5.2 (iOS Build 11 / Android vc21) — falsche Übungsclips raus (27.09.2026)
 
