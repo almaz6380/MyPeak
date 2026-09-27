@@ -76,6 +76,27 @@ den bezahlten Pfad mit DPA oder Anthropic mit Zero-Data-Retention; (c) ob
 (d) Apple Privacy Labels und Play-Datensicherheit gegen die neue DSE abgleichen
 (AdMob-Tracking, Gesundheitsdaten, KI-Anbieter).
 
+### 1.5.2 (iOS Build 11 / Android vc21) — falsche Übungsclips raus (27.09.2026)
+
+**Anlass:** Josef sah am 26.09. ein FullRep-Reel „Schulterdrücken sitzend (KH)" mit
+STEHENDER Puppe. Die Animation hängt am Fotoordner (`tools/anim-import/`), und die
+sitzende Übung teilt sich `Dumbbell_Shoulder_Press` mit dem stehenden Clip 0090. Alle
+42 Clips wurden danach am Kontaktblatt geprüft; sieben passten in Ausführung oder Gerät
+nicht und stehen jetzt in `ausnahmen` (`29418e9`). Neu: `import.mjs --nur-karte`
+schreibt `exerciseAnimations.js` ohne Quellvideos neu. **Regel: Ausführung UND Gerät
+müssen passen** — „bloßer Unterschied in der Last" gilt nicht mehr.
+
+**Ausgeliefert am 27.09., alles auf Josefs Mac (`laeufer: mac`), per Protokoll gemessen:**
+
+| | Stand |
+|---|---|
+| iOS | Build 11 hochgeladen (`ios-release` 36306077586) → Version 1.5.2 angelegt, What's New de-DE → Build 11 VALID, zugewiesen → **eingereicht**, Einreichung `2472b037-06db-4be1-a1f0-5ae1a33f63c4`, `WAITING_FOR_REVIEW`. Beide Abos `APPROVED` |
+| Android | **vc21 (1.5.2) auf `production`, an alle** (`android-release` 36306630722), Edit committet |
+
+Mit drin, weil seit 06.09. auf `main`: die ausdrückliche Einwilligung für
+Gesundheitsdaten (`df638d6`) und der Kreatin-Abschnitt zum Gehirn. Punkt (d) oben ist
+weiterhin offen.
+
 ### iOS-Werbung: ATT nativ + volle SKAdNetwork-Liste (06.09.2026, 1.5.1 / Build 10)
 
 **Eingereicht 06.09., 15:56 UTC** — Einreichung `ee64a99b-…`, `WAITING_FOR_REVIEW`,
