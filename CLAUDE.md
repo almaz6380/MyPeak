@@ -73,8 +73,24 @@ prüfen:** Bei der kostenlosen Stufe nutzt Google Eingaben zur
 Produktverbesserung — für Blutwerte im Coach ist das nicht tragbar, es braucht
 den bezahlten Pfad mit DPA oder Anthropic mit Zero-Data-Retention; (c) ob
 `VITE_SENTRY_DSN` in Vercel gesetzt ist — die DSE sagt „sofern eingeschaltet";
-(d) Apple Privacy Labels und Play-Datensicherheit gegen die neue DSE abgleichen
-(AdMob-Tracking, Gesundheitsdaten, KI-Anbieter).
+(d) ~~Apple Privacy Labels und Play-Datensicherheit gegen die neue DSE abgleichen~~
+✅ **27.09.2026 erledigt, beide von Josef von Hand** (per API nicht erreichbar):
+- **Apple App-Datenschutz** veröffentlicht, samt „Sonstige Benutzerinhalte“ für die
+  Coach-Nachrichten. Zuerst war dort versehentlich „Audio-Daten“ angehakt; das ist korrigiert.
+- **Play-Datensicherheit** gespeichert:
+  - Erhoben **und geteilt** werden ungefährer Standort, App-Interaktionen und
+    Geräte-IDs (AdMob, Zweck Werbung).
+  - Nur erhoben werden Kaufverlauf und „Andere von Nutzern erstellte Inhalte“
+    (Coach: sitzungsspezifisch, optional, App-Funktionen). Gemini und Anthropic
+    sind Dienstleister, das zählt bei Google nicht als Teilen.
+  - Lösch-URL: `https://fullrep.vercel.app/legal/privacy`.
+
+  ⚠ Die Play-Vorschau zeigt die Coach-Inhalte trotz Status „Abgeschlossen“ nicht an.
+  Vermutlich blendet Google sitzungsspezifisch verarbeitete Daten aus. Richtig ist
+  „sitzungsspezifisch = Ja“ trotzdem: Laut DSE liegt der Verlauf nur auf dem Gerät.
+
+  Noch offen: Die Datenschutz-URL im Play-Eintrag zeigt auf die Alt-Domain
+  `my-peak.vercel.app`. Sie funktioniert, sollte aber auf `fullrep.vercel.app`.
 
 ### 1.5.2 (iOS Build 11 / Android vc21) — falsche Übungsclips raus (27.09.2026)
 
