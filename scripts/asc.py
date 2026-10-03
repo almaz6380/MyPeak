@@ -502,10 +502,6 @@ def lokalisieren(tok, locales):
         sys.exit('  Kein bearbeitbares appInfo — erst eine neue Version anlegen.')
     info_locs = {l['attributes']['locale']: l for l in
                  api(tok, f'appInfos/{info["id"]}/appInfoLocalizations').get('data', [])}
-    ver_locs = {l['attributes']['locale']: l for l in
-                api(tok, f'appStoreVersions/{v["id"]}/appStoreVersionLocalizations'
-                    ).get('data', [])}
-
     for locale in locales:
         t = texte[locale]
         print(f'\n  {locale}: {t["name"]!r} · {len(t["description"])} Zeichen Beschreibung')
@@ -516,6 +512,14 @@ def lokalisieren(tok, locales):
              'privacyPolicyUrl': 'https://fullrep.vercel.app/legal/privacy'},
             {'appInfo': {'data': {'type': 'appInfos', 'id': info['id']}}},
             'Name + Untertitel')
+        # ⚠ ERST JETZT die Versions-Lokalisierungen lesen: Legt man eine
+        # appInfoLocalization an, erzeugt Apple die passende
+        # appStoreVersionLocalization automatisch mit. Vorab gelesen, wollte
+        # das Skript sie ein zweites Mal anlegen — "already exists" (03.10.).
+        ver_locs = {} if TROCKEN else {
+            l['attributes']['locale']: l for l in
+            api(tok, f'appStoreVersions/{v["id"]}/appStoreVersionLocalizations'
+                ).get('data', [])}
         _anlegen_oder_setzen(
             tok, 'appStoreVersionLocalizations', ver_locs.get(locale),
             {**({} if ver_locs.get(locale) else {'locale': locale}),

@@ -73,6 +73,15 @@ Sprache PUT statt PATCH. Vorher brach es bei jeder Sprache außer de-DE ab.
 **`whatsNew` je Sprache:** Apple verlangt „Neu in dieser Version“ bei einem Update für
 **jede** Lokalisierung. `--lokalisieren` setzt ihn aus `WHATS_NEW_SPRACHEN` mit.
 
+**Zwei Fallen beim Ausrollen am 03.10., beide gemessen:**
+- **Play kennt nur EINEN offenen Edit.** Ein neuer Edit verwirft den älteren
+  („This Edit has been deleted“). Vier parallele Trockenläufe ließen deshalb den ersten
+  scheitern. **`play-listing.yml` immer nacheinander starten**, auch bei Trockenläufen.
+- **Apple legt die Versions-Lokalisierung selbst an**, sobald eine
+  `appInfoLocalization` angelegt wird. `--lokalisieren` hatte die Liste vorher gelesen
+  und bekam deshalb „already exists“. Das ist behoben: Die Liste wird jetzt nach dem
+  Anlegen gelesen. Der Befehl bleibt idempotent, ein zweiter Lauf aktualisiert nur.
+
 **Nebenbefunde, nicht behoben:**
 - `getXP` gibt Gästen immer Streak 0 und Level 1 zurück. Wer im Gastmodus testet,
   sieht das Motivationssystem also nie.
