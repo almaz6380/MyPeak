@@ -29,6 +29,14 @@ Inhaltsbibliotheken (siehe 4b und 4c)
 | Android | **vc22 (1.5.3) auf `production`, an alle** (`android-release` 37152484197) |
 | iOS | Build 12 hochgeladen (`ios-release` 37152009966, **GitHub-Rechner**, weil der Mac offline war) → Version 1.5.3 angelegt → 7 Lokalisierungen (en-US, en-GB, es-ES, es-MX, fr-FR, pt-BR, ar-SA) mit Texten und `whatsNew` → 84 Screenshots → Build 12 `VALID`, zugewiesen → **eingereicht**, Einreichung `e34b1183-4118-4398-bf7c-dc96a02ee002`, `WAITING_FOR_REVIEW`. Beide Abos `APPROVED` |
 
+**Vorstellungsgrafik je Sprache (03.10., Nachtrag):** Bis dahin zeigte Play auf
+jeder Sprachseite die deutsche Grafik („Training & Ernährung in einer App"), weil Play
+die Grafik der Standardsprache nimmt, wenn eine Sprache keine eigene hat.
+`render-store-graphics.py` rendert sie jetzt sechssprachig nach
+`store-assets/<lang>/android/feature-graphic.png` (de im alten Pfad). Arabisch ist
+gespiegelt: Text rechts, Zeichen links. `play-listing.yml` nimmt sie im Modus
+`grafiken` je `lang`.
+
 **Nach der Freigabe prüfen:** iTunes-Lookup `?id=6788461300&country=us`,
 `languageCodesISO2A` muss `EN` enthalten.
 

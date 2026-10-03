@@ -5,13 +5,18 @@ Zwei Bilder, die NICHT in der App stecken und deshalb beim App-Update nicht
 mitwandern — sie liegen als eigene Uploads im Store-Eintrag:
 
   store-assets/android/icon-512.png        512x512, quadratisch, ohne Alpha
-  store-assets/android/feature-graphic.png 1024x500
+  store-assets/android/feature-graphic.png 1024x500   (de)
+  store-assets/<lang>/android/feature-graphic.png   (en, es, fr, pt, ar)
 
 Quelle ist dasselbe public/favicon.svg wie fuer alle App-Icons, gerendert mit
 headless Chromium; die Schrift ist das im Projekt liegende Inter. Damit sehen
 Store und App gleich aus, statt auseinanderzulaufen.
 
     python3 scripts/render-store-graphics.py
+
+Die Vorstellungsgrafik gibt es seit 10/2026 je Sprache. Vorher stand auf der
+englischen, spanischen usw. Store-Seite „Training & Ernährung in einer App" —
+Play nimmt die Grafik der Standardsprache, wenn eine Sprache keine eigene hat.
 """
 import base64
 import glob
@@ -103,6 +108,67 @@ def kopf(weights):
     return faces
 
 
+# Vorstellungsgrafik je Sprache: (Unterzeile, Zeile 1, hervorgehoben, Zeile 2).
+# "FullRep" bleibt in jeder Sprache stehen — Eigenname.
+FEATURE_TEXTE = {
+    "de": ("Training &amp; Ernährung in einer App",
+           "Training · Kalorien &amp; Makros · ", "Barcode-Scanner",
+           "21 Trainingsprogramme · Fortschritt im Blick"),
+    "en": ("Training &amp; nutrition in one app",
+           "Workouts · Calories &amp; macros · ", "Barcode scanner",
+           "21 training programs · Progress at a glance"),
+    "es": ("Entreno y nutrición en una sola app",
+           "Entreno · Calorías y macros · ", "Escáner de códigos",
+           "21 programas · Tu progreso de un vistazo"),
+    "fr": ("Sport et nutrition dans une seule app",
+           "Séances · Calories &amp; macros · ", "Scanner code-barres",
+           "21 programmes · Tes progrès en un coup d’œil"),
+    "pt": ("Treino e nutrição em um só app",
+           "Treino · Calorias e macros · ", "Leitor de código",
+           "21 programas de treino · Seu progresso à vista"),
+    "ar": ("التدريب والتغذية في تطبيق واحد",
+           "تدريب · سعرات وماكروز · ", "قارئ الباركود",
+           "21 برنامجًا تدريبيًا · تقدّمك أمام عينيك"),
+}
+
+
+def feature_html(lang, mark):
+    unter, z1, hervor, z2 = FEATURE_TEXTE[lang]
+    rtl = lang == "ar"
+    # Arabisch liest von rechts: Text rechts, Zeichen links, Verlauf gespiegelt.
+    # Inter hat keine arabischen Glyphen — dort uebernimmt die Systemschrift.
+    seite_text, seite_mark = ("right", "left") if rtl else ("left", "right")
+    verlauf = "22% 45%" if rtl else "78% 45%"
+    return f"""<style>
+      {kopf([400, 600, 800])}
+      html,body{{margin:0;padding:0;overflow:hidden;width:1024px;height:500px;
+        background:{BG};font-family:Inter,'DejaVu Sans',sans-serif;
+        -webkit-font-smoothing:antialiased}}
+      .wrap{{position:relative;width:1024px;height:500px;overflow:hidden;
+        background:radial-gradient(120% 130% at {verlauf}, #2a2113 0%, {BG} 62%)}}
+      .text{{position:absolute;{seite_text}:76px;top:50%;transform:translateY(-50%);
+        width:570px;direction:{'rtl' if rtl else 'ltr'};text-align:{seite_text}}}
+      h1{{margin:0;font-weight:800;font-size:76px;letter-spacing:-2px;
+        color:#fef3c7;line-height:1;direction:ltr;unicode-bidi:isolate}}
+      h1 span{{color:{GOLD}}}
+      h2{{margin:18px 0 0;font-weight:800;font-size:29px;color:#ffffff;
+        line-height:1.25}}
+      p{{margin:22px 0 0;font-weight:400;font-size:21px;color:#9a9186;
+        line-height:1.6}}
+      p b{{font-weight:600;color:{GOLD}}}
+      .mark{{position:absolute;{seite_mark}:74px;top:50%;transform:translateY(-50%);
+        width:338px;height:338px}}
+    </style>
+    <div class="wrap">
+      <div class="text">
+        <h1>Full<span>Rep</span></h1>
+        <h2>{unter}</h2>
+        <p>{z1}<b>{hervor}</b><br>{z2}</p>
+      </div>
+      <img class="mark" src="{mark}">
+    </div>"""
+
+
 def main():
     chrome = find_chrome()
     os.makedirs(OUT, exist_ok=True)
@@ -120,39 +186,15 @@ def main():
         f"<img src='{logo}'>",
         512, 512, os.path.join(OUT, "icon-512.png"), chrome)
 
-    # ── Vorstellungsgrafik 1024x500 ───────────────────────────────────────
+    # ── Vorstellungsgrafik 1024x500, je Sprache ───────────────────────────
     # Aufbau wie die alte MyPeak-Grafik: Text links, Zeichen rechts. Der
     # Farbverlauf nimmt das Gold auf, ohne dem Logo Kontrast zu nehmen.
-    html = f"""<style>
-      {kopf([400, 600, 800])}
-      html,body{{margin:0;padding:0;overflow:hidden;width:1024px;height:500px;
-        background:radial-gradient(120% 130% at 78% 45%, #2a2113 0%, {BG} 62%);
-        font-family:Inter,sans-serif;
-        -webkit-font-smoothing:antialiased}}
-      .wrap{{position:relative;width:1024px;height:500px;overflow:hidden;
-        background:radial-gradient(120% 130% at 78% 45%, #2a2113 0%, {BG} 62%)}}
-      .text{{position:absolute;left:76px;top:139px;width:560px}}
-      h1{{margin:0;font-weight:800;font-size:76px;letter-spacing:-2px;
-        color:#fef3c7;line-height:1}}
-      h1 span{{color:{GOLD}}}
-      h2{{margin:18px 0 0;font-weight:800;font-size:29px;color:#ffffff;
-        line-height:1.25}}
-      p{{margin:22px 0 0;font-weight:400;font-size:21px;color:#9a9186;
-        line-height:1.6}}
-      p b{{font-weight:600;color:{GOLD}}}
-      .mark{{position:absolute;right:74px;top:50%;transform:translateY(-50%);
-        width:338px;height:338px}}
-    </style>
-    <div class="wrap">
-      <div class="text">
-        <h1>Full<span>Rep</span></h1>
-        <h2>Training &amp; Ernährung in einer App</h2>
-        <p>Training · Kalorien &amp; Makros · <b>Barcode-Scanner</b><br>
-           21 Trainingsprogramme · Fortschritt im Blick</p>
-      </div>
-      <img class="mark" src="{mark}">
-    </div>"""
-    shoot(html, 1024, 500, os.path.join(OUT, "feature-graphic.png"), chrome)
+    # de liegt im alten Pfad (play-listing.yml, Modus grafiken, lang de-DE).
+    for lang in FEATURE_TEXTE:
+        ziel = OUT if lang == "de" else os.path.join(ROOT, "store-assets", lang, "android")
+        os.makedirs(ziel, exist_ok=True)
+        shoot(feature_html(lang, mark), 1024, 500,
+              os.path.join(ziel, "feature-graphic.png"), chrome)
 
 
 if __name__ == "__main__":
