@@ -210,10 +210,26 @@ def setze_namen(tok):
 # appStoreVersions — plus der Text "Neu in dieser Version", der bei einem
 # Update Pflicht ist.
 
-WHATS_NEW = """Übungsanimationen korrigiert: Einige Übungen zeigten eine falsche \
-Ausführung (zum Beispiel stehend statt sitzend) — sie zeigen jetzt wieder die \
-passenden Bilder. Neu: eine ausdrückliche Einwilligung für Gesundheitsdaten \
-und ein erweiterter Kreatin-Abschnitt."""
+WHATS_NEW = """Die Datumsauswahl im Gewichtsdiagramm zeigt das Datum jetzt im \
+richtigen Format. Die Store-Seite gibt es jetzt auch auf Englisch, Spanisch, \
+Französisch, Portugiesisch und Arabisch — die App selbst spricht alle sechs \
+Sprachen."""
+
+# "Neu in dieser Version" fuer die weiteren Sprachen der Store-Seite. Apple
+# verlangt den Text bei einem Update fuer JEDE Lokalisierung der Version —
+# lokalisieren() setzt ihn mit, sonst scheitert die Einreichung.
+WHATS_NEW_SPRACHEN = {
+    'en': "The date picker in the weight chart now shows dates in the right "
+          "format. Small fixes and improvements.",
+    'es': "El selector de fecha del gráfico de peso ahora muestra las fechas en "
+          "el formato correcto. Pequeñas mejoras y correcciones.",
+    'fr': "Le sélecteur de date du graphique de poids affiche désormais les dates "
+          "au bon format. Petites corrections et améliorations.",
+    'pt': "O seletor de data do gráfico de peso agora mostra as datas no formato "
+          "correto. Pequenas correções e melhorias.",
+    'ar': "يعرض منتقي التاريخ في مخطط الوزن التواريخ الآن بالتنسيق الصحيح. "
+          "تحسينات وإصلاحات صغيرة.",
+}
 
 
 def version_anlegen(tok, nummer):
@@ -505,6 +521,7 @@ def lokalisieren(tok, locales):
             {**({} if ver_locs.get(locale) else {'locale': locale}),
              'description': t['description'], 'keywords': t['keywords'],
              'promotionalText': t['promotionalText'],
+             'whatsNew': WHATS_NEW_SPRACHEN[SPRACHEN[locale][2]],
              'supportUrl': SUPPORT_URL, 'marketingUrl': MARKETING_URL},
             {'appStoreVersion': {'data': {'type': 'appStoreVersions', 'id': v['id']}}},
             'Beschreibung, Keywords, Werbetext')

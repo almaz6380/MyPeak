@@ -53,6 +53,26 @@ Design vom Juli, mit leeren Zuständen („Supplements 0/0“, leere Heatmap) un
 - `exercises.js`: `import.meta.env?.DEV`, sonst bricht jedes Node-Skript, das
   `getExerciseById` aufruft.
 
+**Bewertungsanfrage früher (1.5.3, `src/lib/review.js`):** Bisher kam sie frühestens
+nach dem 5. **Kraft**training, nie für Gäste und nie nach Cardio, HIIT oder Essen. Bei
+einer Handvoll Nutzern erschien sie also praktisch nie. Jetzt:
+- ab dem **2. Training jeder Art**
+- ab **3 Tagen mit Essenseinträgen** (`maybeAskForReviewNachEssen`, liest nur
+  localStorage)
+- Gäste eingeschlossen
+- 90-Tage-Sperre gemeinsam für beide Auslöser
+
+Fragt die App, setzt `werbungPausieren()` (`ads.js`) die Interstitial-Mindestpause.
+Nach dem Essen kommt deshalb **entweder** Bewertung **oder** Werbung. 12 Tests in
+`tests/lib/review.test.js`.
+
+**Play legt neue Sprachen jetzt an:** `play-upload.py --listing` sendet bei 404 auf die
+Sprache PUT statt PATCH. Vorher brach es bei jeder Sprache außer de-DE ab.
+**Reihenfolge: erst `texte`, dann `screenshots`**, sonst gibt es die Sprache noch nicht.
+
+**`whatsNew` je Sprache:** Apple verlangt „Neu in dieser Version“ bei einem Update für
+**jede** Lokalisierung. `--lokalisieren` setzt ihn aus `WHATS_NEW_SPRACHEN` mit.
+
 **Nebenbefunde, nicht behoben:**
 - `getXP` gibt Gästen immer Streak 0 und Level 1 zurück. Wer im Gastmodus testet,
   sieht das Motivationssystem also nie.
