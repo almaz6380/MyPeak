@@ -9,8 +9,9 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 leitet mit 307 dorthin weiter — bewusst behalten, solange irgendwo alte Links stehen)
 **Git-Repository:** https://github.com/almaz6380/MyPeak (Repo-Name unverändert)
 **Zielplattform:** Web-App → PWA → später App Store (iOS + Android)
-**Sprachen:** Deutsch, Englisch, Spanisch — **vollständig**, Oberfläche wie
-Inhaltsbibliotheken (siehe 4b und 4c)
+**Sprachen:** Deutsch, Englisch, Spanisch, Französisch, Portugiesisch (pt-BR),
+Arabisch (RTL) — **vollständig**, Oberfläche wie Inhaltsbibliotheken (siehe 4b,
+4c und 4e); Store-Seiten in beiden Stores ebenfalls sechssprachig (seit 1.5.3)
 **Geschäftsmodell:** Freemium mit 7 Tagen kostenloser Testphase
 **Zielgruppe:** Fitnessstudio-Besucher (Geräte + freie Gewichte), Anfänger bis Fortgeschrittene
 
@@ -107,6 +108,51 @@ Sprache PUT statt PATCH. Vorher brach es bei jeder Sprache außer de-DE ab.
   sieht das Motivationssystem also nie.
 - Die App ist auf dem iPad eine schmale Spalte.
 - Die Überschrift „Social“ auf der TrainingPage ist nicht übersetzt.
+
+### Branches aufgeräumt (03.10.2026)
+
+Auf GitHub lagen 22 Branches neben `main`. Alle 22 sind gelöscht, nachdem geprüft war,
+dass nichts verloren geht:
+
+- **19** sind Vorfahren von `main`, jeder Commit steckt dort (`git merge-base --is-ancestor`).
+- **2** (`claude-code-mobile`, `github-connection-check`) wurden per Squash übernommen.
+  Ihr letzter Stand von CLAUDE.md kommt in der Historie von `main` wörtlich vor.
+- **1** (`unlock-pro-two-friends`) hatte einen Commit, der nicht in `main` ist: einen
+  CLAUDE.md-Nachtrag vom 29.08. („PR #50 gemergt“, „Actions führt keine Jobs aus“). Er
+  ist inhaltlich überholt und bewusst nicht übernommen.
+
+⚠ **Falle beim Prüfen:** Der Klon in Claude-Sitzungen ist **flach**, mit nur rund 50
+Commits Historie. Ohne `git fetch --unshallow origin main` hat ein alter Branch scheinbar
+keinen gemeinsamen Vorfahren mit `main`. Dann melden `rev-list` und `diff` hunderte
+„fehlende“ Commits und Dateien, die in Wahrheit längst in `main` stehen.
+
+**Wiederherstellen**, falls doch etwas fehlt: `git push origin <sha>:refs/heads/<name>`.
+Bei Branches mit PR geht es auch über den Knopf „Restore branch“ auf der PR-Seite.
+
+| Branch | letzter Stand |
+|---|---|
+| `claude/actions-kontingent` | `d60fc32a653002eb75f5905ef49e6c97c22b1e1c` |
+| `claude/admob-cpm-anomaly-r2x6bo` | `d49a4e324761f86fb71b186864454451054ff0f4` |
+| `claude/app-bugs-features-check-8xh7ok` | `e3895480240d96645112381f69545be4d58b76e5` |
+| `claude/apps-question-yisd4b` | `7a93e9de29756550c1dce2899b1f0c0946730cf4` |
+| `claude/asc-lokalisieren-reihenfolge` | `f9947c2d975fb3e80c151ca8bcca445ff63b6bfe` |
+| `claude/claude-code-mobile-jcfvtf` | `f62d87fbe044ec000ff5af2937ff79dcd8493bcf` |
+| `claude/command-multiple-apps-foafya` | `30dce89534200d6e1692f839bf46aa0a5d13e0e7` |
+| `claude/cross-project-task-4y6939` | `3e15faecbdcfc513642ca281659eeae5c0726954` |
+| `claude/custom-training-plans-bugs-rt9ch9` | `46d1587fcffa42ed8d1bd12076704d01307d6d64` |
+| `claude/fullrep-auth-store-buttons` | `9416279d1a6051a44a562df83c3a399505c4f17a` |
+| `claude/fullrep-bio-links` | `a2d095aef69945f6d7e4c6a8755ac8569def0da1` |
+| `claude/fullrep-titelbild-entdoppeln` | `7130b373f7d7ebc88f52ec15e46b76b5d1868642` |
+| `claude/funktionierst-du-m4opgh` | `933b3ad85853534ece9d4dd196c21e67375a44ef` |
+| `claude/github-connection-check-v5zzpl` | `238bd1c0cf61e3af25d5b827aaf9a6f747bf1f6d` |
+| `claude/mypeak-to-peakx-rename-o11rdd` | `95e4f0cfd074e80d24bebe90d6684f48f6a90b4e` |
+| `claude/new-session-jfza0c` | `f360c341581f6bdb0a20c7945b8185094a5e2341` |
+| `claude/status-and-tasks-j8e491` | `4957fb654137ede7ae41ec1b48adfe5c39da6328` |
+| `claude/store-sprachen-screenshots` | `3e25f1f432d7992df3e424028a152781e45d198f` |
+| `claude/unlock-pro-two-friends-f4b0bv` | `4a0c2d241e65ba847a4f5815dcac682069f535cb` |
+| `claude/vorstellungsgrafik-sprachen` | `d6026f11ca2ace6a7b122abb9de8d379469d718d` |
+| `improvements-juli` | `aeee80025c71d79d687d8de49dd9854e8a8050a3` |
+| `launch-fixes` | `a432ad0915a26f7b643ea2e9f7074b1d018410af` |
 
 ### DSGVO-Nachzug: Art.-9-Einwilligung, ehrliche Datenschutzerklärung (17.09.2026)
 
@@ -2214,7 +2260,7 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
 
 - **Framework:** React 18 + Vite
 - **Styling:** Tailwind CSS (Mobile-first)
-- **i18n:** react-i18next (DE + EN)
+- **i18n:** react-i18next (de, en, es, fr, pt, ar; neue Sprache = eine Zeile in `src/lib/sprache.js`)
 - **Backend:** Supabase (Auth + PostgreSQL-Datenbank)
 - **Hosting:** Vercel (automatisches Deployment über GitHub)
 - **Besucherzählung:** Vercel Web Analytics — **nur Web**, `src/analytics.js` (siehe unten)
