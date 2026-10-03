@@ -134,6 +134,13 @@ export function setAdsPremiumStatus(isPremium) {
   premiumUser = !!isPremium;
 }
 
+// Nach einer Bewertungsanfrage (lib/review.js) die Werbung fuer die normale
+// Mindestpause aussetzen: Ein Interstitial direkt vor oder nach dem
+// Bewertungsdialog verdirbt genau die Stimmung, um die es dabei geht.
+export function werbungPausieren() {
+  lastInterstitial = Date.now();
+}
+
 export async function maybeShowInterstitial() {
   if (!ready) return;
   if (premiumUser) return; // Premium = werbefrei

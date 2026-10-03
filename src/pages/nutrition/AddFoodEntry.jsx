@@ -10,6 +10,7 @@ import { saveNutritionEntry, getRecentFoods, getCustomMeals, logCustomMeal } fro
 import { checkAchievements } from '../../data/achievements';
 import { getCategoryEmoji } from '../../data/foodDatabase';
 import { maybeShowInterstitial } from '../../lib/ads';
+import { maybeAskForReviewNachEssen } from '../../lib/review';
 
 export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language = 'de' }) {
   const { t, i18n } = useTranslation();
@@ -71,7 +72,9 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
       return;
     }
     checkAchievements(user.id, { type: 'nutrition' }).catch(() => {});
-    maybeShowInterstitial();
+    // Erst die Bewertungsanfrage (ab 3 Tagen mit Essen), sonst Werbung —
+    // nie beides direkt hintereinander (s. lib/review.js).
+    maybeAskForReviewNachEssen(user?.id).then((gefragt) => { if (!gefragt) maybeShowInterstitial(); });
     onSaved();
   }
 

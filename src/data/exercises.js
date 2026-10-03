@@ -352,7 +352,7 @@ export function getCustomExercisesAsExercises() {
 export function getExerciseById(id) {
   const found = exercises.find((e) => e.id === id)
     || getCustomExercisesAsExercises().find((e) => e.id === id);
-  if (!found && import.meta.env.DEV) {
+  if (!found && import.meta.env?.DEV) {
     console.warn(`[exercises] Unbekannte Übungs-ID: "${id}"`);
   }
   return found;

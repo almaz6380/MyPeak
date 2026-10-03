@@ -76,6 +76,7 @@ export default function HomePage() {
   const [weightRange, setWeightRange] = useState('3m');
   const [weightCustomFrom, setWeightCustomFrom] = useState('');
   const [weightCustomTo, setWeightCustomTo] = useState('');
+  const [weightRangePicker, setWeightRangePicker] = useState(null); // 'from' | 'to' | null
   useEffect(() => {
     if (!user) return;
     // Abbruch-Guard: bei schnellem Datumswechsel darf eine ältere Antwort
@@ -508,12 +509,12 @@ export default function HomePage() {
                 {/* Time range selector */}
                 <div className="flex gap-1 mb-2 flex-wrap">
                   {[
-                    { key: '7d', label: '7T' },
-                    { key: '14d', label: '14T' },
-                    { key: '1m', label: '1M' },
-                    { key: '3m', label: '3M' },
-                    { key: '6m', label: '6M' },
-                    { key: '1y', label: '1J' },
+                    { key: '7d', label: t('home.range7d') },
+                    { key: '14d', label: t('home.range14d') },
+                    { key: '1m', label: t('home.range1m') },
+                    { key: '3m', label: t('home.range3m') },
+                    { key: '6m', label: t('home.range6m') },
+                    { key: '1y', label: t('home.range1y') },
                     { key: 'all', label: t('home.weightAll') },
                   ].map((r) => (
                     <button
@@ -529,22 +530,29 @@ export default function HomePage() {
                     </button>
                   ))}
                 </div>
-                {/* Custom date range */}
+                {/* Custom date range. Kein <input type="date">: dessen Platzhalter
+                    folgt der Browser-/Systemsprache, nicht der App-Sprache — auf
+                    der deutschen Oberfläche stand „mm/dd/yyyy“ (auch im Store-Screenshot). */}
                 <div className="flex gap-2 mb-3">
-                  <input
-                    type="date"
-                    value={weightCustomFrom}
-                    onChange={(e) => { setWeightCustomFrom(e.target.value); setWeightRange('custom'); }}
-                    className="flex-1 px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                  <span className="text-xs text-slate-400 self-center">–</span>
-                  <input
-                    type="date"
-                    value={weightCustomTo}
-                    onChange={(e) => { setWeightCustomTo(e.target.value); setWeightRange('custom'); }}
-                    max={formatDate(new Date())}
-                    className="flex-1 px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
+                  {[
+                    { wert: weightCustomFrom, platzhalter: t('home.rangeFrom'), feld: 'from' },
+                    { wert: weightCustomTo, platzhalter: t('home.rangeTo'), feld: 'to' },
+                  ].map((f, i) => (
+                    <div key={f.feld} className="flex-1 flex gap-2">
+                      {i === 1 && <span className="text-xs text-slate-400 self-center">–</span>}
+                      <button
+                        onClick={() => setWeightRangePicker(f.feld)}
+                        className={`flex-1 flex items-center gap-1.5 px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-start ${
+                          f.wert ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400'
+                        }`}
+                      >
+                        <Calendar className="w-3.5 h-3.5 shrink-0" />
+                        {f.wert
+                          ? new Date(f.wert + 'T12:00:00').toLocaleDateString(datumsLocale(lang), { day: '2-digit', month: '2-digit', year: 'numeric' })
+                          : f.platzhalter}
+                      </button>
+                    </div>
+                  ))}
                 </div>
 
                 {/* Chart */}
@@ -567,6 +575,21 @@ export default function HomePage() {
           selectedDate={selectedDate}
           onSelect={(d) => { setSelectedDate(d); setShowCalendar(false); }}
           onClose={() => setShowCalendar(false)}
+          lang={lang}
+        />
+      )}
+
+      {/* Datumswahl für den Gewichts-Zeitraum */}
+      {weightRangePicker && (
+        <CalendarModal
+          selectedDate={(weightRangePicker === 'from' ? weightCustomFrom : weightCustomTo) || formatDate(new Date())}
+          onSelect={(d) => {
+            if (weightRangePicker === 'from') setWeightCustomFrom(d);
+            else setWeightCustomTo(d > formatDate(new Date()) ? formatDate(new Date()) : d);
+            setWeightRange('custom');
+            setWeightRangePicker(null);
+          }}
+          onClose={() => setWeightRangePicker(null)}
           lang={lang}
         />
       )}

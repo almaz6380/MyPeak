@@ -18,6 +18,67 @@ Inhaltsbibliotheken (siehe 4b und 4c)
 
 ## Aktueller Stand
 
+### Store-Seiten in sechs Sprachen + Screenshots mit Aussage (03.10.2026) — CODE FERTIG, Uploads OFFEN
+
+Anlass: Josef fragte, warum niemand die App herunterlädt. Die Länder waren nie das Problem
+(iOS 175, Play 173 Regionen). Das Problem war die **Store-Seite**: Im App Store gab es
+nur **de-DE**, bei Play war sicher nur de-DE live. Wer in den USA oder in Brasilien
+sucht, fand FullRep nicht, weil Keywords je Locale indexiert werden. Wer die App doch
+fand, sah eine deutsche Seite. Dazu kamen nackte App-Screenshots ohne Überschrift, im
+Design vom Juli, mit leeren Zuständen („Supplements 0/0“, leere Heatmap) und
+„mm/dd/yyyy“ auf der deutschen Startseite.
+
+- **`store-assets/play-listing.en-US.json`** neu (Text aus `store-texte.md`).
+  iOS-Felder für Englisch stehen in `store-texte.md` §2b.
+- **`asc.py --lokalisieren [locales]`** (Workflow-Modus `lokalisieren`) legt die
+  iOS-Store-Seite für en-US, en-GB, es-ES, es-MX, fr-FR, pt-BR und ar-SA an oder
+  aktualisiert sie. Name und Untertitel hängen am appInfo, Beschreibung, Keywords und
+  Werbetext an der Version. **Jede Beschreibung trägt einen Abo-Block mit EULA-Link in
+  ihrer Sprache (3.1.2)**, ohne Eurobetrag, weil der außerhalb der Eurozone nicht stimmt.
+  ⚠ Braucht eine **offene Version**, also für eine reine Metadaten-Änderung trotzdem
+  eine neue Version samt Build.
+- **Screenshots:** `store-screenshots.mjs` schreibt nur noch Rohbilder nach
+  `store-assets/roh/<lang>/` (gitignored). **`store-rahmen.mjs`** baut daraus die
+  Store-Bilder mit Überschrift: de in die alten Pfade, andere Sprachen nach
+  `store-assets/<lang>/{ios,ios-ipad,android}`. `asc.py --screenshots` und
+  `play-listing.yml` (mode `screenshots`, `lang`) nehmen den passenden Ordner.
+  Auf dem iPad zeigt der Rahmen nur die App-Spalte (`max-w-lg`), weil das ganze Bild
+  leer und winzig wirkte.
+- **Demo-Daten waren in der Form falsch** und deshalb leer: Supplements brauchen
+  `schedule: { mon: ['morning'], … }`, Workouts `exerciseId`/`nameKey`/`unit` (nicht
+  `id`/`name`). Dazu kommt jetzt ein aktives PPL-Programm für die Heute-Karte.
+- **„mm/dd/yyyy“ behoben:** Der Zeitraum im Gewichtsdiagramm nutzt den eigenen
+  `CalendarModal` statt `<input type="date">`, dessen Platzhalter der Systemsprache
+  folgt. Die Knöpfe „7T/14T/1J“ waren fest deutsch und sind jetzt `home.range*` ×6.
+- `exercises.js`: `import.meta.env?.DEV`, sonst bricht jedes Node-Skript, das
+  `getExerciseById` aufruft.
+
+**Bewertungsanfrage früher (1.5.3, `src/lib/review.js`):** Bisher kam sie frühestens
+nach dem 5. **Kraft**training, nie für Gäste und nie nach Cardio, HIIT oder Essen. Bei
+einer Handvoll Nutzern erschien sie also praktisch nie. Jetzt:
+- ab dem **2. Training jeder Art**
+- ab **3 Tagen mit Essenseinträgen** (`maybeAskForReviewNachEssen`, liest nur
+  localStorage)
+- Gäste eingeschlossen
+- 90-Tage-Sperre gemeinsam für beide Auslöser
+
+Fragt die App, setzt `werbungPausieren()` (`ads.js`) die Interstitial-Mindestpause.
+Nach dem Essen kommt deshalb **entweder** Bewertung **oder** Werbung. 12 Tests in
+`tests/lib/review.test.js`.
+
+**Play legt neue Sprachen jetzt an:** `play-upload.py --listing` sendet bei 404 auf die
+Sprache PUT statt PATCH. Vorher brach es bei jeder Sprache außer de-DE ab.
+**Reihenfolge: erst `texte`, dann `screenshots`**, sonst gibt es die Sprache noch nicht.
+
+**`whatsNew` je Sprache:** Apple verlangt „Neu in dieser Version“ bei einem Update für
+**jede** Lokalisierung. `--lokalisieren` setzt ihn aus `WHATS_NEW_SPRACHEN` mit.
+
+**Nebenbefunde, nicht behoben:**
+- `getXP` gibt Gästen immer Streak 0 und Level 1 zurück. Wer im Gastmodus testet,
+  sieht das Motivationssystem also nie.
+- Die App ist auf dem iPad eine schmale Spalte.
+- Die Überschrift „Social“ auf der TrainingPage ist nicht übersetzt.
+
 ### DSGVO-Nachzug: Art.-9-Einwilligung, ehrliche Datenschutzerklärung (17.09.2026)
 
 Anlass war ein Datenfluss-Inventar über alle Repos. In FullRep waren drei

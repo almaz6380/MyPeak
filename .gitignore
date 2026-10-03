@@ -43,3 +43,6 @@ __pycache__/
 # sich unter home/user/anigosha/... verirrt hatten (Reste aus der Zeit vor dem
 # Pfad-Fix in tools/social/motoren.mjs).
 out/
+
+# Rohbilder aus store-screenshots.mjs — der Store bekommt die gerahmten (store-rahmen.mjs)
+store-assets/roh/

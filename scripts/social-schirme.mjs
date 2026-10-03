@@ -54,7 +54,7 @@ const ctx = await browser.newContext({
 });
 await ctx.addInitScript((seed) => {
   for (const [k, v] of Object.entries(seed)) localStorage.setItem(k, v);
-}, demoData(new Date().toISOString().slice(0, 10)));
+}, await demoData(new Date().toISOString().slice(0, 10)));
 
 const page = await ctx.newPage();
 const tidy = tidyMacher(page);

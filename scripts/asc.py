@@ -210,10 +210,26 @@ def setze_namen(tok):
 # appStoreVersions — plus der Text "Neu in dieser Version", der bei einem
 # Update Pflicht ist.
 
-WHATS_NEW = """Übungsanimationen korrigiert: Einige Übungen zeigten eine falsche \
-Ausführung (zum Beispiel stehend statt sitzend) — sie zeigen jetzt wieder die \
-passenden Bilder. Neu: eine ausdrückliche Einwilligung für Gesundheitsdaten \
-und ein erweiterter Kreatin-Abschnitt."""
+WHATS_NEW = """Die Datumsauswahl im Gewichtsdiagramm zeigt das Datum jetzt im \
+richtigen Format. Die Store-Seite gibt es jetzt auch auf Englisch, Spanisch, \
+Französisch, Portugiesisch und Arabisch — die App selbst spricht alle sechs \
+Sprachen."""
+
+# "Neu in dieser Version" fuer die weiteren Sprachen der Store-Seite. Apple
+# verlangt den Text bei einem Update fuer JEDE Lokalisierung der Version —
+# lokalisieren() setzt ihn mit, sonst scheitert die Einreichung.
+WHATS_NEW_SPRACHEN = {
+    'en': "The date picker in the weight chart now shows dates in the right "
+          "format. Small fixes and improvements.",
+    'es': "El selector de fecha del gráfico de peso ahora muestra las fechas en "
+          "el formato correcto. Pequeñas mejoras y correcciones.",
+    'fr': "Le sélecteur de date du graphique de poids affiche désormais les dates "
+          "au bon format. Petites corrections et améliorations.",
+    'pt': "O seletor de data do gráfico de peso agora mostra as datas no formato "
+          "correto. Pequenas correções e melhorias.",
+    'ar': "يعرض منتقي التاريخ في مخطط الوزن التواريخ الآن بالتنسيق الصحيح. "
+          "تحسينات وإصلاحات صغيرة.",
+}
 
 
 def version_anlegen(tok, nummer):
@@ -342,6 +358,176 @@ def beschreibung(tok):
             print('  gesetzt (Beschreibung, Support-URL, Marketing-URL)')
 
 
+# ── Weitere Sprachen (EN, ES, FR, PT, AR) ─────────────────────────────────
+# Bis 10/2026 gab es in ASC NUR de-DE. Wer in den USA, Spanien oder Brasilien
+# sucht, sah eine deutsche Seite — oder fand FullRep gar nicht, weil Keywords
+# je Locale indexiert werden. Die App selbst kann sechs Sprachen.
+#
+# Quellen, keine Kopien: Fliesstext aus play-listing.<locale>.json (wie Play),
+# Name/Untertitel/Keywords/Werbetext aus store-texte.md §2b.
+#
+# ASC-Locale -> (Abschnitt in store-texte.md, Play-JSON, Abo-Block-Sprache).
+# en-GB/es-MX sind eigene Store-Fronten: ohne eigenen Eintrag fallen UK und
+# Lateinamerika auf die Hauptsprache (Deutsch) zurueck.
+SPRACHEN = {
+    'en-US': ('Englisch', 'en-US', 'en'),
+    'en-GB': ('Englisch', 'en-US', 'en'),
+    'es-ES': ('Spanisch', 'es-ES', 'es'),
+    'es-MX': ('Spanisch', 'es-ES', 'es'),
+    'fr-FR': ('Französisch', 'fr-FR', 'fr'),
+    'pt-BR': ('Portugiesisch', 'pt-BR', 'pt'),
+    'ar-SA': ('Arabisch', 'ar', 'ar'),
+}
+
+# 3.1.2: Der Link auf die Nutzungsbedingungen muss in JEDER Beschreibung
+# stehen, die ein Nutzer sehen kann. Preise bewusst ohne Betrag — ausserhalb
+# der Eurozone stimmte "4,99 EUR" nicht, Apple zeigt den echten Preis.
+ABO_BLOECKE = {
+    'en': """
+
+SUBSCRIPTION — FULLREP PREMIUM
+• Monthly or yearly subscription with automatic renewal; the price in your currency is shown in the app before purchase
+• 7-day free trial; the subscription starts afterwards unless you cancel
+• Payment is charged to your Apple ID at confirmation of purchase
+• The subscription renews automatically unless cancelled at least 24 hours before the end of the current period — manage and cancel in your Apple ID settings
+• Terms of Use: https://fullrep.vercel.app/legal/terms
+• Privacy Policy: https://fullrep.vercel.app/legal/privacy""",
+    'es': """
+
+SUSCRIPCIÓN — FULLREP PREMIUM
+• Suscripción mensual o anual con renovación automática; el precio en tu moneda se muestra en la app antes de comprar
+• 7 días de prueba gratis; después empieza la suscripción si no la cancelas
+• El pago se carga a tu Apple ID al confirmar la compra
+• La suscripción se renueva automáticamente salvo que la canceles al menos 24 horas antes del fin del periodo — gestiónala y cancélala en los ajustes de tu Apple ID
+• Condiciones de uso: https://fullrep.vercel.app/legal/terms
+• Política de privacidad: https://fullrep.vercel.app/legal/privacy""",
+    'fr': """
+
+ABONNEMENT — FULLREP PREMIUM
+• Abonnement mensuel ou annuel à renouvellement automatique ; le prix dans ta devise est affiché dans l'app avant l'achat
+• 7 jours d'essai gratuit ; l'abonnement commence ensuite si tu ne résilies pas
+• Le paiement est débité de ton identifiant Apple à la confirmation de l'achat
+• L'abonnement se renouvelle automatiquement sauf résiliation au moins 24 heures avant la fin de la période — gère-le et résilie-le dans les réglages de ton identifiant Apple
+• Conditions d'utilisation : https://fullrep.vercel.app/legal/terms
+• Politique de confidentialité : https://fullrep.vercel.app/legal/privacy""",
+    'pt': """
+
+ASSINATURA — FULLREP PREMIUM
+• Assinatura mensal ou anual com renovação automática; o preço na sua moeda aparece no app antes da compra
+• 7 dias de teste grátis; depois a assinatura começa se você não cancelar
+• O pagamento é cobrado no seu ID Apple na confirmação da compra
+• A assinatura renova automaticamente, a menos que seja cancelada pelo menos 24 horas antes do fim do período — gerencie e cancele nos ajustes do seu ID Apple
+• Termos de uso: https://fullrep.vercel.app/legal/terms
+• Política de privacidade: https://fullrep.vercel.app/legal/privacy""",
+    'ar': """
+
+الاشتراك — FULLREP PREMIUM
+• اشتراك شهري أو سنوي يتجدد تلقائيًا؛ يظهر السعر بعملتك داخل التطبيق قبل الشراء
+• تجربة مجانية لمدة 7 أيام، ثم يبدأ الاشتراك ما لم تُلغِه
+• يُخصم المبلغ من حساب Apple ID عند تأكيد الشراء
+• يتجدد الاشتراك تلقائيًا ما لم يُلغَ قبل 24 ساعة على الأقل من نهاية الفترة الحالية — يمكنك إدارته وإلغاؤه من إعدادات Apple ID
+• شروط الاستخدام: https://fullrep.vercel.app/legal/terms
+• سياسة الخصوصية: https://fullrep.vercel.app/legal/privacy""",
+}
+
+
+def _ios_felder(abschnitt):
+    """Name/Untertitel/Keywords/Werbetext einer Sprache aus store-texte.md.
+    Muster: ### <Sprache> — <Feld> (max. N Zeichen …) + ```-Block."""
+    import re
+    with open(os.path.join(WURZEL, 'store-assets/store-texte.md'), encoding='utf-8') as f:
+        md = f.read()
+    felder = {}
+    for feld in ('Name', 'Untertitel', 'Keywords', 'Werbetext'):
+        m = re.search(rf'^###\s+{re.escape(abschnitt)}\s+—\s+{feld}\b[^\n]*\n+```\n(.*?)\n```',
+                      md, re.M | re.S)
+        if not m:
+            sys.exit(f'  store-texte.md: "{abschnitt} — {feld}" nicht gefunden')
+        felder[feld] = m.group(1).strip()
+    return felder
+
+
+def _sprachtexte(locale):
+    abschnitt, play, abo = SPRACHEN[locale]
+    f = _ios_felder(abschnitt)
+    with open(os.path.join(WURZEL, f'store-assets/play-listing.{play}.json'),
+              encoding='utf-8') as d:
+        text = json.load(d)['fullDescription'].rstrip() + ABO_BLOECKE[abo]
+    # Werbetext steht in der md umgebrochen; Apple will Fliesstext.
+    werbung = ' '.join(f['Werbetext'].split())
+    t = {'name': f['Name'], 'subtitle': f['Untertitel'],
+         'keywords': f['Keywords'], 'promotionalText': werbung,
+         'description': text}
+    for feld, grenze in (('name', 30), ('subtitle', 30), ('keywords', 100),
+                         ('promotionalText', 170),
+                         ('description', BESCHREIBUNG_GRENZE)):
+        if len(t[feld]) > grenze:
+            sys.exit(f'  {locale}: {feld} {len(t[feld])} > {grenze} Zeichen')
+    return t
+
+
+def _anlegen_oder_setzen(tok, art, vorhanden, attribute, beziehung, label):
+    if TROCKEN:
+        print(f'    [trocken] {"PATCH" if vorhanden else "POST"} {art} ({label})')
+        return
+    if vorhanden:
+        res = api(tok, f'{art}/{vorhanden["id"]}', 'PATCH', {
+            'data': {'type': art, 'id': vorhanden['id'], 'attributes': attribute}},
+            fatal=False)
+    else:
+        res = api(tok, art, 'POST', {
+            'data': {'type': art, 'attributes': attribute,
+                     'relationships': beziehung}}, fatal=False)
+    if res.get('_fehler'):
+        print(f'    {label}: FEHLER {fehler_text(res)}')
+    else:
+        print(f'    {label}: {"aktualisiert" if vorhanden else "angelegt"}')
+
+
+def lokalisieren(tok, locales):
+    """Store-Seiten in weiteren Sprachen anlegen bzw. aktualisieren."""
+    texte = {l: _sprachtexte(l) for l in locales}  # erst alles pruefen, dann schreiben
+    aid = app_id(tok)
+    v = offene_version(tok, aid)
+    print(f'  Version {v["attributes"]["versionString"]} '
+          f'({v["attributes"].get("appStoreState")})')
+
+    # Name/Untertitel haengen am appInfo. Nur das bearbeitbare nimmt Aenderungen
+    # an — das lebende (READY_FOR_SALE) wird uebersprungen.
+    infos = api(tok, f'apps/{aid}/appInfos').get('data', [])
+    lebend = {'READY_FOR_DISTRIBUTION', 'READY_FOR_SALE'}
+    info = next((i for i in infos if (i['attributes'].get('state')
+                 or i['attributes'].get('appStoreState')) not in lebend), None)
+    if not info:
+        sys.exit('  Kein bearbeitbares appInfo — erst eine neue Version anlegen.')
+    info_locs = {l['attributes']['locale']: l for l in
+                 api(tok, f'appInfos/{info["id"]}/appInfoLocalizations').get('data', [])}
+    ver_locs = {l['attributes']['locale']: l for l in
+                api(tok, f'appStoreVersions/{v["id"]}/appStoreVersionLocalizations'
+                    ).get('data', [])}
+
+    for locale in locales:
+        t = texte[locale]
+        print(f'\n  {locale}: {t["name"]!r} · {len(t["description"])} Zeichen Beschreibung')
+        _anlegen_oder_setzen(
+            tok, 'appInfoLocalizations', info_locs.get(locale),
+            {**({} if info_locs.get(locale) else {'locale': locale}),
+             'name': t['name'], 'subtitle': t['subtitle'],
+             'privacyPolicyUrl': 'https://fullrep.vercel.app/legal/privacy'},
+            {'appInfo': {'data': {'type': 'appInfos', 'id': info['id']}}},
+            'Name + Untertitel')
+        _anlegen_oder_setzen(
+            tok, 'appStoreVersionLocalizations', ver_locs.get(locale),
+            {**({} if ver_locs.get(locale) else {'locale': locale}),
+             'description': t['description'], 'keywords': t['keywords'],
+             'promotionalText': t['promotionalText'],
+             'whatsNew': WHATS_NEW_SPRACHEN[SPRACHEN[locale][2]],
+             'supportUrl': SUPPORT_URL, 'marketingUrl': MARKETING_URL},
+            {'appStoreVersion': {'data': {'type': 'appStoreVersions', 'id': v['id']}}},
+            'Beschreibung, Keywords, Werbetext')
+    print('\n  Screenshots: ohne eigene Bilder zeigt Apple die der Hauptsprache.')
+
+
 def setze_build(tok, nummer):
     aid = app_id(tok)
     v = offene_version(tok, aid)
@@ -380,7 +566,17 @@ def setze_screenshots(tok):
         sets = api(tok, f'appStoreVersionLocalizations/{loc["id"]}/appScreenshotSets')
         vorhanden = {s['attributes']['screenshotDisplayType']: s['id']
                      for s in sets.get('data', [])}
+        # Je Sprache eigener Ordner (store-rahmen.mjs): de liegt in den
+        # alten Pfaden, alle anderen unter store-assets/<sprache>/. Fehlt der
+        # Ordner, bleibt die Sprache unangetastet — deutsche Bilder unter
+        # einer englischen Seite waeren schlechter als Apples Rueckfall.
+        sprache = lc.split('-')[0]
         for ordner, typ in BILDER:
+            if sprache != 'de':
+                ordner = ordner.replace('store-assets/', f'store-assets/{sprache}/', 1)
+            if not os.path.isdir(os.path.join(WURZEL, ordner)):
+                print(f'    {typ}: kein Ordner {ordner} — uebersprungen')
+                continue
             pfade = sorted(
                 os.path.join(WURZEL, ordner, f)
                 for f in os.listdir(os.path.join(WURZEL, ordner))
@@ -1096,6 +1292,9 @@ def main():
                    help='neue App-Store-Version anlegen (z. B. 1.5.0) + whatsNew')
     p.add_argument('--beschreibung', action='store_true',
                    help='Beschreibung + Support-/Marketing-URL setzen (3.1.2)')
+    p.add_argument('--lokalisieren', nargs='?', const='alle', metavar='LOCALES',
+                   help='Store-Seite in weiteren Sprachen anlegen/aktualisieren, '
+                        f'kommagetrennt aus {",".join(SPRACHEN)} (Standard: alle)')
     p.add_argument('--build', metavar='NR',
                    help='Diesen Build der offenen Version zuweisen')
     p.add_argument('--screenshots', action='store_true',
@@ -1131,7 +1330,8 @@ def main():
     TROCKEN = a.dry_run
     TROTZDEM = a.trotzdem
 
-    tat = [a.status, a.name, a.build, a.version_anlegen, a.beschreibung, a.screenshots, a.abo_screenshot,
+    tat = [a.status, a.name, a.build, a.version_anlegen, a.beschreibung, a.lokalisieren,
+           a.screenshots, a.abo_screenshot,
            a.warum, a.einreichungen, a.aufraeumen, a.abo_namen, a.abo_notiz,
            a.inhaberrechte, a.exportfrage, a.pruefnotiz,
            a.einreichen, a.alles]
@@ -1165,6 +1365,13 @@ def main():
         version_anlegen(tok, a.version_anlegen)
     if a.beschreibung:
         beschreibung(tok)
+    if a.lokalisieren:
+        gewaehlt = (list(SPRACHEN) if a.lokalisieren == 'alle'
+                    else [s.strip() for s in a.lokalisieren.split(',') if s.strip()])
+        unbekannt = [s for s in gewaehlt if s not in SPRACHEN]
+        if unbekannt:
+            p.error(f'Unbekannte Locale: {", ".join(unbekannt)}')
+        lokalisieren(tok, gewaehlt)
     if a.name:
         setze_namen(tok)
     if a.build:

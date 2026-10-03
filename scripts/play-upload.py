@@ -289,9 +289,18 @@ def setze_listing(tok, datei, lang, dry_run=False):
 
     eid = call(tok, 'POST', f'{API}/applications/{PKG}/edits')['id']
     url = f'{API}/applications/{PKG}/edits/{eid}/listings/{lang}'
-    alt = call(tok, 'GET', url)
+    # Eine Sprache, die es im Eintrag noch nicht gibt, antwortet mit 404 —
+    # bis 10/2026 brach das Skript dort ab, weil es nur de-DE kannte. Dann
+    # wird die Sprache per PUT (listings.update) angelegt statt per PATCH.
+    try:
+        alt = call(tok, 'GET', url, fatal=False)
+        neu_anlegen = False
+    except ApiError as e:
+        if e.code != 404:
+            sys.exit(f'\nFEHLER {e.code} bei GET {url}\n{e.detail}\n')
+        alt, neu_anlegen = {}, True
 
-    print(f'Store-Eintrag {lang}:')
+    print(f'Store-Eintrag {lang}:' + (' (NEU — Sprache wird angelegt)' if neu_anlegen else ''))
     for feld in ('title', 'shortDescription', 'fullDescription'):
         if feld not in neu:
             continue
@@ -317,7 +326,7 @@ def setze_listing(tok, datei, lang, dry_run=False):
         print('\n--dry-run: Edit verworfen, am Eintrag hat sich nichts geaendert.')
         return
 
-    call(tok, 'PATCH', url, data=dict(neu, language=lang))
+    call(tok, 'PUT' if neu_anlegen else 'PATCH', url, data=dict(neu, language=lang))
     print()
     commit_edit(tok, eid)
 
