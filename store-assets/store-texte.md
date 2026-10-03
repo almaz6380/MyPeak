@@ -208,7 +208,7 @@ appreview@wellbooked.at / MyPeak-Review#2026
 
 ---
 
-## 2b. Die vier weiteren Sprachen (ES, FR, PT, AR)
+## 2b. Die weiteren Sprachen (EN, ES, FR, PT, AR)
 
 **Die langen Beschreibungen stehen NICHT hier, sondern in
 `store-assets/play-listing.<locale>.json`** — je Sprache eine Datei, dieselbe
@@ -231,6 +231,31 @@ wäre doppelte Pflege ohne Gegenwert.
 
 ⚠ **Spanisch ist bewusst neutral gehalten** (kein „vosotros"), damit dieselbe
 Datei für Spanien und Lateinamerika taugt.
+
+### Englisch — Name (max. 30 Zeichen)
+```
+FullRep: Workout & Nutrition
+```
+
+### Englisch — Untertitel (max. 30 Zeichen)
+```
+Workout Tracker & AI Coach
+```
+
+### Englisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+gym,fitness,calorie,counter,macro,tracker,weight,loss,muscle,diet,meal,lifting,log,planner,protein
+```
+
+### Englisch — Werbetext (max. 170 Zeichen)
+```
+Log workouts, track calories, see your progress — all in one app.
+With barcode scanner, AI photo recognition and 21 ready-made programs.
+```
+
+Englisch läuft unter `en-US` (Datei `play-listing.en-US.json`); im App Store
+dieselben Texte zusätzlich unter `en-GB`, damit UK/Irland nicht auf Deutsch
+zurückfallen.
 
 ### Spanisch — Name (max. 30 Zeichen)
 ```

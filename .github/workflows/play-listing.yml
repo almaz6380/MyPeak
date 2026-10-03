@@ -100,8 +100,17 @@ jobs:
                 --feature store-assets/android/feature-graphic.png "${GEMEINSAM[@]}"
               ;;
             *)
+              # Je Sprache eigener Ordner (scripts/store-rahmen.mjs): de-DE
+              # liegt im alten Pfad, sonst store-assets/<sprache>/android.
+              SPRACHE="${LANG_INPUT%%-*}"
+              ORDNER="store-assets/android"
+              [ "$SPRACHE" != "de" ] && ORDNER="store-assets/$SPRACHE/android"
+              if [ ! -d "$ORDNER" ]; then
+                echo "Keine Screenshots fuer $LANG_INPUT ($ORDNER fehlt)." >&2
+                exit 1
+              fi
               python3 scripts/play-upload.py \
-                --screenshots store-assets/android "${GEMEINSAM[@]}"
+                --screenshots "$ORDNER" "${GEMEINSAM[@]}"
               ;;
           esac
 

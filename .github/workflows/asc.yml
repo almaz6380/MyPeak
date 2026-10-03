@@ -7,6 +7,7 @@ name: App Store Connect
 #   status          liest nur
 #   version-anlegen neue App-Store-Version + "Neu in dieser Version"
 #   beschreibung    Beschreibung + Support-/Marketing-URL (3.1.2: EULA-Link)
+#   lokalisieren    Store-Seite EN/ES/FR/PT/AR anlegen (Texte aus store-assets/)
 #   name            Anzeigename + Untertitel auf FullRep
 #   build           den Build aus "build_nr" der offenen Version zuweisen
 #   screenshots     iPhone- + iPad-Bilder ersetzen
@@ -31,6 +32,7 @@ on:
           - status
           - version-anlegen
           - beschreibung
+          - lokalisieren
           - name
           - build
           - screenshots
