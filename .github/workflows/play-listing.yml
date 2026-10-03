@@ -93,11 +93,21 @@ jobs:
             grafiken)
               # App-Symbol und Vorstellungsgrafik sind zwei getrennte Uploads;
               # jeder braucht seine eigene Edit-Transaktion.
+              # Das Symbol ist in jeder Sprache dasselbe; die
+              # Vorstellungsgrafik traegt Text und liegt je Sprache in
+              # store-assets/<sprache>/android (de-DE im alten Pfad).
+              SPRACHE="${LANG_INPUT%%-*}"
+              FEATURE="store-assets/android/feature-graphic.png"
+              [ "$SPRACHE" != "de" ] && FEATURE="store-assets/$SPRACHE/android/feature-graphic.png"
+              if [ ! -f "$FEATURE" ]; then
+                echo "Keine Vorstellungsgrafik fuer $LANG_INPUT ($FEATURE fehlt)." >&2
+                exit 1
+              fi
               python3 scripts/play-upload.py \
                 --icon store-assets/android/icon-512.png "${GEMEINSAM[@]}"
               echo
               python3 scripts/play-upload.py \
-                --feature store-assets/android/feature-graphic.png "${GEMEINSAM[@]}"
+                --feature "$FEATURE" "${GEMEINSAM[@]}"
               ;;
             *)
               # Je Sprache eigener Ordner (scripts/store-rahmen.mjs): de-DE
