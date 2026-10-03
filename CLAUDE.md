@@ -18,7 +18,19 @@ Inhaltsbibliotheken (siehe 4b und 4c)
 
 ## Aktueller Stand
 
-### Store-Seiten in sechs Sprachen + Screenshots mit Aussage (03.10.2026) — CODE FERTIG, Uploads OFFEN
+### Store-Seiten in sechs Sprachen + Screenshots mit Aussage (03.10.2026) — AUSGEROLLT als 1.5.3
+
+**Ausgerollt am 03.10., je am Protokoll geprüft (PR #57 gemergt):**
+
+| | Stand |
+|---|---|
+| Play-Texte | en-US, es-ES, fr-FR, pt-BR, ar **neu angelegt** und committet (de-DE unverändert) |
+| Play-Screenshots | alle 6 Sprachen, je 6 gerahmte Bilder |
+| Android | **vc22 (1.5.3) auf `production`, an alle** (`android-release` 37152484197) |
+| iOS | Build 12 hochgeladen (`ios-release` 37152009966, **GitHub-Rechner**, weil der Mac offline war) → Version 1.5.3 angelegt → 7 Lokalisierungen (en-US, en-GB, es-ES, es-MX, fr-FR, pt-BR, ar-SA) mit Texten und `whatsNew` → 84 Screenshots → Build 12 `VALID`, zugewiesen → **eingereicht**, Einreichung `e34b1183-4118-4398-bf7c-dc96a02ee002`, `WAITING_FOR_REVIEW`. Beide Abos `APPROVED` |
+
+**Nach der Freigabe prüfen:** iTunes-Lookup `?id=6788461300&country=us`,
+`languageCodesISO2A` muss `EN` enthalten.
 
 Anlass: Josef fragte, warum niemand die App herunterlädt. Die Länder waren nie das Problem
 (iOS 175, Play 173 Regionen). Das Problem war die **Store-Seite**: Im App Store gab es
@@ -72,6 +84,15 @@ Sprache PUT statt PATCH. Vorher brach es bei jeder Sprache außer de-DE ab.
 
 **`whatsNew` je Sprache:** Apple verlangt „Neu in dieser Version“ bei einem Update für
 **jede** Lokalisierung. `--lokalisieren` setzt ihn aus `WHATS_NEW_SPRACHEN` mit.
+
+**Zwei Fallen beim Ausrollen am 03.10., beide gemessen:**
+- **Play kennt nur EINEN offenen Edit.** Ein neuer Edit verwirft den älteren
+  („This Edit has been deleted“). Vier parallele Trockenläufe ließen deshalb den ersten
+  scheitern. **`play-listing.yml` immer nacheinander starten**, auch bei Trockenläufen.
+- **Apple legt die Versions-Lokalisierung selbst an**, sobald eine
+  `appInfoLocalization` angelegt wird. `--lokalisieren` hatte die Liste vorher gelesen
+  und bekam deshalb „already exists“. Das ist behoben: Die Liste wird jetzt nach dem
+  Anlegen gelesen. Der Befehl bleibt idempotent, ein zweiter Lauf aktualisiert nur.
 
 **Nebenbefunde, nicht behoben:**
 - `getXP` gibt Gästen immer Streak 0 und Level 1 zurück. Wer im Gastmodus testet,
