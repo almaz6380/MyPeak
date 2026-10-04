@@ -306,8 +306,8 @@ def _whats_new(tok, v):
 # "ueber 220 Uebungen" standen, waehrend Play laengst umgestellt war.
 
 LISTING_DE = 'store-assets/play-listing.de-DE.json'
-SUPPORT_URL = 'https://fullrep.vercel.app/legal/imprint'
-MARKETING_URL = 'https://fullrep.vercel.app'
+SUPPORT_URL = 'https://fullrep.pages.dev/legal/imprint'
+MARKETING_URL = 'https://fullrep.pages.dev'
 BESCHREIBUNG_GRENZE = 4000
 
 ABO_BLOCK = """
@@ -317,8 +317,8 @@ ABO — FULLREP PREMIUM
 \u2022 7 Tage kostenlos testen, danach beginnt das Abo, wenn du nicht k\u00fcndigst
 \u2022 Die Zahlung wird bei Best\u00e4tigung des Kaufs \u00fcber deine Apple-ID abgebucht
 \u2022 Das Abo verl\u00e4ngert sich automatisch, sofern es nicht sp\u00e4testens 24 Stunden vor Ablauf gek\u00fcndigt wird \u2014 verwalten und k\u00fcndigen in den Einstellungen deiner Apple-ID
-\u2022 Nutzungsbedingungen: https://fullrep.vercel.app/legal/terms
-\u2022 Datenschutzerkl\u00e4rung: https://fullrep.vercel.app/legal/privacy"""
+\u2022 Nutzungsbedingungen: https://fullrep.pages.dev/legal/terms
+\u2022 Datenschutzerkl\u00e4rung: https://fullrep.pages.dev/legal/privacy"""
 
 
 def beschreibung(tok):
@@ -390,8 +390,8 @@ SUBSCRIPTION — FULLREP PREMIUM
 • 7-day free trial; the subscription starts afterwards unless you cancel
 • Payment is charged to your Apple ID at confirmation of purchase
 • The subscription renews automatically unless cancelled at least 24 hours before the end of the current period — manage and cancel in your Apple ID settings
-• Terms of Use: https://fullrep.vercel.app/legal/terms
-• Privacy Policy: https://fullrep.vercel.app/legal/privacy""",
+• Terms of Use: https://fullrep.pages.dev/legal/terms
+• Privacy Policy: https://fullrep.pages.dev/legal/privacy""",
     'es': """
 
 SUSCRIPCIÓN — FULLREP PREMIUM
@@ -399,8 +399,8 @@ SUSCRIPCIÓN — FULLREP PREMIUM
 • 7 días de prueba gratis; después empieza la suscripción si no la cancelas
 • El pago se carga a tu Apple ID al confirmar la compra
 • La suscripción se renueva automáticamente salvo que la canceles al menos 24 horas antes del fin del periodo — gestiónala y cancélala en los ajustes de tu Apple ID
-• Condiciones de uso: https://fullrep.vercel.app/legal/terms
-• Política de privacidad: https://fullrep.vercel.app/legal/privacy""",
+• Condiciones de uso: https://fullrep.pages.dev/legal/terms
+• Política de privacidad: https://fullrep.pages.dev/legal/privacy""",
     'fr': """
 
 ABONNEMENT — FULLREP PREMIUM
@@ -408,8 +408,8 @@ ABONNEMENT — FULLREP PREMIUM
 • 7 jours d'essai gratuit ; l'abonnement commence ensuite si tu ne résilies pas
 • Le paiement est débité de ton identifiant Apple à la confirmation de l'achat
 • L'abonnement se renouvelle automatiquement sauf résiliation au moins 24 heures avant la fin de la période — gère-le et résilie-le dans les réglages de ton identifiant Apple
-• Conditions d'utilisation : https://fullrep.vercel.app/legal/terms
-• Politique de confidentialité : https://fullrep.vercel.app/legal/privacy""",
+• Conditions d'utilisation : https://fullrep.pages.dev/legal/terms
+• Politique de confidentialité : https://fullrep.pages.dev/legal/privacy""",
     'pt': """
 
 ASSINATURA — FULLREP PREMIUM
@@ -417,8 +417,8 @@ ASSINATURA — FULLREP PREMIUM
 • 7 dias de teste grátis; depois a assinatura começa se você não cancelar
 • O pagamento é cobrado no seu ID Apple na confirmação da compra
 • A assinatura renova automaticamente, a menos que seja cancelada pelo menos 24 horas antes do fim do período — gerencie e cancele nos ajustes do seu ID Apple
-• Termos de uso: https://fullrep.vercel.app/legal/terms
-• Política de privacidade: https://fullrep.vercel.app/legal/privacy""",
+• Termos de uso: https://fullrep.pages.dev/legal/terms
+• Política de privacidade: https://fullrep.pages.dev/legal/privacy""",
     'ar': """
 
 الاشتراك — FULLREP PREMIUM
@@ -426,8 +426,8 @@ ASSINATURA — FULLREP PREMIUM
 • تجربة مجانية لمدة 7 أيام، ثم يبدأ الاشتراك ما لم تُلغِه
 • يُخصم المبلغ من حساب Apple ID عند تأكيد الشراء
 • يتجدد الاشتراك تلقائيًا ما لم يُلغَ قبل 24 ساعة على الأقل من نهاية الفترة الحالية — يمكنك إدارته وإلغاؤه من إعدادات Apple ID
-• شروط الاستخدام: https://fullrep.vercel.app/legal/terms
-• سياسة الخصوصية: https://fullrep.vercel.app/legal/privacy""",
+• شروط الاستخدام: https://fullrep.pages.dev/legal/terms
+• سياسة الخصوصية: https://fullrep.pages.dev/legal/privacy""",
 }
 
 
@@ -509,7 +509,7 @@ def lokalisieren(tok, locales):
             tok, 'appInfoLocalizations', info_locs.get(locale),
             {**({} if info_locs.get(locale) else {'locale': locale}),
              'name': t['name'], 'subtitle': t['subtitle'],
-             'privacyPolicyUrl': 'https://fullrep.vercel.app/legal/privacy'},
+             'privacyPolicyUrl': 'https://fullrep.pages.dev/legal/privacy'},
             {'appInfo': {'data': {'type': 'appInfos', 'id': info['id']}}},
             'Name + Untertitel')
         # ⚠ ERST JETZT die Versions-Lokalisierungen lesen: Legt man eine

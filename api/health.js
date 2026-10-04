@@ -1,4 +1,4 @@
-// Keep-Alive + Health-Check: Der tägliche Vercel-Cron (vercel.json) ruft diesen
+// Keep-Alive + Health-Check: Der tägliche Cron-Workflow (.github/workflows/cron.yml) ruft diesen
 // Endpunkt auf. Die Mini-Abfrage zählt bei Supabase als Aktivität und verhindert,
 // dass der Free-Tier das Projekt nach 7 Tagen Inaktivität pausiert.
 export default async function handler(req, res) {

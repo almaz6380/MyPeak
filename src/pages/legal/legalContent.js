@@ -22,7 +22,7 @@ export const legalDocs = {
         },
         {
           heading: 'Unternehmensgegenstand',
-          body: 'Betrieb der Fitness- und Ernährungs-Web-App „FullRep" (fullrep.vercel.app).',
+          body: 'Betrieb der Fitness- und Ernährungs-Web-App „FullRep" (fullrep.pages.dev).',
         },
         {
           heading: 'Gewerbe- und berufsrechtliche Angaben',
@@ -48,7 +48,7 @@ export const legalDocs = {
         },
         {
           heading: 'Business purpose',
-          body: 'Operation of the fitness and nutrition web app "FullRep" (fullrep.vercel.app).',
+          body: 'Operation of the fitness and nutrition web app "FullRep" (fullrep.pages.dev).',
         },
         {
           heading: 'Trade and professional information',
@@ -69,7 +69,7 @@ export const legalDocs = {
   privacy: {
     de: {
       title: 'Datenschutzerklärung',
-      updated: 'Stand: 20. September 2026',
+      updated: 'Stand: 4. Oktober 2026',
       sections: [
         {
           heading: '1. Verantwortlicher',
@@ -85,7 +85,7 @@ export const legalDocs = {
         },
         {
           heading: '4. Empfänger und Auftragsverarbeiter',
-          body: 'Supabase, Inc. (USA; Datenbank und Login-System): speichert deine Konto-, Profil- und Nutzungsdaten.\n\nVercel, Inc. (USA; Hosting und Besucherzählung): liefert die App und unsere Serverfunktionen aus; dabei fallen technisch notwendige Server-Logs (z. B. IP-Adresse) an. Auf der Web-Fassung unter fullrep.vercel.app zählt Vercel Web Analytics zusätzlich Seitenaufrufe, Herkunftsseite, Land, Gerätetyp und Browser, damit wir sehen, welche Seiten genutzt werden — ohne Cookies und ohne geräteübergreifende Kennung; Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. In den Apps für iOS und Android findet diese Zählung nicht statt.\n\nGoogle LLC / Google Ireland Ltd.: (1) Gemini API — nur wenn du die Mahlzeiten-Fotoanalyse nutzt, wird das aufgenommene Foto zur Auswertung an Google übermittelt; nur wenn du den KI-Coach nutzt, gehen deine Nachrichten an ihn samt dem Verlauf der aktuellen Unterhaltung an Google. Wir senden dabei weder Name, E-Mail-Adresse noch Konto-ID mit; Fotos und Nachrichten speichern wir nicht auf unseren Servern. (2) AdMob — Werbung in den Apps für iOS und Android (siehe Punkt 2 und 3).\n\nAnthropic, PBC (USA; KI-Coach): Für Antworten des KI-Coachs setzen wir alternativ zu Gemini Modelle von Anthropic ein — mit denselben Daten wie oben, ebenfalls ohne Name, E-Mail oder Konto-ID.\n\nRevenueCat, Inc. (USA; Premium-Abo): erhält eine App-interne Nutzerkennung und die Kaufbestätigung des Stores, um dein Abo zu verwalten und auf einem neuen Gerät wiederherzustellen. Die Zahlung selbst wickeln Apple bzw. Google ab; wir sehen keine Zahlungsdaten.\n\nFunctional Software, Inc. (Sentry, USA; Fehlerberichte): erhält technische Fehlermeldungen ohne Personenbezug, sofern die Fehlererfassung eingeschaltet ist.\n\nOpen Food Facts (Lebensmitteldatenbank): Bei der Lebensmittelsuche und beim Barcode-Scan werden Suchbegriff bzw. Barcode (keine persönlichen Daten) an Open Food Facts übermittelt.\n\nMit allen Auftragsverarbeitern bestehen Verträge nach Art. 28 DSGVO. Bei Übermittlungen in die USA stützen wir uns auf die EU-Standardvertragsklauseln bzw. das EU-US Data Privacy Framework, soweit der Anbieter dort zertifiziert ist.',
+          body: 'Supabase, Inc. (USA; Datenbank und Login-System): speichert deine Konto-, Profil- und Nutzungsdaten.\n\nCloudflare, Inc. (USA; Hosting): liefert die App und unsere Serverfunktionen aus; dabei fallen technisch notwendige Server-Logs (z. B. IP-Adresse) an. Eine Besucherzählung oder Analyse findet weder auf der Web-Fassung noch in den Apps statt.\n\nGoogle LLC / Google Ireland Ltd.: (1) Gemini API — nur wenn du die Mahlzeiten-Fotoanalyse nutzt, wird das aufgenommene Foto zur Auswertung an Google übermittelt; nur wenn du den KI-Coach nutzt, gehen deine Nachrichten an ihn samt dem Verlauf der aktuellen Unterhaltung an Google. Wir senden dabei weder Name, E-Mail-Adresse noch Konto-ID mit; Fotos und Nachrichten speichern wir nicht auf unseren Servern. (2) AdMob — Werbung in den Apps für iOS und Android (siehe Punkt 2 und 3).\n\nAnthropic, PBC (USA; KI-Coach): Für Antworten des KI-Coachs setzen wir alternativ zu Gemini Modelle von Anthropic ein — mit denselben Daten wie oben, ebenfalls ohne Name, E-Mail oder Konto-ID.\n\nRevenueCat, Inc. (USA; Premium-Abo): erhält eine App-interne Nutzerkennung und die Kaufbestätigung des Stores, um dein Abo zu verwalten und auf einem neuen Gerät wiederherzustellen. Die Zahlung selbst wickeln Apple bzw. Google ab; wir sehen keine Zahlungsdaten.\n\nFunctional Software, Inc. (Sentry, USA; Fehlerberichte): erhält technische Fehlermeldungen ohne Personenbezug, sofern die Fehlererfassung eingeschaltet ist.\n\nOpen Food Facts (Lebensmitteldatenbank): Bei der Lebensmittelsuche und beim Barcode-Scan werden Suchbegriff bzw. Barcode (keine persönlichen Daten) an Open Food Facts übermittelt.\n\nMit allen Auftragsverarbeitern bestehen Verträge nach Art. 28 DSGVO. Bei Übermittlungen in die USA stützen wir uns auf die EU-Standardvertragsklauseln bzw. das EU-US Data Privacy Framework, soweit der Anbieter dort zertifiziert ist.',
         },
         {
           heading: '5. Lokale Speicherung auf deinem Gerät',
@@ -107,7 +107,7 @@ export const legalDocs = {
     },
     en: {
       title: 'Privacy Policy',
-      updated: 'Last updated: 20 September 2026',
+      updated: 'Last updated: 4 October 2026',
       sections: [
         {
           heading: '1. Controller',
@@ -123,7 +123,7 @@ export const legalDocs = {
         },
         {
           heading: '4. Recipients and processors',
-          body: 'Supabase, Inc. (USA; database and login system): stores your account, profile and usage data.\n\nVercel, Inc. (USA; hosting and visitor counting): delivers the app and our server functions; technically necessary server logs (e.g. IP address) are generated. On the web version at fullrep.vercel.app, Vercel Web Analytics additionally counts page views, referrer, country, device type and browser so that we can see which pages are used — without cookies and without a cross-device identifier; the legal basis is Art. 6(1)(f) GDPR. This counting does not take place in the iOS and Android apps.\n\nGoogle LLC / Google Ireland Ltd.: (1) Gemini API — only if you use the meal photo analysis, the captured photo is transmitted to Google for evaluation; only if you use the AI coach, your messages to it, including the history of the current conversation, go to Google. We do not send your name, email address or account ID; photos and messages are not stored on our servers. (2) AdMob — advertising in the iOS and Android apps (see sections 2 and 3).\n\nAnthropic, PBC (USA; AI coach): For AI coach answers we use Anthropic models as an alternative to Gemini — with the same data as above, likewise without name, email or account ID.\n\nRevenueCat, Inc. (USA; Premium subscription): receives an app-internal user identifier and the store\'s purchase confirmation to manage your subscription and restore it on a new device. Payment itself is handled by Apple or Google; we never see payment details.\n\nFunctional Software, Inc. (Sentry, USA; crash reports): receives technical error messages without personal reference, if error reporting is enabled.\n\nOpen Food Facts (food database): when searching for foods or scanning barcodes, the search term or barcode (no personal data) is transmitted to Open Food Facts.\n\nData processing agreements under Art. 28 GDPR are in place with all processors. For transfers to the USA we rely on the EU standard contractual clauses or the EU-US Data Privacy Framework where the provider is certified.',
+          body: 'Supabase, Inc. (USA; database and login system): stores your account, profile and usage data.\n\nCloudflare, Inc. (USA; hosting): delivers the app and our server functions; technically necessary server logs (e.g. IP address) are generated. No visitor counting or analytics takes place, neither on the web version nor in the apps.\n\nGoogle LLC / Google Ireland Ltd.: (1) Gemini API — only if you use the meal photo analysis, the captured photo is transmitted to Google for evaluation; only if you use the AI coach, your messages to it, including the history of the current conversation, go to Google. We do not send your name, email address or account ID; photos and messages are not stored on our servers. (2) AdMob — advertising in the iOS and Android apps (see sections 2 and 3).\n\nAnthropic, PBC (USA; AI coach): For AI coach answers we use Anthropic models as an alternative to Gemini — with the same data as above, likewise without name, email or account ID.\n\nRevenueCat, Inc. (USA; Premium subscription): receives an app-internal user identifier and the store\'s purchase confirmation to manage your subscription and restore it on a new device. Payment itself is handled by Apple or Google; we never see payment details.\n\nFunctional Software, Inc. (Sentry, USA; crash reports): receives technical error messages without personal reference, if error reporting is enabled.\n\nOpen Food Facts (food database): when searching for foods or scanning barcodes, the search term or barcode (no personal data) is transmitted to Open Food Facts.\n\nData processing agreements under Art. 28 GDPR are in place with all processors. For transfers to the USA we rely on the EU standard contractual clauses or the EU-US Data Privacy Framework where the provider is certified.',
         },
         {
           heading: '5. Local storage on your device',
@@ -152,7 +152,7 @@ export const legalDocs = {
       sections: [
         {
           heading: '1. Geltungsbereich',
-          body: `Diese Nutzungsbedingungen gelten für die Nutzung der Web-App „FullRep" (fullrep.vercel.app), betrieben von:\n\n${operatorBlockDE}`,
+          body: `Diese Nutzungsbedingungen gelten für die Nutzung der Web-App „FullRep" (fullrep.pages.dev), betrieben von:\n\n${operatorBlockDE}`,
         },
         {
           heading: '2. Leistungsbeschreibung',
@@ -186,7 +186,7 @@ export const legalDocs = {
       sections: [
         {
           heading: '1. Scope',
-          body: `These terms of use apply to the use of the web app "FullRep" (fullrep.vercel.app), operated by:\n\n${operatorBlockEN}`,
+          body: `These terms of use apply to the use of the web app "FullRep" (fullrep.pages.dev), operated by:\n\n${operatorBlockEN}`,
         },
         {
           heading: '2. Service description',

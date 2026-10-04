@@ -1,4 +1,4 @@
-// Smoke-Test gegen die LIVE Web-App (fullrep.vercel.app) mit dem Review-Konto.
+// Smoke-Test gegen die LIVE Web-App (fullrep.pages.dev) mit dem Review-Konto.
 //
 // Prueft, was Unit-Tests nicht sehen: Rendert jede Hauptseite ohne
 // Seitenfehler, welche Requests scheitern, bleibt die Navigation benutzbar.
@@ -12,7 +12,7 @@ import { mkdirSync } from 'fs';
 // ueber den Agent-Proxy zu externen Hosts (ERR_CONNECTION_RESET; curl schon).
 // Deshalb laeuft der Test standardmaessig gegen den LOKALEN Build im
 // GASTMODUS — identischer Code wie deployed, komplett ohne Netz. Fuer einen
-// echten Live-Lauf (z. B. am Mac): BASIS=https://fullrep.vercel.app setzen.
+// echten Live-Lauf (z. B. am Mac): BASIS=https://fullrep.pages.dev setzen.
 const BASIS = process.env.BASIS ?? 'http://127.0.0.1:5180'; // vite preview (SPA-Fallback!)
 const GAST = BASIS.includes('127.0.0.1') || BASIS.includes('localhost');
 const OUT = process.env.SHOTS ?? new URL('../out/smoke/', import.meta.url).pathname;

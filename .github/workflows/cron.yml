@@ -1,0 +1,42 @@
+name: Taegliche Aufrufe (Keep-Alive + Backup)
+
+# Ersatz fuer die Vercel-Crons aus vercel.json. Cloudflare Pages hat keinen
+# Zeitplaner, deshalb ruft GitHub die beiden Endpunkte auf.
+#   /api/health  haelt das Supabase-Projekt wach (Free-Tier pausiert nach
+#                7 Tagen ohne Aktivitaet)
+#   /api/backup  sichert alle Tabellen in den Storage-Bucket "backups"
+# Kostet je Lauf wenige Sekunden auf ubuntu-latest.
+on:
+  schedule:
+    - cron: '0 6 * * *'
+    - cron: '30 3 * * *'
+  workflow_dispatch:
+    inputs:
+      was:
+        description: 'Was aufrufen'
+        type: choice
+        options: [beides, health, backup]
+        default: beides
+
+env:
+  BASIS: https://fullrep.pages.dev
+
+jobs:
+  aufruf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Keep-Alive
+        if: github.event.schedule == '0 6 * * *' || (github.event_name == 'workflow_dispatch' && inputs.was != 'backup')
+        run: curl -fsS --max-time 60 "$BASIS/api/health"
+
+      - name: Backup
+        if: github.event.schedule == '30 3 * * *' || (github.event_name == 'workflow_dispatch' && inputs.was != 'health')
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "${CRON_SECRET:-}" ]; then
+            echo "Secret CRON_SECRET fehlt im Repository (derselbe Wert wie in Cloudflare)." >&2
+            exit 1
+          fi
+          curl -fsS --max-time 240 -H "Authorization: Bearer $CRON_SECRET" "$BASIS/api/backup"

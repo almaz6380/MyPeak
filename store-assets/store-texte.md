@@ -116,9 +116,9 @@ FullRep does not replace medical advice. For any health concern, diagnosis or tr
 ### URLs
 | Feld | Wert |
 |---|---|
-| Support-URL | https://fullrep.vercel.app/legal/imprint |
-| Marketing-URL (optional) | https://fullrep.vercel.app |
-| Datenschutz-URL | https://fullrep.vercel.app/legal/privacy |
+| Support-URL | https://fullrep.pages.dev/legal/imprint |
+| Marketing-URL (optional) | https://fullrep.pages.dev |
+| Datenschutz-URL | https://fullrep.pages.dev/legal/privacy |
 
 ### Kategorie
 - Primär: **Gesundheit & Fitness**

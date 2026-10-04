@@ -46,3 +46,7 @@ out/
 
 # Rohbilder aus store-screenshots.mjs — der Store bekommt die gerahmten (store-rahmen.mjs)
 store-assets/roh/
+
+# Cloudflare (wrangler pages dev)
+.dev.vars
+.wrangler/

@@ -29,7 +29,7 @@ export default {
       },
       {
         heading: 'Objeto da empresa',
-        body: 'Operação do aplicativo web de fitness e nutrição «FullRep» (fullrep.vercel.app).',
+        body: 'Operação do aplicativo web de fitness e nutrição «FullRep» (fullrep.pages.dev).',
       },
       {
         heading: 'Dados sobre a atividade profissional',
@@ -48,7 +48,7 @@ export default {
 
   privacy: {
     title: 'Política de privacidade',
-    updated: 'Atualizado: 20 de setembro de 2026',
+    updated: 'Atualizado: 4 de outubro de 2026',
     sections: [
       VORRANG,
       {
@@ -65,7 +65,7 @@ export default {
       },
       {
         heading: '4. Destinatários e operadores',
-        body: 'Supabase, Inc. (EUA; banco de dados e sistema de login): armazena seus dados de conta, perfil e uso.\n\nVercel, Inc. (EUA; hospedagem e contagem de visitas): entrega o app e nossas funções de servidor; são gerados registros de servidor tecnicamente necessários (p. ex. endereço IP). Na versão web em fullrep.vercel.app, o Vercel Web Analytics conta ainda as visualizações de página, a página de origem, o país, o tipo de aparelho e o navegador, para que vejamos quais páginas são usadas — sem cookies e sem identificador entre aparelhos; a base legal é o art. 6.º, n.º 1, alínea f do RGPD. Nos apps para iOS e Android essa contagem não ocorre.\n\nGoogle LLC / Google Ireland Ltd.: (1) Gemini API — somente se você usar a análise de fotos de refeições, a foto tirada é transmitida ao Google para avaliação; somente se você usar o coach de IA, suas mensagens a ele, incluindo o histórico da conversa atual, vão para o Google. Não enviamos nome, e-mail nem ID de conta; não armazenamos fotos nem mensagens em nossos servidores. (2) AdMob — publicidade nos apps para iOS e Android (veja os itens 2 e 3).\n\nAnthropic, PBC (EUA; coach de IA): para as respostas do coach de IA usamos, como alternativa ao Gemini, modelos da Anthropic — com os mesmos dados acima, igualmente sem nome, e-mail ou ID de conta.\n\nRevenueCat, Inc. (EUA; assinatura Premium): recebe um identificador de usuário interno do app e a confirmação de compra da loja para gerenciar sua assinatura e restaurá-la em um novo aparelho. O pagamento em si é processado pela Apple ou pelo Google; não vemos dados de pagamento.\n\nFunctional Software, Inc. (Sentry, EUA; relatórios de erro): recebe mensagens técnicas de erro sem referência pessoal, se o registro de erros estiver ativado.\n\nOpen Food Facts (banco de dados de alimentos): ao pesquisar alimentos ou escanear códigos de barras, o termo de busca ou o código de barras (sem dados pessoais) é transmitido ao Open Food Facts.\n\nCom todos os operadores existem contratos conforme o art. 28 do RGPD. Nas transferências para os EUA baseamo-nos nas cláusulas contratuais-tipo da UE ou no Quadro de Privacidade de Dados UE-EUA, quando o fornecedor está certificado.',
+        body: 'Supabase, Inc. (EUA; banco de dados e sistema de login): armazena seus dados de conta, perfil e uso.\n\nCloudflare, Inc. (EUA; hospedagem): entrega o app e nossas funções de servidor; são gerados registros de servidor tecnicamente necessários (p. ex. endereço IP). Não há contagem de visitas nem análise, nem na versão web nem nos apps.\n\nGoogle LLC / Google Ireland Ltd.: (1) Gemini API — somente se você usar a análise de fotos de refeições, a foto tirada é transmitida ao Google para avaliação; somente se você usar o coach de IA, suas mensagens a ele, incluindo o histórico da conversa atual, vão para o Google. Não enviamos nome, e-mail nem ID de conta; não armazenamos fotos nem mensagens em nossos servidores. (2) AdMob — publicidade nos apps para iOS e Android (veja os itens 2 e 3).\n\nAnthropic, PBC (EUA; coach de IA): para as respostas do coach de IA usamos, como alternativa ao Gemini, modelos da Anthropic — com os mesmos dados acima, igualmente sem nome, e-mail ou ID de conta.\n\nRevenueCat, Inc. (EUA; assinatura Premium): recebe um identificador de usuário interno do app e a confirmação de compra da loja para gerenciar sua assinatura e restaurá-la em um novo aparelho. O pagamento em si é processado pela Apple ou pelo Google; não vemos dados de pagamento.\n\nFunctional Software, Inc. (Sentry, EUA; relatórios de erro): recebe mensagens técnicas de erro sem referência pessoal, se o registro de erros estiver ativado.\n\nOpen Food Facts (banco de dados de alimentos): ao pesquisar alimentos ou escanear códigos de barras, o termo de busca ou o código de barras (sem dados pessoais) é transmitido ao Open Food Facts.\n\nCom todos os operadores existem contratos conforme o art. 28 do RGPD. Nas transferências para os EUA baseamo-nos nas cláusulas contratuais-tipo da UE ou no Quadro de Privacidade de Dados UE-EUA, quando o fornecedor está certificado.',
       },
       {
         heading: '5. Armazenamento local no seu aparelho',
@@ -93,7 +93,7 @@ export default {
       VORRANG,
       {
         heading: '1. Âmbito de aplicação',
-        body: `Estes termos de uso aplicam-se ao uso do aplicativo web «FullRep» (fullrep.vercel.app), operado por:\n\n${BETREIBER}`,
+        body: `Estes termos de uso aplicam-se ao uso do aplicativo web «FullRep» (fullrep.pages.dev), operado por:\n\n${BETREIBER}`,
       },
       {
         heading: '2. Descrição do serviço',

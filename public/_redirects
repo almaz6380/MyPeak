@@ -1,0 +1,14 @@
+# Cloudflare Pages (seit 04.10.2026, vorher vercel.json → rewrites).
+#
+# Kurzlinks fuer Bio und Werbung auf die Download-Seite. /get selbst braucht
+# keine Zeile: Pages liefert get.html unter /get von allein aus.
+/app        /get  200
+/download   /get  200
+/instagram  /get  200
+/tiktok     /get  200
+/facebook   /get  200
+/bio        /get  200
+
+# KEIN „/* /index.html 200" fuer die App-Routen: Ohne 404.html im Build schaltet
+# Pages selbst in den SPA-Modus und liefert index.html fuer jede unbekannte
+# Adresse (/legal/privacy, /coach …). Echte Dateien wie /app-ads.txt gewinnen.

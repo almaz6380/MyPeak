@@ -1,6 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 
-// Basis-Adresse fuer unsere /api-Endpunkte (Vercel Serverless).
+// Basis-Adresse fuer unsere /api-Endpunkte (Cloudflare Pages Functions, bis
+// 03.10.2026 Vercel — dort ist das Konto gesperrt).
 //
 // ⚠ Im Browser ist '' richtig: Die Web-App laeuft auf derselben Domain wie die
 // Funktionen, ein relativer Pfad trifft. In der NATIVEN App ist die Herkunft
@@ -12,4 +13,4 @@ import { Capacitor } from '@capacitor/core';
 //
 // Fest verdrahtet statt aus einer Env-Variable: Die Adresse aendert sich nur
 // mit einem Domain-Umzug, und der braucht ohnehin einen neuen App-Build.
-export const API_BASIS = Capacitor.isNativePlatform() ? 'https://fullrep.vercel.app' : '';
+export const API_BASIS = Capacitor.isNativePlatform() ? 'https://fullrep.pages.dev' : '';

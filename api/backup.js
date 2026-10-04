@@ -1,9 +1,10 @@
-// Tägliches Datenbank-Backup (Vercel-Cron, siehe vercel.json).
+// Tägliches Datenbank-Backup (GitHub-Workflow cron.yml, bis 10/2026 Vercel-Cron).
 // Exportiert alle Tabellen als JSON in den privaten Storage-Bucket "backups"
 // und löscht Backups, die älter als RETENTION_DAYS sind.
 // Kein Ersatz für echte Point-in-Time-Backups (Supabase Pro), aber im Free-Tier
 // die Absicherung gegen Datenverlust/versehentliches Löschen.
-// Benötigt: SUPABASE_SERVICE_ROLE_KEY + CRON_SECRET in Vercel.
+// Benötigt: SUPABASE_SERVICE_ROLE_KEY + CRON_SECRET in Cloudflare Pages, CRON_SECRET
+// zusätzlich als GitHub-Secret für cron.yml.
 
 const TABLES = [
   'profiles', 'user_settings', 'workouts', 'custom_plans', 'custom_exercises',
@@ -18,7 +19,7 @@ const RETENTION_DAYS = 14;
 const PAGE_SIZE = 1000;
 
 export default async function handler(req, res) {
-  // Nur der Vercel-Cron (bzw. wer das Secret kennt) darf das Backup auslösen
+  // Nur der Cron-Workflow (bzw. wer das Secret kennt) darf das Backup auslösen
   const auth = req.headers.authorization || '';
   if (!process.env.CRON_SECRET || auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return res.status(401).json({ error: 'Unauthorized' });
