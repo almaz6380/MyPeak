@@ -972,7 +972,12 @@
   },
   "consentGate": {
     "title": "Consent required",
-    "deleteHint": "Without this consent we may not continue processing your health data. If you do not wish to consent, write to kontakt@wellbooked.at — we will delete your account and all data. More in the"
+    "deleteHint": "Without this consent we may not continue processing your health data. If you do not wish to consent, write to kontakt@wellbooked.at — we will delete your account and all data. More in the",
+    "withdraw": "Withdraw consent to health data",
+    "withdrawTitle": "Withdraw consent?",
+    "withdrawText": "From the moment you withdraw, we no longer process your health data. Processing carried out until then remains lawful. Without consent you cannot keep using your account: the app will ask you again when you open it – or you can have your account and all data deleted.",
+    "withdrawConfirm": "Withdraw",
+    "withdrawError": "Withdrawing did not work. Please check your connection and try again."
   },
   "onboarding": {
     "step": "Step {{current}} of {{total}}",
@@ -1357,7 +1362,6 @@
     "brand": "Brand",
     "calculatedUsingTheMifflinStJeor": "Calculated using the Mifflin-St Jeor equation. Source: Mifflin, M.D., St Jeor, S.T., Hill, L.A., Scott, B.J., Daugherty, S.A. & Koh, Y.O. (1990). A new predictive equation for resting energy expenditure in healthy individuals. American Journal of Clinical Nutrition 51:241–247. These values are estimates and do not replace measurement or medical advice.",
     "cancel": "Cancel",
-    "cancelAnytimeTheTrialCanBe": "Cancel anytime. The trial can be ended in your account settings.",
     "carbsG": "Carbs (g)",
     "cardio": "Cardio",
     "changeAdConsent": "Change ad consent",
@@ -1555,7 +1559,6 @@
     "total": "total",
     "totalMinutes": "total minutes",
     "trialActiveTrialdaysleftDaysLeft": "Trial active — {{trialDaysLeft}} days left",
-    "trialDaysDaysFreeThenPricefor": "{{TRIAL_DAYS}} days free, then {{preis}} / {{zeitraum}}",
     "tryAgain": "Try again",
     "unlockAiCoachMore": "Unlock AI coach & more",
     "unlockPremium": "Unlock Premium",
@@ -1578,6 +1581,9 @@
     "you": "You",
     "youChangedThePlanDoYou": "You changed the plan. Do you want to save your changes?",
     "youCurrentlyHaveActiveschedulename": "You currently have \"{{activeScheduleName}}\" active. Starting \"{{programName}}\" replaces it — \"{{activeScheduleName}}\" stays saved in \"My Plans\".",
-    "yourDailyCalorieAndMacroGoals": "Your daily calorie and macro goals will be set to:"
+    "yourDailyCalorieAndMacroGoals": "Your daily calorie and macro goals will be set to:",
+    "trialFreeNoAutoRenew": "Try it free for {{TRIAL_DAYS}} days. The trial ends automatically and does not turn into a paid subscription – no payment, nothing to cancel.",
+    "subscriptionDisclosure": "FullRep Premium is an auto-renewing subscription: {{preis}} per {{zeitraum}}. Payment is charged to your {{store}} account at confirmation of purchase. The subscription renews automatically for the same period at the then-current price unless you cancel it at least 24 hours before the end of the current period. You can manage and cancel it at any time in your {{store}} account settings.",
+    "termsOfUseEula": "Terms of Use (EULA)"
   }
 }

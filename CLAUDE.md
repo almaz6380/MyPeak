@@ -19,6 +19,37 @@ Arabisch (RTL) — **vollständig**, Oberfläche wie Inhaltsbibliotheken (siehe 
 
 ## Aktueller Stand
 
+### Rechtsprüfung: AGB, Datenschutz, Widerruf, Paywall, Werbebremse (04.10.2026) — Version 1.5.4 vorbereitet
+
+Branch `claude/rechtspruefung-fixes`, nicht gebaut, nicht ausgerollt. Was sich geändert hat:
+
+| Was | Wo |
+|---|---|
+| **AGB neu** (×6): App für iOS/Android/Web, Werbung in der Gratisversion, Premium als Auto-Abo (Preis im Store, Verlängerung, Kündigung ≥ 24 h vorher im Store-Konto, Löschen der App beendet nichts), **Testphase endet von selbst und wird kein Abo**, Erstattung/Widerruf über Apple/Google, Mindestalter 16, Verweis auf den Gesundheitshinweis. Stand 4. Oktober 2026 | `legalContent.js`, `uebersetzungen/*.js` |
+| **Datenschutz** (×6): Mindestalter 16 (Art. 8), Widerruf der Gesundheits-Einwilligung im Profil, Gemini/Anthropic genauer beschrieben, **kein unbedingter Art.-28-Satz mehr** (TODO für Josef im Code), Android-Backup aus | dieselben |
+| Onboarding: Mindestalter **14 → 16** | `OnboardingPage.jsx` |
+| **Widerruf der Gesundheits-Einwilligung** im Profil (Bestätigungsdialog, setzt `health_consent_at = NULL`, trennt Health) → danach blockiert das `HealthConsentGate` wieder. Gäste sehen den Knopf nicht | `ProfilePage.jsx`, `consentGate.withdraw*` ×6 |
+| **Paywall:** Abo-Pflichtangaben (3.1.2) mit Links auf AGB/Datenschutz, „Käufe wiederherstellen" immer bei `canPurchase`, Testphase-Zeile korrigiert (stand „danach 44,99 €/Jahr" — falsch, die Testphase wandelt nicht um) | `PaywallPage.jsx`, `ui.subscriptionDisclosure`, `ui.trialFreeNoAutoRenew`, `ui.termsOfUseEula` |
+| Derselbe Fehler in den **Store-Beschreibungen** („danach beginnt das Abo, wenn du nicht kündigst") — in allen sechs Abo-Blöcken korrigiert. Greift erst mit dem nächsten `--beschreibung`/`--lokalisieren` | `scripts/asc.py` |
+| **Werbebremse:** zusätzlich höchstens 3 Interstitials je Sitzung und keines in den ersten 60 s; als reine Funktion `interstitialErlaubt()` mit Tests | `src/lib/ads.js`, `tests/lib/ads.test.js` |
+| `android:allowBackup="false"` | `AndroidManifest.xml` |
+| **`PrivacyInfo.xcprivacy`** neu (Tracking ja, UserDefaults CA92.1 + 1C8F.1, Health/Fitness/E-Mail/User-ID/Coach/Kaufverlauf/Geräte-ID/Werbedaten/Absturzdaten), nur im App-Target registriert | `ios/App/App/`, `project.pbxproj` |
+| **Prüfkonto-Passwort aus dem Repo entfernt** — `asc.py --pruefnotiz` und `smoke-live.mjs` lesen `ASC_REVIEW_PASSWORD` (Secret in `asc.yml` eingetragen) | `scripts/`, `store-texte.md`, `docs/release-ci.md` |
+| Versionen **1.5.4** (Android vc23, iOS Build 13 an vier Stellen), `WHATS_NEW` ×6, Versionszeile im Profil (stand noch auf „1.5.0 (9)") | — |
+
+⚠ **Vor dem nächsten Release von Josef:**
+1. **Passwort von `appreview@wellbooked.at` wechseln** (Supabase) und in ASC beim Demo-Konto nachtragen — es steht in der Git-Historie. Danach Repo-Secret `ASC_REVIEW_PASSWORD` anlegen; ohne Secret bricht `--pruefnotiz` bewusst ab.
+2. Apple App-Datenschutz gegen das neue `PrivacyInfo.xcprivacy` abgleichen (Kaufverlauf, Absturzdaten).
+
+**Bewusst offen, nicht im Code lösbar:**
+- **Vercel gesperrt** → Cloudflare-Einrichtung (siehe Abschnitt darunter) muss stehen, sonst zeigen die neuen Links in Paywall und Store auf nichts.
+- **Gemini auf bezahlten Tarif mit DPA umstellen** (oder Coach nur über Anthropic mit ZDR). Bis dahin darf in der DSE kein unbedingter Art.-28-Satz stehen.
+- **Bildrechte der Übungsfotos** (`public/exercise-demos/`, free-exercise-db): Herkunft je Bild belegen oder durch die eigenen 3D-Animationen ersetzen.
+- **Peptid-Inhalte** fachlich/rechtlich prüfen lassen (Arzneimittelwerbung, nicht zugelassene Substanzen).
+- Die Paywall bewirbt Funktionen, die es (noch) nicht gibt: „Nährwerttabelle per Foto", „KI-Ernährungsplan", „Detaillierte Analysen" (`ui.benefit*`). Nur der Coach ist hinter Premium. Vor dem nächsten Release entfernen oder bauen.
+- Gäste sehen Werbung ohne Altersabfrage; das Mindestalter greift nur beim Konto.
+- Wer nach dem Widerruf weder einwilligt noch per E-Mail löschen lässt, steht vor dem Gate. Ein Löschknopf direkt im Gate wäre der bessere Weg.
+
 ### Umzug von Vercel auf Cloudflare Pages (04.10.2026)
 
 **Anlass:** Das Vercel-Konto ist gesperrt. Jede Adresse auf `fullrep.vercel.app` und
@@ -2086,7 +2117,7 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
 - **Android:** signiertes `.aab` (versionCode 1 / 1.0) bei Google Play in Prüfung. Upload-Keystore in `android/upload-keystore.jks` + `keystore.properties` (gitignored! Backup in ~/AppSigningKeys/mypeak + OneDrive). Build: `JAVA_HOME=<Android-Studio-jbr> ./gradlew bundleRelease`.
 - **iOS:** IPA bei App Store Connect eingereicht (App-ID 6788461300, Bundle at.gallab.mypeak). Manuelle Distributions-Signierung im pbxproj (Team JU8STVD4SJ, Profil „MyPeak AppStore"). Build: `xcodebuild ... archive` + `-exportArchive` (ExportOptions auf ~/Desktop/mypeak-ios-export/), Upload via `altool` (ASC-Key VGHCB8Z8Q2). Metadaten per ASC-API gesetzt.
 - **Werbung (AdMob, `src/lib/ads.js`):** Interstitials (jede 2. qualifizierende Aktion, ≥90s Abstand) nach Workout-Speichern + Mahlzeit-Hinzufügen, mit DSGVO-Einwilligung (UMP, nativ in @capacitor-community/admob@8). `USE_TEST_ADS`-Flag: `false`=echte Anzeigen (Launch). Echte IDs (Konto pub-8860791993288062): Android App `~3613953701`/Interstitial `/7984478947`, iOS App `~8812263899`/Interstitial `/5028931559`. **NIE eigene Live-Anzeigen anklicken** (Kontosperre). Nur nativ — Web zeigt keine Ads.
-- **Store-Assets:** `store-assets/` (Screenshots iOS+Android, iPad, Feature-Grafik, App-Icon, `store-texte.md`). Review-Demo-Account: appreview@wellbooked.at / MyPeak-Review#2026.
+- **Store-Assets:** `store-assets/` (Screenshots iOS+Android, iPad, Feature-Grafik, App-Icon, `store-texte.md`). Review-Demo-Account: appreview@wellbooked.at (Passwort: siehe Passwortmanager / Secret ASC_REVIEW_PASSWORD — stand bis 04.10.2026 hier im Klartext und ist deshalb zu wechseln).
 - **Offen nach Launch:** ~~AdMob-App↔Store verknüpfen~~ (am 29.07.2026 erledigt, siehe unten);
   iOS-Update 1.1 (Englisch) liegt auf Branch i18n-en.
 

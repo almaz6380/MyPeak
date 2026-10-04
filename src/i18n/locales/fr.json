@@ -941,7 +941,12 @@
   },
   "consentGate": {
     "title": "Consentement requis",
-    "deleteHint": "Sans ce consentement, nous ne pouvons pas continuer à traiter tes données de santé. Si tu ne souhaites pas consentir, écris à kontakt@wellbooked.at — nous supprimerons ton compte et toutes tes données. Plus d’informations dans la"
+    "deleteHint": "Sans ce consentement, nous ne pouvons pas continuer à traiter tes données de santé. Si tu ne souhaites pas consentir, écris à kontakt@wellbooked.at — nous supprimerons ton compte et toutes tes données. Plus d’informations dans la",
+    "withdraw": "Retirer le consentement aux données de santé",
+    "withdrawTitle": "Retirer le consentement ?",
+    "withdrawText": "À partir du retrait, nous ne traitons plus tes données de santé. Le traitement effectué jusque-là reste licite. Sans consentement, tu ne peux plus utiliser ton compte : l’app te reposera la question à l’ouverture – ou tu peux faire supprimer ton compte avec toutes ses données.",
+    "withdrawConfirm": "Retirer",
+    "withdrawError": "Le retrait n’a pas fonctionné. Vérifie ta connexion et réessaie."
   },
   "onboarding": {
     "step": "Étape {{current}} sur {{total}}",
@@ -1326,7 +1331,6 @@
     "brand": "Marque",
     "calculatedUsingTheMifflinStJeor": "Calculé avec l'équation de Mifflin-St Jeor. Source : Mifflin, M.D., St Jeor, S.T., Hill, L.A., Scott, B.J., Daugherty, S.A. & Koh, Y.O. (1990). A new predictive equation for resting energy expenditure in healthy individuals. American Journal of Clinical Nutrition 51:241–247. Ces valeurs sont des estimations et ne remplacent ni une mesure ni un avis médical.",
     "cancel": "Annuler",
-    "cancelAnytimeTheTrialCanBe": "Annulable à tout moment. L'essai peut être arrêté dans les réglages de ton compte.",
     "carbsG": "Glucides (g)",
     "cardio": "Cardio",
     "changeAdConsent": "Modifier le consentement publicitaire",
@@ -1524,7 +1528,6 @@
     "total": "total",
     "totalMinutes": "minutes au total",
     "trialActiveTrialdaysleftDaysLeft": "Essai actif — {{trialDaysLeft}} jours restants",
-    "trialDaysDaysFreeThenPricefor": "{{TRIAL_DAYS}} jours gratuits, puis {{preis}} / {{zeitraum}}",
     "tryAgain": "Réessayer",
     "unlockAiCoachMore": "Débloque le coach IA et plus encore",
     "unlockPremium": "Débloquer Premium",
@@ -1547,7 +1550,10 @@
     "you": "Toi",
     "youChangedThePlanDoYou": "Tu as modifié le programme. Veux-tu enregistrer tes modifications ?",
     "youCurrentlyHaveActiveschedulename": "« {{activeScheduleName}} » est actuellement actif. Démarrer « {{programName}} » le remplace — « {{activeScheduleName}} » reste enregistré dans « Mes programmes ».",
-    "yourDailyCalorieAndMacroGoals": "Tes objectifs quotidiens de calories et de macros seront réglés sur :"
+    "yourDailyCalorieAndMacroGoals": "Tes objectifs quotidiens de calories et de macros seront réglés sur :",
+    "trialFreeNoAutoRenew": "Essaie gratuitement pendant {{TRIAL_DAYS}} jours. L’essai se termine automatiquement et ne se transforme pas en abonnement payant – aucun paiement, rien à résilier.",
+    "subscriptionDisclosure": "FullRep Premium est un abonnement à renouvellement automatique : {{preis}} par {{zeitraum}}. Le paiement est débité de ton compte {{store}} à la confirmation de l’achat. L’abonnement se renouvelle automatiquement pour la même durée au prix alors en vigueur, sauf si tu le résilies au moins 24 heures avant la fin de la période en cours. Tu peux le gérer et le résilier à tout moment dans les réglages de ton compte {{store}}.",
+    "termsOfUseEula": "Conditions d’utilisation (CLUF)"
   },
   "planBuilder": {
     "title": "Créer un plan hebdomadaire",

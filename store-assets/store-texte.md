@@ -135,7 +135,7 @@ FullRep does not replace medical advice. For any health concern, diagnosis or tr
 ```
 Demo account for review:
 Email: appreview@wellbooked.at
-Password: MyPeak-Review#2026
+Password: (siehe Passwortmanager / Secret ASC_REVIEW_PASSWORD)
 
 Notes:
 - The app requires an account; the demo account above is pre-filled with
@@ -203,7 +203,7 @@ Training, Kalorien & Makros tracken — mit Barcode-Scanner & Trainingsplänen
 ### App-Zugriff für die Prüfung („App access")
 ```
 Login required. Demo account:
-appreview@wellbooked.at / MyPeak-Review#2026
+appreview@wellbooked.at / (Passwort: siehe Passwortmanager / Secret ASC_REVIEW_PASSWORD)
 ```
 
 ---

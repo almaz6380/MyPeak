@@ -19,7 +19,7 @@ import { Capacitor } from '@capacitor/core';
 import { healthVerfuegbar, istVerbunden, verbinden, trennen, gewichtImportieren } from '../lib/health';
 
 // Sichtbare Build-Kennung — muss bei jedem neuen Store-Build mitgezogen werden (siehe android/app/build.gradle)
-const APP_VERSION = '1.5.0 (9)';
+const APP_VERSION = '1.5.4 (13)';
 
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
@@ -41,6 +41,9 @@ export default function ProfilePage() {
   const [deleteError, setDeleteError] = useState(null);
   const [deletePassword, setDeletePassword] = useState('');
   const [healthOn, setHealthOn] = useState(() => istVerbunden(user?.id));
+  const [showWithdrawConsent, setShowWithdrawConsent] = useState(false);
+  const [withdrawing, setWithdrawing] = useState(false);
+  const [withdrawError, setWithdrawError] = useState(null);
 
   useEffect(() => {
     setHealthOn(istVerbunden(user?.id));
@@ -109,6 +112,34 @@ export default function ProfilePage() {
     } catch {
       setDeleteError(t('auth.deleteAccountError'));
       setDeleting(false);
+    }
+  };
+
+  // Widerruf der Art.-9-Einwilligung (Art. 7 Abs. 3 DSGVO: so einfach wie die
+  // Erteilung). Setzt health_consent_at zurück auf NULL — danach greift das
+  // HealthConsentGate in App.jsx wieder und blockiert die App, bis erneut
+  // eingewilligt oder das Konto gelöscht wird. Die Health-Verbindung wird
+  // gleich mit getrennt, damit kein Import mehr läuft.
+  const handleWithdrawConsent = async () => {
+    if (!user?.id || isGuestMode) return;
+    setWithdrawing(true);
+    setWithdrawError(null);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ health_consent_at: null })
+        .eq('id', user.id);
+      if (error) throw error;
+      if (healthOn) {
+        trennen(user.id);
+        setHealthOn(false);
+      }
+      setShowWithdrawConsent(false);
+      await refreshProfile();
+    } catch {
+      setWithdrawError(t('consentGate.withdrawError'));
+    } finally {
+      setWithdrawing(false);
     }
   };
 
@@ -445,6 +476,17 @@ export default function ProfilePage() {
         {t('auth.signOut')}
       </button>
 
+      {/* Einwilligung in Gesundheitsdaten widerrufen */}
+      {!isGuestMode && profile?.health_consent_at && (
+        <button
+          onClick={() => setShowWithdrawConsent(true)}
+          className="w-full flex items-center justify-center gap-2 py-3.5 mt-3 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-sm font-medium rounded-2xl border border-slate-200 dark:border-slate-700 transition-colors"
+        >
+          <HeartPulse className="w-4 h-4" />
+          {t('consentGate.withdraw')}
+        </button>
+      )}
+
       {/* Delete Account */}
       {!isGuestMode && (
         <button
@@ -460,6 +502,37 @@ export default function ProfilePage() {
       <p className="text-center text-xs text-slate-400 dark:text-slate-600 mt-4">
         FullRep {APP_VERSION}
       </p>
+
+      {/* Widerruf bestätigen */}
+      {showWithdrawConsent && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-surface-dark-alt rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <p className="text-center font-semibold mb-2">{t('consentGate.withdrawTitle')}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-4">
+              {t('consentGate.withdrawText')}
+            </p>
+            {withdrawError && (
+              <p className="text-sm text-red-500 text-center mb-3">{withdrawError}</p>
+            )}
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowWithdrawConsent(false); setWithdrawError(null); }}
+                disabled={withdrawing}
+                className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                onClick={handleWithdrawConsent}
+                disabled={withdrawing}
+                className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-60 text-white font-medium text-sm transition-colors flex items-center justify-center gap-2"
+              >
+                {withdrawing ? <Loader2 className="w-4 h-4 animate-spin" /> : t('consentGate.withdrawConfirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Delete Account Confirmation */}
       {showDeleteConfirm && (

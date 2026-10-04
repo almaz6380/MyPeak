@@ -31,6 +31,7 @@ New repository secret**. Namen exakt so schreiben:
 | `IOS_CERT_PASSWORD` | das beim Export vergebene Passwort |
 | `IOS_PROVISIONING_PROFILE_BASE64` | Profil „MyPeak AppStore" (`.mobileprovision`), Base64 — Profilname bei Apple unverändert, hängt an der Bundle-ID `at.gallab.mypeak`, nicht am Markennamen |
 | `ASC_KEY_P8_BASE64` | `~/.appstoreconnect/private_keys/AuthKey_VGHCB8Z8Q2.p8`, Base64 |
+| `ASC_REVIEW_PASSWORD` | Passwort des Demo-Kontos `appreview@wellbooked.at` (Passwortmanager) — nur für `asc.py --pruefnotiz` |
 | `ASC_KEY_ID` | `VGHCB8Z8Q2` |
 | `ASC_ISSUER_ID` | `0d4e473b-2807-4c66-9857-6b0eb78e62ce` |
 

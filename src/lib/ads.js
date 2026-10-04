@@ -120,12 +120,32 @@ export async function initAds() {
 }
 
 // ---------------------------------------------------------------------------
-//  Interstitial – sanfte Frequenz: mindestens 90s Abstand, und nicht bei
-//  jeder Aktion (jede 2. qualifizierende Aktion). So bleibt die App nutzbar.
+//  Interstitial – sanfte Frequenz. Vier Bremsen, alle müssen passen:
+//    1. nur jede 2. qualifizierende Aktion
+//    2. mindestens 90 s seit der letzten Anzeige (bzw. seit werbungPausieren)
+//    3. keine Anzeige in den ersten 60 s nach dem App-Start — wer die App
+//       gerade öffnet, will etwas eintragen, nicht Werbung sehen
+//    4. höchstens 3 Interstitials pro Sitzung (seit 1.5.4)
+//  Die Regel steht als reine Funktion da, damit sie ohne AdMob testbar ist.
 // ---------------------------------------------------------------------------
-const INTERSTITIAL_MIN_GAP_MS = 90_000;
+export const INTERSTITIAL_MIN_GAP_MS = 90_000;
+export const INTERSTITIAL_START_SPERRE_MS = 60_000;
+export const INTERSTITIAL_MAX_PRO_SITZUNG = 3;
+
+// `aktion` ist der bereits hochgezählte Aktionszähler.
+export function interstitialErlaubt({ jetzt, appStart, letzte, gezeigt, aktion }) {
+  if (aktion % 2 !== 0) return false;
+  if (gezeigt >= INTERSTITIAL_MAX_PRO_SITZUNG) return false;
+  if (jetzt - appStart < INTERSTITIAL_START_SPERRE_MS) return false;
+  if (jetzt - letzte < INTERSTITIAL_MIN_GAP_MS) return false;
+  return true;
+}
+
+// Sitzung = Laufzeit des JS-Kontexts. Ein Kaltstart der App setzt beides zurück.
+const appStart = Date.now();
 let lastInterstitial = 0;
 let actionCount = 0;
+let shownThisSession = 0;
 
 // Premium-Nutzer (Trial ODER bezahlt) sind werbefrei. Der SubscriptionContext
 // hält diesen Schalter aktuell; ohne Premium bleibt es bei false (mit Werbung).
@@ -145,9 +165,12 @@ export async function maybeShowInterstitial() {
   if (!ready) return;
   if (premiumUser) return; // Premium = werbefrei
   actionCount += 1;
-  if (actionCount % 2 !== 0) return; // nur jede 2. Aktion
-  if (Date.now() - lastInterstitial < INTERSTITIAL_MIN_GAP_MS) return;
-  lastInterstitial = Date.now();
+  const jetzt = Date.now();
+  if (!interstitialErlaubt({
+    jetzt, appStart, letzte: lastInterstitial, gezeigt: shownThisSession, aktion: actionCount,
+  })) return;
+  lastInterstitial = jetzt;
+  shownThisSession += 1;
   try {
     await AdMob.prepareInterstitial({ adId: ids().interstitial, isTesting: USE_TEST_ADS });
     await AdMob.showInterstitial();
