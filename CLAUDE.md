@@ -5,8 +5,8 @@
 Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Tracking in einer einzigen, übersichtlichen App vereint. Die App soll trotz vieler Features einfach zu bedienen und nicht überfüllt sein.
 
 **App-Name:** FullRep (bis 30.07.2026: MyPeak — siehe „Umbenennung" unten)
-**Live-URL:** https://fullrep.vercel.app (seit 29.08.2026; `my-peak.vercel.app`
-leitet mit 307 dorthin weiter — bewusst behalten, solange irgendwo alte Links stehen)
+**Live-URL:** https://fullrep.pages.dev (Cloudflare Pages, seit 04.10.2026). Vorher
+`fullrep.vercel.app` — das Vercel-Konto ist gesperrt (402), siehe „Umzug auf Cloudflare“
 **Git-Repository:** https://github.com/almaz6380/MyPeak (Repo-Name unverändert)
 **Zielplattform:** Web-App → PWA → später App Store (iOS + Android)
 **Sprachen:** Deutsch, Englisch, Spanisch, Französisch, Portugiesisch (pt-BR),
@@ -18,6 +18,64 @@ Arabisch (RTL) — **vollständig**, Oberfläche wie Inhaltsbibliotheken (siehe 
 ---
 
 ## Aktueller Stand
+
+### Umzug von Vercel auf Cloudflare Pages (04.10.2026)
+
+**Anlass:** Das Vercel-Konto ist gesperrt. Jede Adresse auf `fullrep.vercel.app` und
+`my-peak.vercel.app` antwortet mit `402 Payment required`, `x-vercel-error:
+DEPLOYMENT_DISABLED`. Der Vercel-Status am Commit lautete schon am 03.10. abends
+„Account is blocked.“ Damit waren die Web-App, die Rechtsseiten (auch der EULA- und
+Datenschutz-Link in beiden Stores), `app-ads.txt` und alle `/api`-Endpunkte tot.
+
+**Neu ist `https://fullrep.pages.dev`.** Was sich im Repo geändert hat:
+
+| Was | Vercel | Cloudflare |
+|---|---|---|
+| Endpunkte | `api/*.js` direkt | **unverändert** `api/*.js`, aufgerufen über `functions/api/[[pfad]].js` + `functions/_vercelAdapter.js` |
+| Kurzlinks `/app`, `/bio` … | `vercel.json` rewrites | `public/_redirects` |
+| SPA-Fallback | `/(.*) → /index.html` | eingebaut: ohne `404.html` liefert Pages `index.html` für jede unbekannte Adresse |
+| Crons `health` + `backup` | `vercel.json` crons | `.github/workflows/cron.yml` (GitHub ruft die Endpunkte auf) |
+| Besucherzählung | `@vercel/analytics` | **entfernt**, Datenschutzerklärung ×6 angepasst |
+
+- Der Adapter bildet nur das nach, was die Handler nutzen: `req.method`, `headers`,
+  `query`, `body` (JSON wird geparst) und `res.status`, `json`, `setHeader`, `end`.
+  Er setzt `env` als `process.env`. **Er braucht kein `nodejs_compat`.**
+- **Neuer Endpunkt in `api/` → in `ENDPUNKTE` in `functions/api/[[pfad]].js`
+  eintragen.** `tests/functions/cloudflare.test.js` bricht sonst ab.
+- Lokal prüfen mit `npm run build && npx wrangler@4 pages dev dist`. Die Variablen
+  stehen dafür in `.dev.vars` (gitignored).
+- `vercel.json` liegt noch im Repo. Cloudflare beachtet die Datei nicht.
+
+**⚠ Grenze, die es auf Vercel nicht gab: 10 ms CPU je Aufruf** im kostenlosen
+Workers-Tarif. Warten auf Gemini oder Supabase zählt nicht dazu, Rechnen schon.
+Kandidaten, an diese Grenze zu stoßen:
+- `backup` (JSON aller Tabellen)
+- `analyze-meal` (Foto-Body bis 4 MB parsen)
+
+Zeigt sich dort ein Fehler `1102`/„exceeded CPU“, hilft der Workers-Paid-Tarif
+(5 $/Monat, 30 s CPU).
+
+**Einmalig von Josef, nicht per Code möglich:**
+1. Cloudflare → Workers & Pages → Pages → mit Git verbinden, Repo `almaz6380/MyPeak`,
+   Projektname `fullrep`, Build `npm run build`, Ausgabe `dist`.
+2. Variablen und Secrets dort eintragen:
+   - Laufzeit: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
+     `GEMINI_API_KEY`, `ANTHROPIC_API_KEY`, `REVENUECAT_WEBHOOK_SECRET`, `CRON_SECRET`
+   - Build: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`,
+     `VITE_REVENUECAT_WEB_API_KEY`, optional `VITE_SENTRY_DSN`
+3. GitHub-Secret `CRON_SECRET` (derselbe Wert) für `cron.yml`.
+4. Außerhalb des Repos auf `fullrep.pages.dev` umstellen:
+   - Supabase Auth: Site-URL und Redirect-URLs
+   - RevenueCat-Webhook (`/api/revenuecat-webhook`)
+   - Play Console: Website und Datenschutz-URL
+   - AdMob: app-ads.txt neu prüfen lassen
+
+**Danach, je mit eigenem „ja“:**
+- Store-Texte neu hochladen: iOS `--lokalisieren` und `--beschreibung`, Play `texte`
+  für alle sechs Sprachen, nacheinander.
+- **Build 1.5.4.** `API_BASIS` steckt im Binary: Bis dahin rufen die Store-Apps die
+  tote Vercel-Adresse auf. Coach, Foto-KI, Testphase und die Konto-Löschung gehen in
+  der App also erst mit 1.5.4 wieder.
 
 ### Store-Seiten in sechs Sprachen + Screenshots mit Aussage (03.10.2026) — AUSGEROLLT als 1.5.3
 
@@ -2262,8 +2320,8 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
 - **Styling:** Tailwind CSS (Mobile-first)
 - **i18n:** react-i18next (de, en, es, fr, pt, ar; neue Sprache = eine Zeile in `src/lib/sprache.js`)
 - **Backend:** Supabase (Auth + PostgreSQL-Datenbank)
-- **Hosting:** Vercel (automatisches Deployment über GitHub)
-- **Besucherzählung:** Vercel Web Analytics — **nur Web**, `src/analytics.js` (siehe unten)
+- **Hosting:** Cloudflare Pages (seit 04.10.2026, automatisches Deployment über GitHub; vorher Vercel)
+- **Besucherzählung:** keine (Vercel Web Analytics am 04.10.2026 mit dem Umzug entfernt)
 - **Datenspeicherung:** Supabase (Cloud) + localStorage (Cache/Fallback)
 - **Barcode-Scanner:** Quagga2 (Open Source, optimiert für 1D-Barcodes)
 - **Lebensmittel-API:** Open Food Facts (kostenlos, keine API-Keys)
@@ -2272,7 +2330,7 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
 - **KI-Foto-Erkennung:** Google Gemini 2.0 Flash (kostenlos, Vision API via Vercel Serverless Function)
 - **Schrift:** Inter (Google Fonts)
 
-### Besucherzählung: Vercel Web Analytics (20.09.2026)
+### Besucherzählung: Vercel Web Analytics (20.09.2026) — am 04.10.2026 wieder entfernt (Umzug auf Cloudflare)
 
 Josef hat einen Screenshot des Vercel-Dashboards geschickt: Für `fullrep.vercel.app`
 stand dort weiterhin **„Get Started"** — gezählt wurde also nie etwas. Mahjong Royale

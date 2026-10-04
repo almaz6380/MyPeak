@@ -1,10 +1,10 @@
-// CORS fuer die NATIVE App. (Unterstrich-Praefix: wird von Vercel nicht als
-// eigener Endpunkt veroeffentlicht, wie _coachKnowledge.js.)
+// CORS fuer die NATIVE App. (Unterstrich-Praefix: wird nicht als eigener
+// Endpunkt veroeffentlicht — functions/api/[[pfad]].js listet nur echte Endpunkte.)
 //
 // Die Web-App braucht das nicht — sie laeuft auf derselben Domain wie /api.
 // Die native App laedt ihre Oberflaeche aber aus dem App-Paket, ihre Herkunft
 // ist capacitor://localhost (iOS) bzw. https://localhost (Android). Ein fetch
-// von dort auf fullrep.vercel.app ist cross-origin: Der Browser schickt erst
+// von dort auf fullrep.pages.dev ist cross-origin: Der Browser schickt erst
 // ein OPTIONS-Preflight (unsere Handler antworteten darauf mit 405!) und
 // verwirft ohne Access-Control-Header auch jede echte Antwort. Deshalb sah
 // die App „nicht erreichbar", waehrend derselbe Aufruf per curl funktionierte.

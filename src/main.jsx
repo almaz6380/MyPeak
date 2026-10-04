@@ -9,14 +9,12 @@ import { SubscriptionProvider } from './context/SubscriptionContext'
 import ErrorBoundary from './components/ErrorBoundary'
 import App from './App.jsx'
 import { initAds } from './lib/ads'
-import { initAnalytics } from './analytics'
 
 // ⚠ VOR dem Rendern. Gemessen am 20.09.2026: Wirft der Supabase-Client beim
 // Start (etwa weil die Umgebungsvariablen fehlen), bleibt die Seite weiss —
 // und stand der Aufruf hinter `render()`, wurde der Besuch nicht einmal
 // gezählt. Ausgerechnet die kaputten Ladevorgänge fehlten damit in der
 // Statistik, also die, die man am dringendsten sehen will.
-initAnalytics();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
