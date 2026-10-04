@@ -25,10 +25,15 @@ Arabisch (RTL) — **vollständig**, Oberfläche wie Inhaltsbibliotheken (siehe 
 |---|---|
 | Web | live auf fullrep.pages.dev, `/api/scan-label` und `/api/meal-plan` antworten ohne Token mit 401 |
 | Android | **vc24 (1.5.5) auf `production`, an alle** (`android-release` 37203387395), validiert und committet |
-| iOS | Die Einreichung `bcf86ca6` (`UNRESOLVED_ISSUES`) ist per `--aufraeumen` zurückgezogen. Die offene Version 1.5.4 (`INVALID_BINARY`) ist per `--version-anlegen 1.5.5` **umbenannt**, `--lokalisieren` und `--beschreibung` sind gelaufen. Build 14 (`ios-release` 37203388824) trägt den PrivacyInfo-Fehler und wird **nicht** zugewiesen. **Offen:** Build 15 (PR #68, eine Parallel-Sitzung) → `--build 15` → `--pruefnotiz` → `--einreichen` |
+| iOS | **Build 15 (1.5.5) eingereicht** am 04.10., Einreichung `1bcadeec-1024-4c50-997e-dc0014efda52`, `WAITING_FOR_REVIEW`. Build 15 `VALID` und zugewiesen, Prüfnotiz gesetzt, beide Abos `APPROVED`. Davor ist Folgendes passiert: 1.5.3 per `--aufraeumen` zurückgezogen, die offene Version per `--version-anlegen` in 1.5.5 umbenannt, `--lokalisieren` und `--beschreibung` ausgeführt. Build 13 und 14 waren ungültig, weil `PrivacyInfo.xcprivacy` `NSPrivacyTracking = true` mit einer leeren Domainliste hatte (Fix in PR #68). **Im pbxproj steht `CURRENT_PROJECT_VERSION` jetzt auf 15** |
 
 - `asc.py --version-anlegen` benennt jetzt eine offene, nicht eingereichte Version um, statt sie zu überspringen. So bleiben Lokalisierungen und Screenshots erhalten.
 - `release-preflight` prüft `ASC_REVIEW_PASSWORD` mit (gesetzt, 04.10.).
+- ⚠ **Zwei Sitzungen gleichzeitig an Releases:** Am 04.10. hat eine Sitzung Android und das Web übernommen, eine andere iOS. Die Abstimmung lief über `send_message`. Zwei Lehren daraus:
+  - **Zwei iOS-Builds gleichzeitig auf dem Mac** zerstören sich gegenseitig den Schlüsselbund (`errSecInternalComponent`).
+  - **Ein schlafender Mac bricht den Upload ab**, auch nach erfolgreichem Export.
+
+  Deshalb: Vor jedem Build, Upload oder ASC-Lauf klären, ob eine andere Sitzung gerade an FullRep arbeitet.
 
 ### Premium-Funktionen gebaut: Nährwerttabelle, KI-Ernährungsplan, Statistiken (04.10.2026)
 
