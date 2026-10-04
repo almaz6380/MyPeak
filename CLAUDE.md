@@ -21,7 +21,14 @@ Arabisch (RTL) — **vollständig**, Oberfläche wie Inhaltsbibliotheken (siehe 
 
 ### Rechtsprüfung: AGB, Datenschutz, Widerruf, Paywall, Werbebremse (04.10.2026) — Version 1.5.4 vorbereitet
 
-Branch `claude/rechtspruefung-fixes`, nicht gebaut, nicht ausgerollt. Was sich geändert hat:
+**Gebaut und hochgeladen am 04.10.2026** (gemergt als PR #62, mit dem Cloudflare-Umzug — `API_BASIS` = `fullrep.pages.dev`):
+
+| | Stand |
+|---|---|
+| Android | **vc23 (1.5.4) auf `production`, an alle** (`android-release` 37200259645), validiert und committet |
+| iOS | **Build 13 zu ASC hochgeladen** (`ios-release` 37200258312, GitHub-Rechner). **Noch nicht eingereicht:** 1.5.3 liegt noch bei Apple; Version 1.5.4 erst danach anlegen (`--version-anlegen`), Build zuweisen, `--lokalisieren` (neue Links), Prüfnotiz (braucht `ASC_REVIEW_PASSWORD`), dann einreichen |
+
+Was sich geändert hat:
 
 | Was | Wo |
 |---|---|
