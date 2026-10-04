@@ -86,20 +86,27 @@ Kandidaten, an diese Grenze zu stoßen:
 Zeigt sich dort ein Fehler `1102`/„exceeded CPU“, hilft der Workers-Paid-Tarif
 (5 $/Monat, 30 s CPU).
 
-**Einmalig von Josef, nicht per Code möglich:**
-1. Cloudflare → Workers & Pages → Pages → mit Git verbinden, Repo `almaz6380/MyPeak`,
-   Projektname `fullrep`, Build `npm run build`, Ausgabe `dist`.
-2. Variablen und Secrets dort eintragen:
-   - Laufzeit: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
-     `GEMINI_API_KEY`, `ANTHROPIC_API_KEY`, `REVENUECAT_WEBHOOK_SECRET`, `CRON_SECRET`
-   - Build: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`,
-     `VITE_REVENUECAT_WEB_API_KEY`, optional `VITE_SENTRY_DSN`
-3. GitHub-Secret `CRON_SECRET` (derselbe Wert) für `cron.yml`.
-4. Außerhalb des Repos auf `fullrep.pages.dev` umstellen:
-   - Supabase Auth: Site-URL und Redirect-URLs
-   - RevenueCat-Webhook (`/api/revenuecat-webhook`)
-   - Play Console: Website und Datenschutz-URL
-   - AdMob: app-ads.txt neu prüfen lassen
+**Einrichtung am 04.10.2026 (von Josef, per Hand):**
+
+| Schritt | Stand |
+|---|---|
+| Pages-Projekt `fullrep`, Repo `almaz6380/MyPeak`, Build `npm run build` → `dist` | ✅ live, von hier gemessen: Seite, `/legal/privacy`, `app-ads.txt` (text/plain), `/api/health` → `{"ok":true,"db":200}`, CORS-Preflight 204 |
+| `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | ✅ |
+| `GEMINI_API_KEY` (Schlüssel „…wGx0“ vom 11.05., wie in Vercel) | ✅ |
+| `REVENUECAT_WEBHOOK_SECRET` | ✅ **neu erzeugt** (der alte war in Vercel nicht mehr lesbar) und in RevenueCat beim Webhook „MyPeak Supabase“ als Authorization-Wert gesetzt, URL dort auf `fullrep.pages.dev` |
+| `CRON_SECRET` | ✅ neu erzeugt, in Cloudflare **und** als GitHub-Secret |
+| `VITE_REVENUECAT_WEB_API_KEY` | bewusst **nicht** gesetzt: Kauf im Browser ist aus (`PURCHASE_ENABLED.web = false`), in Vercel stand nur ein Sandbox-Schlüssel |
+| `ANTHROPIC_API_KEY` | nicht gesetzt, der Coach läuft über Gemini |
+| Supabase Auth: Site-URL + Redirect-URL `https://fullrep.pages.dev/**` | offen |
+| Play Console: Website + Datenschutz-URL, AdMob app-ads.txt | offen |
+
+⚠ **Vercel zeigt „Secret“-Variablen nie wieder an** — nicht beim Bearbeiten, nicht per
+„Reveal“. Die graue Zeile im Wertfeld ist ein Platzhalter. Werte deshalb an der Quelle
+holen (Supabase → Project Settings → API Keys, **Legacy**-Reiter für anon/service_role;
+Google AI Studio) oder neu erzeugen (`openssl rand -hex 32`).
+
+⚠ **Neue Secrets greifen erst mit dem nächsten Deployment.** Ein Push auf `main` baut neu;
+von Hand: Deployments → Deployment öffnen → „Manage deployment“ → „Retry deployment“.
 
 **Danach, je mit eigenem „ja“:**
 - Store-Texte neu hochladen: iOS `--lokalisieren` und `--beschreibung`, Play `texte`
