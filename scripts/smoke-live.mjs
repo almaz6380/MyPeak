@@ -56,9 +56,16 @@ await halt('start');
 
 // Login-Formular (AuthPage): E-Mail + Passwort.
 const mail = p.locator('input[type=email]').first();
+// Passwort des Demo-Kontos kommt aus der Umgebung (stand bis 1.5.4 im Klartext
+// im Repo): ASC_REVIEW_PASSWORD=… node scripts/smoke-live.mjs
+const REVIEW_PASSWORT = process.env.ASC_REVIEW_PASSWORD;
 if (!GAST && await mail.count()) {
+  if (!REVIEW_PASSWORT) {
+    console.error('ASC_REVIEW_PASSWORD fehlt (Passwort des Demo-Kontos, siehe Passwortmanager).');
+    process.exit(1);
+  }
   await mail.fill('appreview@wellbooked.at');
-  await p.locator('input[type=password]').first().fill('MyPeak-Review#2026');
+  await p.locator('input[type=password]').first().fill(REVIEW_PASSWORT);
   await p.locator('button[type=submit], button:has-text("Anmelden"), button:has-text("Login"), button:has-text("Log in")').first().click();
   await p.waitForTimeout(3500);
   await halt('nach-login');

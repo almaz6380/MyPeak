@@ -972,7 +972,12 @@
   },
   "consentGate": {
     "title": "Einwilligung nachholen",
-    "deleteHint": "Ohne diese Einwilligung dürfen wir deine Gesundheitsdaten nicht weiterverarbeiten. Möchtest du nicht einwilligen, schreib an kontakt@wellbooked.at — wir löschen dein Konto samt aller Daten. Mehr dazu in der"
+    "deleteHint": "Ohne diese Einwilligung dürfen wir deine Gesundheitsdaten nicht weiterverarbeiten. Möchtest du nicht einwilligen, schreib an kontakt@wellbooked.at — wir löschen dein Konto samt aller Daten. Mehr dazu in der",
+    "withdraw": "Einwilligung in Gesundheitsdaten widerrufen",
+    "withdrawTitle": "Einwilligung widerrufen?",
+    "withdrawText": "Ab dem Widerruf verarbeiten wir deine Gesundheitsdaten nicht mehr. Die bis dahin erfolgte Verarbeitung bleibt rechtmäßig. Ohne Einwilligung kannst du dein Konto nicht weiter nutzen: Die App fragt dich beim Öffnen erneut – oder du lässt dein Konto samt aller Daten löschen.",
+    "withdrawConfirm": "Widerrufen",
+    "withdrawError": "Der Widerruf hat nicht geklappt. Bitte prüfe deine Verbindung und versuch es erneut."
   },
   "onboarding": {
     "step": "Schritt {{current}} von {{total}}",
@@ -1357,7 +1362,6 @@
     "brand": "Marke",
     "calculatedUsingTheMifflinStJeor": "Berechnet nach der Mifflin-St-Jeor-Formel. Quelle: Mifflin, M.D., St Jeor, S.T., Hill, L.A., Scott, B.J., Daugherty, S.A. & Koh, Y.O. (1990). A new predictive equation for resting energy expenditure in healthy individuals. American Journal of Clinical Nutrition 51:241–247. Die Werte sind Schätzungen und ersetzen keine Messung oder ärztliche Beratung.",
     "cancel": "Abbrechen",
-    "cancelAnytimeTheTrialCanBe": "Jederzeit kündbar. Die Testphase kann in den Konto-Einstellungen beendet werden.",
     "carbsG": "Kohlenhydrate (g)",
     "cardio": "Cardio",
     "changeAdConsent": "Werbe-Einwilligung ändern",
@@ -1555,7 +1559,6 @@
     "total": "gesamt",
     "totalMinutes": "Minuten gesamt",
     "trialActiveTrialdaysleftDaysLeft": "Testphase aktiv — noch {{trialDaysLeft}} Tage",
-    "trialDaysDaysFreeThenPricefor": "{{TRIAL_DAYS}} Tage kostenlos, danach {{preis}} / {{zeitraum}}",
     "tryAgain": "Erneut versuchen",
     "unlockAiCoachMore": "KI-Coach & mehr freischalten",
     "unlockPremium": "Premium freischalten",
@@ -1578,6 +1581,9 @@
     "you": "Du",
     "youChangedThePlanDoYou": "Du hast den Plan geändert. Sollen die Änderungen gespeichert werden?",
     "youCurrentlyHaveActiveschedulename": "Du hast gerade „{{activeScheduleName}}“ aktiv. „{{programName}}“ zu starten ersetzt es — „{{activeScheduleName}}“ bleibt aber in „Meine Pläne“ gespeichert.",
-    "yourDailyCalorieAndMacroGoals": "Deine täglichen Kalorien- und Makro-Ziele werden auf folgende Werte gesetzt:"
+    "yourDailyCalorieAndMacroGoals": "Deine täglichen Kalorien- und Makro-Ziele werden auf folgende Werte gesetzt:",
+    "trialFreeNoAutoRenew": "{{TRIAL_DAYS}} Tage kostenlos testen. Die Testphase endet automatisch und wird nicht zu einem bezahlten Abo – keine Zahlung, keine Kündigung nötig.",
+    "subscriptionDisclosure": "FullRep Premium ist ein Abo mit automatischer Verlängerung: {{preis}} pro {{zeitraum}}. Bezahlt wird bei Bestätigung des Kaufs über dein {{store}}-Konto. Das Abo verlängert sich automatisch um denselben Zeitraum zum dann gültigen Preis, wenn du es nicht mindestens 24 Stunden vor Ende des laufenden Zeitraums kündigst. Verwalten und kündigen kannst du es jederzeit in den Einstellungen deines {{store}}-Kontos.",
+    "termsOfUseEula": "Nutzungsbedingungen (EULA)"
   }
 }

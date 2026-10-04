@@ -37,6 +37,9 @@ const PURCHASE_ENABLED = { ios: true, android: true, web: false };
 const canPurchase = (PURCHASE_ENABLED[Capacitor.getPlatform()] ?? false)
   && revenueCatConfigured();
 
+// Name des Stores, über den abgerechnet wird — Eigenname, wird nicht übersetzt.
+const STORE_NAME = Capacitor.getPlatform() === 'android' ? 'Google Play' : 'App Store';
+
 // ── Preis-Konfiguration (Fallback-Anzeige) ────────────────────────
 // Sobald ein RevenueCat-Offering geladen ist, werden die echten, lokalisierten
 // Store-Preise angezeigt; diese Konstanten sind nur der Fallback davor.
@@ -240,13 +243,18 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
             </div>
           </button>
 
-          {!hadTrial && (
-            <p className="text-xs text-primary-600 dark:text-primary-400 mt-1 flex items-center justify-center gap-1 text-center">
-              <Sparkles className="w-3.5 h-3.5 shrink-0" />
-              {t('ui.trialDaysDaysFreeThenPricefor', { TRIAL_DAYS, preis: priceFor(selectedPlan), zeitraum: periodLabel(selectedPlan) })}
-            </p>
-          )}
         </div>
+        )}
+
+        {/* Die Testphase läuft serverseitig (api/start-trial.js), nicht über den
+            Store — sie endet von selbst und wird NIE zu einem bezahlten Abo.
+            Bis 1.5.3 stand hier „7 Tage kostenlos, danach 44,99 €/Jahr", was
+            eine automatische Umwandlung versprach, die es nicht gibt. */}
+        {!hadTrial && (
+          <p className="px-6 mt-3 text-xs text-primary-600 dark:text-primary-400 flex items-center justify-center gap-1 text-center">
+            <Sparkles className="w-3.5 h-3.5 shrink-0" />
+            {t('ui.trialFreeNoAutoRenew', { TRIAL_DAYS })}
+          </p>
         )}
 
         {/* CTA */}
@@ -265,7 +273,10 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
               {t('ui.thisFeatureIsPartOfPremium2')}
             </p>
           )}
-          {hadTrial && canPurchase && (
+          {/* Wiederherstellen immer zeigen, sobald gekauft werden kann — auch
+              vor der Testphase: Wer auf einem neuen Gerät schon ein Abo hat,
+              muss es zurückholen können (App-Store-Richtlinie 3.1.1). */}
+          {canPurchase && (
             <button
               onClick={handleRestore}
               disabled={busy}
@@ -274,10 +285,29 @@ export default function PaywallPage({ reason, hadTrial, onStartTrial, onClose })
               {t('ui.restorePurchases')}
             </button>
           )}
-          {(!hadTrial || canPurchase) && (
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-3 leading-relaxed">
-              {t('ui.cancelAnytimeTheTrialCanBe')}
-            </p>
+          {/* Pflichtangaben zum Abo (Apple 3.1.2, Google Play Abo-Richtlinie):
+              Laufzeit, Preis je Zeitraum, automatische Verlängerung, Kündigung
+              mindestens 24 h vor Ablauf im Store-Konto, Abbuchung über das
+              Store-Konto, dazu funktionierende Links auf AGB und Datenschutz. */}
+          {canPurchase && (
+            <div className="mt-3 text-[11px] text-slate-400 dark:text-slate-500 text-center leading-relaxed">
+              <p>
+                {t('ui.subscriptionDisclosure', {
+                  preis: priceFor(selectedPlan),
+                  zeitraum: periodLabel(selectedPlan),
+                  store: STORE_NAME,
+                })}
+              </p>
+              <p className="mt-2">
+                <a href="/legal/terms" target="_blank" rel="noopener" className="underline">
+                  {t('ui.termsOfUseEula')}
+                </a>
+                {' · '}
+                <a href="/legal/privacy" target="_blank" rel="noopener" className="underline">
+                  {t('legal.privacy')}
+                </a>
+              </p>
+            </div>
           )}
         </div>
       </div>

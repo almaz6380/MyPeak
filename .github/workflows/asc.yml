@@ -89,6 +89,7 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          ASC_REVIEW_PASSWORD: ${{ secrets.ASC_REVIEW_PASSWORD }}
           MODE: ${{ inputs.mode }}
           VERSION_NR: ${{ inputs.version_nr }}
           DRY: ${{ inputs.dry_run }}

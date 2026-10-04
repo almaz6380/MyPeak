@@ -210,25 +210,38 @@ def setze_namen(tok):
 # appStoreVersions — plus der Text "Neu in dieser Version", der bei einem
 # Update Pflicht ist.
 
-WHATS_NEW = """Die Datumsauswahl im Gewichtsdiagramm zeigt das Datum jetzt im \
-richtigen Format. Die Store-Seite gibt es jetzt auch auf Englisch, Spanisch, \
-Französisch, Portugiesisch und Arabisch — die App selbst spricht alle sechs \
-Sprachen."""
+WHATS_NEW = """Neue Nutzungsbedingungen und eine überarbeitete Datenschutzerklärung. \
+Die Einwilligung in die Verarbeitung von Gesundheitsdaten kannst du jetzt \
+jederzeit im Profil widerrufen. Klarere Angaben zum Premium-Abo vor dem Kauf, \
+und Werbung erscheint seltener und nie direkt nach dem Start."""
 
 # "Neu in dieser Version" fuer die weiteren Sprachen der Store-Seite. Apple
 # verlangt den Text bei einem Update fuer JEDE Lokalisierung der Version —
 # lokalisieren() setzt ihn mit, sonst scheitert die Einreichung.
 WHATS_NEW_SPRACHEN = {
-    'en': "The date picker in the weight chart now shows dates in the right "
-          "format. Small fixes and improvements.",
-    'es': "El selector de fecha del gráfico de peso ahora muestra las fechas en "
-          "el formato correcto. Pequeñas mejoras y correcciones.",
-    'fr': "Le sélecteur de date du graphique de poids affiche désormais les dates "
-          "au bon format. Petites corrections et améliorations.",
-    'pt': "O seletor de data do gráfico de peso agora mostra as datas no formato "
-          "correto. Pequenas correções e melhorias.",
-    'ar': "يعرض منتقي التاريخ في مخطط الوزن التواريخ الآن بالتنسيق الصحيح. "
-          "تحسينات وإصلاحات صغيرة.",
+    'en': "New terms of use and a revised privacy policy. You can now withdraw "
+          "your consent to the processing of health data at any time in your "
+          "profile. Clearer information about the Premium subscription before "
+          "you buy, and ads appear less often and never right after launch.",
+    'es': "Nuevas condiciones de uso y una política de privacidad revisada. Ahora "
+          "puedes retirar en cualquier momento desde tu perfil el consentimiento "
+          "para el tratamiento de datos de salud. Información más clara sobre la "
+          "suscripción Premium antes de comprar, y la publicidad aparece con menos "
+          "frecuencia y nunca justo al abrir la app.",
+    'fr': "Nouvelles conditions d’utilisation et politique de confidentialité "
+          "révisée. Tu peux désormais retirer à tout moment, dans ton profil, ton "
+          "consentement au traitement des données de santé. Des informations plus "
+          "claires sur l’abonnement Premium avant l’achat, et la publicité apparaît "
+          "moins souvent et jamais juste après le démarrage.",
+    'pt': "Novos termos de uso e uma política de privacidade revisada. Agora você "
+          "pode revogar a qualquer momento, no seu perfil, o consentimento para o "
+          "tratamento de dados de saúde. Informações mais claras sobre a assinatura "
+          "Premium antes da compra, e os anúncios aparecem com menos frequência e "
+          "nunca logo após abrir o app.",
+    'ar': "شروط استخدام جديدة وسياسة خصوصية محدّثة. يمكنك الآن سحب موافقتك على "
+          "معالجة البيانات الصحية في أي وقت من ملفك الشخصي. معلومات أوضح عن اشتراك "
+          "Premium قبل الشراء، وتظهر الإعلانات بشكل أقل ولا تظهر أبدًا مباشرة بعد "
+          "فتح التطبيق.",
 }
 
 
@@ -314,7 +327,7 @@ ABO_BLOCK = """
 
 ABO — FULLREP PREMIUM
 \u2022 4,99 \u20ac pro Monat oder 44,99 \u20ac pro Jahr, mit automatischer Verl\u00e4ngerung
-\u2022 7 Tage kostenlos testen, danach beginnt das Abo, wenn du nicht k\u00fcndigst
+\u2022 7 Tage kostenlos testen: Die Testphase endet von selbst und wird nicht zu einem bezahlten Abo
 \u2022 Die Zahlung wird bei Best\u00e4tigung des Kaufs \u00fcber deine Apple-ID abgebucht
 \u2022 Das Abo verl\u00e4ngert sich automatisch, sofern es nicht sp\u00e4testens 24 Stunden vor Ablauf gek\u00fcndigt wird \u2014 verwalten und k\u00fcndigen in den Einstellungen deiner Apple-ID
 \u2022 Nutzungsbedingungen: https://fullrep.pages.dev/legal/terms
@@ -387,7 +400,7 @@ ABO_BLOECKE = {
 
 SUBSCRIPTION — FULLREP PREMIUM
 • Monthly or yearly subscription with automatic renewal; the price in your currency is shown in the app before purchase
-• 7-day free trial; the subscription starts afterwards unless you cancel
+• 7-day free trial that ends on its own and does not turn into a paid subscription
 • Payment is charged to your Apple ID at confirmation of purchase
 • The subscription renews automatically unless cancelled at least 24 hours before the end of the current period — manage and cancel in your Apple ID settings
 • Terms of Use: https://fullrep.pages.dev/legal/terms
@@ -396,7 +409,7 @@ SUBSCRIPTION — FULLREP PREMIUM
 
 SUSCRIPCIÓN — FULLREP PREMIUM
 • Suscripción mensual o anual con renovación automática; el precio en tu moneda se muestra en la app antes de comprar
-• 7 días de prueba gratis; después empieza la suscripción si no la cancelas
+• 7 días de prueba gratis que terminan solos y no se convierten en una suscripción de pago
 • El pago se carga a tu Apple ID al confirmar la compra
 • La suscripción se renueva automáticamente salvo que la canceles al menos 24 horas antes del fin del periodo — gestiónala y cancélala en los ajustes de tu Apple ID
 • Condiciones de uso: https://fullrep.pages.dev/legal/terms
@@ -405,7 +418,7 @@ SUSCRIPCIÓN — FULLREP PREMIUM
 
 ABONNEMENT — FULLREP PREMIUM
 • Abonnement mensuel ou annuel à renouvellement automatique ; le prix dans ta devise est affiché dans l'app avant l'achat
-• 7 jours d'essai gratuit ; l'abonnement commence ensuite si tu ne résilies pas
+• 7 jours d'essai gratuit, qui se terminent d'eux-mêmes et ne deviennent pas un abonnement payant
 • Le paiement est débité de ton identifiant Apple à la confirmation de l'achat
 • L'abonnement se renouvelle automatiquement sauf résiliation au moins 24 heures avant la fin de la période — gère-le et résilie-le dans les réglages de ton identifiant Apple
 • Conditions d'utilisation : https://fullrep.pages.dev/legal/terms
@@ -414,7 +427,7 @@ ABONNEMENT — FULLREP PREMIUM
 
 ASSINATURA — FULLREP PREMIUM
 • Assinatura mensal ou anual com renovação automática; o preço na sua moeda aparece no app antes da compra
-• 7 dias de teste grátis; depois a assinatura começa se você não cancelar
+• 7 dias de teste grátis, que terminam sozinhos e não viram uma assinatura paga
 • O pagamento é cobrado no seu ID Apple na confirmação da compra
 • A assinatura renova automaticamente, a menos que seja cancelada pelo menos 24 horas antes do fim do período — gerencie e cancele nos ajustes do seu ID Apple
 • Termos de uso: https://fullrep.pages.dev/legal/terms
@@ -423,7 +436,7 @@ ASSINATURA — FULLREP PREMIUM
 
 الاشتراك — FULLREP PREMIUM
 • اشتراك شهري أو سنوي يتجدد تلقائيًا؛ يظهر السعر بعملتك داخل التطبيق قبل الشراء
-• تجربة مجانية لمدة 7 أيام، ثم يبدأ الاشتراك ما لم تُلغِه
+• تجربة مجانية لمدة 7 أيام تنتهي تلقائيًا ولا تتحول إلى اشتراك مدفوع
 • يُخصم المبلغ من حساب Apple ID عند تأكيد الشراء
 • يتجدد الاشتراك تلقائيًا ما لم يُلغَ قبل 24 ساعة على الأقل من نهاية الفترة الحالية — يمكنك إدارته وإلغاؤه من إعدادات Apple ID
 • شروط الاستخدام: https://fullrep.pages.dev/legal/terms
@@ -691,11 +704,28 @@ and a medical disclaimer appears on every health-related screen. A dedicated
 page is reachable at Profile > Health notice.
 
 Demo account (not required - the app is fully usable as a guest):
-appreview@wellbooked.at / MyPeak-Review#2026
+appreview@wellbooked.at / {REVIEW_PASSWORT}
 """
 
 
+def pruefnotiz():
+    """Prüfnotiz mit dem Passwort des Demo-Kontos.
+
+    Das Passwort stand bis 1.5.4 im Klartext in diesem Skript und damit in der
+    Git-Historie. Es kommt jetzt aus dem Secret ASC_REVIEW_PASSWORD (Workflow
+    asc.yml) bzw. der Umgebung — ohne Wert bricht der Befehl klar ab, statt
+    eine Notiz mit leerem Passwort an Apple zu schicken.
+    """
+    pw = os.environ.get('ASC_REVIEW_PASSWORD', '').strip()
+    if not pw:
+        sys.exit('FEHLER: ASC_REVIEW_PASSWORD ist nicht gesetzt (Passwort des '
+                 'Demo-Kontos appreview@wellbooked.at, siehe Passwortmanager). '
+                 'Im Workflow als Repo-Secret ASC_REVIEW_PASSWORD hinterlegen.')
+    return PRUEFNOTIZ.replace('{REVIEW_PASSWORT}', pw)
+
+
 def setze_pruefnotiz(tok):
+    notiz = pruefnotiz()
     aid = app_id(tok)
     v = offene_version(tok, aid)
     print(f'  Version {v["attributes"]["versionString"]}')
@@ -703,24 +733,24 @@ def setze_pruefnotiz(tok):
                  fatal=False)
     if TROCKEN:
         alt = (detail.get('data') or {}).get('attributes', {}).get('notes') or ''
-        print(f'  [trocken] Notiz ersetzen ({len(alt)} -> {len(PRUEFNOTIZ)} Zeichen)')
+        print(f'  [trocken] Notiz ersetzen ({len(alt)} -> {len(notiz)} Zeichen)')
         return
     if detail.get('data'):
         res = api(tok, f'appStoreReviewDetails/{detail["data"]["id"]}', 'PATCH', {
             'data': {'type': 'appStoreReviewDetails', 'id': detail['data']['id'],
-                     'attributes': {'notes': PRUEFNOTIZ}},
+                     'attributes': {'notes': notiz}},
         }, fatal=False)
     else:
         res = api(tok, 'appStoreReviewDetails', 'POST', {
             'data': {'type': 'appStoreReviewDetails',
-                     'attributes': {'notes': PRUEFNOTIZ},
+                     'attributes': {'notes': notiz},
                      'relationships': {'appStoreVersion': {'data': {
                          'type': 'appStoreVersions', 'id': v['id']}}}},
         }, fatal=False)
     if res.get('_fehler'):
         print(f'  FEHLER: {fehler_text(res)}')
     else:
-        print(f'  Notiz gesetzt ({len(PRUEFNOTIZ)} Zeichen)')
+        print(f'  Notiz gesetzt ({len(notiz)} Zeichen)')
 
 
 # Zustaende, in denen eine Einreichung die Version blockiert. UNRESOLVED_ISSUES

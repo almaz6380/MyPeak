@@ -43,7 +43,7 @@ export default function OnboardingPage() {
 
   function canProceed() {
     switch (step) {
-      case 1: return data.name.trim().length > 0 && data.birthdate.length > 0 && getAge(data.birthdate) >= 14;
+      case 1: return data.name.trim().length > 0 && data.birthdate.length > 0 && getAge(data.birthdate) >= 16;
       case 2: return !!data.gender;
       case 3: return data.height_cm >= 120 && data.height_cm <= 230;
       case 4: return data.weight_kg >= 30 && data.weight_kg <= 300;
@@ -222,7 +222,7 @@ function NameBirthdateStep({ data, updateField }) {
             type="date"
             value={data.birthdate}
             onChange={(e) => updateField('birthdate', e.target.value)}
-            max={toLocalDateString(new Date(new Date().setFullYear(new Date().getFullYear() - 14)))}
+            max={toLocalDateString(new Date(new Date().setFullYear(new Date().getFullYear() - 16)))}
             min="1930-01-01"
             className="w-full px-4 py-4 bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 rounded-2xl text-lg font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />

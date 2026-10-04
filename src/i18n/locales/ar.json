@@ -941,7 +941,12 @@
   },
   "consentGate": {
     "title": "الموافقة مطلوبة",
-    "deleteHint": "بدون هذه الموافقة لا يجوز لنا مواصلة معالجة بياناتك الصحية. إذا كنت لا ترغب في الموافقة فاكتب إلى kontakt@wellbooked.at — وسنحذف حسابك مع كل بياناته. المزيد في"
+    "deleteHint": "بدون هذه الموافقة لا يجوز لنا مواصلة معالجة بياناتك الصحية. إذا كنت لا ترغب في الموافقة فاكتب إلى kontakt@wellbooked.at — وسنحذف حسابك مع كل بياناته. المزيد في",
+    "withdraw": "سحب الموافقة على البيانات الصحية",
+    "withdrawTitle": "سحب الموافقة؟",
+    "withdrawText": "منذ لحظة السحب لن نعالج بياناتك الصحية بعد الآن. وتبقى المعالجة التي تمت قبل ذلك مشروعة. بدون موافقة لا يمكنك مواصلة استخدام حسابك: سيسألك التطبيق مجددًا عند فتحه – أو يمكنك طلب حذف حسابك مع جميع البيانات.",
+    "withdrawConfirm": "سحب",
+    "withdrawError": "تعذّر سحب الموافقة. تحقق من اتصالك وحاول مرة أخرى."
   },
   "onboarding": {
     "step": "الخطوة {{current}} من {{total}}",
@@ -1326,7 +1331,6 @@
     "brand": "العلامة التجارية",
     "calculatedUsingTheMifflinStJeor": "محسوب بمعادلة ميفلين-سانت جيور. المصدر: Mifflin, M.D., St Jeor, S.T., Hill, L.A., Scott, B.J., Daugherty, S.A. & Koh, Y.O. (1990). A new predictive equation for resting energy expenditure in healthy individuals. American Journal of Clinical Nutrition 51:241–247. هذه القيم تقديرية ولا تغني عن القياس أو الاستشارة الطبية.",
     "cancel": "إلغاء",
-    "cancelAnytimeTheTrialCanBe": "يمكنك الإلغاء في أي وقت. يمكن إنهاء الفترة التجريبية من إعدادات حسابك.",
     "carbsG": "كربوهيدرات (غ)",
     "cardio": "كارديو",
     "changeAdConsent": "تغيير الموافقة على الإعلانات",
@@ -1524,7 +1528,6 @@
     "total": "الإجمالي",
     "totalMinutes": "إجمالي الدقائق",
     "trialActiveTrialdaysleftDaysLeft": "التجربة نشطة — بقي {{trialDaysLeft}} يومًا",
-    "trialDaysDaysFreeThenPricefor": "{{TRIAL_DAYS}} أيام مجانًا، ثم {{preis}} / {{zeitraum}}",
     "tryAgain": "أعد المحاولة",
     "unlockAiCoachMore": "افتح مدرب الذكاء الاصطناعي والمزيد",
     "unlockPremium": "فتح Premium",
@@ -1547,7 +1550,10 @@
     "you": "أنت",
     "youChangedThePlanDoYou": "لقد غيّرت الخطة. هل تريد حفظ تغييراتك؟",
     "youCurrentlyHaveActiveschedulename": "«{{activeScheduleName}}» مفعّل حاليًا. بدء «{{programName}}» يستبدله — ويبقى «{{activeScheduleName}}» محفوظًا في «خططي».",
-    "yourDailyCalorieAndMacroGoals": "سيتم ضبط أهدافك اليومية من السعرات والعناصر الكبرى على:"
+    "yourDailyCalorieAndMacroGoals": "سيتم ضبط أهدافك اليومية من السعرات والعناصر الكبرى على:",
+    "trialFreeNoAutoRenew": "جرّب مجانًا لمدة {{TRIAL_DAYS}} أيام. تنتهي الفترة التجريبية تلقائيًا ولا تتحول إلى اشتراك مدفوع – لا دفع ولا حاجة إلى الإلغاء.",
+    "subscriptionDisclosure": "FullRep Premium اشتراك يتجدد تلقائيًا: {{preis}} لكل {{zeitraum}}. يُخصم المبلغ من حسابك في {{store}} عند تأكيد الشراء. يتجدد الاشتراك تلقائيًا للمدة نفسها بالسعر الساري حينها ما لم تلغِه قبل 24 ساعة على الأقل من نهاية الفترة الحالية. يمكنك إدارته وإلغاؤه في أي وقت من إعدادات حسابك في {{store}}.",
+    "termsOfUseEula": "شروط الاستخدام (EULA)"
   },
   "planBuilder": {
     "title": "إنشاء خطة أسبوعية",
