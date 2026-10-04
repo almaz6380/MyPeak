@@ -19,6 +19,17 @@ Arabisch (RTL) — **vollständig**, Oberfläche wie Inhaltsbibliotheken (siehe 
 
 ## Aktueller Stand
 
+### Release 1.5.5 (04.10.2026): Premium-Funktionen + Rechtstexte
+
+| | Stand |
+|---|---|
+| Web | live auf fullrep.pages.dev, `/api/scan-label` und `/api/meal-plan` antworten ohne Token mit 401 |
+| Android | **vc24 (1.5.5) auf `production`, an alle** (`android-release` 37203387395), validiert und committet |
+| iOS | Die Einreichung `bcf86ca6` (`UNRESOLVED_ISSUES`) ist per `--aufraeumen` zurückgezogen. Die offene Version 1.5.4 (`INVALID_BINARY`) ist per `--version-anlegen 1.5.5` **umbenannt**, `--lokalisieren` und `--beschreibung` sind gelaufen. Build 14 (`ios-release` 37203388824) trägt den PrivacyInfo-Fehler und wird **nicht** zugewiesen. **Offen:** Build 15 (PR #68, eine Parallel-Sitzung) → `--build 15` → `--pruefnotiz` → `--einreichen` |
+
+- `asc.py --version-anlegen` benennt jetzt eine offene, nicht eingereichte Version um, statt sie zu überspringen. So bleiben Lokalisierungen und Screenshots erhalten.
+- `release-preflight` prüft `ASC_REVIEW_PASSWORD` mit (gesetzt, 04.10.).
+
 ### Premium-Funktionen gebaut: Nährwerttabelle, KI-Ernährungsplan, Statistiken (04.10.2026)
 
 Die Paywall versprach drei Dinge, die es nicht gab. Statt sie zu streichen, sind sie jetzt da:
@@ -40,7 +51,7 @@ aus dem **Mahlzeit-Foto (`ai_photo`)**, aus **Community-Produkten (`community`)*
 **Kochbuch (`recipe`)** scheiterten beim Cloud-Insert. Lokal blieben sie stehen, aber
 `AddFoodEntry` meldete „Speichern fehlgeschlagen“. In der Datenbank gezählt: 0 solche Zeilen.
 Migration **`20261004120000_nutrition_source_erweitern.sql`** erlaubt sie, dazu `label_scan` und
-`ai_plan`. Als `begin … rollback` gegen Prod geprüft. **Eingespielt: noch nicht.**
+`ai_plan`. **In Prod eingespielt am 04.10.2026** (Management-API, Constraint nachgelesen).
 Auch der Slot heißt in der DB `snack`, nicht `snacks`. Der Plan-Endpunkt nutzt deshalb `snack`.
 
 ### Rechtsprüfung: AGB, Datenschutz, Widerruf, Paywall, Werbebremse (04.10.2026) — Version 1.5.4 vorbereitet
