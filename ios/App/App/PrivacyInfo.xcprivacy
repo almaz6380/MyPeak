@@ -5,8 +5,8 @@
   Muss zur App-Datenschutzangabe in App Store Connect und zur
   Datenschutzerklärung (src/pages/legal/legalContent.js) passen.
   - Tracking: ja, wegen AdMob (personalisierte Werbung nach ATT-Zustimmung).
-    Die Tracking-Domains bringt das Google-Mobile-Ads-SDK in seinem eigenen
-    Manifest mit; hier stehen nur die Angaben der App selbst.
+    ⚠ Tracking-Domains NICHT leer lassen: NSPrivacyTracking = true mit leerer
+    Liste ist "Ungueltige Binaerdatei" (ITMS-91064, Build 13 am 04.10.2026).
   - UserDefaults: AppDelegate liest UserDefaults.standard (CA92.1) und
     spiegelt die Widget-Daten in die App-Group-Suite (1C8F.1).
   - Health/Fitness, E-Mail, Nutzer-ID, Coach-Nachrichten, Kaufverlauf:
@@ -19,7 +19,11 @@
 	<key>NSPrivacyTracking</key>
 	<true/>
 	<key>NSPrivacyTrackingDomains</key>
-	<array/>
+	<array>
+		<string>googleads.g.doubleclick.net</string>
+		<string>pagead2.googlesyndication.com</string>
+		<string>googleadservices.com</string>
+	</array>
 	<key>NSPrivacyAccessedAPITypes</key>
 	<array>
 		<dict>
