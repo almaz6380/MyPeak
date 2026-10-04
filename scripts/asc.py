@@ -370,6 +370,27 @@ def beschreibung(tok):
         else:
             print('  gesetzt (Beschreibung, Support-URL, Marketing-URL)')
 
+    # ⚠ 04.10.2026: --lokalisieren setzt die Datenschutz-URL nur fuer die
+    # weiteren Sprachen; de-DE stand noch auf der gesperrten Vercel-Adresse.
+    # Sie haengt am bearbeitbaren appInfo, nicht an der Version.
+    lebend = {'READY_FOR_DISTRIBUTION', 'READY_FOR_SALE'}
+    for info in api(tok, f'apps/{aid}/appInfos').get('data', []):
+        if (info['attributes'].get('state')
+                or info['attributes'].get('appStoreState')) in lebend:
+            continue
+        for l in api(tok, f'appInfos/{info["id"]}/appInfoLocalizations').get('data', []):
+            if l['attributes']['locale'] != 'de-DE':
+                continue
+            soll = 'https://fullrep.pages.dev/legal/privacy'
+            print(f'  de-DE Datenschutz-URL: {l["attributes"].get("privacyPolicyUrl")!r} -> {soll}')
+            if TROCKEN or l['attributes'].get('privacyPolicyUrl') == soll:
+                continue
+            res = api(tok, f'appInfoLocalizations/{l["id"]}', 'PATCH', {
+                'data': {'type': 'appInfoLocalizations', 'id': l['id'],
+                         'attributes': {'privacyPolicyUrl': soll}},
+            }, fatal=False)
+            print(f'  FEHLER: {fehler_text(res)}' if res.get('_fehler') else '  gesetzt')
+
 
 # ── Weitere Sprachen (EN, ES, FR, PT, AR) ─────────────────────────────────
 # Bis 10/2026 gab es in ASC NUR de-DE. Wer in den USA, Spanien oder Brasilien
