@@ -51,6 +51,11 @@ export default function PortionPicker({ food, onConfirm, onClose, initialServing
         </button>
       </div>
 
+      {/* Hinweis, z. B. Werte, die auf dem Etikett nicht lesbar waren */}
+      {food.hinweis && (
+        <p className="mb-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 text-xs leading-relaxed">{food.hinweis}</p>
+      )}
+
       {/* Content */}
       <div>
         {/* Per 100g reference */}

@@ -33,7 +33,10 @@ describe('Vertrag aller api/-Endpunkte', () => {
       // Schluessels bzw. probt eines an (?probe=). Login-Pflicht wie
       // analyze-meal; gibt nur Modellnamen zurueck, nie den Schluessel.
       'gemini-modelle.js',
-      'health.js', 'revenuecat-webhook.js', 'start-trial.js',
+      'health.js',
+      // Premium (04.10.2026): KI-Ernaehrungsplan und Naehrwerttabelle per Foto.
+      'meal-plan.js',
+      'revenuecat-webhook.js', 'scan-label.js', 'start-trial.js',
     ]);
   });
 
