@@ -12,7 +12,9 @@ import coach from '../../api/coach.js';
 import deleteAccount from '../../api/delete-account.js';
 import geminiModelle from '../../api/gemini-modelle.js';
 import health from '../../api/health.js';
+import mealPlan from '../../api/meal-plan.js';
 import revenuecatWebhook from '../../api/revenuecat-webhook.js';
+import scanLabel from '../../api/scan-label.js';
 import startTrial from '../../api/start-trial.js';
 import { vercelHandlerAusfuehren } from '../_vercelAdapter.js';
 
@@ -23,7 +25,9 @@ export const ENDPUNKTE = {
   'delete-account': deleteAccount,
   'gemini-modelle': geminiModelle,
   health,
+  'meal-plan': mealPlan,
   'revenuecat-webhook': revenuecatWebhook,
+  'scan-label': scanLabel,
   'start-trial': startTrial,
 };
 

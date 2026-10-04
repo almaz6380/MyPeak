@@ -8,7 +8,7 @@ import { saveSetting } from '../data/settingsStorage';
 import FullRepLogo from '../components/FullRepLogo';
 import CardPhotoMotif from '../components/CardPhotoMotif';
 import { supabase } from '../lib/supabase';
-import { Moon, Sun, Globe, Weight, LogOut, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2, ShieldCheck, Crown, HeartPulse } from 'lucide-react';
+import { Moon, Sun, Globe, Weight, LogOut, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2, ShieldCheck, Crown, HeartPulse, BarChart3 } from 'lucide-react';
 import { useSubscription } from '../context/SubscriptionContext';
 import { getOrCreateFriendCode, getXP, getLevelTitle, calculateLevel, hasGoldenFrame } from '../data/socialStorage';
 import AchievementGallery from '../components/progress/AchievementGallery';
@@ -290,6 +290,26 @@ export default function ProfilePage() {
           ? <span className="text-[11px] font-semibold text-primary-500 dark:text-primary-400">✓</span>
           : <ChevronRight className="w-5 h-5 text-slate-300" />}
       </button>
+
+      {/* Statistiken (Premium) */}
+      <Link
+        to="/stats"
+        className="relative overflow-hidden w-full karte p-4 mb-4 flex items-center justify-between"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+            <BarChart3 className="w-5 h-5 text-primary-500" />
+          </div>
+          <div className="text-start">
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+              {t('premium.statsTitle')}
+              {!isPremium && <Crown className="w-3.5 h-3.5 text-primary-500" />}
+            </p>
+            <p className="text-[11px] text-slate-400">{t('premium.statsSubtitle')}</p>
+          </div>
+        </div>
+        <ChevronRight className="w-5 h-5 text-slate-300 rtl:-scale-x-100" />
+      </Link>
 
       {/* Erfolge & Abzeichen */}
       <AchievementGallery userId={user?.id} />

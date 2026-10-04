@@ -18,6 +18,8 @@ import ProfilePage from './pages/ProfilePage';
 import CycleDetailPage from './pages/CycleDetailPage';
 import ProgressPhotosPage from './pages/progress/ProgressPhotosPage';
 import CoachPage from './pages/CoachPage';
+import MealPlanPage from './pages/nutrition/MealPlanPage';
+import StatsPage from './pages/StatsPage';
 import AuthPage from './pages/auth/AuthPage';
 import UpdatePasswordPage from './pages/auth/UpdatePasswordPage';
 import OnboardingPage from './pages/onboarding/OnboardingPage';
@@ -64,6 +66,8 @@ export default function App() {
       <Route path="/legal/terms" element={<LegalPage doc="terms" />} />
       <Route path="/legal/health" element={<LegalPage doc="health" />} />
       <Route path="/coach" element={user ? <CoachPage /> : <AuthPage />} />
+      <Route path="/meal-plan" element={user ? <MealPlanPage /> : <AuthPage />} />
+      <Route path="/stats" element={user ? <StatsPage /> : <AuthPage />} />
       <Route
         path="*"
         element={

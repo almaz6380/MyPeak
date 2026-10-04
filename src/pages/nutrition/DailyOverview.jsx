@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { datumsLocale, wochentagKuerzel } from '../../lib/datumsformat';
 import i18nInstanz from '../../i18n';
-import { ChevronLeft, ChevronRight, Plus, Trash2, Settings, UtensilsCrossed, Pencil, X, Check, GlassWater, BookOpen } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2, Settings, UtensilsCrossed, Pencil, X, Check, GlassWater, BookOpen, Sparkles, Crown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useSubscription } from '../../context/SubscriptionContext';
 import CardPhotoMotif from '../../components/CardPhotoMotif';
 import MacroRing from './MacroRing';
 import FullRepLogo from '../../components/FullRepLogo';
@@ -24,6 +26,8 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
   const { t, i18n } = useTranslation();
   const lang = appSprache(i18n.language);
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { isPremium, requirePremium } = useSubscription();
   const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
   const [entries, setEntries] = useState([]);
   const [goals, setGoals] = useState({ calories: 2000, protein: 150, carbs: 250, fat: 70, water_ml: 3000 });
@@ -169,6 +173,17 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
           </button>
         )}
       </div>
+
+      {/* KI-Ernährungsplan (Premium) */}
+      <button
+        onClick={() => { if (requirePremium('meal_plan')) navigate('/meal-plan'); }}
+        className="w-full mb-4 px-4 py-3 rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-white shadow-md flex items-center gap-3"
+      >
+        <Sparkles className="w-5 h-5 flex-shrink-0" />
+        <span className="flex-1 text-start text-sm font-semibold">{t('premium.planTitle')}</span>
+        {!isPremium && <Crown className="w-4 h-4 text-white/80" />}
+        <ChevronRight className="w-4 h-4 text-white/70 rtl:-scale-x-100" />
+      </button>
 
       {/* Macro Rings */}
       <div className="karte relative overflow-hidden p-5 mb-4">

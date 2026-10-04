@@ -567,3 +567,40 @@ export async function removeWaterAmount(userId, date, amountMl) {
     }
   }
 }
+
+// Einträge eines Zeitraums auf einmal (für die Statistik). EINE Abfrage statt
+// je Tag eine — 30 Tage einzeln über getNutritionEntries wären 30 Aufrufe.
+// Lokale Einträge (Gast, offline, noch nicht gesynct) kommen aus dem Cache dazu.
+export async function getNutritionEntriesRange(userId, fromDate, toDate) {
+  const proTag = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key?.startsWith(ENTRIES_PREFIX)) continue;
+    const date = key.slice(ENTRIES_PREFIX.length);
+    if (date < fromDate || date > toDate) continue;
+    try { proTag[date] = JSON.parse(localStorage.getItem(key) || '[]'); } catch { /* kaputter Eintrag */ }
+  }
+
+  if (!guestSkip(userId)) {
+    try {
+      const { data, error } = await supabase
+        .from('nutrition_entries')
+        .select('date, calories, protein, carbs, fat')
+        .eq('user_id', userId)
+        .gte('date', fromDate)
+        .lte('date', toDate);
+      if (!error && data) {
+        const cloud = {};
+        for (const e of data) (cloud[e.date] ||= []).push(e);
+        // Cloud gewinnt je Tag; nur rein lokale Einträge kommen dazu.
+        for (const [date, eintraege] of Object.entries(cloud)) {
+          const lokal = (proTag[date] || []).filter((e) => String(e.id).startsWith('local_'));
+          proTag[date] = [...eintraege, ...lokal];
+        }
+      }
+    } catch {
+      // offline — dann zählt der Cache
+    }
+  }
+  return proTag;
+}

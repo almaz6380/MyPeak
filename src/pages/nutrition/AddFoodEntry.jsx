@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Clock, UtensilsCrossed, PenLine, ScanBarcode, Camera, Check, Plus, X } from 'lucide-react';
+import { ArrowLeft, Clock, UtensilsCrossed, PenLine, ScanBarcode, Camera, Check, Plus, X, ScanText } from 'lucide-react';
 import FoodSearch from './FoodSearch';
 import PortionPicker from './PortionPicker';
 import BarcodeScanner from './BarcodeScanner';
 import MealPhotoCapture from './MealPhotoCapture';
+import LabelScanCapture from './LabelScanCapture';
+import { useSubscription } from '../../context/SubscriptionContext';
 import { useAuth } from '../../context/AuthContext';
 import { saveNutritionEntry, getRecentFoods, getCustomMeals, logCustomMeal } from '../../data/nutritionStorage';
 import { checkAchievements } from '../../data/achievements';
@@ -15,6 +17,7 @@ import { maybeAskForReviewNachEssen } from '../../lib/review';
 export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language = 'de' }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const { requirePremium } = useSubscription();
   const lang = i18n.language || language;
 
   const [activeTab, setActiveTab] = useState('search'); // search | recent
@@ -25,6 +28,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
   const [showManual, setShowManual] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [showMealPhoto, setShowMealPhoto] = useState(false);
+  const [showLabelScan, setShowLabelScan] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
 
@@ -136,6 +140,22 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
     );
   }
 
+  // Nährwerttabelle per Foto (Premium)
+  if (showLabelScan) {
+    return (
+      <LabelScanCapture
+        onClose={() => setShowLabelScan(false)}
+        onScanned={(food, fehlend) => {
+          setShowLabelScan(false);
+          const hinweis = fehlend.length
+            ? t('premium.labelMissing', { werte: fehlend.map((k) => (k === 'calories' ? 'kcal' : t(`nutrition.${k}`))).join(', ') })
+            : null;
+          setTimeout(() => setSelectedFood({ ...food, hinweis }), 50);
+        }}
+      />
+    );
+  }
+
   // Barcode scanner
   if (showScanner) {
     return (
@@ -215,7 +235,7 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
       {activeTab === 'search' && (
         <>
           {/* Quick Actions */}
-          <div className="grid grid-cols-3 gap-2 mb-4">
+          <div className="grid grid-cols-4 gap-2 mb-4">
             <button
               onClick={() => setShowScanner(true)}
               className="flex flex-col items-center gap-1.5 px-2 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
@@ -233,6 +253,15 @@ export default function AddFoodEntry({ mealSlot, date, onBack, onSaved, language
                 <Camera className="w-4.5 h-4.5 text-violet-600 dark:text-violet-400" />
               </div>
               <p className="text-[11px] font-medium text-slate-700 dark:text-slate-200 text-center leading-tight">{t('nutrition.mealPhoto')}</p>
+            </button>
+            <button
+              onClick={() => { if (requirePremium('label_scan')) setShowLabelScan(true); }}
+              className="relative flex flex-col items-center gap-1.5 px-2 py-3 bg-white dark:bg-surface-dark-alt rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                <ScanText className="w-4.5 h-4.5 text-amber-600 dark:text-amber-400" />
+              </div>
+              <p className="text-[11px] font-medium text-slate-700 dark:text-slate-200 text-center leading-tight">{t('premium.labelShort')}</p>
             </button>
             <button
               onClick={() => setShowManual(true)}

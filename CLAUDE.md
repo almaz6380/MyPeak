@@ -19,6 +19,30 @@ Arabisch (RTL) — **vollständig**, Oberfläche wie Inhaltsbibliotheken (siehe 
 
 ## Aktueller Stand
 
+### Premium-Funktionen gebaut: Nährwerttabelle, KI-Ernährungsplan, Statistiken (04.10.2026)
+
+Die Paywall versprach drei Dinge, die es nicht gab. Statt sie zu streichen, sind sie jetzt da:
+
+| Funktion | Wo | Server |
+|---|---|---|
+| **Nährwerttabelle per Foto** | 4. Schnellknopf in „Lebensmittel hinzufügen“ → `LabelScanCapture` → Portionswähler | `api/scan-label.js`: liest je 100 g ab, erfindet nichts (`null` → `fehlend`, der Portionswähler zeigt einen Hinweis). Nur kcal wird aus P/C/F nachgerechnet |
+| **KI-Ernährungsplan** | Goldene Zeile auf der Ernährungsseite → `/meal-plan` | `api/meal-plan.js`: Tagesplan aus den eigenen Zielen, Ernährungsform, Anzahl Mahlzeiten, Ausschlüsse. **Summen rechnet der Server**, nicht das Modell. Zählt gegen das **Coach-Kontingent** (`coach_usage`, 5/30 pro Tag) — keine neue Tabelle |
+| **Statistiken** | Profil → „Statistiken“ → `/stats` | keiner — rechnet auf dem Gerät (`src/lib/statistik.js`): Trainings und Volumen je Woche (8 Wochen), Top-Übungen, Ernährungsschnitt gegen Ziel, Gewichtstrend. Zeitraum 7/30/90 Tage |
+
+- Premium-Prüfung für beide Endpunkte in **`api/_premium.js`** (`premiumPruefen`, gleiche Kette wie `coach.js`, das selbst unverändert bleibt). Beide sind in `functions/api/[[pfad]].js` eingetragen.
+- Gesperrter Zustand: `PremiumGesperrt.jsx`. Letzter Plan liegt pro Nutzer in localStorage (`fullrep.mealplan.<id>`).
+- `getNutritionEntriesRange()` holt einen Zeitraum mit **einer** Abfrage statt einer je Tag.
+- Neue Schlüssel `premium.*` ×6 (50 je Sprache), bewusst ohne `count`-Mehrzahl (`{{n}}`).
+
+⚠ **Nebenbefund, älter als dieser Umbau: Die Datenbank lehnte drei Quellen ab, die die App schreibt.**
+`nutrition_entries_source_check` kannte nur `manual/openfoodfacts/custom_meal/local_db`. Einträge
+aus dem **Mahlzeit-Foto (`ai_photo`)**, aus **Community-Produkten (`community`)** und dem
+**Kochbuch (`recipe`)** scheiterten beim Cloud-Insert. Lokal blieben sie stehen, aber
+`AddFoodEntry` meldete „Speichern fehlgeschlagen“. In der Datenbank gezählt: 0 solche Zeilen.
+Migration **`20261004120000_nutrition_source_erweitern.sql`** erlaubt sie, dazu `label_scan` und
+`ai_plan`. Als `begin … rollback` gegen Prod geprüft. **Eingespielt: noch nicht.**
+Auch der Slot heißt in der DB `snack`, nicht `snacks`. Der Plan-Endpunkt nutzt deshalb `snack`.
+
 ### Rechtsprüfung: AGB, Datenschutz, Widerruf, Paywall, Werbebremse (04.10.2026) — Version 1.5.4 vorbereitet
 
 **Gebaut und hochgeladen am 04.10.2026** (gemergt als PR #62, mit dem Cloudflare-Umzug — `API_BASIS` = `fullrep.pages.dev`):
@@ -53,7 +77,7 @@ Was sich geändert hat:
 - **Gemini auf bezahlten Tarif mit DPA umstellen** (oder Coach nur über Anthropic mit ZDR). Bis dahin darf in der DSE kein unbedingter Art.-28-Satz stehen.
 - **Bildrechte der Übungsfotos** (`public/exercise-demos/`, free-exercise-db): Herkunft je Bild belegen oder durch die eigenen 3D-Animationen ersetzen.
 - **Peptid-Inhalte** fachlich/rechtlich prüfen lassen (Arzneimittelwerbung, nicht zugelassene Substanzen).
-- Die Paywall bewirbt Funktionen, die es (noch) nicht gibt: „Nährwerttabelle per Foto", „KI-Ernährungsplan", „Detaillierte Analysen" (`ui.benefit*`). Nur der Coach ist hinter Premium. Vor dem nächsten Release entfernen oder bauen.
+- ~~Die Paywall bewirbt Funktionen, die es nicht gibt~~ → **am 04.10. gebaut**, siehe „Premium-Funktionen“ unten.
 - Gäste sehen Werbung ohne Altersabfrage; das Mindestalter greift nur beim Konto.
 - Wer nach dem Widerruf weder einwilligt noch per E-Mail löschen lässt, steht vor dem Gate. Ein Löschknopf direkt im Gate wäre der bessere Weg.
 
