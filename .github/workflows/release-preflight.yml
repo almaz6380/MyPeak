@@ -30,6 +30,7 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           VITE_REVENUECAT_IOS_KEY: ${{ secrets.VITE_REVENUECAT_IOS_KEY }}
+          ASC_REVIEW_PASSWORD: ${{ secrets.ASC_REVIEW_PASSWORD }}
         run: |
           fehlt=0
           # Die Laenge mitzuzeigen ist kein Leck — GitHub maskiert Werte ohnehin —,
@@ -43,6 +44,7 @@ jobs:
           minimum() {
             case "$1" in
               ANDROID_KEY_ALIAS|ASC_KEY_ID) echo 3 ;;
+              ASC_REVIEW_PASSWORD) echo 4 ;;
               *) echo 8 ;;
             esac
           }
@@ -61,6 +63,10 @@ jobs:
             fi
           }
 
+          echo "Pruefkonto fuer Apple (asc.py --pruefnotiz, seit 04.10.2026)"
+          pruefe ASC_REVIEW_PASSWORD
+
+          echo
           echo "Play-API (play-listing.yml, Upload in android-release.yml)"
           pruefe PLAY_SERVICE_ACCOUNT_JSON
 

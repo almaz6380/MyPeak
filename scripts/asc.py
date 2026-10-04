@@ -210,39 +210,46 @@ def setze_namen(tok):
 # appStoreVersions — plus der Text "Neu in dieser Version", der bei einem
 # Update Pflicht ist.
 
-WHATS_NEW = """Neue Nutzungsbedingungen und eine überarbeitete Datenschutzerklärung. \
-Die Einwilligung in die Verarbeitung von Gesundheitsdaten kannst du jetzt \
-jederzeit im Profil widerrufen. Klarere Angaben zum Premium-Abo vor dem Kauf, \
-und Werbung erscheint seltener und nie direkt nach dem Start."""
+WHATS_NEW = """Neu für Premium: Nährwerttabellen per Foto einscannen, ein persönlicher \
+KI-Ernährungsplan aus deinen Makrozielen und detaillierte Statistiken zu Training, \
+Ernährung und Gewicht. Außerdem: Mahlzeit-Fotos und Rezepte werden jetzt zuverlässig \
+in der Cloud gespeichert, neue Nutzungsbedingungen, überarbeitete Datenschutzerklärung \
+und seltener Werbung."""
 
 # "Neu in dieser Version" fuer die weiteren Sprachen der Store-Seite. Apple
 # verlangt den Text bei einem Update fuer JEDE Lokalisierung der Version —
 # lokalisieren() setzt ihn mit, sonst scheitert die Einreichung.
 WHATS_NEW_SPRACHEN = {
-    'en': "New terms of use and a revised privacy policy. You can now withdraw "
-          "your consent to the processing of health data at any time in your "
-          "profile. Clearer information about the Premium subscription before "
-          "you buy, and ads appear less often and never right after launch.",
-    'es': "Nuevas condiciones de uso y una política de privacidad revisada. Ahora "
-          "puedes retirar en cualquier momento desde tu perfil el consentimiento "
-          "para el tratamiento de datos de salud. Información más clara sobre la "
-          "suscripción Premium antes de comprar, y la publicidad aparece con menos "
-          "frecuencia y nunca justo al abrir la app.",
-    'fr': "Nouvelles conditions d’utilisation et politique de confidentialité "
-          "révisée. Tu peux désormais retirer à tout moment, dans ton profil, ton "
-          "consentement au traitement des données de santé. Des informations plus "
-          "claires sur l’abonnement Premium avant l’achat, et la publicité apparaît "
-          "moins souvent et jamais juste après le démarrage.",
-    'pt': "Novos termos de uso e uma política de privacidade revisada. Agora você "
-          "pode revogar a qualquer momento, no seu perfil, o consentimento para o "
-          "tratamento de dados de saúde. Informações mais claras sobre a assinatura "
-          "Premium antes da compra, e os anúncios aparecem com menos frequência e "
-          "nunca logo após abrir o app.",
-    'ar': "شروط استخدام جديدة وسياسة خصوصية محدّثة. يمكنك الآن سحب موافقتك على "
-          "معالجة البيانات الصحية في أي وقت من ملفك الشخصي. معلومات أوضح عن اشتراك "
-          "Premium قبل الشراء، وتظهر الإعلانات بشكل أقل ولا تظهر أبدًا مباشرة بعد "
-          "فتح التطبيق.",
+    'en': "New for Premium: scan nutrition labels with your camera, a personal AI "
+          "meal plan built from your macro targets, and detailed statistics for "
+          "training, nutrition and weight. Also: meal photos and recipes now sync "
+          "reliably to the cloud, new terms of use, a revised privacy policy and "
+          "fewer ads.",
+    'es': "Novedades en Premium: escanea tablas nutricionales con la cámara, un plan "
+          "de alimentación con IA basado en tus macros y estadísticas detalladas de "
+          "entrenamiento, nutrición y peso. Además: las fotos de comidas y las "
+          "recetas se guardan de forma fiable en la nube, nuevas condiciones de uso, "
+          "política de privacidad revisada y menos publicidad.",
+    'fr': "Nouveau dans Premium : scanne les tableaux nutritionnels avec l’appareil "
+          "photo, un plan alimentaire IA basé sur tes macros et des statistiques "
+          "détaillées sur l’entraînement, l’alimentation et le poids. Aussi : les "
+          "photos de repas et les recettes sont enregistrées de façon fiable dans le "
+          "cloud, nouvelles conditions d’utilisation, politique de confidentialité "
+          "révisée et moins de publicité.",
+    'pt': "Novo no Premium: escaneie tabelas nutricionais com a câmera, um plano "
+          "alimentar com IA a partir das suas metas de macros e estatísticas "
+          "detalhadas de treino, alimentação e peso. Além disso: fotos de refeições "
+          "e receitas agora são salvas na nuvem com segurança, novos termos de uso, "
+          "política de privacidade revisada e menos anúncios.",
+    'ar': "جديد في Premium: امسح جداول القيم الغذائية بالكاميرا، وخطة غذائية شخصية "
+          "بالذكاء الاصطناعي مبنية على أهدافك، وإحصاءات مفصلة للتمرين والتغذية "
+          "والوزن. وأيضًا: تُحفظ صور الوجبات والوصفات الآن بشكل موثوق في السحابة، "
+          "وشروط استخدام جديدة، وسياسة خصوصية محدّثة، وإعلانات أقل.",
 }
+
+
+UMBENENNBAR = {'PREPARE_FOR_SUBMISSION', 'DEVELOPER_REJECTED', 'REJECTED',
+               'METADATA_REJECTED', 'INVALID_BINARY'}
 
 
 def version_anlegen(tok, nummer):
@@ -253,8 +260,30 @@ def version_anlegen(tok, nummer):
               'REMOVED_FROM_SALE', 'DEVELOPER_REMOVED_FROM_SALE'}
     for v in vers.get('data', []):
         if v['attributes'].get('appStoreState') not in fertig:
-            print(f'  Version {v["attributes"]["versionString"]} ist schon offen '
-                  f'({v["attributes"].get("appStoreState")}) — nichts anzulegen.')
+            alt_nr = v['attributes']['versionString']
+            zustand = v['attributes'].get('appStoreState')
+            # Eine offene, nicht eingereichte Version wird UMBENANNT statt neu
+            # angelegt: ASC erlaubt nur eine offene Version, und so bleiben
+            # Lokalisierungen und Screenshots erhalten (04.10.2026: 1.5.3 lag
+            # noch offen, als 1.5.5 kam). Eine Version in der Pruefung laesst
+            # sich nicht umbenennen — erst --aufraeumen.
+            if alt_nr != str(nummer):
+                if zustand in UMBENENNBAR:
+                    if TROCKEN:
+                        print(f'  [trocken] wuerde Version {alt_nr} -> {nummer} umbenennen')
+                    else:
+                        res = api(tok, f'appStoreVersions/{v["id"]}', 'PATCH', {
+                            'data': {'type': 'appStoreVersions', 'id': v['id'],
+                                     'attributes': {'versionString': str(nummer)}},
+                        }, fatal=False)
+                        if res.get('_fehler'):
+                            sys.exit(f'  Umbenennen gescheitert: {fehler_text(res)}')
+                        print(f'  Version {alt_nr} ({zustand}) -> {nummer} umbenannt')
+                else:
+                    sys.exit(f'  Version {alt_nr} ist offen ({zustand}) und laesst sich '
+                             f'nicht umbenennen. Erst --aufraeumen, dann erneut.')
+            else:
+                print(f'  Version {alt_nr} ist schon offen ({zustand}) — nichts anzulegen.')
             _whats_new(tok, v)
             return
     if TROCKEN:
