@@ -25,7 +25,7 @@ const gemini = (text = 'Antwort vom Coach.') => ({
 });
 const claude = (text = 'Antwort von Claude.') => ({
   match: (u) => u.includes('api.anthropic.com'),
-  respond: () => jsonResponse({ content: [{ type: 'text', text }] }),
+  respond: () => jsonResponse({ content: [{ type: 'text', text }], stop_reason: 'end_turn' }),
 });
 
 const frage = (messages = [{ role: 'user', content: 'Wie viel Protein am Tag?' }], lang) =>
@@ -311,28 +311,49 @@ describe('/api/coach', () => {
       expect(fetchMock.to('generativelanguage')).toHaveLength(0);
     });
 
-    it('nimmt für kurze Fragen das kleine Modell, für lange das große', async () => {
+    it('nimmt Claude Opus 5.5 mit Aufwand „low", Modell und Aufwand per Umgebung umstellbar', async () => {
       setEnv({ ...ENV_FULL, ANTHROPIC_API_KEY: 'sk-test' });
-      const kurz = installFetch([authRoute(), abo(PREMIUM), nutzung(0), claude()]);
-      await handler(frage([{ role: 'user', content: 'Kreatin?' }]), makeRes());
-      expect(kurz.to('api.anthropic.com')[0].body.model).toContain('haiku');
+      const f = installFetch([authRoute(), abo(PREMIUM), nutzung(0), claude()]);
+      await handler(frage(), makeRes());
+      const body = f.to('api.anthropic.com')[0].body;
+      expect(body.model).toBe('claude-opus-5-5');
+      expect(body.output_config).toEqual({ effort: 'low' });
+      expect(body.system).toContain('FullRep');
 
-      const lang = installFetch([authRoute(), abo(PREMIUM), nutzung(0), claude()]);
-      await handler(frage([{ role: 'user', content: 'Frage '.repeat(60) }]), makeRes());
-      expect(lang.to('api.anthropic.com')[0].body.model).toContain('sonnet');
+      setEnv({ ...ENV_FULL, ANTHROPIC_API_KEY: 'sk-test', CLAUDE_MODELL: 'claude-haiku-4-5' });
+      const h = installFetch([authRoute(), abo(PREMIUM), nutzung(0), claude()]);
+      await handler(frage(), makeRes());
+      const hb = h.to('api.anthropic.com')[0].body;
+      expect(hb.model).toBe('claude-haiku-4-5');
+      // Haiku kennt den Aufwand-Regler nicht.
+      expect(hb.output_config).toBeUndefined();
     });
 
-    it('fällt auf Gemini zurück, wenn Claude ausfällt', async () => {
+    it('weicht NICHT auf Gemini aus, wenn Claude ausfällt (Datenschutz)', async () => {
       setEnv({ ...ENV_FULL, ANTHROPIC_API_KEY: 'sk-test' });
-      installFetch([
+      const f = installFetch([
         authRoute(), abo(PREMIUM), nutzung(0),
         { match: (u) => u.includes('api.anthropic.com'), respond: () => jsonResponse({}, 529) },
         gemini('Von Gemini nach Ausfall.'),
       ]);
       const res = makeRes();
       await handler(frage(), res);
-      expect(res.statusCode).toBe(200);
-      expect(res.body.reply).toBe('Von Gemini nach Ausfall.');
+      expect(res.statusCode).toBe(503);
+      expect(f.to('generativelanguage')).toHaveLength(0);
+      // Kein Wiederholversuch: die App wartet nur 28 s.
+      expect(f.to('api.anthropic.com')).toHaveLength(1);
+    });
+
+    it('meldet 503 bei einer Ablehnung durch Claude und zählt das Kontingent nicht hoch', async () => {
+      setEnv({ ...ENV_FULL, ANTHROPIC_API_KEY: 'sk-test' });
+      const f = installFetch([
+        authRoute(), abo(PREMIUM), nutzung(0),
+        { match: (u) => u.includes('api.anthropic.com'), respond: () => jsonResponse({ content: [], stop_reason: 'refusal' }) },
+      ]);
+      const res = makeRes();
+      await handler(frage(), res);
+      expect(res.statusCode).toBe(503);
+      expect(f.calls.filter((c) => c.init.method === 'POST' && c.url.includes('coach_usage'))).toHaveLength(0);
     });
 
     it('meldet 503, wenn beide Anbieter ausfallen', async () => {

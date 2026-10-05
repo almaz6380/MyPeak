@@ -1,4 +1,5 @@
 import { corsBehandeln } from './_cors.js';
+import { claudeAktiv, claudeJson, istRateLimit } from './_ki.js';
 import { apiSprache } from './_sprache.js';
 
 // ── Prompt je Sprache ─────────────────────────────────────────────
@@ -141,7 +142,7 @@ export default async function handler(req, res) {
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
+  if (!apiKey && !claudeAktiv()) {
     return res.status(500).json({ error: 'API key not configured' });
   }
 
@@ -187,6 +188,24 @@ export default async function handler(req, res) {
   }
 
   const prompt = mahlzeitPrompt(apiSprache(language));
+
+  // Mit Claude-Schlüssel nur Claude, ohne Ausweichen auf Gemini (api/_ki.js).
+  // Kein Wiederholversuch: Die App bricht nach 25 s ab.
+  if (claudeAktiv()) {
+    try {
+      const parsed = await claudeJson({ text: prompt, bildBase64: base64Data, timeoutMs: 22000 });
+      return res.status(200).json(parsed);
+    } catch (err) {
+      console.error('analyze-meal Claude-Fehler:', err?.message);
+      if (istRateLimit(err)) {
+        return res.status(429).json({ error: 'rate_limit', message: 'AI service is busy. Please wait a moment and try again.' });
+      }
+      if (err instanceof SyntaxError || err?.message === 'claude_no_json') {
+        return res.status(422).json({ error: 'Could not parse AI response' });
+      }
+      return res.status(503).json({ error: 'ai_unavailable', message: 'AI service unavailable. Please try again.' });
+    }
+  }
 
   // ⚠ Modellname synchron mit api/coach.js halten und NIE raten — mit
   // /api/gemini-modelle?probe=<name> nachmessen. 2.0-flash abgeschaltet,

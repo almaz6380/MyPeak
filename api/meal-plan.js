@@ -11,9 +11,10 @@
 import { corsBehandeln } from './_cors.js';
 import { apiSprache } from './_sprache.js';
 import {
-  premiumPruefen, kontingentLesen, kontingentHochzaehlen, geminiJson,
+  premiumPruefen, kontingentLesen, kontingentHochzaehlen,
   SPRACHNAME, TRIAL_LIMIT, PREMIUM_LIMIT, zahl,
 } from './_premium.js';
+import { kiJson, kiVerfuegbar } from './_ki.js';
 
 export const config = { maxDuration: 30 };
 
@@ -90,8 +91,7 @@ export default async function handler(req, res) {
   if (corsBehandeln(req, res)) return;
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(503).json({ error: 'Service unavailable' });
+  if (!kiVerfuegbar()) return res.status(503).json({ error: 'Service unavailable' });
 
   const pruefung = await premiumPruefen(req);
   if (pruefung.fehler) return res.status(pruefung.fehler.status).json(pruefung.fehler.body);
@@ -110,7 +110,7 @@ export default async function handler(req, res) {
 
   let plan;
   try {
-    plan = planNormalisieren(await geminiJson(apiKey, { parts: [{ text: planPrompt(eingabe) }], maxTokens: 8192 }));
+    plan = planNormalisieren(await kiJson({ text: planPrompt(eingabe), maxTokens: 8192, timeoutMs: 32000 }));
   } catch (err) {
     console.error('meal-plan Modellfehler:', err?.message);
     return res.status(503).json({ error: 'ai_unavailable' });

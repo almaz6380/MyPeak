@@ -19,6 +19,41 @@ Arabisch (RTL) — **vollständig**, Oberfläche wie Inhaltsbibliotheken (siehe 
 
 ## Aktueller Stand
 
+### KI auf Claude umgestellt, Gemini raus (05.10.2026)
+
+**Anlass:** AVV-Prüfung. Googles Bedingungen erlauben die Gemini-API für Nutzer im EWR
+nur im **bezahlten** Tarif („You may use only Paid Services when making API Clients
+available to users in the EEA"), und im kostenlosen Tarif nutzt Google Eingaben zur
+Produktverbesserung. Für Coach-Nachrichten mit Blutwerten nicht tragbar. Anthropic:
+DPA ist Teil der Commercial Terms, „Anthropic may not train models on Customer Content".
+
+| Was | Wo |
+|---|---|
+| Gemeinsamer Claude-Zugang (`@anthropic-ai/sdk`), `claudeText`, `claudeJson`, `kiJson` | **`api/_ki.js`** |
+| Coach, Mahlzeit-Foto, Nährwerttabelle, Ernährungsplan | `coach.js`, `analyze-meal.js`, `scan-label.js`, `meal-plan.js` |
+| Datenschutzerklärung ×6: Anthropic für alle vier KI-Funktionen, Gemini raus, Stand 5. Oktober 2026 | `legalContent.js`, `uebersetzungen/*.js` |
+| Tests | `tests/api/claude.test.js`, `coach.test.js` (Modellwahl umgeschrieben) |
+
+- **Ist `ANTHROPIC_API_KEY` gesetzt, läuft ALLES über Claude, ohne Ausweichen auf
+  Gemini** — ein stilles Ausweichen würde die Datenschutzzusage brechen. Ohne Schlüssel
+  bleibt alles wie vorher (Gemini).
+- Modell `claude-opus-5-5`, Aufwand `low`, **kein Wiederholversuch**. Grund: Die Apps
+  im Store haben feste Zeitlimits (Coach 28 s, Foto 25 s, Etikett 28 s, Plan 35 s); der
+  Server bleibt mit 25/22/25/32 s darunter. Umstellbar ohne Code über die
+  Cloudflare-Variablen `CLAUDE_MODELL` und `CLAUDE_EFFORT` (bei Haiku wird kein Aufwand
+  gesendet, sonst 400).
+- Bei `stop_reason: refusal` → 503, Kontingent wird nicht hochgezählt.
+- Das SDK läuft auf Cloudflare **ohne `nodejs_compat`** (gebaut mit
+  `wrangler pages functions build`, lokal mit `wrangler pages dev` gestartet).
+- ⚠ Das SDK braucht `response.headers`. Die Test-Attrappen (`jsonResponse`,
+  `textResponse`) tragen deshalb jetzt `headers`.
+- ⚠ **Reihenfolge:** Erst den Schlüssel in Cloudflare setzen, dann mergen. Sonst
+  nennt die Datenschutzerklärung Anthropic, während noch Gemini antwortet.
+- Danach `GEMINI_API_KEY` in Cloudflare löschen; dann kann Gemini gar nicht mehr
+  aufgerufen werden. (`/api/gemini-modelle` meldet dann 503, das ist gewollt.)
+- Apple App-Datenschutz und Play-Datensicherheit müssen nicht geändert werden: dieselben
+  Datentypen, nur ein anderer Dienstleister.
+
 ### Release 1.5.5 (04.10.2026): Premium-Funktionen + Rechtstexte
 
 | | Stand |
@@ -143,7 +178,7 @@ Zeigt sich dort ein Fehler `1102`/„exceeded CPU“, hilft der Workers-Paid-Tar
 | `REVENUECAT_WEBHOOK_SECRET` | ✅ **neu erzeugt** (der alte war in Vercel nicht mehr lesbar) und in RevenueCat beim Webhook „MyPeak Supabase“ als Authorization-Wert gesetzt, URL dort auf `fullrep.pages.dev` |
 | `CRON_SECRET` | ✅ neu erzeugt, in Cloudflare **und** als GitHub-Secret |
 | `VITE_REVENUECAT_WEB_API_KEY` | bewusst **nicht** gesetzt: Kauf im Browser ist aus (`PURCHASE_ENABLED.web = false`), in Vercel stand nur ein Sandbox-Schlüssel |
-| `ANTHROPIC_API_KEY` | nicht gesetzt, der Coach läuft über Gemini |
+| `ANTHROPIC_API_KEY` | ab 05.10.2026 nötig: alle KI-Funktionen laufen über Claude (siehe „KI auf Claude umgestellt“) |
 | Supabase Auth: Site-URL + Redirect-URL `https://fullrep.pages.dev/**` | offen |
 | Play Console: Website + Datenschutz-URL, AdMob app-ads.txt | offen |
 
@@ -2412,7 +2447,7 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
 - **Lebensmittel-API:** Open Food Facts (kostenlos, keine API-Keys)
 - **PWA:** manifest.json + Service Worker (installierbar auf Homescreen)
 - **Icons:** Lucide React
-- **KI-Foto-Erkennung:** Google Gemini 2.0 Flash (kostenlos, Vision API via Vercel Serverless Function)
+- **KI (Coach, Foto, Nährwerttabelle, Ernährungsplan):** Anthropic Claude über `api/_ki.js` (seit 05.10.2026; vorher Google Gemini)
 - **Schrift:** Inter (Google Fonts)
 
 ### Besucherzählung: Vercel Web Analytics (20.09.2026) — am 04.10.2026 wieder entfernt (Umzug auf Cloudflare)

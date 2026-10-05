@@ -26,10 +26,13 @@ export function makeRes() {
 }
 
 // ── fetch-Attrappe ────────────────────────────────────────────────
+// `headers` braucht das Anthropic-SDK (liest content-type und request-id);
+// die übrigen Handler sehen nur ok/status/json/text.
 export function jsonResponse(body, status = 200) {
   return {
     ok: status >= 200 && status < 300,
     status,
+    headers: new Headers({ 'content-type': 'application/json' }),
     json: async () => body,
     text: async () => JSON.stringify(body),
   };
@@ -39,6 +42,7 @@ export function textResponse(text, status = 200) {
   return {
     ok: status >= 200 && status < 300,
     status,
+    headers: new Headers({ 'content-type': 'text/plain' }),
     json: async () => JSON.parse(text),
     text: async () => text,
   };
@@ -92,6 +96,8 @@ export const ENV_FULL = {
   SUPABASE_SERVICE_ROLE_KEY: 'service-key',
   GEMINI_API_KEY: 'gemini-key',
   ANTHROPIC_API_KEY: undefined,
+  CLAUDE_MODELL: undefined,
+  CLAUDE_EFFORT: undefined,
   REVENUECAT_WEBHOOK_SECRET: 'rc-secret',
   CRON_SECRET: 'cron-secret',
 };

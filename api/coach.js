@@ -2,15 +2,15 @@
 // Beantwortet ausschließlich Fragen zu Training, Ernährung und Supplementen.
 // Premium-Feature mit serverseitigem Tageskontingent pro Nutzer.
 //
-// Modell: nutzt Google Gemini (schon konfiguriert, kostenlos). Ist zusätzlich
-// ANTHROPIC_API_KEY gesetzt, werden Claude-Modelle gestuft eingesetzt
-// (Haiku für einfache, Sonnet für komplexe Fragen) mit Gemini als Fallback.
+// Modell: Ist ANTHROPIC_API_KEY gesetzt, antwortet ausschließlich Claude
+// (api/_ki.js, seit 05.10.2026). Nur ohne diesen Schlüssel noch Gemini.
 //
-// Benötigte Env-Vars: GEMINI_API_KEY, SUPABASE_URL(+ANON), SUPABASE_SERVICE_ROLE_KEY.
-// Optional: ANTHROPIC_API_KEY.
+// Benötigte Env-Vars: ANTHROPIC_API_KEY (sonst GEMINI_API_KEY),
+// SUPABASE_URL(+ANON), SUPABASE_SERVICE_ROLE_KEY.
 
 import coachKnowledge from './_coachKnowledge.js';
 import { corsBehandeln } from './_cors.js';
+import { claudeAktiv, claudeText } from './_ki.js';
 import { apiSprache } from './_sprache.js';
 
 const TRIAL_LIMIT = 5;     // Coach-Fragen/Tag während der Testphase
@@ -165,49 +165,15 @@ async function callGemini(apiKey, sys, messages, signal) {
   return text.trim();
 }
 
-async function callClaude(apiKey, model, sys, messages, signal) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({
-      model,
-      max_tokens: 800,
-      system: sys,
-      messages: messages.map((m) => ({
-        role: m.role === 'assistant' ? 'assistant' : 'user',
-        content: String(m.content || ''),
-      })),
-    }),
-    signal,
-  });
-  if (!res.ok) throw new Error('claude_' + res.status);
-  const data = await res.json();
-  const text = data.content?.find((b) => b.type === 'text')?.text;
-  if (!text) throw new Error('claude_empty');
-  return text.trim();
-}
-
-// Gestufter Einsatz mit Fallback: Claude (falls Key) → sonst/danach Gemini.
+// Ist ein Claude-Schlüssel gesetzt, antwortet NUR Claude — ohne Ausweichen auf
+// Gemini (Begründung in api/_ki.js). Ohne Schlüssel bleibt es bei Gemini.
 async function generateReply(sys, messages) {
-  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  if (claudeAktiv()) {
+    return claudeText({ system: sys, messages, timeoutMs: 25000 });
+  }
   const geminiKey = process.env.GEMINI_API_KEY;
-  const lastUser = [...messages].reverse().find((m) => m.role === 'user')?.content || '';
-  const complex = String(lastUser).length > 240;
-  const withTimeout = () => AbortSignal.timeout(22000);
-
-  const attempts = [];
-  if (anthropicKey) {
-    attempts.push(() => callClaude(anthropicKey, complex ? 'claude-sonnet-5' : 'claude-haiku-4-5', sys, messages, withTimeout()));
-  }
-  if (geminiKey) {
-    attempts.push(() => callGemini(geminiKey, sys, messages, withTimeout()));
-  }
-
-  let lastErr = null;
-  for (const attempt of attempts) {
-    try { return await attempt(); } catch (err) { lastErr = err; }
-  }
-  throw lastErr || new Error('no_model_configured');
+  if (!geminiKey) throw new Error('no_model_configured');
+  return callGemini(geminiKey, sys, messages, AbortSignal.timeout(22000));
 }
 
 // ── Supabase (Service-Role) ───────────────────────────────────────

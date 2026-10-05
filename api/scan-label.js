@@ -11,7 +11,8 @@
 
 import { corsBehandeln } from './_cors.js';
 import { apiSprache } from './_sprache.js';
-import { premiumPruefen, geminiJson, SPRACHNAME, zahl } from './_premium.js';
+import { premiumPruefen, SPRACHNAME, zahl } from './_premium.js';
+import { kiJson, kiVerfuegbar, istRateLimit } from './_ki.js';
 
 export const config = { maxDuration: 30 };
 
@@ -78,8 +79,7 @@ export default async function handler(req, res) {
   if (corsBehandeln(req, res)) return;
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(503).json({ error: 'Service unavailable' });
+  if (!kiVerfuegbar()) return res.status(503).json({ error: 'Service unavailable' });
 
   const pruefung = await premiumPruefen(req);
   if (pruefung.fehler) return res.status(pruefung.fehler.status).json(pruefung.fehler.body);
@@ -91,16 +91,10 @@ export default async function handler(req, res) {
 
   let roh;
   try {
-    roh = await geminiJson(apiKey, {
-      parts: [
-        { text: etikettPrompt(language) },
-        { inline_data: { mime_type: 'image/jpeg', data: base64 } },
-      ],
-      maxTokens: 2048,
-    });
+    roh = await kiJson({ text: etikettPrompt(language), bildBase64: base64, maxTokens: 2048, timeoutMs: 25000 });
   } catch (err) {
     console.error('scan-label Modellfehler:', err?.message);
-    if (String(err?.message) === 'gemini_429') return res.status(429).json({ error: 'rate_limit' });
+    if (String(err?.message) === 'gemini_429' || istRateLimit(err)) return res.status(429).json({ error: 'rate_limit' });
     return res.status(503).json({ error: 'ai_unavailable' });
   }
 
