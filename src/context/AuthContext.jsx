@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core';
 import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { loadSettings } from '../data/settingsStorage';
@@ -166,6 +167,15 @@ export function AuthProvider({ children }) {
     // ausschließlich hierüber aktualisiert werden.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        // Link aus der Passwort-Mail: Supabase fällt auf die site_url (Startseite)
+        // zurück, wenn die redirectTo-Adresse nicht in der Erlaubnisliste steht —
+        // genau das passiert bei Anfragen aus der App (capacitor://localhost). Dann
+        // stünde der Nutzer eingeloggt auf der Startseite, ohne Formular für das
+        // neue Passwort. Deshalb hier selbst auf die richtige Seite wechseln.
+        if (event === 'PASSWORD_RECOVERY' && window.location.pathname !== '/auth/update-password') {
+          window.location.replace('/auth/update-password');
+          return;
+        }
         const supaUser = session?.user ?? null;
         // Im Gastmodus ohne echte Session nichts überschreiben (Gast bleibt Gast).
         if (!supaUser && localStorage.getItem('guestMode') === 'true') return;
@@ -242,7 +252,9 @@ export function AuthProvider({ children }) {
 
   async function resetPassword(email) {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/update-password`,
+      // In der App ist origin capacitor://localhost bzw. https://localhost — dorthin
+      // kann ein Mail-Link nicht führen. Dann immer die Web-Fassung nehmen.
+      redirectTo: `${Capacitor.isNativePlatform() ? 'https://fullrep.pages.dev' : window.location.origin}/auth/update-password`,
     });
     return { data, error };
   }
