@@ -8,7 +8,7 @@ on:
       mode:
         description: 'Was aktualisiert wird'
         type: choice
-        options: [screenshots, texte, grafiken, abos, abo-setzen, abo-titel]
+        options: [screenshots, texte, grafiken, abos, abo-setzen, abo-titel, website]
         default: screenshots
       lang:
         description: 'Sprache des Store-Eintrags'
@@ -64,6 +64,10 @@ jobs:
           fi
 
           case "$MODE" in
+            website)
+              # Website im Eintrag (contactWebsite). Daran haengt app-ads.txt.
+              python3 scripts/play-upload.py --website https://fullrep.pages.dev "${GEMEINSAM[@]}"
+              ;;
             abo-titel)
               # Nur der Anzeigename. Getrennt vom Preis, weil der Preis-PATCH
               # die komplette Regionstabelle mitvalidiert und an Altlasten

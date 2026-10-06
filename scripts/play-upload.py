@@ -331,6 +331,33 @@ def setze_listing(tok, datei, lang, dry_run=False):
     commit_edit(tok, eid)
 
 
+def setze_website(tok, url, dry_run=False):
+    """Website im Play-Eintrag setzen (edits.details, Feld contactWebsite).
+
+    Daran haengt auch app-ads.txt: Google sucht die Datei unter
+    <contactWebsite>/app-ads.txt. Nach dem Umzug auf Cloudflare (04.10.2026)
+    stand hier noch die gesperrte Vercel-Adresse. Die Datenschutz-URL liegt
+    NICHT hier, sondern unter „App-Inhalte“ und geht nur von Hand.
+    """
+    if not url.startswith('https://'):
+        sys.exit(f'Website muss mit https:// beginnen: {url}')
+    eid = call(tok, 'POST', f'{API}/applications/{PKG}/edits')['id']
+    durl = f'{API}/applications/{PKG}/edits/{eid}/details'
+    alt = call(tok, 'GET', durl)
+    print(f"Website: {alt.get('contactWebsite') or '(leer)'} -> {url}")
+    print(f"  (E-Mail {alt.get('contactEmail')}, Standardsprache {alt.get('defaultLanguage')} bleiben)")
+    if alt.get('contactWebsite') == url:
+        call(tok, 'DELETE', f'{API}/applications/{PKG}/edits/{eid}')
+        print('Schon gesetzt, nichts zu tun.')
+        return
+    if dry_run:
+        call(tok, 'DELETE', f'{API}/applications/{PKG}/edits/{eid}')
+        print('--dry-run: Edit verworfen.')
+        return
+    call(tok, 'PATCH', durl, data={'contactWebsite': url})
+    commit_edit(tok, eid)
+
+
 def zeige_abos(tok):
     """Play-Abos lesen: Produkt, Basis-Tarife, Zustand, Preise.
 
@@ -477,6 +504,8 @@ def main():
                    help='App-Symbol im Store-Eintrag ersetzen (512x512)')
     p.add_argument('--feature', metavar='PNG',
                    help='Vorstellungsgrafik ersetzen (1024x500)')
+    p.add_argument('--website', metavar='URL',
+                   help='Website im Play-Eintrag setzen (contactWebsite, fuer app-ads.txt)')
     p.add_argument('--lang', default='de-DE', help='Sprache des Eintrags (Standard: de-DE)')
     p.add_argument('--dry-run', action='store_true',
                    help='nur auflisten, nichts hochladen — das Listing ist oeffentlich')
@@ -486,9 +515,9 @@ def main():
     a = p.parse_args()
 
     if not (a.aab or a.promote or a.status or a.abos or a.abo_setzen or a.screenshots
-            or a.listing or a.icon or a.feature):
+            or a.listing or a.icon or a.feature or a.website):
         p.error('--aab, --promote, --status, --abos, --screenshots, --listing, '
-                '--icon oder --feature angeben')
+                '--icon, --feature oder --website angeben')
     if a.aab and not a.complete and a.fraction is None:
         p.error('--fraction 0.2 oder --complete angeben')
 
@@ -507,6 +536,8 @@ def main():
         return lade_screenshots(tok, a.screenshots, a.lang, a.dry_run)
     if a.listing:
         return setze_listing(tok, a.listing, a.lang, a.dry_run)
+    if a.website:
+        return setze_website(tok, a.website, a.dry_run)
     if a.icon:
         return lade_einzelbild(tok, a.icon, a.lang, 'icon', a.dry_run)
     if a.feature:
