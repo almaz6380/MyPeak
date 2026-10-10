@@ -2406,7 +2406,10 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
 - **i18n:** react-i18next (de, en, es, fr, pt, ar; neue Sprache = eine Zeile in `src/lib/sprache.js`)
 - **Backend:** Supabase (Auth + PostgreSQL-Datenbank)
 - **Hosting:** Cloudflare Pages (seit 04.10.2026, automatisches Deployment über GitHub; vorher Vercel)
-- **Besucherzählung:** keine (Vercel Web Analytics am 04.10.2026 mit dem Umzug entfernt)
+- **Besucherzählung:** Cloudflare Web Analytics seit 08.10.2026 — von Josef im Pages-Projekt `fullrep`
+  eingeschaltet (Metrics → Web Analytics), Cloudflare spielt das Skript selbst ein, nichts im Code. Nur
+  Web: die Apps laden ihr eigenes Paket. Datenschutz (alle 6 Sprachen, Punkt 3 + 4) seit 10.10. angepasst —
+  vorher stand dort „keine Besucherzählung“. (Vercel Web Analytics war am 04.10. mit dem Umzug entfernt worden.)
 - **Datenspeicherung:** Supabase (Cloud) + localStorage (Cache/Fallback)
 - **Barcode-Scanner:** Quagga2 (Open Source, optimiert für 1D-Barcodes)
 - **Lebensmittel-API:** Open Food Facts (kostenlos, keine API-Keys)
