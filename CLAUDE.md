@@ -32,6 +32,13 @@ Arabisch (RTL) — **vollständig**, Oberfläche wie Inhaltsbibliotheken (siehe 
   Vorgabewert NULL = „nie gewählt". `loadSettings` übernimmt nur noch eine echte Wahl.
 - Web: mit dem Merge live. Store-Apps erst mit dem nächsten Build.
 
+### Release 1.5.6 (11.10.2026)
+
+Startsprache + Sprachwahl-Fix (Abschnitt darüber). Android **vc25 auf `production`, an alle**;
+iOS **Build 16 eingereicht**, Einreichung `2b5f3d79-aec8-4f82-89cc-15a980378703`,
+WAITING_FOR_REVIEW (Ablauf: `version-anlegen 1.5.6` → `lokalisieren` → `build 16` →
+`einreichen`, alles `laeufer: mac`). 1.5.5 war vorher schon live.
+
 ### Release 1.5.5 (04.10.2026): Premium-Funktionen + Rechtstexte
 
 | | Stand |
