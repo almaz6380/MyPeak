@@ -19,6 +19,19 @@ Arabisch (RTL) — **vollständig**, Oberfläche wie Inhaltsbibliotheken (siehe 
 
 ## Aktueller Stand
 
+### Startsprache = Gerätesprache + Sprachwahl speichert endlich (11.10.2026)
+
+- **Start:** Wahl im Profil (`localStorage.language`) gewinnt, sonst Gerätesprache
+  (`geraeteSprache()` in `src/i18n/index.js`), sonst **Englisch**. Vorher startete jede
+  neue Installation auf Deutsch.
+- **Fehler, seit 1.4.0 im Code:** `user_settings.language` hatte noch `CHECK (de, en)`.
+  Eine Wahl von es/fr/pt/ar schrieb `saveSetting` still ins Leere (Update ohne
+  Fehlerprüfung), und `loadSettings` setzte die App bei der nächsten Anmeldung auf den
+  alten Wert zurück. Migration **`20261011120000_sprache_alle.sql`, in Prod eingespielt
+  am 11.10.** (Trockenlauf, echt, Constraint nachgelesen): alle sechs Sprachen,
+  Vorgabewert NULL = „nie gewählt". `loadSettings` übernimmt nur noch eine echte Wahl.
+- Web: mit dem Merge live. Store-Apps erst mit dem nächsten Build.
+
 ### Release 1.5.5 (04.10.2026): Premium-Funktionen + Rechtstexte
 
 | | Stand |

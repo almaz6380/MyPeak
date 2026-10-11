@@ -7,8 +7,32 @@ import fr from './locales/fr.json';
 import pt from './locales/pt.json';
 import ar from './locales/ar.json';
 import { CUSTOM_NAME_PREFIX } from '../data/exercises';
+import { SPRACHEN } from '../lib/sprache';
 
-const savedLanguage = localStorage.getItem('language') || 'de';
+// Startsprache: eine Wahl im Profil (localStorage) gewinnt, sonst die Sprache
+// des Geräts, sonst Englisch. Bis 10/2026 startete jede neue Installation auf
+// Deutsch — auch in Brasilien, obwohl es Portugiesisch gibt.
+export function geraeteSprache() {
+  const liste = typeof navigator === 'undefined'
+    ? []
+    : navigator.languages?.length ? navigator.languages : [navigator.language];
+  for (const l of liste) {
+    const code = (l ?? '').toLowerCase().slice(0, 2);
+    if (SPRACHEN.includes(code)) return code;
+  }
+  return 'en';
+}
+
+function gespeicherteSprache() {
+  try {
+    const s = localStorage.getItem('language');
+    return SPRACHEN.includes(s) ? s : null;
+  } catch {
+    return null;
+  }
+}
+
+const savedLanguage = gespeicherteSprache() || geraeteSprache();
 
 i18n.use(initReactI18next).init({
   resources: {

@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { isGuest } from '../context/AuthContext';
+import { SPRACHEN } from '../lib/sprache';
 
 export async function loadSettings(userId) {
   if (isGuest(userId)) return null;
@@ -12,7 +13,9 @@ export async function loadSettings(userId) {
 
   if (!error && data) {
     localStorage.setItem('weightUnit', data.weight_unit || 'kg');
-    localStorage.setItem('language', data.language || 'de');
+    // Nur eine echte Wahl übernehmen. NULL heißt „nie gewählt" — dann bleibt
+    // die Gerätesprache stehen, statt auf Deutsch zurückzuspringen.
+    if (SPRACHEN.includes(data.language)) localStorage.setItem('language', data.language);
     // Cloud-Dark-Mode geräteübergreifend anwenden: themeChosen setzen (aktive
     // Wahl zählt auch nach Reload) und ThemeProvider benachrichtigen — sonst
     // ist der ThemeContext schon initialisiert und ignoriert den neuen Wert.
