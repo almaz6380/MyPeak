@@ -30,7 +30,7 @@ Arabisch (RTL) — **vollständig**, Oberfläche wie Inhaltsbibliotheken (siehe 
   alten Wert zurück. Migration **`20261011120000_sprache_alle.sql`, in Prod eingespielt
   am 11.10.** (Trockenlauf, echt, Constraint nachgelesen): alle sechs Sprachen,
   Vorgabewert NULL = „nie gewählt". `loadSettings` übernimmt nur noch eine echte Wahl.
-- Web: mit dem Merge live. Store-Apps erst mit dem nächsten Build.
+- Web: mit dem Merge live. Store-Apps: mit 1.5.6 (iOS Build 16 eingereicht, Android vc25 in Produktion, 11.10.).
 
 ### Release 1.5.6 (11.10.2026)
 
