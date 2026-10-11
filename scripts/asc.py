@@ -210,41 +210,30 @@ def setze_namen(tok):
 # appStoreVersions — plus der Text "Neu in dieser Version", der bei einem
 # Update Pflicht ist.
 
-WHATS_NEW = """Neu für Premium: Nährwerttabellen per Foto einscannen, ein persönlicher \
-KI-Ernährungsplan aus deinen Makrozielen und detaillierte Statistiken zu Training, \
-Ernährung und Gewicht. Außerdem: Mahlzeit-Fotos und Rezepte werden jetzt zuverlässig \
-in der Cloud gespeichert, neue Nutzungsbedingungen, überarbeitete Datenschutzerklärung \
-und seltener Werbung."""
+WHATS_NEW = """FullRep startet jetzt in der Sprache deines Geräts. Und deine Sprachwahl \
+bleibt erhalten: Spanisch, Französisch, Portugiesisch und Arabisch sprangen nach \
+der nächsten Anmeldung bisher auf Deutsch zurück. Dazu kleinere Verbesserungen."""
 
 # "Neu in dieser Version" fuer die weiteren Sprachen der Store-Seite. Apple
 # verlangt den Text bei einem Update fuer JEDE Lokalisierung der Version —
 # lokalisieren() setzt ihn mit, sonst scheitert die Einreichung.
 WHATS_NEW_SPRACHEN = {
-    'en': "New for Premium: scan nutrition labels with your camera, a personal AI "
-          "meal plan built from your macro targets, and detailed statistics for "
-          "training, nutrition and weight. Also: meal photos and recipes now sync "
-          "reliably to the cloud, new terms of use, a revised privacy policy and "
-          "fewer ads.",
-    'es': "Novedades en Premium: escanea tablas nutricionales con la cámara, un plan "
-          "de alimentación con IA basado en tus macros y estadísticas detalladas de "
-          "entrenamiento, nutrición y peso. Además: las fotos de comidas y las "
-          "recetas se guardan de forma fiable en la nube, nuevas condiciones de uso, "
-          "política de privacidad revisada y menos publicidad.",
-    'fr': "Nouveau dans Premium : scanne les tableaux nutritionnels avec l’appareil "
-          "photo, un plan alimentaire IA basé sur tes macros et des statistiques "
-          "détaillées sur l’entraînement, l’alimentation et le poids. Aussi : les "
-          "photos de repas et les recettes sont enregistrées de façon fiable dans le "
-          "cloud, nouvelles conditions d’utilisation, politique de confidentialité "
-          "révisée et moins de publicité.",
-    'pt': "Novo no Premium: escaneie tabelas nutricionais com a câmera, um plano "
-          "alimentar com IA a partir das suas metas de macros e estatísticas "
-          "detalhadas de treino, alimentação e peso. Além disso: fotos de refeições "
-          "e receitas agora são salvas na nuvem com segurança, novos termos de uso, "
-          "política de privacidade revisada e menos anúncios.",
-    'ar': "جديد في Premium: امسح جداول القيم الغذائية بالكاميرا، وخطة غذائية شخصية "
-          "بالذكاء الاصطناعي مبنية على أهدافك، وإحصاءات مفصلة للتمرين والتغذية "
-          "والوزن. وأيضًا: تُحفظ صور الوجبات والوصفات الآن بشكل موثوق في السحابة، "
-          "وشروط استخدام جديدة، وسياسة خصوصية محدّثة، وإعلانات أقل.",
+    'en': "FullRep now starts in your device language, and your language choice "
+          "sticks: Spanish, French, Portuguese and Arabic used to fall back to "
+          "German after your next sign-in. Plus smaller improvements.",
+    'es': "FullRep ahora se abre en el idioma de tu dispositivo y tu elección de "
+          "idioma se mantiene: el español, el francés, el portugués y el árabe "
+          "volvían al alemán al iniciar sesión de nuevo. Además, pequeñas mejoras.",
+    'fr': "FullRep démarre désormais dans la langue de ton appareil, et ton choix "
+          "de langue est conservé : l’espagnol, le français, le portugais et "
+          "l’arabe repassaient en allemand à la connexion suivante. Et quelques "
+          "petites améliorations.",
+    'pt': "O FullRep agora abre no idioma do seu aparelho, e sua escolha de idioma "
+          "fica salva: espanhol, francês, português e árabe voltavam para o alemão "
+          "no próximo login. Além de pequenas melhorias.",
+    'ar': "يبدأ FullRep الآن بلغة جهازك، وتبقى اللغة التي تختارها محفوظة: كانت "
+          "الإسبانية والفرنسية والبرتغالية والعربية تعود إلى الألمانية عند تسجيل "
+          "الدخول التالي. بالإضافة إلى تحسينات صغيرة.",
 }
 
 
