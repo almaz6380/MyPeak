@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { saveSetting } from '../data/settingsStorage';
+import { spracheWechseln } from '../i18n';
 import FullRepLogo from '../components/FullRepLogo';
 import CardPhotoMotif from '../components/CardPhotoMotif';
 import { supabase } from '../lib/supabase';
@@ -66,7 +67,7 @@ export default function ProfilePage() {
 
   const spracheWaehlen = (neueSprache) => {
     setSpracheOffen(false);
-    i18n.changeLanguage(neueSprache);
+    spracheWechseln(neueSprache);
     localStorage.setItem('language', neueSprache);
     if (user) saveSetting(user.id, 'language', neueSprache);
   };

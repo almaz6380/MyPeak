@@ -70,7 +70,7 @@ for (const datei of listings) {
   const voll = String(daten.fullDescription || '');
   if (!/FullRep/.test(voll)) meckern(`${locale} · der App-Name kommt in der Beschreibung nicht vor`);
   // „Arzt“ in sechs Sprachen — der Hinweis muss in JEDER Fassung stehen.
-  if (!/(ärztlich|Arzt|doctor|médico|médecin|طبيب|الطبي)/i.test(voll)) {
+  if (!/(ärztlich|Arzt|doctor|médico|médecin|medico|arts|lekarz|lekarza|hekim|doktor|医師|医生|의사|طبيب|الطبي)/i.test(voll)) {
     meckern(`${locale} · der Gesundheitshinweis fehlt (kein Verweis auf ärztlichen Rat)`);
   }
   if (/\bDeutsch und Englisch\b|\bEnglish and German\b/.test(voll)) {

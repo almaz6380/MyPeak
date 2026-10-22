@@ -11,7 +11,8 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 const WURZEL = join(dirname(fileURLToPath(import.meta.url)), '..');
-const SPRACHEN = ['de', 'en', 'es', 'fr', 'pt', 'ar'];
+// Aus der App selbst, damit eine neue Sprache hier nicht vergessen werden kann
+import { SPRACHEN } from '../src/lib/sprache.js';
 
 const flach = (o, p = '') => Object.entries(o).flatMap(([k, v]) =>
   (v && typeof v === 'object' ? flach(v, `${p}${k}.`) : [[p + k, v]]));
@@ -236,9 +237,17 @@ for (const s of SPRACHEN) {
   const seite = await kontext.newPage();
   const konsole = [];
   seite.on('pageerror', (e) => konsole.push(String(e)));
-  await seite.addInitScript((sp) => localStorage.setItem('language', sp), s);
+  // Gastmodus + Splash übersprungen: sonst prüft man nur den Startbildschirm
+  // (15 Zeichen Text) und nicht die App.
+  await seite.addInitScript((sp) => {
+    localStorage.setItem('language', sp);
+    localStorage.setItem('guestMode', 'true');
+    localStorage.setItem('splashSeen', 'true');
+  }, s);
   await seite.goto(process.env.URL || 'http://localhost:4173/', { waitUntil: 'networkidle' });
   const text = await seite.locator('body').innerText();
+  const lang = await seite.evaluate(() => document.documentElement.lang);
+  if (lang !== s) meckern(`${s}: <html lang> ist „${lang}" — Sprachpaket nicht geladen?`);
   const roh = [...text.matchAll(/\b(ui|common|training|nutrition|home|profile)\.[a-zA-Z0-9_]+/g)].map((m) => m[0]);
   if (roh.length) meckern(`${s}: rohe Schlüssel sichtbar — ${[...new Set(roh)].join(', ')}`);
   if (konsole.length) meckern(`${s}: Seitenfehler — ${konsole.join(' | ')}`);

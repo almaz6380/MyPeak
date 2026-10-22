@@ -24,7 +24,7 @@ const NUR_FEHLEND = process.argv.includes('--fehlend');
 
 // Sprachen mit eigenen Inhaltspaketen. DE ist die Quelle, EN steht in den
 // Datendateien selbst — beide haben hier nichts zu suchen.
-const ALLE_SPRACHEN = ['es', 'fr', 'pt', 'ar'];
+const ALLE_SPRACHEN = (await import('../src/lib/sprache.js')).SPRACHEN.filter((s) => s !== 'de' && s !== 'en');
 const nurArg = process.argv.indexOf('--sprache');
 const SPRACHEN = nurArg > -1 ? [process.argv[nurArg + 1]] : ALLE_SPRACHEN;
 
