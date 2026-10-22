@@ -530,7 +530,7 @@
     "termsHeading": "Condiciones de uso",
     "termsText1": "Al usar FullRep aceptas utilizar la app de forma responsable. La app no sustituye el consejo médico. Ante cualquier duda de salud, consulta siempre a un médico.",
     "privacyHeading": "Privacidad",
-    "privacyText1": "Tus datos se almacenan en nuestros encargados del tratamiento Supabase y Vercel. Para funciones concretas, los datos van a Google (análisis de fotos, coach de IA, publicidad en las apps), Anthropic (coach de IA) y RevenueCat (Premium). Los detalles están en la política de privacidad. Puedes eliminar tu cuenta y todos tus datos en cualquier momento.",
+    "privacyText1": "Tus datos se almacenan en nuestros encargados del tratamiento Supabase y Cloudflare. Para funciones concretas, los datos van a Google (análisis de fotos, coach de IA, publicidad en las apps), Anthropic (coach de IA) y RevenueCat (Premium). Los detalles están en la política de privacidad. Puedes eliminar tu cuenta y todos tus datos en cualquier momento.",
     "termsAccept": "Acepto las condiciones de uso y la política de privacidad",
     "healthConsentHeading": "Datos de salud",
     "healthConsentText": "Peso, medidas corporales, datos de nutrición y entrenamiento y – si los activas – datos del ciclo y Apple Health/Health Connect son datos de salud (art. 9 RGPD). Para ello necesitamos tu consentimiento explícito. Puedes retirarlo en cualquier momento eliminando tu cuenta.",
