@@ -40,7 +40,7 @@ CREATE POLICY "Users can insert their own profile"
 CREATE TABLE user_settings (
   user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   weight_unit text DEFAULT 'kg' CHECK (weight_unit IN ('kg', 'lbs')),
-  language text DEFAULT NULL CHECK (language IS NULL OR language IN ('de', 'en', 'es', 'fr', 'pt', 'ar')),
+  language text DEFAULT NULL CHECK (language IS NULL OR language IN ('de', 'en', 'es', 'fr', 'pt', 'ar', 'it', 'nl', 'pl', 'tr', 'ja', 'ko', 'zh')),
   dark_mode boolean DEFAULT false,
   updated_at timestamptz DEFAULT now()
 );

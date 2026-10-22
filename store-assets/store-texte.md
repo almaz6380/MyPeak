@@ -60,7 +60,7 @@ FORTSCHRITT & MOTIVATION
 AUSSERDEM
 • Supplement-Tracker mit Wochenplan und Einnahme-Übersicht
 • Zyklustracking mit phasengerechten Trainings- und Ernährungsempfehlungen
-• Dunkler und heller Modus, sechs Sprachen (Deutsch, Englisch, Spanisch, Französisch, Portugiesisch, Arabisch), kg oder lbs
+• Dunkler und heller Modus, 13 Sprachen (Deutsch, Englisch, Spanisch, Französisch, Portugiesisch, Arabisch, Italienisch, Niederländisch, Polnisch, Türkisch, Japanisch, Koreanisch, Chinesisch), kg oder lbs
 • Gastmodus: Erst ausprobieren, dann registrieren
 • Funktioniert auch offline — deine Daten synchronisieren sich automatisch
 
@@ -103,7 +103,7 @@ PROGRESS & MOTIVATION
 ALSO INCLUDED
 • Supplement tracker with weekly schedule
 • Cycle tracking with phase-based training and nutrition tips
-• Dark and light mode, six languages (German, English, Spanish, French, Portuguese, Arabic), kg or lbs
+• Dark and light mode, 13 languages (German, English, Spanish, French, Portuguese, Arabic, Italian, Dutch, Polish, Turkish, Japanese, Korean, Chinese), kg or lbs
 • Guest mode: try everything before signing up
 • Works offline — your data syncs automatically
 

@@ -250,30 +250,38 @@ def setze_primaersprache(tok, locale):
 # appStoreVersions — plus der Text "Neu in dieser Version", der bei einem
 # Update Pflicht ist.
 
-WHATS_NEW = """FullRep startet jetzt in der Sprache deines Geräts. Und deine Sprachwahl \
-bleibt erhalten: Spanisch, Französisch, Portugiesisch und Arabisch sprangen nach \
-der nächsten Anmeldung bisher auf Deutsch zurück. Dazu kleinere Verbesserungen."""
+WHATS_NEW = """FullRep spricht jetzt 13 Sprachen: neu sind Italienisch, Niederländisch, \
+Polnisch, Türkisch, Japanisch, Koreanisch und Chinesisch. Auf Wunsch speichert FullRep \
+deine Workouts in Apple Health. Supplements mit Nährwerten zählen beim Abhaken in deine \
+Tageswerte, und auch im Gastmodus wachsen Streak und Level."""
 
 # "Neu in dieser Version" fuer die weiteren Sprachen der Store-Seite. Apple
 # verlangt den Text bei einem Update fuer JEDE Lokalisierung der Version —
 # lokalisieren() setzt ihn mit, sonst scheitert die Einreichung.
 WHATS_NEW_SPRACHEN = {
-    'en': "FullRep now starts in your device language, and your language choice "
-          "sticks: Spanish, French, Portuguese and Arabic used to fall back to "
-          "German after your next sign-in. Plus smaller improvements.",
-    'es': "FullRep ahora se abre en el idioma de tu dispositivo y tu elección de "
-          "idioma se mantiene: el español, el francés, el portugués y el árabe "
-          "volvían al alemán al iniciar sesión de nuevo. Además, pequeñas mejoras.",
-    'fr': "FullRep démarre désormais dans la langue de ton appareil, et ton choix "
-          "de langue est conservé : l’espagnol, le français, le portugais et "
-          "l’arabe repassaient en allemand à la connexion suivante. Et quelques "
-          "petites améliorations.",
-    'pt': "O FullRep agora abre no idioma do seu aparelho, e sua escolha de idioma "
-          "fica salva: espanhol, francês, português e árabe voltavam para o alemão "
-          "no próximo login. Além de pequenas melhorias.",
-    'ar': "يبدأ FullRep الآن بلغة جهازك، وتبقى اللغة التي تختارها محفوظة: كانت "
-          "الإسبانية والفرنسية والبرتغالية والعربية تعود إلى الألمانية عند تسجيل "
-          "الدخول التالي. بالإضافة إلى تحسينات صغيرة.",
+    'en': "FullRep now speaks 13 languages: new are Italian, Dutch, Polish, Turkish, "
+          "Japanese, Korean and Chinese. If you like, FullRep saves your workouts to "
+          "Apple Health. Supplements with nutrition values count toward your daily "
+          "totals when you tick them off, and your streak and level now grow in guest "
+          "mode too.",
+    'es': "FullRep ya habla 13 idiomas: nuevos son el italiano, el neerlandés, el polaco, "
+          "el turco, el japonés, el coreano y el chino. Si quieres, FullRep guarda tus "
+          "entrenos en Apple Salud. Los suplementos con valores nutricionales cuentan en "
+          "tus totales del día al marcarlos, y la racha y el nivel también crecen en modo "
+          "invitado.",
+    'fr': "FullRep parle désormais 13 langues : nouveaux, l’italien, le néerlandais, le "
+          "polonais, le turc, le japonais, le coréen et le chinois. Si tu le souhaites, "
+          "FullRep enregistre tes séances dans Apple Santé. Les compléments avec valeurs "
+          "nutritionnelles comptent dans tes totaux du jour quand tu les coches, et ta "
+          "série et ton niveau progressent aussi en mode invité.",
+    'pt': "O FullRep agora fala 13 idiomas: novos são italiano, holandês, polonês, turco, "
+          "japonês, coreano e chinês. Se quiser, o FullRep salva seus treinos no Apple "
+          "Saúde. Suplementos com valores nutricionais entram nos seus totais do dia ao "
+          "marcar, e a sequência e o nível também crescem no modo convidado.",
+    'ar': "يتحدث FullRep الآن 13 لغة: الجديد هو الإيطالية والهولندية والبولندية والتركية "
+          "واليابانية والكورية والصينية. إن رغبت، يحفظ FullRep تمارينك في Apple Health. "
+          "وتُحتسب المكملات ذات القيم الغذائية ضمن مجموعك اليومي عند تحديدها، كما تنمو "
+          "سلسلتك ومستواك في وضع الضيف أيضًا.",
 }
 
 
