@@ -8,7 +8,7 @@ on:
       mode:
         description: 'Was aktualisiert wird'
         type: choice
-        options: [screenshots, texte, grafiken, abos, abo-setzen, abo-titel, website]
+        options: [screenshots, texte, grafiken, abos, abo-setzen, abo-titel, website, standardsprache]
         default: screenshots
       lang:
         description: 'Sprache des Store-Eintrags'
@@ -64,6 +64,10 @@ jobs:
           fi
 
           case "$MODE" in
+            standardsprache)
+              # Rueckfall-Sprache fuer Laender ohne eigenes Listing (seit 22.10.2026 en-US)
+              python3 scripts/play-upload.py --standardsprache en-US "${GEMEINSAM[@]}"
+              ;;
             website)
               # Website im Eintrag (contactWebsite). Daran haengt app-ads.txt.
               python3 scripts/play-upload.py --website https://fullrep.pages.dev "${GEMEINSAM[@]}"

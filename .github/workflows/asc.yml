@@ -33,6 +33,7 @@ on:
           - version-anlegen
           - beschreibung
           - lokalisieren
+          - primaersprache
           - name
           - build
           - screenshots
@@ -113,6 +114,8 @@ jobs:
             version-anlegen) ARGS="--version-anlegen $VERSION_NR" ;;
             build) ARGS="--build $BUILD_NR" ;;
             alles) ARGS="--alles --build $BUILD_NR" ;;
+            # Rueckfall-Sprache fuer Laender ohne eigene Lokalisierung (seit 22.10.2026 en-US)
+            primaersprache) ARGS="--primaersprache en-US" ;;
             *)     ARGS="--$MODE" ;;
           esac
           # warum liest nur, kennt --dry-run also nicht.

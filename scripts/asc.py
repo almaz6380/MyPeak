@@ -203,6 +203,46 @@ def setze_namen(tok):
 
 
 
+# ── Primärsprache ──────────────────────────────────────────────────────────
+# Die Primärsprache ist der Rückfall für jedes Land, für das es keine eigene
+# Lokalisierung gibt (22.10.2026: de-DE -> en-US, auf Josefs Wunsch — wer in
+# Schweden oder Indien sucht, liest eher Englisch als Deutsch). Apple nimmt
+# sie nur an, wenn es in dieser Sprache schon eine appInfoLocalization gibt;
+# das prüfen wir vorher selbst, statt Apples Fehlermeldung zu deuten.
+
+def setze_primaersprache(tok, locale):
+    aid = app_id(tok)
+    app = api(tok, f'apps/{aid}')
+    alt = app['data']['attributes'].get('primaryLocale')
+    print(f'Primärsprache: {alt} -> {locale}')
+    if alt == locale:
+        print('Schon gesetzt, nichts zu tun.')
+        return
+
+    vorhanden = False
+    for info in api(tok, f'apps/{aid}/appInfos').get('data', []):
+        for loc in api(tok, f'appInfos/{info["id"]}/appInfoLocalizations').get('data', []):
+            la = loc['attributes']
+            if la.get('locale') == locale and la.get('name'):
+                vorhanden = True
+                print(f'  {locale} vorhanden: {la.get("name")!r} / {la.get("subtitle")!r}')
+    if not vorhanden:
+        sys.exit(f'Keine Lokalisierung {locale} mit Namen — erst --lokalisieren {locale}.')
+
+    if TROCKEN:
+        print('--dry-run: nichts gesendet.')
+        return
+    res = api(tok, f'apps/{aid}', 'PATCH', {
+        'data': {'type': 'apps', 'id': aid, 'attributes': {'primaryLocale': locale}},
+    }, fatal=False)
+    if res.get('_fehler'):
+        sys.exit(f'Abgelehnt: {fehler_text(res)}')
+    neu = api(tok, f'apps/{aid}')['data']['attributes'].get('primaryLocale')
+    print(f'Nachgelesen: primaryLocale = {neu}')
+    if neu != locale:
+        sys.exit('Apple meldet Erfolg, der Wert steht aber nicht da.')
+
+
 # ── Version anlegen ────────────────────────────────────────────────────────
 # Nach einer Freigabe gibt es in ASC keine offene Version mehr; alle
 # schreibenden Befehle hier brauchen aber eine. Die Oberflaeche nennt das
@@ -1397,6 +1437,8 @@ def main():
                         'abo-screenshot, pruefnotiz, einreichen')
     p.add_argument('--trotzdem', action='store_true',
                    help='einreichen, auch wenn Abos nicht mitkoennen')
+    p.add_argument('--primaersprache', metavar='LOCALE',
+                   help='Primärsprache der App setzen, z. B. en-US')
     p.add_argument('--dry-run', action='store_true',
                    help='nur zeigen, nichts an Apple senden')
     a = p.parse_args()
@@ -1407,7 +1449,7 @@ def main():
            a.screenshots, a.abo_screenshot,
            a.warum, a.einreichungen, a.aufraeumen, a.abo_namen, a.abo_notiz,
            a.inhaberrechte, a.exportfrage, a.pruefnotiz,
-           a.einreichen, a.alles]
+           a.einreichen, a.alles, a.primaersprache]
     if not any(tat):
         p.error('Einen Befehl angeben, z. B. --status')
 
@@ -1434,6 +1476,8 @@ def main():
             print(f'\n═══ {titel} ═══')
             fn()
         return
+    if a.primaersprache:
+        setze_primaersprache(tok, a.primaersprache)
     if a.version_anlegen:
         version_anlegen(tok, a.version_anlegen)
     if a.beschreibung:

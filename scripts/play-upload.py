@@ -358,6 +358,39 @@ def setze_website(tok, url, dry_run=False):
     commit_edit(tok, eid)
 
 
+def setze_standardsprache(tok, sprache, dry_run=False):
+    """Standardsprache des Play-Eintrags setzen (edits.details, defaultLanguage).
+
+    Sie ist der Rueckfall fuer jedes Land ohne eigenes Listing. Seit
+    22.10.2026 en-US statt de-DE. Play verlangt, dass es in der neuen
+    Standardsprache ein vollstaendiges Listing gibt — das pruefen wir vorher
+    selbst, statt Googles 400 zu deuten.
+    """
+    eid = call(tok, 'POST', f'{API}/applications/{PKG}/edits')['id']
+    durl = f'{API}/applications/{PKG}/edits/{eid}/details'
+    alt = call(tok, 'GET', durl)
+    print(f"Standardsprache: {alt.get('defaultLanguage')} -> {sprache}")
+    if alt.get('defaultLanguage') == sprache:
+        call(tok, 'DELETE', f'{API}/applications/{PKG}/edits/{eid}')
+        print('Schon gesetzt, nichts zu tun.')
+        return
+    try:
+        lst = call(tok, 'GET', f'{API}/applications/{PKG}/edits/{eid}/listings/{sprache}', fatal=False)
+    except ApiError:
+        lst = {}
+    fehlt = [f for f in ('title', 'shortDescription', 'fullDescription') if not lst.get(f)]
+    if fehlt:
+        call(tok, 'DELETE', f'{API}/applications/{PKG}/edits/{eid}')
+        sys.exit(f'Listing {sprache} unvollstaendig ({", ".join(fehlt)}) — erst --listing hochladen.')
+    print(f"  Listing {sprache}: {lst.get('title')!r}")
+    if dry_run:
+        call(tok, 'DELETE', f'{API}/applications/{PKG}/edits/{eid}')
+        print('--dry-run: Edit verworfen.')
+        return
+    call(tok, 'PATCH', durl, data={'defaultLanguage': sprache})
+    commit_edit(tok, eid)
+
+
 def zeige_abos(tok):
     """Play-Abos lesen: Produkt, Basis-Tarife, Zustand, Preise.
 
@@ -506,6 +539,8 @@ def main():
                    help='Vorstellungsgrafik ersetzen (1024x500)')
     p.add_argument('--website', metavar='URL',
                    help='Website im Play-Eintrag setzen (contactWebsite, fuer app-ads.txt)')
+    p.add_argument('--standardsprache', metavar='LOCALE',
+                   help='Standardsprache des Eintrags setzen, z. B. en-US')
     p.add_argument('--lang', default='de-DE', help='Sprache des Eintrags (Standard: de-DE)')
     p.add_argument('--dry-run', action='store_true',
                    help='nur auflisten, nichts hochladen — das Listing ist oeffentlich')
@@ -515,7 +550,7 @@ def main():
     a = p.parse_args()
 
     if not (a.aab or a.promote or a.status or a.abos or a.abo_setzen or a.screenshots
-            or a.listing or a.icon or a.feature or a.website):
+            or a.listing or a.icon or a.feature or a.website or a.standardsprache):
         p.error('--aab, --promote, --status, --abos, --screenshots, --listing, '
                 '--icon, --feature oder --website angeben')
     if a.aab and not a.complete and a.fraction is None:
@@ -538,6 +573,8 @@ def main():
         return setze_listing(tok, a.listing, a.lang, a.dry_run)
     if a.website:
         return setze_website(tok, a.website, a.dry_run)
+    if a.standardsprache:
+        return setze_standardsprache(tok, a.standardsprache, a.dry_run)
     if a.icon:
         return lade_einzelbild(tok, a.icon, a.lang, 'icon', a.dry_run)
     if a.feature:
