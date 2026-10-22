@@ -1172,7 +1172,10 @@
     "slot_midday": "Midday",
     "slot_pre_workout": "Pre-Workout",
     "slot_post_workout": "Post-Workout",
-    "slot_evening": "Evening"
+    "slot_evening": "Evening",
+    "nutritionTitle": "Nutrition (optional)",
+    "nutritionHint": "Per serving — counts toward your daily totals when you tick it off",
+    "nutritionBadge": "{{kcal}} kcal · {{protein}} g protein"
   },
   "cycle": {
     "title": "Cycle Tracking",

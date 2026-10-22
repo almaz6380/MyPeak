@@ -674,7 +674,10 @@
     "slot_midday": "Al mediodía",
     "slot_pre_workout": "Pre-entreno",
     "slot_post_workout": "Post-entreno",
-    "slot_evening": "Por la noche"
+    "slot_evening": "Por la noche",
+    "nutritionTitle": "Valores nutricionales (opcional)",
+    "nutritionHint": "Por toma — se suma a tus valores diarios al marcarlo",
+    "nutritionBadge": "{{kcal}} kcal · {{protein}} g de proteína"
   },
   "cycle": {
     "title": "Seguimiento del ciclo",

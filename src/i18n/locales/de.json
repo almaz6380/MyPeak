@@ -1172,7 +1172,10 @@
     "slot_midday": "Mittags",
     "slot_pre_workout": "Pre-Workout",
     "slot_post_workout": "Post-Workout",
-    "slot_evening": "Abends"
+    "slot_evening": "Abends",
+    "nutritionTitle": "Nährwerte (optional)",
+    "nutritionHint": "Je Einnahme — zählt beim Abhaken in deine Tageswerte",
+    "nutritionBadge": "{{kcal}} kcal · {{protein}} g Protein"
   },
   "cycle": {
     "title": "Zyklustracking",

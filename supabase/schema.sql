@@ -126,7 +126,7 @@ CREATE TABLE nutrition_entries (
   fat numeric NOT NULL DEFAULT 0,
   fiber numeric DEFAULT 0,
   sugar numeric DEFAULT 0,
-  source text DEFAULT 'manual' CHECK (source IN ('manual', 'openfoodfacts', 'custom_meal', 'local_db', 'ai_photo', 'community', 'recipe', 'label_scan', 'ai_plan')),
+  source text DEFAULT 'manual' CHECK (source IN ('manual', 'openfoodfacts', 'custom_meal', 'local_db', 'ai_photo', 'community', 'recipe', 'label_scan', 'ai_plan', 'supplement')),
   source_id text,
   created_at timestamptz DEFAULT now()
 );
@@ -371,6 +371,12 @@ CREATE TABLE supplements (
   notes text DEFAULT '',
   barcode text,
   schedule jsonb NOT NULL DEFAULT '{}',
+  -- Nährwerte je Einnahme, optional (NULL = nicht angegeben)
+  calories numeric,
+  protein numeric,
+  carbs numeric,
+  fat numeric,
+  fiber numeric,
   created_at timestamptz DEFAULT now(),
   deleted_at timestamptz
 );

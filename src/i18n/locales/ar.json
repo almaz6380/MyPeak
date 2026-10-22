@@ -1141,7 +1141,10 @@
     "slot_midday": "الظهيرة",
     "slot_pre_workout": "قبل التمرين",
     "slot_post_workout": "بعد التمرين",
-    "slot_evening": "مساءً"
+    "slot_evening": "مساءً",
+    "nutritionTitle": "القيم الغذائية (اختياري)",
+    "nutritionHint": "لكل جرعة — تُضاف إلى مجموعك اليومي عند تحديدها",
+    "nutritionBadge": "{{kcal}} سعرة · {{protein}} غ بروتين"
   },
   "cycle": {
     "title": "تتبّع الدورة",

@@ -142,6 +142,9 @@ describe('Gast-Zusage: nichts verlässt das Gerät', () => {
       'subscriptionStorage.computeAccess',
       'supplementStorage.getSupplementProgress',
       'supplementStorage.getTodayScheduledSupplements',
+      'supplementStorage.hatNaehrwerte',
+      'supplementStorage.naehrwerteBereinigen',
+      'supplementStorage.supplementQuelle',
       'workoutStorage.getPlanType',
       'workoutStorage.getScheduledDaysForMonth',
     ]);

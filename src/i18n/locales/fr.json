@@ -1141,7 +1141,10 @@
     "slot_midday": "Midi",
     "slot_pre_workout": "Avant la séance",
     "slot_post_workout": "Après la séance",
-    "slot_evening": "Soir"
+    "slot_evening": "Soir",
+    "nutritionTitle": "Valeurs nutritionnelles (facultatif)",
+    "nutritionHint": "Par prise — s'ajoute à tes totaux du jour quand tu le coches",
+    "nutritionBadge": "{{kcal}} kcal · {{protein}} g de protéines"
   },
   "cycle": {
     "title": "Suivi du cycle",
