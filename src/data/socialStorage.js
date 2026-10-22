@@ -282,9 +282,33 @@ export function hasGoldenFrame(level) {
 }
 
 const XP_KEY = 'user_xp';
+// Gäste sammeln XP/Streak nur auf dem Gerät, unter eigenem Schlüssel: Nach der
+// Registrierung liest getXP() zuerst den Cache des Kontos, und dessen
+// Hintergrund-Refresh würde einen gemeinsamen Schlüssel still überschreiben.
+// resync.js führt GUEST_XP_KEY ins Konto zusammen und löscht ihn danach.
+export const GUEST_XP_KEY = 'guest_xp';
+const LEER_XP = { total_xp: 0, level: 1, streak_days: 0 };
+
+function gastXP() {
+  try { return { ...LEER_XP, ...JSON.parse(localStorage.getItem(GUEST_XP_KEY)) }; } catch { return { ...LEER_XP }; }
+}
+
+// Speichert XP-Felder: Gäste nur lokal, Konten in Supabase + Cache.
+async function xpSchreiben(userId, felder, bisher) {
+  const neu = { ...bisher, ...felder };
+  if (isGuest(userId)) {
+    localStorage.setItem(GUEST_XP_KEY, JSON.stringify(neu));
+    return;
+  }
+  await supabase
+    .from('user_xp')
+    .upsert({ user_id: userId, ...felder, updated_at: new Date().toISOString() });
+  // Cache aktualisieren, damit Home/Profil sofort frische Werte zeigen
+  localStorage.setItem(XP_KEY, JSON.stringify(neu));
+}
 
 export async function getXP(userId) {
-  if (isGuest(userId)) return { total_xp: 0, level: 1, streak_days: 0 };
+  if (isGuest(userId)) return gastXP();
 
   // localStorage first — instant
   const cached = localStorage.getItem(XP_KEY);
@@ -327,31 +351,17 @@ export async function getXP(userId) {
 
 // Returns { oldLevel, newLevel, xpGained } for level-up detection
 export async function addXP(userId, amount) {
-  if (isGuest(userId)) return { oldLevel: 1, newLevel: 1, xpGained: 0 };
-
   const current = await getXP(userId);
   const oldLevel = calculateLevel(current.total_xp || 0).level;
   const newXP = (current.total_xp || 0) + amount;
   const { level: newLevel } = calculateLevel(newXP);
 
-  await supabase
-    .from('user_xp')
-    .upsert({
-      user_id: userId,
-      total_xp: newXP,
-      level: newLevel,
-      updated_at: new Date().toISOString(),
-    });
-
-  // Cache aktualisieren, damit Home/Profil sofort frische Werte zeigen
-  localStorage.setItem(XP_KEY, JSON.stringify({ ...current, total_xp: newXP, level: newLevel }));
+  await xpSchreiben(userId, { total_xp: newXP, level: newLevel }, current);
 
   return { oldLevel, newLevel, xpGained: amount };
 }
 
 export async function updateStreak(userId) {
-  if (isGuest(userId)) return null;
-
   const xp = await getXP(userId);
   const today = todayLocal();
   // „Gestern" DST-sicher: von der Tagesmitte einen Kalendertag zurück (fixe
@@ -378,25 +388,12 @@ export async function updateStreak(userId) {
   const { level: newLevel } = calculateLevel(newTotalXP);
   const oldLevel = calculateLevel(xp.total_xp || 0).level;
 
-  await supabase
-    .from('user_xp')
-    .upsert({
-      user_id: userId,
-      total_xp: newTotalXP,
-      level: newLevel,
-      streak_days: newStreak,
-      last_workout_date: today,
-      updated_at: new Date().toISOString(),
-    });
-
-  // Cache aktualisieren, damit Home/Profil sofort frische Werte zeigen
-  localStorage.setItem(XP_KEY, JSON.stringify({
-    ...xp,
+  await xpSchreiben(userId, {
     total_xp: newTotalXP,
     level: newLevel,
     streak_days: newStreak,
     last_workout_date: today,
-  }));
+  }, xp);
 
   return { oldLevel, newLevel, xpGained: totalXPGain, streak: newStreak };
 }
