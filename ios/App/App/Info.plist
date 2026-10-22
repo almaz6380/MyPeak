@@ -53,19 +53,13 @@
 	<string>FullRep nutzt die Kamera, um Barcodes von Lebensmitteln zu scannen und Mahlzeiten zu fotografieren.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>FullRep liest Schritte und Gewicht aus Apple Health, um sie in der App anzuzeigen — nur wenn du die Verbindung im Profil einschaltest.</string>
-	<!-- ⚠ NSHealthUpdateUsageDescription ist PFLICHT, obwohl FullRep nichts nach
-	     Apple Health schreibt. Apple prüft nicht, was die App tut, sondern was
-	     das Binary an Schnittstellen verlinkt: capacitor-health bindet die
-	     HealthKit-Schreib-API mit ein, und altool lehnt den Upload sonst mit
-	     Fehler 90683 ab („While your app might not use these APIs, a purpose
-	     string is still required"). Genau daran ist der erste 1.5.0-Upload
-	     gescheitert — nach einem vollständig gebauten und signierten Archiv,
-	     also erst nach vier Minuten macOS-Laufzeit.
-	     Der Text muss trotzdem stimmen: Es wird nicht geschrieben, und der
-	     Dialog erscheint nie, weil die App die Schreibberechtigung nie
-	     anfordert. -->
+	<!-- Seit 1.6.0 schreibt FullRep tatsächlich: abgeschlossene Workouts als
+	     HKWorkout (HealthExportPlugin.swift), nur nach eigenem Opt-in im
+	     Profil. Bis 1.5.x stand hier „schreibt keine Daten" — der Schlüssel war
+	     nur Pflicht, weil capacitor-health die Schreib-API mitverlinkt
+	     (Fehler 90683 beim Upload ohne ihn). -->
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>FullRep schreibt keine Daten nach Apple Health. Die App liest nur Schritte und Gewicht, und auch das nur, wenn du die Verbindung im Profil einschaltest.</string>
+	<string>FullRep speichert deine abgeschlossenen Workouts (Art, Beginn, Dauer) in Apple Health — nur wenn du das im Profil einschaltest.</string>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-8860791993288062~8812263899</string>
 	<key>NSUserTrackingUsageDescription</key>

@@ -97,6 +97,12 @@
          nachziehen — Formular UND Datenschutztext. -->
     <uses-permission android:name="android.permission.health.READ_STEPS" />
     <uses-permission android:name="android.permission.health.READ_WEIGHT" />
+    <!-- Seit 1.6.0: Workouts nach Health Connect schreiben (HealthExportPlugin.kt),
+         eigenes Opt-in im Profil. Nur Trainingseinheiten — Typ, Start, Ende,
+         Titel. ⚠ Neue Berechtigung = neuer Eintrag im Play-Formular
+         „Berechtigungen für Gesundheitsdaten" (erster Build von Hand in den
+         internen Test, siehe CLAUDE.md) UND im Datenschutztext. -->
+    <uses-permission android:name="android.permission.health.WRITE_EXERCISE" />
 
     <!-- ⚠⚠ NEUN BERECHTIGUNGEN, DIE WIR NIE ANGEFORDERT HABEN — vom Plugin.
          `capacitor-health` deklariert in seinem eigenen Manifest ELF

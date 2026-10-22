@@ -388,7 +388,8 @@
     "editHeight": "Größe ändern",
     "editGoal": "Ziel ändern",
     "editActivity": "Aktivitätslevel ändern",
-    "editExperience": "Trainingserfahrung ändern"
+    "editExperience": "Trainingserfahrung ändern",
+    "healthExport": "Workouts nach Health schreiben"
   },
   "common": {
     "welcome": "Willkommen",

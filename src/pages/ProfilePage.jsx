@@ -16,7 +16,7 @@ import { canChangeAdConsent, changeAdConsent } from '../lib/ads';
 import { clearAllLocalPhotos } from '../data/exercisePhotos';
 import { API_BASIS } from '../data/apiBasis';
 import { Capacitor } from '@capacitor/core';
-import { healthVerfuegbar, istVerbunden, verbinden, trennen, gewichtImportieren } from '../lib/health';
+import { healthVerfuegbar, istVerbunden, verbinden, trennen, gewichtImportieren, exportAktiv, exportEinschalten, exportAusschalten } from '../lib/health';
 
 // Sichtbare Build-Kennung — muss bei jedem neuen Store-Build mitgezogen werden (siehe android/app/build.gradle)
 const APP_VERSION = '1.5.6 (16)';
@@ -41,6 +41,7 @@ export default function ProfilePage() {
   const [deleteError, setDeleteError] = useState(null);
   const [deletePassword, setDeletePassword] = useState('');
   const [healthOn, setHealthOn] = useState(() => istVerbunden(user?.id));
+  const [exportOn, setExportOn] = useState(() => exportAktiv(user?.id));
   const [showWithdrawConsent, setShowWithdrawConsent] = useState(false);
   const [withdrawing, setWithdrawing] = useState(false);
   const [withdrawError, setWithdrawError] = useState(null);
@@ -134,6 +135,8 @@ export default function ProfilePage() {
         trennen(user.id);
         setHealthOn(false);
       }
+      exportAusschalten(user.id);
+      setExportOn(false);
       setShowWithdrawConsent(false);
       await refreshProfile();
     } catch {
@@ -453,6 +456,32 @@ export default function ProfilePage() {
                 className={`relative w-12 h-7 rounded-full transition-colors ${healthOn ? 'bg-primary-500' : 'bg-slate-300'}`}
               >
                 <span className={`absolute top-0.5 start-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${healthOn ? 'translate-x-5 rtl:-translate-x-5' : ''}`} />
+              </button>
+            }
+          />
+        )}
+
+        {/* Workouts nach Health SCHREIBEN — eigenes Opt-in, unabhaengig vom
+            Lesen. Bleibt aus, wenn das System die Freigabe verweigert. */}
+        {healthVerfuegbar() && (
+          <SettingRow
+            icon={<HeartPulse className="w-5 h-5" />}
+            label={t('profile.healthExport')}
+            action={
+              <button
+                aria-label={t('profile.healthExport')}
+                onClick={async () => {
+                  if (exportOn) {
+                    exportAusschalten(user?.id);
+                    setExportOn(false);
+                    return;
+                  }
+                  const res = await exportEinschalten(user?.id);
+                  setExportOn(res.ok);
+                }}
+                className={`relative w-12 h-7 rounded-full transition-colors ${exportOn ? 'bg-primary-500' : 'bg-slate-300'}`}
+              >
+                <span className={`absolute top-0.5 start-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${exportOn ? 'translate-x-5 rtl:-translate-x-5' : ''}`} />
               </button>
             }
             last

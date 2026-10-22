@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Check, Play, Pause } from 'lucide-react';
 import { saveWorkout } from '../../data/workoutStorage';
 import { awardWorkoutCompletion } from '../../data/socialStorage';
+import { workoutExportieren } from '../../lib/health';
 import { maybeAskForReview } from '../../lib/review';
 import { useAuth } from '../../context/AuthContext';
 import { getExerciseById } from '../../data/exercises';
@@ -84,6 +85,7 @@ export default function ActiveStructuredCardio({ session, onFinish, onDiscard })
     };
     await saveWorkout(user?.id || 'guest', workout);
     await awardWorkoutCompletion(user?.id || 'guest', workout);
+    workoutExportieren(user?.id || 'guest', workout);
     // Bewertungsanfrage ab dem 2. Training jeder Art (s. lib/review.js), nur nativ.
     setTimeout(() => { maybeAskForReview(user?.id || 'guest'); }, 1500);
     onFinish();

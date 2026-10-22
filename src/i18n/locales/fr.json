@@ -357,7 +357,8 @@
     "editHeight": "Modifier la taille",
     "editGoal": "Modifier l'objectif",
     "editActivity": "Modifier le niveau d'activité",
-    "editExperience": "Modifier l'expérience d'entraînement"
+    "editExperience": "Modifier l'expérience d'entraînement",
+    "healthExport": "Enregistrer les séances dans Santé"
   },
   "common": {
     "welcome": "Bienvenue",

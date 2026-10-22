@@ -1,5 +1,7 @@
 package at.gallab.mypeak;
 
+import android.os.Bundle;
+
 import com.getcapacitor.BridgeActivity;
 
 /**
@@ -9,6 +11,16 @@ import com.getcapacitor.BridgeActivity;
  * hier — ein konkurrierender Listener macht Capacitors Safe-Area-Neuberechnung kaputt.
  */
 public class MainActivity extends BridgeActivity {
+
+    /**
+     * Eigene Plugins im App-Projekt (keine npm-Pakete) muss man vor
+     * super.onCreate anmelden — danach ist die Bridge schon gebaut.
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        registerPlugin(HealthExportPlugin.class);
+        super.onCreate(savedInstanceState);
+    }
 
     /**
      * Beim Verlassen der App das Homescreen-Widget auffrischen. Die WebView hat

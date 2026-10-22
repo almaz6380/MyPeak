@@ -388,7 +388,8 @@
     "editHeight": "Change Height",
     "editGoal": "Change Goal",
     "editActivity": "Change Activity Level",
-    "editExperience": "Change Training Experience"
+    "editExperience": "Change Training Experience",
+    "healthExport": "Save workouts to Health"
   },
   "common": {
     "welcome": "Welcome",

@@ -357,7 +357,8 @@
     "editHeight": "تغيير الطول",
     "editGoal": "تغيير الهدف",
     "editActivity": "تغيير مستوى النشاط",
-    "editExperience": "تغيير الخبرة التدريبية"
+    "editExperience": "تغيير الخبرة التدريبية",
+    "healthExport": "حفظ التمارين في تطبيق الصحة"
   },
   "common": {
     "welcome": "مرحبًا",

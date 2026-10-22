@@ -1,15 +1,18 @@
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { Health } from 'capacitor-health';
 import { saveWeightEntry, getWeightEntries } from '../data/weightStorage';
+import { getExerciseById } from '../data/exercises';
 
-// Apple Health / Google Health Connect — LESEND, als Opt-in im Profil.
+// Apple Health / Google Health Connect, zwei getrennte Opt-ins im Profil.
 //
-// Umfang V1 (bewusst): Schritte heute anzeigen und Gewicht aus Health in den
-// FullRep-Gewichtsverlauf uebernehmen. NICHT enthalten: Workouts nach Health
-// SCHREIBEN — das Plugin capacitor-health 8.x hat schlicht keine
-// Schreib-Methode (in dist/esm/definitions.d.ts nachgelesen: nur query*;
-// die WRITE_WORKOUTS-Permission ist eine Altlast ohne API). Wer den Export
-// will, braucht ein eigenes Plugin — als Ausbaustufe in CLAUDE.md notiert.
+// LESEN (capacitor-health): Schritte heute anzeigen und Gewicht aus Health in
+// den FullRep-Gewichtsverlauf uebernehmen.
+//
+// SCHREIBEN (seit 1.6.0, eigenes Plugin „HealthExport" im App-Projekt:
+// ios/App/App/HealthExportPlugin.swift, android/…/HealthExportPlugin.kt):
+// abgeschlossene Workouts als Trainingseinheit (Art, Start, Ende). capacitor-
+// health 8.x hat keine Schreib-Methode (nur query*), deshalb das eigene Plugin
+// statt eines Wechsels — das Lesen und die Play-Erklaerung bleiben unberuehrt.
 //
 // Der Schalter ist ein reines Opt-in: ohne gesetzte Flagge fragt nichts nach
 // Berechtigungen und nichts wird gelesen. Browser: alles No-Op/false.
@@ -113,5 +116,67 @@ export async function gewichtImportieren(userId) {
   } catch (e) {
     console.warn('[health] Gewichts-Import fehlgeschlagen:', e);
     return 0;
+  }
+}
+
+// ── Workouts nach Health schreiben ──────────────────────────────
+
+const HealthExport = registerPlugin('HealthExport');
+const EXPORT_FLAGGE = (userId) => `fullrep.health.export.${userId}`;
+
+export function exportAktiv(userId) {
+  return !!userId && localStorage.getItem(EXPORT_FLAGGE(userId)) === 'true';
+}
+
+// Schreibrecht anfragen. Anders als beim Lesen meldet das System hier zurueck,
+// ob erlaubt wurde — der Schalter bleibt aus, wenn nicht.
+export async function exportEinschalten(userId) {
+  if (!healthVerfuegbar()) return { ok: false, grund: 'nur_nativ' };
+  try {
+    const { granted } = await HealthExport.requestAuthorization();
+    if (!granted) return { ok: false, grund: 'abgelehnt' };
+    localStorage.setItem(EXPORT_FLAGGE(userId), 'true');
+    return { ok: true };
+  } catch (e) {
+    console.warn('[health] Export-Freigabe fehlgeschlagen:', e);
+    return { ok: false, grund: 'fehler' };
+  }
+}
+
+export function exportAusschalten(userId) {
+  localStorage.removeItem(EXPORT_FLAGGE(userId));
+}
+
+// Feinere Art fuer Health: cardioType (running, cycling …) bzw.
+// martialArtsCategory (boxing …) aus dem Uebungskatalog. HIIT und Kampfsport
+// speichern eine Sitzung mit exerciseList, dort zaehlt die erste Uebung.
+export function workoutAktivitaet(workout) {
+  const ex = workout?.exercises?.[0];
+  if (!ex) return null;
+  const katalog = getExerciseById(ex.exerciseId) || getExerciseById(ex.exerciseList?.[0]);
+  return katalog?.cardioType || katalog?.martialArtsCategory || null;
+}
+
+// Nach dem Speichern aufrufen. Wirft nie: Health ist eine Zugabe, das
+// Training ist in FullRep schon gespeichert. `start` fehlt bei allen Typen
+// ausser Kraft — dann gilt Ende minus Dauer.
+export async function workoutExportieren(userId, workout, { start, ende = new Date() } = {}) {
+  if (!healthVerfuegbar() || !exportAktiv(userId) || !workout) return false;
+  try {
+    const bis = new Date(ende);
+    const von = start ? new Date(start) : new Date(bis.getTime() - (workout.duration || 0));
+    if (!(bis - von >= 60000)) return false; // unter einer Minute: kein Training fuer Health
+    const { saved } = await HealthExport.saveWorkout({
+      id: `fullrep-${von.getTime()}`,
+      type: workout.type || 'strength',
+      activity: workoutAktivitaet(workout),
+      start: von.toISOString(),
+      end: bis.toISOString(),
+      title: 'FullRep',
+    });
+    return !!saved;
+  } catch (e) {
+    console.warn('[health] Workout-Export fehlgeschlagen:', e);
+    return false;
   }
 }

@@ -388,7 +388,8 @@
     "editHeight": "Cambiar estatura",
     "editGoal": "Cambiar objetivo",
     "editActivity": "Cambiar nivel de actividad",
-    "editExperience": "Cambiar experiencia de entreno"
+    "editExperience": "Cambiar experiencia de entreno",
+    "healthExport": "Guardar entrenos en Salud"
   },
   "common": {
     "welcome": "Bienvenido",
