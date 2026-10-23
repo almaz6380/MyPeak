@@ -18,7 +18,7 @@
 //   ar  م.ك, م.ص (ملعقة كبيرة/صغيرة)
 //   it  cucch., cucchiaino/cucchiaini
 //   nl  el, tl (eetlepel/theelepel; greifen über EL/TL, weil ohne Groß-/Kleinschreibung)
-//   pl  łyżka/łyżki/łyżkę, łyżeczka/łyżeczki/łyżeczkę
+//   pl  łyżka/łyżki/łyżkę/łyżek, łyżeczka/łyżeczki/łyżeczkę/łyżeczek
 //   tr  yk, çk (yemek/çay kaşığı)
 //   ko  큰술, 작은술 · zh 汤匙, 茶匙 — Zahl davor, oft ohne Leerzeichen
 //   ja  大さじ, 小さじ — die Zahl steht DAHINTER („大さじ1"), eigener Ausdruck unten
@@ -34,7 +34,7 @@ const EINHEITEN = [
   String.raw`col\.?\s*sopa`, String.raw`col\.?\s*chá`,
   String.raw`م\.\s*ك`, String.raw`م\.\s*ص`,
   String.raw`cucch\.?`, 'cucchiain[oi]',
-  'łyżeczk[aię]', 'łyżk[aię]',
+  'łyżeczk[aię]', 'łyżeczek', 'łyżk[aię]', 'łyżek',
   'yk', 'çk',
   '큰술', '작은술', '汤匙', '茶匙',
 ].join('|');
