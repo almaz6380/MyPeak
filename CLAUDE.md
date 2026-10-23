@@ -67,6 +67,24 @@ Stellen gemeldet (Gym-Lehnwörter, Quark/Hüttenkäse ohne Gegenstück, Knopfnam
 Workflow-Modus `primaersprache`, `play-upload.py --standardsprache en-US` bzw. Modus
 `standardsprache`. Beide mit Trockenlauf, **noch nicht ausgeführt**.
 
+**Ausgeführt am 23.10. (Josefs „ja“):**
+- ✅ Beide Migrationen in Prod, nachgelesen: Spalten `supplements.calories/protein/carbs/fat/fiber`,
+  `nutrition_entries_source_check` mit `supplement`, `user_settings_language_check` mit 13 Codes.
+- ✅ iOS `nur_kompilieren` (Lauf 39994389018): `BUILD SUCCEEDED`, das Swift-Plugin kompiliert.
+- ✅ Android-Build vc26 (Lauf 39994392780) grün, also kompiliert auch das Kotlin-Plugin.
+  ⚠ **Das AAB fehlt trotzdem:** „Artifact storage quota has been hit“. Der Upload-Schritt hat
+  `continue-on-error`, deshalb ist der Lauf grün. Lösung: alte Artefakte löschen (Repo → Actions →
+  Caches/Artefakte) oder Speicher in den Billing-Einstellungen erhöhen, dann den Lauf neu starten.
+- ❌ **iOS-Primärsprache:** Der PATCH `apps/{id}` mit `primaryLocale=en-US` wird von Apple mit
+  Erfolg beantwortet, der Wert bleibt aber `de-DE` (nachgelesen). Das Skript bricht deshalb ab.
+  Vermutlich ist die Primärsprache nur änderbar, solange eine bearbeitbare Version offen ist
+  (1.5.6 liegt in der Prüfung). Neuer Versuch erst mit offener 1.6.0, sonst von Hand in ASC
+  (App-Informationen → Primärsprache).
+- ❌ **Play-Standardsprache:** 403 „Before you can change default language, you need to provide
+  translations for all your in-app products.“ Das Abo `mypeak_premium_monthly` hat nur ein
+  de-DE-Listing. Erst muss ein en-US-Titel und eine en-US-Beschreibung am Abo stehen (Console oder API,
+  `regionsVersion` beachten), dann `standardsprache` erneut. Der Edit wurde verworfen, nichts geändert.
+
 **Offen, je mit eigenem „ja“ von Josef, in dieser Reihenfolge:**
 1. Migrationen in Prod: `20261022120000_supplement_naehrwerte.sql` und
    `20261022130000_sprache_13.sql` (ohne die zweite geht die Wahl einer neuen Sprache still verloren).
