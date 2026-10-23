@@ -9,15 +9,74 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 `fullrep.vercel.app` — das Vercel-Konto ist gesperrt (402), siehe „Umzug auf Cloudflare“
 **Git-Repository:** https://github.com/almaz6380/MyPeak (Repo-Name unverändert)
 **Zielplattform:** Web-App → PWA → später App Store (iOS + Android)
-**Sprachen:** Deutsch, Englisch, Spanisch, Französisch, Portugiesisch (pt-BR),
-Arabisch (RTL) — **vollständig**, Oberfläche wie Inhaltsbibliotheken (siehe 4b,
-4c und 4e); Store-Seiten in beiden Stores ebenfalls sechssprachig (seit 1.5.3)
+**Sprachen (13, seit 1.6.0):** Deutsch, Englisch, Spanisch, Französisch, Portugiesisch (pt-BR),
+Arabisch (RTL), Italienisch, Niederländisch, Polnisch, Türkisch, Japanisch, Koreanisch,
+Chinesisch (vereinfacht) — **vollständig**, Oberfläche wie Inhaltsbibliotheken (siehe 4b,
+4c, 4e und „Version 1.6.0“). Store-Seiten: sechs Sprachen live seit 1.5.3, die sieben
+neuen liegen fertig im Repo und gehen mit 1.6.0 hoch
 **Geschäftsmodell:** Freemium mit 7 Tagen kostenloser Testphase
 **Zielgruppe:** Fitnessstudio-Besucher (Geräte + freie Gewichte), Anfänger bis Fortgeschrittene
 
 ---
 
 ## Aktueller Stand
+
+### Version 1.6.0 vorbereitet: 13 Sprachen, drei Features (22./23.10.2026) — NICHT AUSGELIEFERT
+
+Branch `claude/clever-wright-skzprt`, alles gepusht, **kein PR, kein Build, keine Migration in Prod**.
+Versionen stehen schon auf Android vc26 / iOS Build 17 / 1.6.0.
+
+**Neue Sprachen:** it, nl, pl, tr, ja, ko, zh (vereinfacht; zh-TW landet bewusst auch dort).
+Je Sprache Oberfläche, alle 222 Bibliothekseinträge, Rechtstexte (mit „Vorrang der deutschen
+Fassung“, Notrufnummer des Landes), Coach-/Mahlzeit-Prompt, Play-Text und iOS-Felder,
+134 Beschriftungstabellen. `pruefe-inhalte`: 2442 Einträge, 0 offen. Übersetzt von
+Sub-Agents, **nicht muttersprachlich gegengelesen** — die Agents haben je ~5 unsichere
+Stellen gemeldet (Gym-Lehnwörter, Quark/Hüttenkäse ohne Gegenstück, Knopfnamen).
+⚠ Die Commit-Titel zählen um eins falsch („achte Sprache“ für nl …): nl ist die 7., zh die 13.
+
+**Wie man eine Sprache einträgt** (wiederholbar, an 7 Sprachen erprobt):
+- Agents schreiben nur eigene Dateien: `locales/<c>.json`, `src/data/<c>/` (9 Pakete),
+  `legal/uebersetzungen/<c>.js`, `store-assets/play-listing.<locale>.json` und Schnipsel.
+- `python3 scripts/sprache-eintragen.py <c> <schnipsel-ordner> --tabellen <c>.json` trägt
+  sie in alle gemeinsamen Dateien ein (Sprachlisten App+API, Paket-Lader, Prompts,
+  Store-Skripte, asc.py, store-texte.md, Tests) und importiert die Tabellen.
+- `scripts/sprachtabellen.mjs export|import` ordnet über **de+en zu, nicht über die Zeile** —
+  die Zeilennummer verschiebt sich, sobald eine andere Sprache eingetragen wurde.
+- Danach: `npm test`, `pruefe-sprachen --browser`, `pruefe-inhalte`, `pruefe-store-texte`, Build.
+
+**Technik dazu:**
+- Sprachpakete werden **nachgeladen** (`spracheWechseln()` in `src/i18n/index.js`), nur de/en
+  sind fest im Bündel; `main.jsx` wartet höchstens 1,5 s auf die Startsprache.
+- CJK-Schriften per `:lang()` in `index.css`, `keep-all` für Koreanisch.
+- Mengenskalierung kennt die Löffel aller 13 Sprachen, Japanisch mit Zahl dahinter (大さじ1).
+- `pruefe-sprachen` liest die Sprachliste aus `src/lib/sprache.js`, die Browserprobe läuft im
+  Gastmodus; fehlende Mehrzahlformen, die eine Sprache nicht hat (ja/ko/zh: nur `other`),
+  zählen nicht mehr als Fehler.
+
+**Features:**
+1. **Gäste sammeln XP und Streak** (`guest_xp` in localStorage), `resync.js` führt sie bei
+   der Registrierung ins Konto zusammen. Nebenbei: Gast-Cardio verlor beim Hochladen den `type`.
+2. **Supplements mit Nährwerten** (optional, je Einnahme). Abhaken legt einen Ernährungseintrag
+   an (`source 'supplement'`, `source_id supp:<id>:<slot>`), Abwählen entfernt ihn.
+3. **Workouts nach Apple Health / Health Connect schreiben** — eigenes Opt-in im Profil, eigenes
+   kleines Plugin im App-Projekt (`HealthExportPlugin.swift` über `FullRepBridgeViewController`
+   im Main.storyboard, `HealthExportPlugin.kt` mit Kotlin fürs App-Modul), nur Art/Start/Ende.
+   ⚠ **Nie kompiliert** — hier gibt es weder Xcode noch Android-SDK.
+
+**Store-Standardsprache Englisch** (Josefs Wunsch): `asc.py --primaersprache en-US` bzw.
+Workflow-Modus `primaersprache`, `play-upload.py --standardsprache en-US` bzw. Modus
+`standardsprache`. Beide mit Trockenlauf, **noch nicht ausgeführt**.
+
+**Offen, je mit eigenem „ja“ von Josef, in dieser Reihenfolge:**
+1. Migrationen in Prod: `20261022120000_supplement_naehrwerte.sql` und
+   `20261022130000_sprache_13.sql` (ohne die zweite geht die Wahl einer neuen Sprache still verloren).
+2. Kompilier-Läufe: `ios-release.yml` mit `nur_kompilieren`, `android-release.yml` ohne Upload.
+3. **Play-Gesundheitsformular:** WRITE_EXERCISE ist eine neue Health-Berechtigung. Ersten
+   Android-Build von Hand in den internen Test, Formular ergänzen, Genehmigung abwarten
+   (Ablauf siehe „Health hat drei Hürden“). Datensicherheit und Apple App-Datenschutz prüfen.
+4. Store: Version 1.6.0 anlegen, `--lokalisieren` für die neuen Locales, Play `texte` je Sprache
+   (nacheinander!), Screenshots je Sprache rendern, Primär-/Standardsprache auf en-US.
+5. Gerätetest Health-Export, dann Builds hochladen und einreichen.
 
 ### Startsprache = Gerätesprache + Sprachwahl speichert endlich (11.10.2026)
 
@@ -2423,7 +2482,7 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
 
 - **Framework:** React 18 + Vite
 - **Styling:** Tailwind CSS (Mobile-first)
-- **i18n:** react-i18next (de, en, es, fr, pt, ar; neue Sprache = eine Zeile in `src/lib/sprache.js`)
+- **i18n:** react-i18next, 13 Sprachen; nur de/en fest im Bündel, der Rest wird nachgeladen. Neue Sprache: siehe `scripts/sprache-eintragen.py`
 - **Backend:** Supabase (Auth + PostgreSQL-Datenbank)
 - **Hosting:** Cloudflare Pages (seit 04.10.2026, automatisches Deployment über GitHub; vorher Vercel)
 - **Besucherzählung:** Cloudflare Web Analytics seit 08.10.2026 — von Josef im Pages-Projekt `fullrep`
