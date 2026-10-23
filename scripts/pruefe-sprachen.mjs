@@ -46,7 +46,16 @@ const grundform = (k) => k.replace(FORMEN, '');
 const grundformen = new Set([...tabellen.de.keys()].filter((k) => FORMEN.test(k)).map(grundform));
 
 for (const s of SPRACHEN.filter((x) => x !== 'de')) {
-  for (const k of tabellen.de.keys()) if (!tabellen[s].has(k)) meckern(`${s}: Schlüssel fehlt — ${k}`);
+  // Eine Mehrzahlform, die die Sprache gar nicht hat (Japanisch kennt nur
+  // `other`), fehlt nicht — i18next fragt sie nie ab. Ob die nötigen Formen
+  // da sind, prüft die Mehrzahl-Auflösung weiter unten gegen i18next selbst.
+  const formen = new Set(new Intl.PluralRules(s).resolvedOptions().pluralCategories);
+  for (const k of tabellen.de.keys()) {
+    if (tabellen[s].has(k)) continue;
+    const f = k.match(FORMEN)?.[1];
+    if (f && !formen.has(f)) continue;
+    meckern(`${s}: Schlüssel fehlt — ${k}`);
+  }
   for (const k of tabellen[s].keys()) {
     if (tabellen.de.has(k)) continue;
     if (FORMEN.test(k) && grundformen.has(grundform(k))) continue;

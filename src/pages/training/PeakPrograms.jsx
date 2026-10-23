@@ -22,9 +22,9 @@ const CAT_COLORS = {
 };
 
 const LEVEL_LABELS = {
-  beginner: { de: 'Anfänger', en: 'Beginner', es: 'Principiante', fr: 'Débutant', pt: 'Iniciante', ar: 'مبتدئ', nl: 'Beginner', pl: 'Początkujący', it: 'Principiante', tr: 'Başlangıç', color: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' },
-  intermediate: { de: 'Fortgeschritten', en: 'Intermediate', es: 'Intermedio', fr: 'Intermédiaire', pt: 'Intermediário', ar: 'متوسط', nl: 'Gevorderd', pl: 'Średniozaawansowany', it: 'Intermedio', tr: 'Orta seviye', color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400' },
-  advanced: { de: 'Profi', en: 'Advanced', es: 'Avanzado', fr: 'Confirmé', pt: 'Avançado', ar: 'متقدم', nl: 'Expert', pl: 'Zaawansowany', it: 'Avanzato', tr: 'İleri seviye', color: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' },
+  beginner: { de: 'Anfänger', en: 'Beginner', es: 'Principiante', fr: 'Débutant', pt: 'Iniciante', ar: 'مبتدئ', nl: 'Beginner', pl: 'Początkujący', it: 'Principiante', tr: 'Başlangıç', ja: '初心者', color: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' },
+  intermediate: { de: 'Fortgeschritten', en: 'Intermediate', es: 'Intermedio', fr: 'Intermédiaire', pt: 'Intermediário', ar: 'متوسط', nl: 'Gevorderd', pl: 'Średniozaawansowany', it: 'Intermedio', tr: 'Orta seviye', ja: '中級者', color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400' },
+  advanced: { de: 'Profi', en: 'Advanced', es: 'Avanzado', fr: 'Confirmé', pt: 'Avançado', ar: 'متقدم', nl: 'Expert', pl: 'Zaawansowany', it: 'Avanzato', tr: 'İleri seviye', ja: '上級者', color: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' },
 };
 
 export default function PeakPrograms({ onBack, onProgramActivated, userGoal, userExperience, activeScheduleName }) {

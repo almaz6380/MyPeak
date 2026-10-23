@@ -451,6 +451,29 @@ Barkod tarayıcı, AI fotoğraf tanıma ve 21 hazır programla.
 
 ---
 
+### Japanisch — Name (max. 30 Zeichen)
+```
+FullRep: 筋トレ記録＆食事管理
+```
+
+### Japanisch — Untertitel (max. 30 Zeichen)
+```
+ワークアウト・カロリー・PFC管理
+```
+
+### Japanisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+筋トレ,ジム,ダイエット,カロリー計算,PFC,マクロ,たんぱく質,体重記録,ワークアウト,トレーニング,食事記録,減量,増量,レシピ,プロテイン,サプリ,ボディメイク,HIIT,腹筋
+```
+
+### Japanisch — Werbetext (max. 170 Zeichen)
+```
+ワークアウトを記録し、カロリーを管理し、進捗をひと目で確認 — すべてを 1 つのアプリで。
+バーコードスキャナー、AI による写真認識、21 の既製プログラムつき。
+```
+
+---
+
 ## 3. Apple „App-Datenschutz" (Privacy Nutrition Labels)
 
 **Datenerhebung: Ja** — alle Daten „mit dem Nutzer verknüpft" (Konto-basiert), **kein Tracking** (kein Ad-Tracking, keine Datenweitergabe an Werbenetzwerke).

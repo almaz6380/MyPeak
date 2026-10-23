@@ -112,6 +112,14 @@ const TEXTE = {
     '05-peak-programme': ['21 program', 'güç, kardiyo, HIIT ve dövüş sporları'],
     '06-uebungen': ['240’tan fazla egzersiz', 'açıklama ve animasyonla'],
   },
+  ja: {
+    '01-dashboard': ['トレーニングと食事を', '1 つのアプリで'],
+    '02-ernaehrung': ['カロリーとマクロ', '写真・バーコード・検索で記録'],
+    '03-kochbuch': ['高たんぱくレシピ 25 品', 'マクロ表示と分量計算つき'],
+    '04-training': ['鍛えた部位がひと目で', '筋肉マップと週間プラン'],
+    '05-peak-programme': ['21 のプログラム', '筋トレ・有酸素・HIIT・格闘技'],
+    '06-uebungen': ['240 種類以上のエクササイズ', '解説とアニメーションつき'],
+  },
 };
 
 const schrift = (g) => fs.readFileSync(

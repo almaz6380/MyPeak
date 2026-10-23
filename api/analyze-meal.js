@@ -135,6 +135,18 @@ const MAHLZEIT = {
     beispielName: 'Tavuk göğsü',
     beispielBeschreibung: 'Yemeğin kısa açıklaması',
   },
+  ja: {
+    intro: 'あなたは栄養分析のアシスタントです。この食事の写真を分析し、写っているすべての食品を特定してください。',
+    schaetze: '各食品について、次の値を推定してください:',
+    felder: ['1 人前の量（グラム）（皿やボウルと比べた見た目の大きさから）', 'カロリー (kcal)', 'たんぱく質 (g)', '炭水化物 (g)', '脂質 (g)', '確信度 (high, medium, low)'],
+    namenZeile: (s) => `${s}での名前`,
+    wichtig: '重要:',
+    regeln: ['見た目の大きさから量を推定してください', '一般的な栄養データベースを基準にしてください', '調理に使う通常量の油・脂肪を考慮してください', '食品を特定できない場合は、その食品を説明し、できる限りの推定をしてください', '画像に食べ物が写っていない場合は {"error": "no_food_detected"} と返してください'],
+    format: 'ほかのテキストを一切含めず、次の形式どおりの有効な JSON のみで回答してください:',
+    sprachname: '日本語',
+    beispielName: '鶏むね肉',
+    beispielBeschreibung: '食事の短い説明',
+  },
 };
 
 export function mahlzeitPrompt(sprache) {

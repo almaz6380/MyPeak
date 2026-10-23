@@ -141,6 +141,9 @@ FEATURE_TEXTE = {
     "tr": ("Antrenman ve beslenme tek uygulamada",
            "Antrenman · Kalori ve makrolar · ", "Barkod tarayıcı",
            "21 program · İlerlemen bir bakışta"),
+    "ja": ("トレーニングと食事を1つのアプリで",
+           "トレーニング · カロリーとマクロ · ", "バーコードスキャナー",
+           "21 のプログラム · 進捗がひと目でわかる"),
 }
 
 

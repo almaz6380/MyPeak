@@ -301,6 +301,11 @@ WHATS_NEW_SPRACHEN = {
           "Türkçe, Japonca, Korece ve Çince. İstersen FullRep antrenmanlarını Apple "
           "Health’e kaydeder. Besin değerleri olan takviyeler işaretlediğinde günlük "
           "değerlerine eklenir ve misafir modunda da seri (streak) ve seviye artar.",
+    'ja': "FullRep が 13 言語に対応しました。新たにイタリア語、オランダ語、ポーランド語、"
+          "トルコ語、日本語、韓国語、中国語が加わりました。ご希望に応じて、FullRep は"
+          "ワークアウトを Apple Health に保存します。栄養成分値のあるサプリメントは、"
+          "チェックすると 1 日の摂取量に加算されます。ゲストモードでもストリークと"
+          "レベルが上がるようになりました。",
 }
 
 
@@ -500,6 +505,7 @@ SPRACHEN = {
     'pl': ('Polnisch', 'pl-PL', 'pl'),
     'it': ('Italienisch', 'it-IT', 'it'),
     'tr': ('Türkisch', 'tr-TR', 'tr'),
+    'ja': ('Japanisch', 'ja-JP', 'ja'),
 }
 
 # 3.1.2: Der Link auf die Nutzungsbedingungen muss in JEDER Beschreibung
@@ -587,6 +593,15 @@ ABONELİK — FULLREP PREMIUM
 • Mevcut dönemin bitiminden en az 24 saat önce iptal edilmezse abonelik otomatik olarak yenilenir — Apple Kimliği ayarlarından yönetebilir ve iptal edebilirsin
 • Kullanım koşulları: https://fullrep.pages.dev/legal/terms
 • Gizlilik politikası: https://fullrep.pages.dev/legal/privacy""",
+    'ja': """
+
+サブスクリプション — FULLREP PREMIUM
+• 月額または年額の自動更新サブスクリプション。お使いの通貨での価格は購入前にアプリ内で表示されます
+• 7 日間の無料トライアルは自動的に終了し、有料サブスクリプションには移行しません
+• 代金は購入の確定時に Apple ID に請求されます
+• サブスクリプションは、現在の期間が終了する少なくとも 24 時間前までに解約しない限り自動的に更新されます — Apple ID の設定で管理・解約できます
+• 利用規約: https://fullrep.pages.dev/legal/terms
+• プライバシーポリシー: https://fullrep.pages.dev/legal/privacy""",
 }
 
 

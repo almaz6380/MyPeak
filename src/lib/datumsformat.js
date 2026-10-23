@@ -23,6 +23,7 @@ const LOCALES = {
   pl: 'pl-PL',
   it: 'it-IT',
   tr: 'tr-TR',
+  ja: 'ja-JP',
 };
 
 // BCP-47-Locale zur aktuellen Oberflächensprache.
