@@ -297,6 +297,10 @@ WHATS_NEW_SPRACHEN = {
           "in Apple Health o Health Connect. Gli integratori con valori nutrizionali "
           "contano nei tuoi valori giornalieri quando li spunti, e anche in modalità "
           "ospite streak e livello crescono.",
+    'tr': "FullRep artık 13 dil konuşuyor: yeni diller İtalyanca, Felemenkçe, Lehçe, "
+          "Türkçe, Japonca, Korece ve Çince. İstersen FullRep antrenmanlarını Apple "
+          "Health’e kaydeder. Besin değerleri olan takviyeler işaretlediğinde günlük "
+          "değerlerine eklenir ve misafir modunda da seri (streak) ve seviye artar.",
 }
 
 
@@ -495,6 +499,7 @@ SPRACHEN = {
     'nl-NL': ('Niederländisch', 'nl-NL', 'nl'),
     'pl': ('Polnisch', 'pl-PL', 'pl'),
     'it': ('Italienisch', 'it-IT', 'it'),
+    'tr': ('Türkisch', 'tr-TR', 'tr'),
 }
 
 # 3.1.2: Der Link auf die Nutzungsbedingungen muss in JEDER Beschreibung
@@ -573,6 +578,15 @@ ABBONAMENTO — FULLREP PREMIUM
 • L’abbonamento si rinnova automaticamente, a meno che non venga disdetto almeno 24 ore prima della fine del periodo in corso — gestiscilo e disdicilo nelle impostazioni del tuo ID Apple
 • Condizioni d’uso: https://fullrep.pages.dev/legal/terms
 • Informativa sulla privacy: https://fullrep.pages.dev/legal/privacy""",
+    'tr': """
+
+ABONELİK — FULLREP PREMIUM
+• Otomatik yenilenen aylık veya yıllık abonelik; kendi para birimindeki fiyat satın almadan önce uygulamada gösterilir
+• 7 günlük ücretsiz deneme kendiliğinden sona erer ve ücretli bir aboneliğe dönüşmez
+• Ödeme, satın almayı onayladığında Apple Kimliğinden tahsil edilir
+• Mevcut dönemin bitiminden en az 24 saat önce iptal edilmezse abonelik otomatik olarak yenilenir — Apple Kimliği ayarlarından yönetebilir ve iptal edebilirsin
+• Kullanım koşulları: https://fullrep.pages.dev/legal/terms
+• Gizlilik politikası: https://fullrep.pages.dev/legal/privacy""",
 }
 
 

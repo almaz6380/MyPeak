@@ -20,6 +20,7 @@ const PAKETE = {
   nl: () => import('./nl.js'),
   pl: () => import('./pl.js'),
   it: () => import('./it.js'),
+  tr: () => import('./tr.js'),
 };
 
 const zwischenspeicher = new Map();

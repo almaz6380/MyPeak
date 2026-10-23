@@ -123,6 +123,18 @@ const MAHLZEIT = {
     beispielName: 'Petto di pollo',
     beispielBeschreibung: 'Breve descrizione del pasto',
   },
+  tr: {
+    intro: 'Sen bir beslenme analizi asistanısın. Bu yemek fotoğrafını analiz et ve görünen her yiyeceği belirle.',
+    schaetze: 'Her yiyecek için şunları tahmin et:',
+    felder: ['Gram cinsinden porsiyon miktarı (tabağa/kâseye göre görsel büyüklüğe dayanarak)', 'Kalori (kcal)', 'Protein (g)', 'Karbonhidrat (g)', 'Yağ (g)', 'Güven düzeyi (high, medium, low)'],
+    namenZeile: (s) => `${s} dilinde ad`,
+    wichtig: 'Önemli:',
+    regeln: ['Porsiyonları görsel büyüklüğe göre tahmin et', 'Referans olarak standart besin veritabanlarını kullan', 'Hazırlamada normal miktarda yağ kullanıldığını varsay', 'Bir yiyeceği tanıyamazsan onu tarif et ve en iyi tahminini ver', 'Görselde yiyecek yoksa {"error": "no_food_detected"} ile yanıt ver'],
+    format: 'YALNIZCA tam olarak bu biçimde geçerli JSON ile yanıt ver, başka hiçbir metin ekleme:',
+    sprachname: 'Türkçe',
+    beispielName: 'Tavuk göğsü',
+    beispielBeschreibung: 'Yemeğin kısa açıklaması',
+  },
 };
 
 export function mahlzeitPrompt(sprache) {

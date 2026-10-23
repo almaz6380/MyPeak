@@ -428,6 +428,29 @@ Con scanner barcode, riconoscimento foto con IA e 21 programmi pronti.
 
 ---
 
+### Türkisch — Name (max. 30 Zeichen)
+```
+FullRep: Antrenman & Beslenme
+```
+
+### Türkisch — Untertitel (max. 30 Zeichen)
+```
+Workout, kalori ve makrolar
+```
+
+### Türkisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+spor,fitness,gym,kilo,zayıflama,kas,ağırlık,program,protein,diyet,vücutgeliştirme,tarif,beslenme
+```
+
+### Türkisch — Werbetext (max. 170 Zeichen)
+```
+Antrenmanlarını kaydet, kalorini takip et ve ilerlemeni gör — hepsi tek uygulamada.
+Barkod tarayıcı, AI fotoğraf tanıma ve 21 hazır programla.
+```
+
+---
+
 ## 3. Apple „App-Datenschutz" (Privacy Nutrition Labels)
 
 **Datenerhebung: Ja** — alle Daten „mit dem Nutzer verknüpft" (Konto-basiert), **kein Tracking** (kein Ad-Tracking, keine Datenweitergabe an Werbenetzwerke).

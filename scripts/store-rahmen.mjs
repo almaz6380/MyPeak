@@ -104,6 +104,14 @@ const TEXTE = {
     '05-peak-programme': ['21 programmi', 'forza, cardio, HIIT e arti marziali'],
     '06-uebungen': ['Oltre 240 esercizi', 'con guida e animazione'],
   },
+  tr: {
+    '01-dashboard': ['Antrenman ve beslenme', 'tek bir uygulamada'],
+    '02-ernaehrung': ['Kalori ve makrolar', 'fotoğraf, barkod veya aramayla'],
+    '03-kochbuch': ['25 proteinli tarif', 'makrolar ve porsiyon hesabıyla'],
+    '04-training': ['Neyi çalıştırdığını gör', 'kas haritası ve haftalık plan'],
+    '05-peak-programme': ['21 program', 'güç, kardiyo, HIIT ve dövüş sporları'],
+    '06-uebungen': ['240’tan fazla egzersiz', 'açıklama ve animasyonla'],
+  },
 };
 
 const schrift = (g) => fs.readFileSync(

@@ -138,6 +138,9 @@ FEATURE_TEXTE = {
     "it": ("Allenamento e nutrizione in un’app",
            "Allenamento · Calorie e macro · ", "Scanner barcode",
            "21 programmi · I progressi a colpo d’occhio"),
+    "tr": ("Antrenman ve beslenme tek uygulamada",
+           "Antrenman · Kalori ve makrolar · ", "Barkod tarayıcı",
+           "21 program · İlerlemen bir bakışta"),
 }
 
 

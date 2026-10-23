@@ -22,6 +22,7 @@ const LOCALES = {
   nl: 'nl-NL',
   pl: 'pl-PL',
   it: 'it-IT',
+  tr: 'tr-TR',
 };
 
 // BCP-47-Locale zur aktuellen Oberflächensprache.

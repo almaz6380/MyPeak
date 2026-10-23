@@ -194,6 +194,7 @@ export function getPhaseRecommendations(phase, lang) {
         nl: 'Lichte training aanbevolen: yoga, mobility, wandelen. Luister naar je lichaam.',
         pl: 'Zalecany lekki trening: joga, mobility, spacery. Słuchaj swojego ciała.',
         it: 'Allenamento leggero consigliato: yoga, mobilità, passeggiate. Ascolta il tuo corpo.',
+        tr: 'Hafif antrenman önerilir: yoga, mobilite, yürüyüş. Vücudunu dinle.',
       },
       nutrition: {
         de: 'Eisenreiche Lebensmittel (Spinat, rotes Fleisch), Magnesium. Kein Kaloriendefizit.',
@@ -205,6 +206,7 @@ export function getPhaseRecommendations(phase, lang) {
         nl: 'IJzerrijke voeding (spinazie, rood vlees), magnesium. Geen calorietekort.',
         pl: 'Produkty bogate w żelazo (szpinak, czerwone mięso), magnez. Bez deficytu kalorycznego.',
         it: 'Alimenti ricchi di ferro (spinaci, carne rossa), magnesio. Niente deficit calorico.',
+        tr: 'Demir açısından zengin besinler (ıspanak, kırmızı et), magnezyum. Kalori açığı yok.',
       },
     },
     follicular: {
@@ -218,6 +220,7 @@ export function getPhaseRecommendations(phase, lang) {
         nl: 'Beste fase voor intensieve training! Krachttraining, volume opvoeren, PR’s proberen.',
         pl: 'Najlepsza faza na intensywny trening! Trening siłowy, więcej objętości, próby PR.',
         it: 'Fase migliore per l’allenamento intenso! Allenamento di forza, aumenta il volume, punta ai PR.',
+        tr: 'Yoğun antrenman için en iyi dönem! Kuvvet antrenmanı, hacmi artır, PR dene.',
       },
       nutrition: {
         de: 'Mehr Kohlenhydrate für maximale Performance. Protein wie gewohnt.',
@@ -229,6 +232,7 @@ export function getPhaseRecommendations(phase, lang) {
         nl: 'Meer koolhydraten voor maximale prestaties. Eiwit zoals gewoonlijk.',
         pl: 'Więcej węglowodanów dla maksymalnej wydajności. Białko jak zwykle.',
         it: 'Più carboidrati per la massima performance. Proteine come al solito.',
+        tr: 'En yüksek performans için daha fazla karbonhidrat. Protein her zamanki gibi.',
       },
     },
     ovulation: {
@@ -242,6 +246,7 @@ export function getPhaseRecommendations(phase, lang) {
         nl: 'Piekenergie! HIIT, maximale inspanning mogelijk. Let op: iets hoger blessurerisico.',
         pl: 'Szczyt energii! HIIT, możliwy maksymalny wysiłek. Uwaga: lekko wyższe ryzyko kontuzji.',
         it: 'Energia al massimo! HIIT, sforzi massimali possibili. Attenzione: rischio di infortuni leggermente più alto.',
+        tr: 'Zirve enerji! HIIT, maksimum yüklenme mümkün. Dikkat: sakatlanma riski biraz daha yüksek.',
       },
       nutrition: {
         de: 'Ausgewogene Ernährung, Protein hoch halten. Viel Wasser trinken.',
@@ -253,6 +258,7 @@ export function getPhaseRecommendations(phase, lang) {
         nl: 'Gevarieerde voeding, eiwit hoog houden. Drink veel water.',
         pl: 'Zbilansowana dieta, utrzymuj wysokie spożycie białka. Pij dużo wody.',
         it: 'Alimentazione equilibrata, mantieni alte le proteine. Bevi molta acqua.',
+        tr: 'Dengeli beslen, proteini yüksek tut. Bol su iç.',
       },
     },
     luteal: {
@@ -266,6 +272,7 @@ export function getPhaseRecommendations(phase, lang) {
         nl: 'Gematigde intensiteit. Lichtere gewichten, meer rust. Uithoudingsvermogen boven maximale kracht.',
         pl: 'Umiarkowana intensywność. Lżejsze ciężary, dłuższe przerwy. Wytrzymałość zamiast siły maksymalnej.',
         it: 'Intensità moderata. Pesi più leggeri, più pause. Resistenza invece di forza massimale.',
+        tr: 'Orta yoğunluk. Daha hafif ağırlıklar, daha uzun molalar. Maksimum kuvvet yerine dayanıklılık.',
       },
       nutrition: {
         de: 'Kalorienbedarf steigt (+100-300 kcal). Heißhunger ist normal — gesunde Snacks einplanen.',
@@ -277,6 +284,7 @@ export function getPhaseRecommendations(phase, lang) {
         nl: 'Caloriebehoefte stijgt (+100-300 kcal). Trek is normaal — plan gezonde snacks in.',
         pl: 'Zapotrzebowanie kaloryczne rośnie (+100-300 kcal). Napady głodu są normalne — zaplanuj zdrowe przekąski.',
         it: 'Il fabbisogno calorico aumenta (+100-300 kcal). Le voglie sono normali — pianifica snack sani.',
+        tr: 'Kalori ihtiyacı artar (+100-300 kcal). Aşırı iştah normaldir — sağlıklı atıştırmalıklar planla.',
       },
     },
   };

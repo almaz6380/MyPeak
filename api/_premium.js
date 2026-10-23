@@ -134,6 +134,7 @@ export const SPRACHNAME = {
   nl: 'Dutch (Nederlands)',
   pl: 'Polish (polski)',
   it: 'Italian (italiano)',
+  tr: 'Turkish (Türkçe)',
 };
 
 export function zahl(wert, max = 100000) {
