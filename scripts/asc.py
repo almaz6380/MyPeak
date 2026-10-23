@@ -287,6 +287,11 @@ WHATS_NEW_SPRACHEN = {
           "op in Apple Health of Health Connect. Supplementen met voedingswaarden "
           "tellen bij het afvinken mee in je dagtotalen, en ook in de gastmodus "
           "groeien je streak en level.",
+    'pl': "FullRep mówi teraz w 13 językach — nowe to włoski, niderlandzki, polski, "
+          "turecki, japoński, koreański i chiński. Na życzenie FullRep zapisuje twoje "
+          "treningi w Apple Health lub Health Connect. Suplementy z wartościami "
+          "odżywczymi po odhaczeniu wliczają się do twoich wartości dziennych, a seria "
+          "i poziom rosną także w trybie gościa.",
 }
 
 
@@ -483,6 +488,7 @@ SPRACHEN = {
     'pt-BR': ('Portugiesisch', 'pt-BR', 'pt'),
     'ar-SA': ('Arabisch', 'ar', 'ar'),
     'nl-NL': ('Niederländisch', 'nl-NL', 'nl'),
+    'pl': ('Polnisch', 'pl-PL', 'pl'),
 }
 
 # 3.1.2: Der Link auf die Nutzungsbedingungen muss in JEDER Beschreibung
@@ -543,6 +549,15 @@ ABONNEMENT — FULLREP PREMIUM
 • Het abonnement wordt automatisch verlengd, tenzij je het uiterlijk 24 uur vóór het einde van de lopende periode opzegt — beheer en opzeggen via de instellingen van je Apple ID
 • Gebruiksvoorwaarden: https://fullrep.pages.dev/legal/terms
 • Privacyverklaring: https://fullrep.pages.dev/legal/privacy""",
+    'pl': """
+
+SUBSKRYPCJA — FULLREP PREMIUM
+• Subskrypcja miesięczna lub roczna z automatycznym odnowieniem; cena w twojej walucie jest wyświetlana w aplikacji przed zakupem
+• 7 dni bezpłatnego okresu próbnego, który kończy się sam i nie przechodzi w płatną subskrypcję
+• Płatność jest pobierana z twojego Apple ID w momencie potwierdzenia zakupu
+• Subskrypcja odnawia się automatycznie, chyba że anulujesz ją co najmniej 24 godziny przed końcem okresu — zarządzaj nią i anuluj ją w ustawieniach swojego Apple ID
+• Warunki korzystania: https://fullrep.pages.dev/legal/terms
+• Polityka prywatności: https://fullrep.pages.dev/legal/privacy""",
 }
 
 

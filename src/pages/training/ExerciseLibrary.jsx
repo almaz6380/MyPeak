@@ -10,31 +10,31 @@ import ExerciseDetailSheet from './ExerciseDetailSheet';
 import { hasDemo } from '../../data/exerciseDemos';
 
 const EQUIPMENT_TYPES = [
-  { key: 'all', de: 'Alle', en: 'All', es: 'Todos', fr: 'Tous', pt: 'Todos', ar: 'الكل', nl: 'Alle' },
-  { key: 'barbell', de: 'Langhantel', en: 'Barbell', es: 'Barra', fr: 'Barre', pt: 'Barra', ar: 'بار حديد', nl: 'Barbell' },
-  { key: 'dumbbell', de: 'Kurzhantel', en: 'Dumbbell', es: 'Mancuerna', fr: 'Haltères', pt: 'Halteres', ar: 'دمبل', nl: 'Dumbbell' },
-  { key: 'cable', de: 'Kabelzug', en: 'Cable', es: 'Polea', fr: 'Poulie', pt: 'Polia', ar: 'كابل', nl: 'Kabel' },
-  { key: 'machine', de: 'Maschine', en: 'Machine', es: 'Máquina', fr: 'Machine', pt: 'Máquina', ar: 'جهاز', nl: 'Machine' },
-  { key: 'bodyweight', de: 'Körpergewicht', en: 'Bodyweight', es: 'Peso corporal', fr: 'Poids du corps', pt: 'Peso corporal', ar: 'وزن الجسم', nl: 'Eigen gewicht' },
+  { key: 'all', de: 'Alle', en: 'All', es: 'Todos', fr: 'Tous', pt: 'Todos', ar: 'الكل', nl: 'Alle', pl: 'Wszystkie' },
+  { key: 'barbell', de: 'Langhantel', en: 'Barbell', es: 'Barra', fr: 'Barre', pt: 'Barra', ar: 'بار حديد', nl: 'Barbell', pl: 'Sztanga' },
+  { key: 'dumbbell', de: 'Kurzhantel', en: 'Dumbbell', es: 'Mancuerna', fr: 'Haltères', pt: 'Halteres', ar: 'دمبل', nl: 'Dumbbell', pl: 'Hantle' },
+  { key: 'cable', de: 'Kabelzug', en: 'Cable', es: 'Polea', fr: 'Poulie', pt: 'Polia', ar: 'كابل', nl: 'Kabel', pl: 'Wyciąg' },
+  { key: 'machine', de: 'Maschine', en: 'Machine', es: 'Máquina', fr: 'Machine', pt: 'Máquina', ar: 'جهاز', nl: 'Machine', pl: 'Maszyna' },
+  { key: 'bodyweight', de: 'Körpergewicht', en: 'Bodyweight', es: 'Peso corporal', fr: 'Poids du corps', pt: 'Peso corporal', ar: 'وزن الجسم', nl: 'Eigen gewicht', pl: 'Masa ciała' },
 ];
 
 const TRAINING_TYPES = [
-  { key: 'strength', de: 'Krafttraining', en: 'Strength', es: 'Fuerza', fr: 'Musculation', pt: 'Musculação', ar: 'تمارين القوة', nl: 'Kracht', icon: Dumbbell },
-  { key: 'martial-arts', de: 'Kampfsport', en: 'Martial Arts', es: 'Artes marciales', fr: 'Sports de combat', pt: 'Artes marciais', ar: 'فنون قتالية', nl: 'Vechtsport', icon: null },
-  { key: 'cardio', de: 'Cardio', en: 'Cardio', es: 'Cardio', fr: 'Cardio', pt: 'Cardio', ar: 'كارديو', nl: 'Cardio', icon: Heart },
-  { key: 'hiit', de: 'HIIT', en: 'HIIT', es: 'HIIT', fr: 'HIIT', pt: 'HIIT', ar: 'HIIT', nl: 'HIIT', icon: Zap },
-  { key: 'circuit', de: 'Zirkel', en: 'Circuit', es: 'Circuito', fr: 'Circuit', pt: 'Circuito', ar: 'دائري', nl: 'Circuit', icon: RefreshCw },
+  { key: 'strength', de: 'Krafttraining', en: 'Strength', es: 'Fuerza', fr: 'Musculation', pt: 'Musculação', ar: 'تمارين القوة', nl: 'Kracht', pl: 'Trening siłowy', icon: Dumbbell },
+  { key: 'martial-arts', de: 'Kampfsport', en: 'Martial Arts', es: 'Artes marciales', fr: 'Sports de combat', pt: 'Artes marciais', ar: 'فنون قتالية', nl: 'Vechtsport', pl: 'Sporty walki', icon: null },
+  { key: 'cardio', de: 'Cardio', en: 'Cardio', es: 'Cardio', fr: 'Cardio', pt: 'Cardio', ar: 'كارديو', nl: 'Cardio', pl: 'Cardio', icon: Heart },
+  { key: 'hiit', de: 'HIIT', en: 'HIIT', es: 'HIIT', fr: 'HIIT', pt: 'HIIT', ar: 'HIIT', nl: 'HIIT', pl: 'HIIT', icon: Zap },
+  { key: 'circuit', de: 'Zirkel', en: 'Circuit', es: 'Circuito', fr: 'Circuit', pt: 'Circuito', ar: 'دائري', nl: 'Circuit', pl: 'Trening obwodowy', icon: RefreshCw },
 ];
 
 const MA_CATEGORIES = [
-  { key: 'all', de: 'Alle Stile', en: 'All Styles', es: 'Todos los estilos', fr: 'Toutes les disciplines', pt: 'Todos os estilos', ar: 'كل الأساليب', nl: 'Alle stijlen' },
-  { key: 'boxing', de: 'Boxen', en: 'Boxing', es: 'Boxeo', fr: 'Boxe', pt: 'Boxe', ar: 'ملاكمة', nl: 'Boksen' },
-  { key: 'kickboxing', de: 'Kickboxen', en: 'Kickboxing', es: 'Kickboxing', fr: 'Kickboxing', pt: 'Kickboxing', ar: 'كيك بوكسينغ', nl: 'Kickboksen' },
-  { key: 'mma', de: 'MMA', en: 'MMA', es: 'MMA', fr: 'MMA', pt: 'MMA', ar: 'فنون قتالية مختلطة', nl: 'MMA' },
-  { key: 'judo', de: 'Judo', en: 'Judo', es: 'Judo', fr: 'Judo', pt: 'Judô', ar: 'جودو', nl: 'Judo' },
-  { key: 'bjj', de: 'BJJ', en: 'BJJ', es: 'BJJ', fr: 'JJB', pt: 'Jiu-jítsu', ar: 'جوجيتسو برازيلي', nl: 'BJJ' },
-  { key: 'taekwondo', de: 'Taekwondo', en: 'Taekwondo', es: 'Taekwondo', fr: 'Taekwondo', pt: 'Taekwondo', ar: 'تايكوندو', nl: 'Taekwondo' },
-  { key: 'wrestling', de: 'Ringen', en: 'Wrestling', es: 'Lucha', fr: 'Lutte', pt: 'Wrestling', ar: 'مصارعة', nl: 'Worstelen' },
+  { key: 'all', de: 'Alle Stile', en: 'All Styles', es: 'Todos los estilos', fr: 'Toutes les disciplines', pt: 'Todos os estilos', ar: 'كل الأساليب', nl: 'Alle stijlen', pl: 'Wszystkie style' },
+  { key: 'boxing', de: 'Boxen', en: 'Boxing', es: 'Boxeo', fr: 'Boxe', pt: 'Boxe', ar: 'ملاكمة', nl: 'Boksen', pl: 'Boks' },
+  { key: 'kickboxing', de: 'Kickboxen', en: 'Kickboxing', es: 'Kickboxing', fr: 'Kickboxing', pt: 'Kickboxing', ar: 'كيك بوكسينغ', nl: 'Kickboksen', pl: 'Kickboxing' },
+  { key: 'mma', de: 'MMA', en: 'MMA', es: 'MMA', fr: 'MMA', pt: 'MMA', ar: 'فنون قتالية مختلطة', nl: 'MMA', pl: 'MMA' },
+  { key: 'judo', de: 'Judo', en: 'Judo', es: 'Judo', fr: 'Judo', pt: 'Judô', ar: 'جودو', nl: 'Judo', pl: 'Judo' },
+  { key: 'bjj', de: 'BJJ', en: 'BJJ', es: 'BJJ', fr: 'JJB', pt: 'Jiu-jítsu', ar: 'جوجيتسو برازيلي', nl: 'BJJ', pl: 'BJJ' },
+  { key: 'taekwondo', de: 'Taekwondo', en: 'Taekwondo', es: 'Taekwondo', fr: 'Taekwondo', pt: 'Taekwondo', ar: 'تايكوندو', nl: 'Taekwondo', pl: 'Taekwondo' },
+  { key: 'wrestling', de: 'Ringen', en: 'Wrestling', es: 'Lucha', fr: 'Lutte', pt: 'Wrestling', ar: 'مصارعة', nl: 'Worstelen', pl: 'Zapasy' },
 ];
 
 export default function ExerciseLibrary({ onBack, onSelect, selectionMode = false, initialType = null }) {

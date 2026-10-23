@@ -192,6 +192,7 @@ export function getPhaseRecommendations(phase, lang) {
         pt: 'Treino leve recomendado: ioga, mobilidade, caminhadas. Escute o seu corpo.',
         ar: 'يُنصح بتدريب خفيف: يوغا، وتمارين مرونة، ومشي. أنصت إلى جسدك.',
         nl: 'Lichte training aanbevolen: yoga, mobility, wandelen. Luister naar je lichaam.',
+        pl: 'Zalecany lekki trening: joga, mobility, spacery. Słuchaj swojego ciała.',
       },
       nutrition: {
         de: 'Eisenreiche Lebensmittel (Spinat, rotes Fleisch), Magnesium. Kein Kaloriendefizit.',
@@ -201,6 +202,7 @@ export function getPhaseRecommendations(phase, lang) {
         pt: 'Alimentos ricos em ferro (espinafre, carne vermelha), magnésio. Sem déficit calórico.',
         ar: 'أطعمة غنية بالحديد (سبانخ، لحم أحمر) ومغنيسيوم. بلا عجز سعري.',
         nl: 'IJzerrijke voeding (spinazie, rood vlees), magnesium. Geen calorietekort.',
+        pl: 'Produkty bogate w żelazo (szpinak, czerwone mięso), magnez. Bez deficytu kalorycznego.',
       },
     },
     follicular: {
@@ -212,6 +214,7 @@ export function getPhaseRecommendations(phase, lang) {
         pt: 'A melhor fase para treinar pesado! Força, aumente o volume, busque recordes.',
         ar: 'أفضل مرحلة للتدريب المكثّف! تدريب قوة، وارفع الحجم، وحاول تسجيل أرقام جديدة.',
         nl: 'Beste fase voor intensieve training! Krachttraining, volume opvoeren, PR’s proberen.',
+        pl: 'Najlepsza faza na intensywny trening! Trening siłowy, więcej objętości, próby PR.',
       },
       nutrition: {
         de: 'Mehr Kohlenhydrate für maximale Performance. Protein wie gewohnt.',
@@ -221,6 +224,7 @@ export function getPhaseRecommendations(phase, lang) {
         pt: 'Mais carboidratos para o desempenho máximo. Proteína como sempre.',
         ar: 'كربوهيدرات أكثر لأقصى أداء. والبروتين كالمعتاد.',
         nl: 'Meer koolhydraten voor maximale prestaties. Eiwit zoals gewoonlijk.',
+        pl: 'Więcej węglowodanów dla maksymalnej wydajności. Białko jak zwykle.',
       },
     },
     ovulation: {
@@ -232,6 +236,7 @@ export function getPhaseRecommendations(phase, lang) {
         pt: 'Energia no pico! HIIT e esforço máximo são possíveis. Atenção: risco de lesão um pouco maior.',
         ar: 'ذروة الطاقة! تمارين HIIT وجهد أقصى ممكنان. انتبه: خطر الإصابة أعلى قليلًا.',
         nl: 'Piekenergie! HIIT, maximale inspanning mogelijk. Let op: iets hoger blessurerisico.',
+        pl: 'Szczyt energii! HIIT, możliwy maksymalny wysiłek. Uwaga: lekko wyższe ryzyko kontuzji.',
       },
       nutrition: {
         de: 'Ausgewogene Ernährung, Protein hoch halten. Viel Wasser trinken.',
@@ -241,6 +246,7 @@ export function getPhaseRecommendations(phase, lang) {
         pt: 'Alimentação equilibrada, mantenha a proteína alta. Beba bastante água.',
         ar: 'تغذية متوازنة مع إبقاء البروتين مرتفعًا. واشرب ماءً كثيرًا.',
         nl: 'Gevarieerde voeding, eiwit hoog houden. Drink veel water.',
+        pl: 'Zbilansowana dieta, utrzymuj wysokie spożycie białka. Pij dużo wody.',
       },
     },
     luteal: {
@@ -252,6 +258,7 @@ export function getPhaseRecommendations(phase, lang) {
         pt: 'Intensidade moderada. Cargas mais leves, mais descanso. Resistência em vez de força máxima.',
         ar: 'شدّة معتدلة. أوزان أخف واستراحات أكثر. تحمّل بدل القوة القصوى.',
         nl: 'Gematigde intensiteit. Lichtere gewichten, meer rust. Uithoudingsvermogen boven maximale kracht.',
+        pl: 'Umiarkowana intensywność. Lżejsze ciężary, dłuższe przerwy. Wytrzymałość zamiast siły maksymalnej.',
       },
       nutrition: {
         de: 'Kalorienbedarf steigt (+100-300 kcal). Heißhunger ist normal — gesunde Snacks einplanen.',
@@ -261,6 +268,7 @@ export function getPhaseRecommendations(phase, lang) {
         pt: 'A necessidade calórica sobe (+100-300 kcal). A fome intensa é normal — planeje lanches saudáveis.',
         ar: 'ترتفع الحاجة السعرية (100-300+ سعرة). والاشتهاء أمر طبيعي — خطّط لوجبات خفيفة صحية.',
         nl: 'Caloriebehoefte stijgt (+100-300 kcal). Trek is normaal — plan gezonde snacks in.',
+        pl: 'Zapotrzebowanie kaloryczne rośnie (+100-300 kcal). Napady głodu są normalne — zaplanuj zdrowe przekąski.',
       },
     },
   };

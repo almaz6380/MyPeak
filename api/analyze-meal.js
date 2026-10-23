@@ -99,6 +99,18 @@ const MAHLZEIT = {
     beispielName: 'Kipfilet',
     beispielBeschreibung: 'Korte beschrijving van de maaltijd',
   },
+  pl: {
+    intro: 'Jesteś asystentem do analizy żywienia. Przeanalizuj to zdjęcie posiłku i rozpoznaj każdy widoczny produkt.',
+    schaetze: 'Dla każdego produktu oszacuj:',
+    felder: ['Wielkość porcji w gramach (na podstawie wielkości widocznej w stosunku do talerza/miski)', 'Kalorie (kcal)', 'Białko (g)', 'Węglowodany (g)', 'Tłuszcz (g)', 'Poziom pewności (high, medium, low)'],
+    namenZeile: (s) => `Nazwa w językach: ${s}`,
+    wichtig: 'Ważne:',
+    regeln: ['Szacuj porcje na podstawie widocznej wielkości', 'Korzystaj ze standardowych baz danych wartości odżywczych jako punktu odniesienia', 'Przyjmij normalną ilość oleju/tłuszczu użytego do przygotowania', 'Jeśli nie możesz rozpoznać produktu, opisz go i podaj swoje najlepsze oszacowanie', 'Jeśli zdjęcie nie przedstawia jedzenia, odpowiedz {"error": "no_food_detected"}'],
+    format: 'Odpowiedz WYŁĄCZNIE poprawnym JSON-em dokładnie w tym formacie, bez żadnego innego tekstu:',
+    sprachname: 'polski',
+    beispielName: 'Pierś z kurczaka',
+    beispielBeschreibung: 'Krótki opis posiłku',
+  },
 };
 
 export function mahlzeitPrompt(sprache) {

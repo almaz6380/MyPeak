@@ -74,7 +74,7 @@ def vor_ende(rel, anker, block, schon):
 
 def ersetzen(rel, muster, ersatz, schon=None):
     text = datei(rel).read_text()
-    if schon and re.search(schon, text):
+    if schon and re.search(schon, text, re.M):
         print(f'  {rel}: schon eingetragen')
         return
     neu, n = re.subn(muster, ersatz, text, count=1, flags=re.M)
@@ -125,7 +125,7 @@ def main():
     vor_ende('scripts/store-rahmen.mjs', 'const TEXTE = {', schnipsel(ordner, 'rahmen.txt'), rf"^\s*{c}: \{{")
     vor_ende('scripts/render-store-graphics.py', 'FEATURE_TEXTE = {', schnipsel(ordner, 'grafik.txt'), rf'^\s*"{c}":')
     shots = schnipsel(ordner, 'screenshots.txt')
-    teile = re.split(r'^// *(SPEISEN|PRAEPARATE)\s*$', shots, flags=re.M)
+    teile = re.split(r'^// *(SPEISEN|PRAEPARATE):?\s*$', shots, flags=re.M)
     bloecke = dict(zip(teile[1::2], teile[2::2]))
     for name in ('SPEISEN', 'PRAEPARATE'):
         if name not in bloecke:

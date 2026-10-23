@@ -94,6 +94,17 @@ const PAKETE = {
     programs: () => import('./nl/programme.js'),
     foods: () => import('./nl/lebensmittel.js'),
   },
+  pl: {
+    peptides: () => import('./pl/peptide.js'),
+    diets: () => import('./pl/diaeten.js'),
+    training: () => import('./pl/training.js'),
+    nutrition: () => import('./pl/ernaehrung.js'),
+    supplements: () => import('./pl/supplemente.js'),
+    bloodwork: () => import('./pl/blutwerte.js'),
+    recipes: () => import('./pl/rezepte.js'),
+    programs: () => import('./pl/programme.js'),
+    foods: () => import('./pl/lebensmittel.js'),
+  },
 };
 
 export { BEREICHE };

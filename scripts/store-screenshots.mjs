@@ -40,7 +40,7 @@ const lokal = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, 
 const today = lokal(new Date());
 const daysAgo = (n) => lokal(new Date(Date.now() - n * 864e5));
 
-export const SPRACHEN = ['de', 'en', 'es', 'fr', 'pt', 'ar', 'nl'];
+export const SPRACHEN = ['de', 'en', 'es', 'fr', 'pt', 'ar', 'nl', 'pl'];
 
 // Was auf den Bildern als Eintrag steht, muss in der Sprache des Bildes stehen —
 // ein englischer Store mit „Haferflocken mit Beeren“ wirkt wie eine Fremd-App.
@@ -52,6 +52,7 @@ const SPEISEN = {
   pt: ['Aveia com frutas vermelhas', 'Queijo quark magro', 'Peito de frango com arroz', 'Salada mista', 'Salmão com batatas', 'Shake de proteína'],
   ar: ['شوفان مع التوت', 'جبن قريش قليل الدسم', 'صدر دجاج مع أرز', 'سلطة مشكّلة', 'سلمون مع بطاطس', 'مخفوق بروتين'],
   nl: ['Havermout met bessen', 'Magere kwark', 'Kipfilet met rijst', 'Gemengde salade', 'Zalm met aardappelen', 'Eiwitshake'],
+  pl: ['Owsianka z owocami jagodowymi', 'Chudy twaróg', 'Pierś z kurczaka z ryżem', 'Sałatka mieszana', 'Łosoś z ziemniakami', 'Shake proteinowy'],
 };
 const PRAEPARATE = {
   de: ['Kreatin', 'Vitamin D3', 'Omega-3'],
@@ -61,6 +62,7 @@ const PRAEPARATE = {
   pt: ['Creatina', 'Vitamina D3', 'Ômega-3'],
   ar: ['كرياتين', 'فيتامين د3', 'أوميغا 3'],
   nl: ['Creatine', 'Vitamine D3', 'Omega-3'],
+  pl: ['Kreatyna', 'Witamina D3', 'Omega-3'],
 };
 // Eine volle Push/Pull/Legs-Woche bis heute, damit die Heatmap Farbe hat.
 const PUSH = [['bench-press', 'exercises.benchPress', 80, 8], ['incline-dumbbell-press', 'exercises.inclineDumbbellPress', 30, 10], ['overhead-press', 'exercises.overheadPress', 45, 10]];
@@ -217,7 +219,7 @@ function uebersetzung(lang, key) {
   return key.split('.').reduce((o, k) => o?.[k], d);
 }
 
-const BROWSER_LOCALE = { de: 'de-DE', en: 'en-US', es: 'es-ES', fr: 'fr-FR', pt: 'pt-BR', ar: 'ar', nl: 'nl-NL' };
+const BROWSER_LOCALE = { de: 'de-DE', en: 'en-US', es: 'es-ES', fr: 'fr-FR', pt: 'pt-BR', ar: 'ar', nl: 'nl-NL', pl: 'pl-PL' };
 
 async function shoot(browser, device, lang) {
   const outDir = path.join(ROOT, 'store-assets', 'roh', lang, device.dir);

@@ -6,30 +6,30 @@ import recipes from '../../data/recipesData';
 import { useUebersetzung, uebersetztesRezept } from '../../data/uebersetzungen';
 
 const MEAL_FILTERS = [
-  { key: 'all', de: 'Alle', en: 'All', es: 'Todas', fr: 'Toutes', pt: 'Todas', ar: 'الكل', nl: 'Alle' },
-  { key: 'breakfast', de: 'Frühstück', en: 'Breakfast', es: 'Desayuno', fr: 'Petit-déjeuner', pt: 'Café da manhã', ar: 'الإفطار', nl: 'Ontbijt' },
-  { key: 'lunch', de: 'Mittagessen', en: 'Lunch', es: 'Comida', fr: 'Déjeuner', pt: 'Almoço', ar: 'الغداء', nl: 'Lunch' },
-  { key: 'dinner', de: 'Abendessen', en: 'Dinner', es: 'Cena', fr: 'Dîner', pt: 'Jantar', ar: 'العشاء', nl: 'Diner' },
-  { key: 'snack', de: 'Snack', en: 'Snack', es: 'Tentempié', fr: 'Collation', pt: 'Lanche', ar: 'وجبة خفيفة', nl: 'Snack' },
-  { key: 'postworkout', de: 'Post-Workout', en: 'Post-Workout', es: 'Post-entreno', fr: 'Après séance', pt: 'Pós-treino', ar: 'بعد التمرين', nl: 'Post-workout' },
+  { key: 'all', de: 'Alle', en: 'All', es: 'Todas', fr: 'Toutes', pt: 'Todas', ar: 'الكل', nl: 'Alle', pl: 'Wszystkie' },
+  { key: 'breakfast', de: 'Frühstück', en: 'Breakfast', es: 'Desayuno', fr: 'Petit-déjeuner', pt: 'Café da manhã', ar: 'الإفطار', nl: 'Ontbijt', pl: 'Śniadanie' },
+  { key: 'lunch', de: 'Mittagessen', en: 'Lunch', es: 'Comida', fr: 'Déjeuner', pt: 'Almoço', ar: 'الغداء', nl: 'Lunch', pl: 'Obiad' },
+  { key: 'dinner', de: 'Abendessen', en: 'Dinner', es: 'Cena', fr: 'Dîner', pt: 'Jantar', ar: 'العشاء', nl: 'Diner', pl: 'Kolacja' },
+  { key: 'snack', de: 'Snack', en: 'Snack', es: 'Tentempié', fr: 'Collation', pt: 'Lanche', ar: 'وجبة خفيفة', nl: 'Snack', pl: 'Przekąska' },
+  { key: 'postworkout', de: 'Post-Workout', en: 'Post-Workout', es: 'Post-entreno', fr: 'Après séance', pt: 'Pós-treino', ar: 'بعد التمرين', nl: 'Post-workout', pl: 'Po treningu' },
 ];
 
 const TAG_FILTERS = [
-  { key: 'all', de: 'Alle', en: 'All', es: 'Todas', fr: 'Toutes', pt: 'Todas', ar: 'الكل', nl: 'Alle' },
-  { key: 'normal', de: 'Normal', en: 'Normal', es: 'Normal', fr: 'Normal', pt: 'Normal', ar: 'عادي', nl: 'Normaal' },
-  { key: 'vegetarian', de: 'Vegetarisch', en: 'Vegetarian', es: 'Vegetariana', fr: 'Végétarien', pt: 'Vegetariana', ar: 'نباتي', nl: 'Vegetarisch' },
-  { key: 'vegan', de: 'Vegan', en: 'Vegan', es: 'Vegana', fr: 'Végétalien', pt: 'Vegana', ar: 'نباتي صرف', nl: 'Veganistisch' },
-  { key: 'keto', de: 'Keto', en: 'Keto', es: 'Keto', fr: 'Céto', pt: 'Keto', ar: 'كيتو', nl: 'Keto' },
-  { key: 'lowcarb', de: 'Low Carb', en: 'Low Carb', es: 'Baja en carbohidratos', fr: 'Pauvre en glucides', pt: 'Baixo carboidrato', ar: 'قليل الكربوهيدرات', nl: 'Low carb' },
-  { key: 'highcarb', de: 'High Carb', en: 'High Carb', es: 'Alta en carbohidratos', fr: 'Riche en glucides', pt: 'Alto carboidrato', ar: 'عالي الكربوهيدرات', nl: 'High carb' },
-  { key: 'glutenfree', de: 'Glutenfrei', en: 'Gluten-free', es: 'Sin gluten', fr: 'Sans gluten', pt: 'Sem glúten', ar: 'خالٍ من الغلوتين', nl: 'Glutenvrij' },
-  { key: 'lactosefree', de: 'Laktosefrei', en: 'Lactose-free', es: 'Sin lactosa', fr: 'Sans lactose', pt: 'Sem lactose', ar: 'خالٍ من اللاكتوز', nl: 'Lactosevrij' },
+  { key: 'all', de: 'Alle', en: 'All', es: 'Todas', fr: 'Toutes', pt: 'Todas', ar: 'الكل', nl: 'Alle', pl: 'Wszystkie' },
+  { key: 'normal', de: 'Normal', en: 'Normal', es: 'Normal', fr: 'Normal', pt: 'Normal', ar: 'عادي', nl: 'Normaal', pl: 'Standardowa' },
+  { key: 'vegetarian', de: 'Vegetarisch', en: 'Vegetarian', es: 'Vegetariana', fr: 'Végétarien', pt: 'Vegetariana', ar: 'نباتي', nl: 'Vegetarisch', pl: 'Wegetariańska' },
+  { key: 'vegan', de: 'Vegan', en: 'Vegan', es: 'Vegana', fr: 'Végétalien', pt: 'Vegana', ar: 'نباتي صرف', nl: 'Veganistisch', pl: 'Wegańska' },
+  { key: 'keto', de: 'Keto', en: 'Keto', es: 'Keto', fr: 'Céto', pt: 'Keto', ar: 'كيتو', nl: 'Keto', pl: 'Keto' },
+  { key: 'lowcarb', de: 'Low Carb', en: 'Low Carb', es: 'Baja en carbohidratos', fr: 'Pauvre en glucides', pt: 'Baixo carboidrato', ar: 'قليل الكربوهيدرات', nl: 'Low carb', pl: 'Low carb' },
+  { key: 'highcarb', de: 'High Carb', en: 'High Carb', es: 'Alta en carbohidratos', fr: 'Riche en glucides', pt: 'Alto carboidrato', ar: 'عالي الكربوهيدرات', nl: 'High carb', pl: 'High carb' },
+  { key: 'glutenfree', de: 'Glutenfrei', en: 'Gluten-free', es: 'Sin gluten', fr: 'Sans gluten', pt: 'Sem glúten', ar: 'خالٍ من الغلوتين', nl: 'Glutenvrij', pl: 'Bez glutenu' },
+  { key: 'lactosefree', de: 'Laktosefrei', en: 'Lactose-free', es: 'Sin lactosa', fr: 'Sans lactose', pt: 'Sem lactose', ar: 'خالٍ من اللاكتوز', nl: 'Lactosevrij', pl: 'Bez laktozy' },
 ];
 
 const DIFFICULTY = {
-  easy: { de: 'Einfach', en: 'Easy', es: 'Fácil', fr: 'Facile', pt: 'Fácil', ar: 'سهل', nl: 'Makkelijk', color: 'text-green-500 bg-green-50 dark:bg-green-900/20' },
-  medium: { de: 'Mittel', en: 'Medium', es: 'Media', fr: 'Moyen', pt: 'Média', ar: 'متوسط', nl: 'Gemiddeld', color: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' },
-  hard: { de: 'Schwer', en: 'Hard', es: 'Difícil', fr: 'Difficile', pt: 'Difícil', ar: 'صعب', nl: 'Moeilijk', color: 'text-red-500 bg-red-50 dark:bg-red-900/20' },
+  easy: { de: 'Einfach', en: 'Easy', es: 'Fácil', fr: 'Facile', pt: 'Fácil', ar: 'سهل', nl: 'Makkelijk', pl: 'Łatwy', color: 'text-green-500 bg-green-50 dark:bg-green-900/20' },
+  medium: { de: 'Mittel', en: 'Medium', es: 'Media', fr: 'Moyen', pt: 'Média', ar: 'متوسط', nl: 'Gemiddeld', pl: 'Średni', color: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' },
+  hard: { de: 'Schwer', en: 'Hard', es: 'Difícil', fr: 'Difficile', pt: 'Difícil', ar: 'صعب', nl: 'Moeilijk', pl: 'Trudny', color: 'text-red-500 bg-red-50 dark:bg-red-900/20' },
 };
 
 export default function Cookbook({ onBack, onSelectRecipe }) {

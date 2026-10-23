@@ -382,6 +382,29 @@ Met barcodescanner, fotoherkenning met AI en 21 kant-en-klare programma’s.
 
 ---
 
+### Polnisch — Name (max. 30 Zeichen)
+```
+FullRep: Trening i dieta
+```
+
+### Polnisch — Untertitel (max. 30 Zeichen)
+```
+Trening, kalorie i makro
+```
+
+### Polnisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+siłownia,fitness,odchudzanie,mięśnie,białko,ćwiczenia,waga,licznik,kcal,redukcja,masa,gym,workout
+```
+
+### Polnisch — Werbetext (max. 170 Zeichen)
+```
+Zapisuj treningi, licz kalorie, śledź postępy — wszystko w jednej aplikacji.
+Ze skanerem kodów, rozpoznawaniem zdjęć przez AI i 21 gotowymi programami.
+```
+
+---
+
 ## 3. Apple „App-Datenschutz" (Privacy Nutrition Labels)
 
 **Datenerhebung: Ja** — alle Daten „mit dem Nutzer verknüpft" (Konto-basiert), **kein Tracking** (kein Ad-Tracking, keine Datenweitergabe an Werbenetzwerke).

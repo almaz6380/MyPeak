@@ -252,11 +252,11 @@ export const XP_VALUES = {
 
 // Titel basierend auf Level
 export function getLevelTitle(level) {
-  if (level >= 51) return { de: 'GOAT', en: 'GOAT', es: 'GOAT', fr: 'GOAT', pt: 'GOAT', ar: 'الأعظم', nl: 'GOAT', emoji: '🐐' };
-  if (level >= 31) return { de: 'Legende', en: 'Legend', es: 'Leyenda', fr: 'Légende', pt: 'Lenda', ar: 'أسطورة', nl: 'Legende', emoji: '👑' };
-  if (level >= 16) return { de: 'Champion', en: 'Champion', es: 'Campeón', fr: 'Champion', pt: 'Campeão', ar: 'بطل', nl: 'Kampioen', emoji: '🏆' };
-  if (level >= 6) return { de: 'Warrior', en: 'Warrior', es: 'Guerrero', fr: 'Guerrier', pt: 'Guerreiro', ar: 'محارب', nl: 'Strijder', emoji: '⚔️' };
-  return { de: 'Rookie', en: 'Rookie', es: 'Novato', fr: 'Débutant', pt: 'Novato', ar: 'مبتدئ', nl: 'Rookie', emoji: '🌱' };
+  if (level >= 51) return { de: 'GOAT', en: 'GOAT', es: 'GOAT', fr: 'GOAT', pt: 'GOAT', ar: 'الأعظم', nl: 'GOAT', pl: 'GOAT', emoji: '🐐' };
+  if (level >= 31) return { de: 'Legende', en: 'Legend', es: 'Leyenda', fr: 'Légende', pt: 'Lenda', ar: 'أسطورة', nl: 'Legende', pl: 'Legenda', emoji: '👑' };
+  if (level >= 16) return { de: 'Champion', en: 'Champion', es: 'Campeón', fr: 'Champion', pt: 'Campeão', ar: 'بطل', nl: 'Kampioen', pl: 'Champion', emoji: '🏆' };
+  if (level >= 6) return { de: 'Warrior', en: 'Warrior', es: 'Guerrero', fr: 'Guerrier', pt: 'Guerreiro', ar: 'محارب', nl: 'Strijder', pl: 'Warrior', emoji: '⚔️' };
+  return { de: 'Rookie', en: 'Rookie', es: 'Novato', fr: 'Débutant', pt: 'Novato', ar: 'مبتدئ', nl: 'Rookie', pl: 'Rookie', emoji: '🌱' };
 }
 
 // XP pro Level (progressiv: Level 1=100, Level 2=150, Level 3=200...)

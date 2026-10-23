@@ -72,34 +72,47 @@ if (befehl === 'export') {
   }
   process.stdout.write(JSON.stringify(liste, null, 2) + '\n');
 } else {
+  // Zugeordnet wird über den INHALT (de + en), die Zeile ist nur ein Hinweis:
+  // Seit dem Export kann eine andere Sprache Zeilen eingefügt haben, und eine
+  // feste Zeilennummer träfe dann die falsche Tabelle.
   const eintraege = JSON.parse(readFileSync(datei, 'utf8'));
-  const jeDatei = new Map();
+  const esc = (s) => s.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n');
+  let eingetragen = 0;
   for (const e of eintraege) {
     if (!e.text) { console.error(`leer: ${e.id}`); process.exitCode = 1; continue; }
-    const [rel, zeile] = [e.id.slice(0, e.id.lastIndexOf(':')), Number(e.id.slice(e.id.lastIndexOf(':') + 1))];
-    if (!jeDatei.has(rel)) jeDatei.set(rel, []);
-    jeDatei.get(rel).push({ zeile, text: e.text });
-  }
-  const esc = (s) => s.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n');
-  for (const [rel, liste] of jeDatei) {
+    const rel = e.id.slice(0, e.id.lastIndexOf(':'));
+    const hinweis = Number(e.id.slice(e.id.lastIndexOf(':') + 1));
     const pfad = join(WURZEL, rel);
-    const zeilen = readFileSync(pfad, 'utf8').split('\n');
-    // Von unten nach oben, damit eingefügte Zeilen die Nummern darüber nicht verschieben
-    for (const { zeile, text } of liste.sort((a, b) => b.zeile - a.zeile)) {
-      const z = zeilen[zeile - 1];
-      const m = z.match(WERT('ar'));
-      if (!m) { console.error(`keine ar-Angabe mehr in ${rel}:${zeile}`); process.exitCode = 1; continue; }
-      const nur = /^\s*ar:\s*'(?:[^'\\]|\\.)*',?\s*$/.test(z);
-      if (nur) {
-        const einzug = z.match(/^\s*/)[0];
-        zeilen.splice(zeile, 0, `${einzug}${sprache}: '${esc(text)}',`);
-        if (!z.trimEnd().endsWith(',')) zeilen[zeile - 1] = `${z.trimEnd()},`;
-      } else {
-        const ende = m.index + m[0].length;
-        zeilen[zeile - 1] = `${z.slice(0, ende)}, ${sprache}: '${esc(text)}'${z.slice(ende)}`;
-      }
+    const src = readFileSync(pfad, 'utf8');
+    const kandidaten = tabellen(src).filter((t) => t.de === e.de && t.en === e.en && !t.hat(sprache) && t.arZeile >= 0);
+    if (!kandidaten.length) {
+      // Schon eingetragen (zweiter Lauf) ist kein Fehler, alles andere schon
+      const schon = tabellen(src).some((t) => t.de === e.de && t.en === e.en && t.hat(sprache));
+      if (!schon) { console.error(`nicht gefunden: ${e.id} (${e.en.slice(0, 40)})`); process.exitCode = 1; }
+      continue;
+    }
+    kandidaten.sort((a, b) => Math.abs(a.arZeile + 1 - hinweis) - Math.abs(b.arZeile + 1 - hinweis));
+    const zeilen = src.split('\n');
+    const zeile = kandidaten[0].arZeile; // 0-basiert
+    const z = zeilen[zeile];
+    const m = z.match(WERT('ar'));
+    if (/^\s*ar:\s*'(?:[^'\\]|\\.)*',?\s*$/.test(z)) {
+      const einzug = z.match(/^\s*/)[0];
+      // Andere Sprachen stehen evtl. schon in eigenen Zeilen nach ar — dahinter einreihen
+      let nach = zeile + 1;
+      while (nach < zeilen.length && /^\s*[a-z]{2}:\s*'/.test(zeilen[nach])) nach += 1;
+      if (!zeilen[nach - 1].trimEnd().endsWith(',')) zeilen[nach - 1] = `${zeilen[nach - 1].trimEnd()},`;
+      zeilen.splice(nach, 0, `${einzug}${sprache}: '${esc(e.text)}',`);
+    } else {
+      // Einzeilige Tabelle: hinter die letzte Sprachangabe nach ar setzen
+      let ende = m.index + m[0].length;
+      const rest = z.slice(ende);
+      const weitere = rest.match(/^(?:,\s*[a-z]{2}:\s*'(?:[^'\\]|\\.)*')+/);
+      if (weitere) ende += weitere[0].length;
+      zeilen[zeile] = `${z.slice(0, ende)}, ${sprache}: '${esc(e.text)}'${z.slice(ende)}`;
     }
     writeFileSync(pfad, zeilen.join('\n'));
+    eingetragen += 1;
   }
-  console.log(`${eintraege.length} Einträge für ${sprache} eingetragen.`);
+  console.log(`${eingetragen} Einträge für ${sprache} eingetragen.`);
 }

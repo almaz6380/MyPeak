@@ -132,6 +132,9 @@ FEATURE_TEXTE = {
     "nl": ("Training &amp; voeding in één app",
            "Workouts · Calorieën &amp; macro’s · ", "Barcodescanner",
            "21 programma’s · Je voortgang in één oogopslag"),
+    "pl": ("Trening i dieta w jednej aplikacji",
+           "Trening · Kalorie i makro · ", "Skaner kodów",
+           "21 programów · Postępy na pierwszy rzut oka"),
 }
 
 

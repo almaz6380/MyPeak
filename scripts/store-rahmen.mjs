@@ -88,6 +88,14 @@ const TEXTE = {
     '05-peak-programme': ['21 trainingsprogramma’s', 'kracht, cardio, HIIT & vechtsport'],
     '06-uebungen': ['Meer dan 240 oefeningen', 'met uitleg & animatie'],
   },
+  pl: {
+    '01-dashboard': ['Trening i odżywianie', 'w jednej aplikacji'],
+    '02-ernaehrung': ['Kalorie i makro', 'ze zdjęcia, kodu lub wyszukiwarki'],
+    '03-kochbuch': ['25 białkowych przepisów', 'z makro i kalkulatorem porcji'],
+    '04-training': ['Zobacz, co trenujesz', 'mapa mięśni i plan tygodnia'],
+    '05-peak-programme': ['21 programów treningowych', 'siła, cardio, HIIT i sporty walki'],
+    '06-uebungen': ['Ponad 240 ćwiczeń', 'z instrukcją i animacją'],
+  },
 };
 
 const schrift = (g) => fs.readFileSync(

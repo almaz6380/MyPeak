@@ -24,6 +24,7 @@ const TEXTS = {
     pt: 'O FullRep não substitui orientação médica. Para qualquer dúvida de saúde, diagnóstico ou tratamento, procure sempre um médico.',
     ar: 'لا يغني FullRep عن الاستشارة الطبية. وعند أي سؤال صحي أو لتشخيص أو علاج، راجع الطبيب دائمًا.',
     nl: 'FullRep vervangt geen medisch advies. Neem bij gezondheidsvragen, voor een diagnose of een behandeling altijd contact op met een arts.',
+    pl: 'FullRep nie zastępuje porady lekarskiej. W sprawach zdrowotnych, w celu diagnozy lub leczenia zawsze zwróć się do lekarki lub lekarza.',
   },
   general: {
     de: 'Diese Informationen dienen zu Bildungszwecken. Trainings- und Ernährungsempfehlungen sind allgemein gehalten und ersetzen keine individuelle oder ärztliche Beratung. Wende dich bei gesundheitlichen Fragen, für eine Diagnose oder eine Behandlung an eine Ärztin oder einen Arzt.',
@@ -33,6 +34,7 @@ const TEXTS = {
     pt: 'Estas informações têm finalidade educativa. As recomendações de treino e de nutrição são gerais e não substituem orientação individual nem médica. Para qualquer dúvida de saúde, diagnóstico ou tratamento, procure um médico.',
     ar: 'هذه المعلومات لأغراض تعليمية. وتوصيات التدريب والتغذية عامة ولا تغني عن استشارة فردية أو طبية. وعند أي سؤال صحي أو لتشخيص أو علاج، راجع الطبيب.',
     nl: 'Deze informatie is bedoeld voor educatieve doeleinden. Trainings- en voedingsadviezen zijn algemeen en vervangen geen persoonlijk of medisch advies. Neem bij gezondheidsvragen, voor een diagnose of een behandeling contact op met een arts.',
+    pl: 'Te informacje służą celom edukacyjnym. Zalecenia treningowe i żywieniowe mają charakter ogólny i nie zastępują indywidualnej ani lekarskiej porady. W sprawach zdrowotnych, w celu diagnozy lub leczenia zwróć się do lekarki lub lekarza.',
   },
 };
 
