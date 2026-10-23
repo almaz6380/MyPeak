@@ -29,6 +29,7 @@ const TEXTS = {
     tr: 'FullRep tıbbi danışmanlığın yerini tutmaz. Sağlıkla ilgili her soru, teşhis veya tedavi için mutlaka bir doktora başvur.',
     ja: 'FullRepは医師の助言に代わるものではありません。健康上の疑問、診断や治療については、必ず医師にご相談ください。',
     ko: 'FullRep은 의학적 조언을 대신하지 않아요. 건강 문제, 진단 또는 치료가 필요하면 반드시 의사와 상담하세요.',
+    zh: 'FullRep 不能替代医生的建议。如有任何健康问题、需要诊断或治疗，请务必咨询医生。',
   },
   general: {
     de: 'Diese Informationen dienen zu Bildungszwecken. Trainings- und Ernährungsempfehlungen sind allgemein gehalten und ersetzen keine individuelle oder ärztliche Beratung. Wende dich bei gesundheitlichen Fragen, für eine Diagnose oder eine Behandlung an eine Ärztin oder einen Arzt.',
@@ -43,6 +44,7 @@ const TEXTS = {
     tr: 'Bu bilgiler eğitim amaçlıdır. Antrenman ve beslenme önerileri geneldir; kişisel veya tıbbi danışmanlığın yerini tutmaz. Sağlıkla ilgili her soru, teşhis veya tedavi için bir doktora başvur.',
     ja: 'この情報は教育を目的としたものです。トレーニングと食事のアドバイスは一般的な内容であり、個別の助言や医師の助言に代わるものではありません。健康上の疑問、診断や治療については、医師にご相談ください。',
     ko: '이 정보는 교육 목적으로 제공돼요. 운동 및 식단 권장 사항은 일반적인 내용이며 개인 맞춤 조언이나 의학적 조언을 대신하지 않아요. 건강 문제, 진단 또는 치료가 필요하면 의사와 상담하세요.',
+    zh: '这些信息仅供学习参考。训练和饮食建议是一般性的，不能替代个人化建议或医生的建议。如有任何健康问题、需要诊断或治疗，请咨询医生。',
   },
 };
 

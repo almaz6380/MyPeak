@@ -25,6 +25,7 @@ const LOCALES = {
   tr: 'tr-TR',
   ja: 'ja-JP',
   ko: 'ko-KR',
+  zh: 'zh-CN',
 };
 
 // BCP-47-Locale zur aktuellen Oberflächensprache.

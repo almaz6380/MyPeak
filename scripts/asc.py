@@ -310,6 +310,10 @@ WHATS_NEW_SPRACHEN = {
           "튀르키예어, 일본어, 한국어, 중국어가 새로 추가되었어요. 원하면 FullRep이 "
           "운동을 Apple Health에 저장해요. 영양 성분이 있는 보충제는 체크하면 "
           "하루 섭취량에 더해져요. 게스트 모드에서도 이제 스트릭과 레벨이 올라가요.",
+    'zh': "FullRep 现已支持 13 种语言：新增意大利语、荷兰语、波兰语、土耳其语、"
+          "日语、韩语和中文。如果你愿意，FullRep 会把你的训练保存到 Apple Health。"
+          "带有营养成分的补剂在勾选后会计入你当天的总摄入量，访客模式下连续打卡"
+          "和等级现在也会增长。",
 }
 
 
@@ -511,6 +515,7 @@ SPRACHEN = {
     'tr': ('Türkisch', 'tr-TR', 'tr'),
     'ja': ('Japanisch', 'ja-JP', 'ja'),
     'ko': ('Koreanisch', 'ko-KR', 'ko'),
+    'zh-Hans': ('Chinesisch', 'zh-CN', 'zh'),
 }
 
 # 3.1.2: Der Link auf die Nutzungsbedingungen muss in JEDER Beschreibung
@@ -616,6 +621,15 @@ ABONELİK — FULLREP PREMIUM
 • 구독은 현재 기간이 끝나기 최소 24시간 전까지 해지하지 않으면 자동으로 갱신돼요 — Apple ID 설정에서 관리하고 해지할 수 있어요
 • 이용약관: https://fullrep.pages.dev/legal/terms
 • 개인정보 처리방침: https://fullrep.pages.dev/legal/privacy""",
+    'zh': """
+
+订阅 — FULLREP PREMIUM
+• 按月或按年自动续订的订阅。以你所在货币计的价格会在购买前于应用内显示
+• 7 天免费试用会自动结束，不会转为付费订阅
+• 确认购买时，费用从你的 Apple ID 扣除
+• 除非在当前周期结束前至少 24 小时取消，订阅会自动续订——可在 Apple ID 设置中管理和取消
+• 使用条款：https://fullrep.pages.dev/legal/terms
+• 隐私政策：https://fullrep.pages.dev/legal/privacy""",
 }
 
 

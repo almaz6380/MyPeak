@@ -9,7 +9,7 @@
 // **Reihenfolge ist Absicht.** `find(startsWith)` nimmt den ersten Treffer.
 // Solange kein Code Präfix eines anderen ist, spielt sie keine Rolle — käme
 // einmal ein `pt-BR` neben `pt` dazu, müsste der spezifischere zuerst stehen.
-export const SPRACHEN = ['de', 'en', 'es', 'fr', 'pt', 'ar', 'nl', 'pl', 'it', 'tr', 'ja', 'ko'];
+export const SPRACHEN = ['de', 'en', 'es', 'fr', 'pt', 'ar', 'nl', 'pl', 'it', 'tr', 'ja', 'ko', 'zh'];
 
 // Sprachen, die von rechts nach links laufen. Steuert `dir` am <html> und damit
 // auch die `rtl:`-Varianten von Tailwind.
@@ -31,6 +31,7 @@ export const SPRACHNAMEN = {
   tr: 'Türkçe',
   ja: '日本語',
   ko: '한국어',
+  zh: '中文',
 };
 
 export function appSprache(sprache) {

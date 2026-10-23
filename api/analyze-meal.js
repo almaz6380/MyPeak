@@ -159,6 +159,18 @@ const MAHLZEIT = {
     beispielName: '닭가슴살',
     beispielBeschreibung: '식사에 대한 짧은 설명',
   },
+  zh: {
+    intro: '你是一名营养分析助手。请分析这张餐食照片，识别出所有可见的食物。',
+    schaetze: '请为每种食物估算：',
+    felder: ['份量（克）（根据相对于盘子或碗的视觉大小）', '热量 (kcal)', '蛋白质 (g)', '碳水化合物 (g)', '脂肪 (g)', '置信度 (high, medium, low)'],
+    namenZeile: (s) => `名称（${s}）`,
+    wichtig: '重要：',
+    regeln: ['根据视觉大小估算份量', '以常见的营养数据库为参考', '考虑烹饪时常规用量的油和脂肪', '如果无法识别某种食物，请描述它并尽量给出估算', '如果图片中没有食物，请返回 {"error": "no_food_detected"}'],
+    format: '只用符合以下格式的有效 JSON 回答，不要包含任何其他文字：',
+    sprachname: '中文',
+    beispielName: '鸡胸肉',
+    beispielBeschreibung: '餐食的简短描述',
+  },
 };
 
 export function mahlzeitPrompt(sprache) {

@@ -137,6 +137,7 @@ export const SPRACHNAME = {
   tr: 'Turkish (Türkçe)',
   ja: 'Japanese (日本語)',
   ko: 'Korean (한국어)',
+  zh: 'Simplified Chinese (简体中文)',
 };
 
 export function zahl(wert, max = 100000) {

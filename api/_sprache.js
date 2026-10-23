@@ -9,7 +9,7 @@
 // BEIDE Stellen anfassen — `src/lib/sprache.js` und diese hier. Der Test
 // `sprache-api.test.js` vergleicht sie und schlägt fehl, sobald sie
 // auseinanderlaufen.
-export const SPRACHEN = ['de', 'en', 'es', 'fr', 'pt', 'ar', 'nl', 'pl', 'it', 'tr', 'ja', 'ko'];
+export const SPRACHEN = ['de', 'en', 'es', 'fr', 'pt', 'ar', 'nl', 'pl', 'it', 'tr', 'ja', 'ko', 'zh'];
 
 // Bildet `de-AT`, `pt-BR`, `ar-EG` … auf unsere Codes ab.
 //

@@ -497,6 +497,29 @@ FullRep: 운동 기록 & 식단 관리
 
 ---
 
+### Chinesisch — Name (max. 30 Zeichen)
+```
+FullRep：健身记录与饮食管理
+```
+
+### Chinesisch — Untertitel (max. 30 Zeichen)
+```
+训练记录·热量计算·宏量营养素
+```
+
+### Chinesisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+健身,健身房,撸铁,增肌,减脂,减肥,热量,卡路里,蛋白质,宏量营养素,体重记录,训练计划,饮食记录,食谱,补剂,蛋白粉,HIIT,有氧,腹肌,力量训练
+```
+
+### Chinesisch — Werbetext (max. 170 Zeichen)
+```
+记录训练、管理热量、进度一目了然——全部在一个应用里。
+带条形码扫描、AI 照片识别和 21 套现成训练计划。
+```
+
+---
+
 ## 3. Apple „App-Datenschutz" (Privacy Nutrition Labels)
 
 **Datenerhebung: Ja** — alle Daten „mit dem Nutzer verknüpft" (Konto-basiert), **kein Tracking** (kein Ad-Tracking, keine Datenweitergabe an Werbenetzwerke).

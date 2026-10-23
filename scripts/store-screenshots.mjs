@@ -40,7 +40,7 @@ const lokal = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, 
 const today = lokal(new Date());
 const daysAgo = (n) => lokal(new Date(Date.now() - n * 864e5));
 
-export const SPRACHEN = ['de', 'en', 'es', 'fr', 'pt', 'ar', 'nl', 'pl', 'it', 'tr', 'ja', 'ko'];
+export const SPRACHEN = ['de', 'en', 'es', 'fr', 'pt', 'ar', 'nl', 'pl', 'it', 'tr', 'ja', 'ko', 'zh'];
 
 // Was auf den Bildern als Eintrag steht, muss in der Sprache des Bildes stehen —
 // ein englischer Store mit „Haferflocken mit Beeren“ wirkt wie eine Fremd-App.
@@ -57,6 +57,7 @@ const SPEISEN = {
   tr: ['Orman meyveli yulaf ezmesi', 'Yağsız lor peyniri', 'Pilavlı tavuk göğsü', 'Karışık salata', 'Patatesli somon', 'Protein shake'],
   ja: ['ベリー入りオートミール', '低脂肪クワルク', '鶏むね肉とごはん', 'ミックスサラダ', 'サーモンとじゃがいも', 'プロテインシェイク'],
   ko: ['베리를 올린 오트밀', '저지방 크바르크', '닭가슴살과 밥', '믹스 샐러드', '연어와 감자', '프로틴 셰이크'],
+  zh: ['莓果燕麦粥', '低脂夸克奶酪', '鸡胸肉配米饭', '什锦沙拉', '三文鱼配土豆', '蛋白奶昔'],
 };
 const PRAEPARATE = {
   de: ['Kreatin', 'Vitamin D3', 'Omega-3'],
@@ -71,6 +72,7 @@ const PRAEPARATE = {
   tr: ['Kreatin', 'D3 vitamini', 'Omega-3'],
   ja: ['クレアチン', 'ビタミン D3', 'オメガ 3'],
   ko: ['크레아틴', '비타민 D3', '오메가 3'],
+  zh: ['肌酸', '维生素 D3', 'Omega-3'],
 };
 // Eine volle Push/Pull/Legs-Woche bis heute, damit die Heatmap Farbe hat.
 const PUSH = [['bench-press', 'exercises.benchPress', 80, 8], ['incline-dumbbell-press', 'exercises.inclineDumbbellPress', 30, 10], ['overhead-press', 'exercises.overheadPress', 45, 10]];
@@ -227,7 +229,7 @@ function uebersetzung(lang, key) {
   return key.split('.').reduce((o, k) => o?.[k], d);
 }
 
-const BROWSER_LOCALE = { de: 'de-DE', en: 'en-US', es: 'es-ES', fr: 'fr-FR', pt: 'pt-BR', ar: 'ar', nl: 'nl-NL', pl: 'pl-PL', it: 'it-IT', tr: 'tr-TR', ja: 'ja-JP', ko: 'ko-KR' };
+const BROWSER_LOCALE = { de: 'de-DE', en: 'en-US', es: 'es-ES', fr: 'fr-FR', pt: 'pt-BR', ar: 'ar', nl: 'nl-NL', pl: 'pl-PL', it: 'it-IT', tr: 'tr-TR', ja: 'ja-JP', ko: 'ko-KR', zh: 'zh-CN' };
 
 async function shoot(browser, device, lang) {
   const outDir = path.join(ROOT, 'store-assets', 'roh', lang, device.dir);
