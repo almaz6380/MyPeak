@@ -87,6 +87,18 @@ const MAHLZEIT = {
     beispielName: 'صدر دجاج',
     beispielBeschreibung: 'وصف موجز للوجبة',
   },
+  nl: {
+    intro: 'Je bent een assistent voor voedingsanalyse. Analyseer deze foto van een maaltijd en herken elk zichtbaar voedingsmiddel.',
+    schaetze: 'Schat voor elk voedingsmiddel:',
+    felder: ['Portiegrootte in gram (op basis van de zichtbare grootte ten opzichte van het bord of de kom)', 'Calorieën (kcal)', 'Eiwitten (g)', 'Koolhydraten (g)', 'Vetten (g)', 'Betrouwbaarheid (high, medium, low)'],
+    namenZeile: (s) => `Naam in ${s}`,
+    wichtig: 'Belangrijk:',
+    regeln: ['Schat porties op basis van de zichtbare grootte', 'Gebruik standaard voedingsdatabases als referentie', 'Ga uit van een normale hoeveelheid olie of vet bij de bereiding', 'Als je een voedingsmiddel niet kunt herkennen, beschrijf het en geef je beste schatting', 'Als de afbeelding geen eten toont, antwoord dan met {"error": "no_food_detected"}'],
+    format: 'Antwoord ALLEEN met geldige JSON in precies dit formaat, zonder andere tekst:',
+    sprachname: 'Nederlands',
+    beispielName: 'Kipfilet',
+    beispielBeschreibung: 'Korte beschrijving van de maaltijd',
+  },
 };
 
 export function mahlzeitPrompt(sprache) {

@@ -131,6 +131,7 @@ export const SPRACHNAME = {
   fr: 'French (français)',
   pt: 'Brazilian Portuguese (português do Brasil)',
   ar: 'Arabic (العربية)',
+  nl: 'Dutch (Nederlands)',
 };
 
 export function zahl(wert, max = 100000) {

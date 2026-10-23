@@ -129,6 +129,9 @@ FEATURE_TEXTE = {
     "ar": ("التدريب والتغذية في تطبيق واحد",
            "تدريب · سعرات وماكروز · ", "قارئ الباركود",
            "21 برنامجًا تدريبيًا · تقدّمك أمام عينيك"),
+    "nl": ("Training &amp; voeding in één app",
+           "Workouts · Calorieën &amp; macro’s · ", "Barcodescanner",
+           "21 programma’s · Je voortgang in één oogopslag"),
 }
 
 

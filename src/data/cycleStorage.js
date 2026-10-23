@@ -191,6 +191,7 @@ export function getPhaseRecommendations(phase, lang) {
         fr: 'Entraînement léger recommandé : yoga, mobilité, marche. Écoute ton corps.',
         pt: 'Treino leve recomendado: ioga, mobilidade, caminhadas. Escute o seu corpo.',
         ar: 'يُنصح بتدريب خفيف: يوغا، وتمارين مرونة، ومشي. أنصت إلى جسدك.',
+        nl: 'Lichte training aanbevolen: yoga, mobility, wandelen. Luister naar je lichaam.',
       },
       nutrition: {
         de: 'Eisenreiche Lebensmittel (Spinat, rotes Fleisch), Magnesium. Kein Kaloriendefizit.',
@@ -199,6 +200,7 @@ export function getPhaseRecommendations(phase, lang) {
         fr: 'Aliments riches en fer (épinards, viande rouge), magnésium. Pas de déficit calorique.',
         pt: 'Alimentos ricos em ferro (espinafre, carne vermelha), magnésio. Sem déficit calórico.',
         ar: 'أطعمة غنية بالحديد (سبانخ، لحم أحمر) ومغنيسيوم. بلا عجز سعري.',
+        nl: 'IJzerrijke voeding (spinazie, rood vlees), magnesium. Geen calorietekort.',
       },
     },
     follicular: {
@@ -209,6 +211,7 @@ export function getPhaseRecommendations(phase, lang) {
         fr: 'Meilleure phase pour s’entraîner dur ! Musculation, monte le volume, vise des records.',
         pt: 'A melhor fase para treinar pesado! Força, aumente o volume, busque recordes.',
         ar: 'أفضل مرحلة للتدريب المكثّف! تدريب قوة، وارفع الحجم، وحاول تسجيل أرقام جديدة.',
+        nl: 'Beste fase voor intensieve training! Krachttraining, volume opvoeren, PR’s proberen.',
       },
       nutrition: {
         de: 'Mehr Kohlenhydrate für maximale Performance. Protein wie gewohnt.',
@@ -217,6 +220,7 @@ export function getPhaseRecommendations(phase, lang) {
         fr: 'Plus de glucides pour la performance. Protéines comme d’habitude.',
         pt: 'Mais carboidratos para o desempenho máximo. Proteína como sempre.',
         ar: 'كربوهيدرات أكثر لأقصى أداء. والبروتين كالمعتاد.',
+        nl: 'Meer koolhydraten voor maximale prestaties. Eiwit zoals gewoonlijk.',
       },
     },
     ovulation: {
@@ -227,6 +231,7 @@ export function getPhaseRecommendations(phase, lang) {
         fr: 'Énergie au maximum ! HIIT et effort maximal possibles. Attention : risque de blessure un peu plus élevé.',
         pt: 'Energia no pico! HIIT e esforço máximo são possíveis. Atenção: risco de lesão um pouco maior.',
         ar: 'ذروة الطاقة! تمارين HIIT وجهد أقصى ممكنان. انتبه: خطر الإصابة أعلى قليلًا.',
+        nl: 'Piekenergie! HIIT, maximale inspanning mogelijk. Let op: iets hoger blessurerisico.',
       },
       nutrition: {
         de: 'Ausgewogene Ernährung, Protein hoch halten. Viel Wasser trinken.',
@@ -235,6 +240,7 @@ export function getPhaseRecommendations(phase, lang) {
         fr: 'Alimentation équilibrée, garde les protéines hautes. Bois beaucoup d’eau.',
         pt: 'Alimentação equilibrada, mantenha a proteína alta. Beba bastante água.',
         ar: 'تغذية متوازنة مع إبقاء البروتين مرتفعًا. واشرب ماءً كثيرًا.',
+        nl: 'Gevarieerde voeding, eiwit hoog houden. Drink veel water.',
       },
     },
     luteal: {
@@ -245,6 +251,7 @@ export function getPhaseRecommendations(phase, lang) {
         fr: 'Intensité modérée. Charges plus légères, plus de repos. Endurance plutôt que force maximale.',
         pt: 'Intensidade moderada. Cargas mais leves, mais descanso. Resistência em vez de força máxima.',
         ar: 'شدّة معتدلة. أوزان أخف واستراحات أكثر. تحمّل بدل القوة القصوى.',
+        nl: 'Gematigde intensiteit. Lichtere gewichten, meer rust. Uithoudingsvermogen boven maximale kracht.',
       },
       nutrition: {
         de: 'Kalorienbedarf steigt (+100-300 kcal). Heißhunger ist normal — gesunde Snacks einplanen.',
@@ -253,6 +260,7 @@ export function getPhaseRecommendations(phase, lang) {
         fr: 'Les besoins caloriques montent (+100-300 kcal). Les fringales sont normales — prévois des en-cas sains.',
         pt: 'A necessidade calórica sobe (+100-300 kcal). A fome intensa é normal — planeje lanches saudáveis.',
         ar: 'ترتفع الحاجة السعرية (100-300+ سعرة). والاشتهاء أمر طبيعي — خطّط لوجبات خفيفة صحية.',
+        nl: 'Caloriebehoefte stijgt (+100-300 kcal). Trek is normaal — plan gezonde snacks in.',
       },
     },
   };

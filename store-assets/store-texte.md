@@ -359,6 +359,29 @@ Längenmeldung abbricht.
 
 ---
 
+### Niederländisch — Name (max. 30 Zeichen)
+```
+FullRep: Training & Voeding
+```
+
+### Niederländisch — Untertitel (max. 30 Zeichen)
+```
+Workouttracker & AI-coach
+```
+
+### Niederländisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+fitness,gym,sportschool,calorieën,macros,afvallen,spieropbouw,dieet,eiwit,gewicht,kcal,afslanken
+```
+
+### Niederländisch — Werbetext (max. 170 Zeichen)
+```
+Log je workouts, houd calorieën bij, zie je voortgang — alles in één app.
+Met barcodescanner, fotoherkenning met AI en 21 kant-en-klare programma’s.
+```
+
+---
+
 ## 3. Apple „App-Datenschutz" (Privacy Nutrition Labels)
 
 **Datenerhebung: Ja** — alle Daten „mit dem Nutzer verknüpft" (Konto-basiert), **kein Tracking** (kein Ad-Tracking, keine Datenweitergabe an Werbenetzwerke).

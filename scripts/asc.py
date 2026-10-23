@@ -282,6 +282,11 @@ WHATS_NEW_SPRACHEN = {
           "واليابانية والكورية والصينية. إن رغبت، يحفظ FullRep تمارينك في Apple Health. "
           "وتُحتسب المكملات ذات القيم الغذائية ضمن مجموعك اليومي عند تحديدها، كما تنمو "
           "سلسلتك ومستواك في وضع الضيف أيضًا.",
+    'nl': "FullRep spreekt nu 13 talen, nieuw zijn Italiaans, Nederlands, Pools, "
+          "Turks, Japans, Koreaans en Chinees. Als je wilt, slaat FullRep je workouts "
+          "op in Apple Health of Health Connect. Supplementen met voedingswaarden "
+          "tellen bij het afvinken mee in je dagtotalen, en ook in de gastmodus "
+          "groeien je streak en level.",
 }
 
 
@@ -477,6 +482,7 @@ SPRACHEN = {
     'fr-FR': ('Französisch', 'fr-FR', 'fr'),
     'pt-BR': ('Portugiesisch', 'pt-BR', 'pt'),
     'ar-SA': ('Arabisch', 'ar', 'ar'),
+    'nl-NL': ('Niederländisch', 'nl-NL', 'nl'),
 }
 
 # 3.1.2: Der Link auf die Nutzungsbedingungen muss in JEDER Beschreibung
@@ -528,6 +534,15 @@ ASSINATURA — FULLREP PREMIUM
 • يتجدد الاشتراك تلقائيًا ما لم يُلغَ قبل 24 ساعة على الأقل من نهاية الفترة الحالية — يمكنك إدارته وإلغاؤه من إعدادات Apple ID
 • شروط الاستخدام: https://fullrep.pages.dev/legal/terms
 • سياسة الخصوصية: https://fullrep.pages.dev/legal/privacy""",
+    'nl': """
+
+ABONNEMENT — FULLREP PREMIUM
+• Maand- of jaarabonnement met automatische verlenging; de prijs in jouw valuta zie je vóór de aankoop in de app
+• 7 dagen gratis proberen, de proefperiode stopt vanzelf en wordt geen betaald abonnement
+• De betaling wordt bij het bevestigen van de aankoop van je Apple ID afgeschreven
+• Het abonnement wordt automatisch verlengd, tenzij je het uiterlijk 24 uur vóór het einde van de lopende periode opzegt — beheer en opzeggen via de instellingen van je Apple ID
+• Gebruiksvoorwaarden: https://fullrep.pages.dev/legal/terms
+• Privacyverklaring: https://fullrep.pages.dev/legal/privacy""",
 }
 
 

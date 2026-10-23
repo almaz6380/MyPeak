@@ -26,12 +26,12 @@ const SECTION_COLORS = [
 // zwei der drei Fundstellen fehlte selbst dieser Rueckfall, dort stand nichts.
 // Der Helfer faellt sauber auf EN, dann DE zurueck.
 const categoryNames = {
-  all: { de: 'Alle', en: 'All', es: 'Todos', fr: 'Tous', pt: 'Todos', ar: 'الكل' },
-  healing: { de: 'Heilung & Recovery', en: 'Healing & Recovery', es: 'Curación y recuperación', fr: 'Guérison et récupération', pt: 'Cura e recuperação', ar: 'الشفاء والاستشفاء' },
-  gh: { de: 'Wachstumshormon', en: 'Growth Hormone', es: 'Hormona del crecimiento', fr: 'Hormone de croissance', pt: 'Hormônio do crescimento', ar: 'هرمون النمو' },
-  fatloss: { de: 'Fettabbau', en: 'Fat Loss', es: 'Pérdida de grasa', fr: 'Perte de graisse', pt: 'Perda de gordura', ar: 'حرق الدهون' },
-  antiaging: { de: 'Anti-Aging', en: 'Anti-Aging', es: 'Antienvejecimiento', fr: 'Anti-âge', pt: 'Antienvelhecimento', ar: 'مقاومة الشيخوخة' },
-  cognitive: { de: 'Kognition', en: 'Cognition', es: 'Cognición', fr: 'Cognition', pt: 'Cognição', ar: 'الإدراك' },
+  all: { de: 'Alle', en: 'All', es: 'Todos', fr: 'Tous', pt: 'Todos', ar: 'الكل', nl: 'Alle' },
+  healing: { de: 'Heilung & Recovery', en: 'Healing & Recovery', es: 'Curación y recuperación', fr: 'Guérison et récupération', pt: 'Cura e recuperação', ar: 'الشفاء والاستشفاء', nl: 'Herstel & recovery' },
+  gh: { de: 'Wachstumshormon', en: 'Growth Hormone', es: 'Hormona del crecimiento', fr: 'Hormone de croissance', pt: 'Hormônio do crescimento', ar: 'هرمون النمو', nl: 'Groeihormoon' },
+  fatloss: { de: 'Fettabbau', en: 'Fat Loss', es: 'Pérdida de grasa', fr: 'Perte de graisse', pt: 'Perda de gordura', ar: 'حرق الدهون', nl: 'Vetverlies' },
+  antiaging: { de: 'Anti-Aging', en: 'Anti-Aging', es: 'Antienvejecimiento', fr: 'Anti-âge', pt: 'Antienvelhecimento', ar: 'مقاومة الشيخوخة', nl: 'Anti-aging' },
+  cognitive: { de: 'Kognition', en: 'Cognition', es: 'Cognición', fr: 'Cognition', pt: 'Cognição', ar: 'الإدراك', nl: 'Cognitie' },
 };
 
 export default function PeptidesPage({ onBack }) {
