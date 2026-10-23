@@ -111,6 +111,18 @@ const MAHLZEIT = {
     beispielName: 'Pierś z kurczaka',
     beispielBeschreibung: 'Krótki opis posiłku',
   },
+  it: {
+    intro: 'Sei un assistente per l’analisi nutrizionale. Analizza questa foto di un pasto e identifica ogni alimento visibile.',
+    schaetze: 'Per ogni alimento, stima:',
+    felder: ['Dimensione della porzione in grammi (in base alla dimensione visiva rispetto al piatto/alla ciotola)', 'Calorie (kcal)', 'Proteine (g)', 'Carboidrati (g)', 'Grassi (g)', 'Livello di confidenza (high, medium, low)'],
+    namenZeile: (s) => `Nome in ${s}`,
+    wichtig: 'Importante:',
+    regeln: ['Stima le porzioni in base alla dimensione visiva', 'Usa database nutrizionali standard come riferimento', 'Considera una quantità normale di olio/grassi nella preparazione', 'Se non riesci a identificare un alimento, descrivilo e dai la tua stima migliore', 'Se l’immagine non mostra cibo, rispondi con {"error": "no_food_detected"}'],
+    format: 'Rispondi SOLO con JSON valido esattamente in questo formato, senza nessun altro testo:',
+    sprachname: 'italiano',
+    beispielName: 'Petto di pollo',
+    beispielBeschreibung: 'Breve descrizione del pasto',
+  },
 };
 
 export function mahlzeitPrompt(sprache) {

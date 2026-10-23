@@ -405,6 +405,29 @@ Ze skanerem kodów, rozpoznawaniem zdjęć przez AI i 21 gotowymi programami.
 
 ---
 
+### Italienisch — Name (max. 30 Zeichen)
+```
+FullRep: Allenamento e Dieta
+```
+
+### Italienisch — Untertitel (max. 30 Zeichen)
+```
+Workout, calorie e macro
+```
+
+### Italienisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+palestra,fitness,dimagrire,massa,muscoli,pesi,scheda,proteine,nutrizione,peso,bodybuilding,ricette
+```
+
+### Italienisch — Werbetext (max. 170 Zeichen)
+```
+Registra i workout, tieni d’occhio le calorie e guarda i tuoi progressi — tutto in un’app.
+Con scanner barcode, riconoscimento foto con IA e 21 programmi pronti.
+```
+
+---
+
 ## 3. Apple „App-Datenschutz" (Privacy Nutrition Labels)
 
 **Datenerhebung: Ja** — alle Daten „mit dem Nutzer verknüpft" (Konto-basiert), **kein Tracking** (kein Ad-Tracking, keine Datenweitergabe an Werbenetzwerke).

@@ -133,6 +133,7 @@ export const SPRACHNAME = {
   ar: 'Arabic (العربية)',
   nl: 'Dutch (Nederlands)',
   pl: 'Polish (polski)',
+  it: 'Italian (italiano)',
 };
 
 export function zahl(wert, max = 100000) {

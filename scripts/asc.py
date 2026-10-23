@@ -292,6 +292,11 @@ WHATS_NEW_SPRACHEN = {
           "treningi w Apple Health lub Health Connect. Suplementy z wartościami "
           "odżywczymi po odhaczeniu wliczają się do twoich wartości dziennych, a seria "
           "i poziom rosną także w trybie gościa.",
+    'it': "FullRep ora parla 13 lingue: le novità sono italiano, olandese, polacco, "
+          "turco, giapponese, coreano e cinese. Se vuoi, FullRep salva i tuoi workout "
+          "in Apple Health o Health Connect. Gli integratori con valori nutrizionali "
+          "contano nei tuoi valori giornalieri quando li spunti, e anche in modalità "
+          "ospite streak e livello crescono.",
 }
 
 
@@ -489,6 +494,7 @@ SPRACHEN = {
     'ar-SA': ('Arabisch', 'ar', 'ar'),
     'nl-NL': ('Niederländisch', 'nl-NL', 'nl'),
     'pl': ('Polnisch', 'pl-PL', 'pl'),
+    'it': ('Italienisch', 'it-IT', 'it'),
 }
 
 # 3.1.2: Der Link auf die Nutzungsbedingungen muss in JEDER Beschreibung
@@ -558,6 +564,15 @@ SUBSKRYPCJA — FULLREP PREMIUM
 • Subskrypcja odnawia się automatycznie, chyba że anulujesz ją co najmniej 24 godziny przed końcem okresu — zarządzaj nią i anuluj ją w ustawieniach swojego Apple ID
 • Warunki korzystania: https://fullrep.pages.dev/legal/terms
 • Polityka prywatności: https://fullrep.pages.dev/legal/privacy""",
+    'it': """
+
+ABBONAMENTO — FULLREP PREMIUM
+• Abbonamento mensile o annuale con rinnovo automatico; il prezzo nella tua valuta viene mostrato nell’app prima dell’acquisto
+• 7 giorni di prova gratuita che terminano da soli e non diventano un abbonamento a pagamento
+• Il pagamento viene addebitato sul tuo ID Apple alla conferma dell’acquisto
+• L’abbonamento si rinnova automaticamente, a meno che non venga disdetto almeno 24 ore prima della fine del periodo in corso — gestiscilo e disdicilo nelle impostazioni del tuo ID Apple
+• Condizioni d’uso: https://fullrep.pages.dev/legal/terms
+• Informativa sulla privacy: https://fullrep.pages.dev/legal/privacy""",
 }
 
 

@@ -193,6 +193,7 @@ export function getPhaseRecommendations(phase, lang) {
         ar: 'يُنصح بتدريب خفيف: يوغا، وتمارين مرونة، ومشي. أنصت إلى جسدك.',
         nl: 'Lichte training aanbevolen: yoga, mobility, wandelen. Luister naar je lichaam.',
         pl: 'Zalecany lekki trening: joga, mobility, spacery. Słuchaj swojego ciała.',
+        it: 'Allenamento leggero consigliato: yoga, mobilità, passeggiate. Ascolta il tuo corpo.',
       },
       nutrition: {
         de: 'Eisenreiche Lebensmittel (Spinat, rotes Fleisch), Magnesium. Kein Kaloriendefizit.',
@@ -203,6 +204,7 @@ export function getPhaseRecommendations(phase, lang) {
         ar: 'أطعمة غنية بالحديد (سبانخ، لحم أحمر) ومغنيسيوم. بلا عجز سعري.',
         nl: 'IJzerrijke voeding (spinazie, rood vlees), magnesium. Geen calorietekort.',
         pl: 'Produkty bogate w żelazo (szpinak, czerwone mięso), magnez. Bez deficytu kalorycznego.',
+        it: 'Alimenti ricchi di ferro (spinaci, carne rossa), magnesio. Niente deficit calorico.',
       },
     },
     follicular: {
@@ -215,6 +217,7 @@ export function getPhaseRecommendations(phase, lang) {
         ar: 'أفضل مرحلة للتدريب المكثّف! تدريب قوة، وارفع الحجم، وحاول تسجيل أرقام جديدة.',
         nl: 'Beste fase voor intensieve training! Krachttraining, volume opvoeren, PR’s proberen.',
         pl: 'Najlepsza faza na intensywny trening! Trening siłowy, więcej objętości, próby PR.',
+        it: 'Fase migliore per l’allenamento intenso! Allenamento di forza, aumenta il volume, punta ai PR.',
       },
       nutrition: {
         de: 'Mehr Kohlenhydrate für maximale Performance. Protein wie gewohnt.',
@@ -225,6 +228,7 @@ export function getPhaseRecommendations(phase, lang) {
         ar: 'كربوهيدرات أكثر لأقصى أداء. والبروتين كالمعتاد.',
         nl: 'Meer koolhydraten voor maximale prestaties. Eiwit zoals gewoonlijk.',
         pl: 'Więcej węglowodanów dla maksymalnej wydajności. Białko jak zwykle.',
+        it: 'Più carboidrati per la massima performance. Proteine come al solito.',
       },
     },
     ovulation: {
@@ -237,6 +241,7 @@ export function getPhaseRecommendations(phase, lang) {
         ar: 'ذروة الطاقة! تمارين HIIT وجهد أقصى ممكنان. انتبه: خطر الإصابة أعلى قليلًا.',
         nl: 'Piekenergie! HIIT, maximale inspanning mogelijk. Let op: iets hoger blessurerisico.',
         pl: 'Szczyt energii! HIIT, możliwy maksymalny wysiłek. Uwaga: lekko wyższe ryzyko kontuzji.',
+        it: 'Energia al massimo! HIIT, sforzi massimali possibili. Attenzione: rischio di infortuni leggermente più alto.',
       },
       nutrition: {
         de: 'Ausgewogene Ernährung, Protein hoch halten. Viel Wasser trinken.',
@@ -247,6 +252,7 @@ export function getPhaseRecommendations(phase, lang) {
         ar: 'تغذية متوازنة مع إبقاء البروتين مرتفعًا. واشرب ماءً كثيرًا.',
         nl: 'Gevarieerde voeding, eiwit hoog houden. Drink veel water.',
         pl: 'Zbilansowana dieta, utrzymuj wysokie spożycie białka. Pij dużo wody.',
+        it: 'Alimentazione equilibrata, mantieni alte le proteine. Bevi molta acqua.',
       },
     },
     luteal: {
@@ -259,6 +265,7 @@ export function getPhaseRecommendations(phase, lang) {
         ar: 'شدّة معتدلة. أوزان أخف واستراحات أكثر. تحمّل بدل القوة القصوى.',
         nl: 'Gematigde intensiteit. Lichtere gewichten, meer rust. Uithoudingsvermogen boven maximale kracht.',
         pl: 'Umiarkowana intensywność. Lżejsze ciężary, dłuższe przerwy. Wytrzymałość zamiast siły maksymalnej.',
+        it: 'Intensità moderata. Pesi più leggeri, più pause. Resistenza invece di forza massimale.',
       },
       nutrition: {
         de: 'Kalorienbedarf steigt (+100-300 kcal). Heißhunger ist normal — gesunde Snacks einplanen.',
@@ -269,6 +276,7 @@ export function getPhaseRecommendations(phase, lang) {
         ar: 'ترتفع الحاجة السعرية (100-300+ سعرة). والاشتهاء أمر طبيعي — خطّط لوجبات خفيفة صحية.',
         nl: 'Caloriebehoefte stijgt (+100-300 kcal). Trek is normaal — plan gezonde snacks in.',
         pl: 'Zapotrzebowanie kaloryczne rośnie (+100-300 kcal). Napady głodu są normalne — zaplanuj zdrowe przekąski.',
+        it: 'Il fabbisogno calorico aumenta (+100-300 kcal). Le voglie sono normali — pianifica snack sani.',
       },
     },
   };

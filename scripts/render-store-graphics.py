@@ -135,6 +135,9 @@ FEATURE_TEXTE = {
     "pl": ("Trening i dieta w jednej aplikacji",
            "Trening · Kalorie i makro · ", "Skaner kodów",
            "21 programów · Postępy na pierwszy rzut oka"),
+    "it": ("Allenamento e nutrizione in un’app",
+           "Allenamento · Calorie e macro · ", "Scanner barcode",
+           "21 programmi · I progressi a colpo d’occhio"),
 }
 
 
