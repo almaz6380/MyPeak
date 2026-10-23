@@ -252,11 +252,11 @@ export const XP_VALUES = {
 
 // Titel basierend auf Level
 export function getLevelTitle(level) {
-  if (level >= 51) return { de: 'GOAT', en: 'GOAT', es: 'GOAT', fr: 'GOAT', pt: 'GOAT', ar: 'الأعظم', nl: 'GOAT', pl: 'GOAT', it: 'GOAT', tr: 'GOAT', ja: 'GOAT', emoji: '🐐' };
-  if (level >= 31) return { de: 'Legende', en: 'Legend', es: 'Leyenda', fr: 'Légende', pt: 'Lenda', ar: 'أسطورة', nl: 'Legende', pl: 'Legenda', it: 'Leggenda', tr: 'Efsane', ja: 'レジェンド', emoji: '👑' };
-  if (level >= 16) return { de: 'Champion', en: 'Champion', es: 'Campeón', fr: 'Champion', pt: 'Campeão', ar: 'بطل', nl: 'Kampioen', pl: 'Champion', it: 'Campione', tr: 'Şampiyon', ja: 'チャンピオン', emoji: '🏆' };
-  if (level >= 6) return { de: 'Warrior', en: 'Warrior', es: 'Guerrero', fr: 'Guerrier', pt: 'Guerreiro', ar: 'محارب', nl: 'Strijder', pl: 'Warrior', it: 'Guerriero', tr: 'Savaşçı', ja: 'ウォリアー', emoji: '⚔️' };
-  return { de: 'Rookie', en: 'Rookie', es: 'Novato', fr: 'Débutant', pt: 'Novato', ar: 'مبتدئ', nl: 'Rookie', pl: 'Rookie', it: 'Novellino', tr: 'Çaylak', ja: 'ルーキー', emoji: '🌱' };
+  if (level >= 51) return { de: 'GOAT', en: 'GOAT', es: 'GOAT', fr: 'GOAT', pt: 'GOAT', ar: 'الأعظم', nl: 'GOAT', pl: 'GOAT', it: 'GOAT', tr: 'GOAT', ja: 'GOAT', ko: 'GOAT', emoji: '🐐' };
+  if (level >= 31) return { de: 'Legende', en: 'Legend', es: 'Leyenda', fr: 'Légende', pt: 'Lenda', ar: 'أسطورة', nl: 'Legende', pl: 'Legenda', it: 'Leggenda', tr: 'Efsane', ja: 'レジェンド', ko: '레전드', emoji: '👑' };
+  if (level >= 16) return { de: 'Champion', en: 'Champion', es: 'Campeón', fr: 'Champion', pt: 'Campeão', ar: 'بطل', nl: 'Kampioen', pl: 'Champion', it: 'Campione', tr: 'Şampiyon', ja: 'チャンピオン', ko: '챔피언', emoji: '🏆' };
+  if (level >= 6) return { de: 'Warrior', en: 'Warrior', es: 'Guerrero', fr: 'Guerrier', pt: 'Guerreiro', ar: 'محارب', nl: 'Strijder', pl: 'Warrior', it: 'Guerriero', tr: 'Savaşçı', ja: 'ウォリアー', ko: '워리어', emoji: '⚔️' };
+  return { de: 'Rookie', en: 'Rookie', es: 'Novato', fr: 'Débutant', pt: 'Novato', ar: 'مبتدئ', nl: 'Rookie', pl: 'Rookie', it: 'Novellino', tr: 'Çaylak', ja: 'ルーキー', ko: '루키', emoji: '🌱' };
 }
 
 // XP pro Level (progressiv: Level 1=100, Level 2=150, Level 3=200...)

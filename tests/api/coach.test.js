@@ -241,6 +241,7 @@ describe('/api/coach', () => {
       ['it', 'Rispondi in italiano'],
       ['tr', 'Türkçe yanıt ver'],
       ['ja', '日本語で回答'],
+      ['ko', '한국어로 답변'],
     ])('nimmt für lang=%s den passenden System-Prompt', async (lang, satz) => {
       setEnv(ENV_FULL);
       const fetchMock = installFetch([authRoute(), abo(PREMIUM), nutzung(0), gemini()]);
@@ -287,7 +288,7 @@ describe('/api/coach', () => {
     // Sprachen muss sie trotzdem im Prompt landen — mit dem englischen Text und
     // der ausdrücklichen Ansage, in der Nutzersprache zu antworten. Ohne diesen
     // Satz antwortet das Modell gern in der Sprache der Quelle.
-    it.each(['es', 'fr', 'pt', 'ar', 'nl', 'pl', 'it', 'tr', 'ja'])('hängt die Wissensbasis auch für %s an', async (lang) => {
+    it.each(['es', 'fr', 'pt', 'ar', 'nl', 'pl', 'it', 'tr', 'ja', 'ko'])('hängt die Wissensbasis auch für %s an', async (lang) => {
       setEnv(ENV_FULL);
       const fetchMock = installFetch([authRoute(), abo(PREMIUM), nutzung(0), gemini()]);
       await handler(frage([{ role: 'user', content: 'Bringt Kreatin wirklich etwas?' }], lang), makeRes());

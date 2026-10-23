@@ -13,7 +13,7 @@ describe('Sprachliste api/ ↔ src/', () => {
   });
 
   it('bildet dieselben Eingaben auf dasselbe Ergebnis ab', () => {
-    for (const code of ['de', 'en', 'es', 'fr', 'pt', 'ar', 'nl', 'pl', 'it', 'tr', 'ja', 'de-AT', 'pt-BR', 'ar-EG', 'kl-KL', '', undefined, null]) {
+    for (const code of ['de', 'en', 'es', 'fr', 'pt', 'ar', 'nl', 'pl', 'it', 'tr', 'ja', 'ko', 'de-AT', 'pt-BR', 'ar-EG', 'kl-KL', '', undefined, null]) {
       expect(apiSprache(code), `Code ${JSON.stringify(code)}`).toBe(appSprache(code ?? undefined));
     }
   });
@@ -42,7 +42,7 @@ describe('mahlzeitPrompt', () => {
     expect(p).toContain('"meal_description_en"');
   });
 
-  it.each(['es', 'fr', 'pt', 'ar', 'nl', 'pl', 'it', 'tr', 'ja'])('verlangt für %s zusätzlich das eigene Feld', (sp) => {
+  it.each(['es', 'fr', 'pt', 'ar', 'nl', 'pl', 'it', 'tr', 'ja', 'ko'])('verlangt für %s zusätzlich das eigene Feld', (sp) => {
     const p = mahlzeitPrompt(sp);
     expect(p).toContain(`"name_${sp}"`);
     expect(p).toContain(`"meal_description_${sp}"`);

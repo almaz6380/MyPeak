@@ -474,6 +474,29 @@ FullRep: 筋トレ記録＆食事管理
 
 ---
 
+### Koreanisch — Name (max. 30 Zeichen)
+```
+FullRep: 운동 기록 & 식단 관리
+```
+
+### Koreanisch — Untertitel (max. 30 Zeichen)
+```
+헬스 기록 · 칼로리 · 탄단지 관리
+```
+
+### Koreanisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+헬스,운동기록,다이어트,칼로리계산,식단관리,탄단지,단백질,체중기록,웨이트,근력운동,홈트,벌크업,감량,레시피,프로틴,영양제,바디프로필,HIIT,복근
+```
+
+### Koreanisch — Werbetext (max. 170 Zeichen)
+```
+운동을 기록하고, 칼로리를 관리하고, 진행 상황을 한눈에 확인하세요 — 모두 하나의 앱에서.
+바코드 스캐너, AI 사진 인식, 21가지 기본 프로그램이 함께해요.
+```
+
+---
+
 ## 3. Apple „App-Datenschutz" (Privacy Nutrition Labels)
 
 **Datenerhebung: Ja** — alle Daten „mit dem Nutzer verknüpft" (Konto-basiert), **kein Tracking** (kein Ad-Tracking, keine Datenweitergabe an Werbenetzwerke).

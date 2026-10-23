@@ -196,6 +196,7 @@ export function getPhaseRecommendations(phase, lang) {
         it: 'Allenamento leggero consigliato: yoga, mobilità, passeggiate. Ascolta il tuo corpo.',
         tr: 'Hafif antrenman önerilir: yoga, mobilite, yürüyüş. Vücudunu dinle.',
         ja: '軽めのトレーニングがおすすめです：ヨガ、モビリティ、散歩。体の声に耳を傾けましょう。',
+        ko: '가벼운 운동을 추천해요: 요가, 모빌리티, 산책. 몸의 신호에 귀 기울이세요.',
       },
       nutrition: {
         de: 'Eisenreiche Lebensmittel (Spinat, rotes Fleisch), Magnesium. Kein Kaloriendefizit.',
@@ -209,6 +210,7 @@ export function getPhaseRecommendations(phase, lang) {
         it: 'Alimenti ricchi di ferro (spinaci, carne rossa), magnesio. Niente deficit calorico.',
         tr: 'Demir açısından zengin besinler (ıspanak, kırmızı et), magnezyum. Kalori açığı yok.',
         ja: '鉄分の多い食品（ほうれん草、赤身肉）、マグネシウム。カロリー不足にしないこと。',
+        ko: '철분이 풍부한 음식(시금치, 붉은 고기), 마그네슘. 칼로리 적자는 피하세요.',
       },
     },
     follicular: {
@@ -224,6 +226,7 @@ export function getPhaseRecommendations(phase, lang) {
         it: 'Fase migliore per l’allenamento intenso! Allenamento di forza, aumenta il volume, punta ai PR.',
         tr: 'Yoğun antrenman için en iyi dönem! Kuvvet antrenmanı, hacmi artır, PR dene.',
         ja: '高強度トレーニングに最適な時期です！筋トレでボリュームを増やし、自己ベストに挑戦しましょう。',
+        ko: '고강도 운동에 가장 좋은 시기예요! 근력 운동으로 볼륨을 늘리고 PR에 도전하세요.',
       },
       nutrition: {
         de: 'Mehr Kohlenhydrate für maximale Performance. Protein wie gewohnt.',
@@ -237,6 +240,7 @@ export function getPhaseRecommendations(phase, lang) {
         it: 'Più carboidrati per la massima performance. Proteine come al solito.',
         tr: 'En yüksek performans için daha fazla karbonhidrat. Protein her zamanki gibi.',
         ja: '最高のパフォーマンスのために炭水化物を多めに。たんぱく質はいつもどおり。',
+        ko: '최고의 퍼포먼스를 위해 탄수화물을 더 드세요. 단백질은 평소대로요.',
       },
     },
     ovulation: {
@@ -252,6 +256,7 @@ export function getPhaseRecommendations(phase, lang) {
         it: 'Energia al massimo! HIIT, sforzi massimali possibili. Attenzione: rischio di infortuni leggermente più alto.',
         tr: 'Zirve enerji! HIIT, maksimum yüklenme mümkün. Dikkat: sakatlanma riski biraz daha yüksek.',
         ja: 'エネルギーがピークです！HIITや全力の負荷も可能。注意：ケガのリスクがやや高まります。',
+        ko: '에너지가 최고조예요! HIIT, 최대 강도도 가능해요. 주의: 부상 위험이 조금 높아요.',
       },
       nutrition: {
         de: 'Ausgewogene Ernährung, Protein hoch halten. Viel Wasser trinken.',
@@ -265,6 +270,7 @@ export function getPhaseRecommendations(phase, lang) {
         it: 'Alimentazione equilibrata, mantieni alte le proteine. Bevi molta acqua.',
         tr: 'Dengeli beslen, proteini yüksek tut. Bol su iç.',
         ja: 'バランスの良い食事で、たんぱく質を多めに保ちましょう。水分をしっかりとりましょう。',
+        ko: '균형 잡힌 식사로 단백질을 넉넉히 유지하세요. 수분을 충분히 섭취하세요.',
       },
     },
     luteal: {
@@ -280,6 +286,7 @@ export function getPhaseRecommendations(phase, lang) {
         it: 'Intensità moderata. Pesi più leggeri, più pause. Resistenza invece di forza massimale.',
         tr: 'Orta yoğunluk. Daha hafif ağırlıklar, daha uzun molalar. Maksimum kuvvet yerine dayanıklılık.',
         ja: '中程度の強度で。軽めの重量、長めの休憩。最大筋力より持久力を。',
+        ko: '중간 강도로 하세요. 가벼운 무게, 더 긴 휴식. 최대 근력보다 지구력을 우선해요.',
       },
       nutrition: {
         de: 'Kalorienbedarf steigt (+100-300 kcal). Heißhunger ist normal — gesunde Snacks einplanen.',
@@ -293,6 +300,7 @@ export function getPhaseRecommendations(phase, lang) {
         it: 'Il fabbisogno calorico aumenta (+100-300 kcal). Le voglie sono normali — pianifica snack sani.',
         tr: 'Kalori ihtiyacı artar (+100-300 kcal). Aşırı iştah normaldir — sağlıklı atıştırmalıklar planla.',
         ja: '必要カロリーが増えます（+100-300 kcal）。食欲が増すのは普通のことです。ヘルシーな間食を用意しましょう。',
+        ko: '필요 칼로리가 늘어나요(+100-300 kcal). 식욕이 느는 건 정상이에요. 건강한 간식을 준비하세요.',
       },
     },
   };

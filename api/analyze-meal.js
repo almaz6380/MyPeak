@@ -147,6 +147,18 @@ const MAHLZEIT = {
     beispielName: '鶏むね肉',
     beispielBeschreibung: '食事の短い説明',
   },
+  ko: {
+    intro: '당신은 영양 분석 도우미예요. 이 식사 사진을 분석하고, 보이는 모든 식품을 찾아 주세요.',
+    schaetze: '각 식품에 대해 다음 값을 추정해 주세요:',
+    felder: ['1인분 양(그램)(접시나 그릇과 비교한 겉보기 크기 기준)', '칼로리 (kcal)', '단백질 (g)', '탄수화물 (g)', '지방 (g)', '확신도 (high, medium, low)'],
+    namenZeile: (s) => `${s} 이름`,
+    wichtig: '중요:',
+    regeln: ['겉보기 크기로 양을 추정하세요', '일반적인 영양 데이터베이스를 기준으로 하세요', '조리에 쓰이는 보통 양의 기름·지방을 고려하세요', '식품을 알아볼 수 없으면 그 식품을 설명하고 최대한 추정하세요', '이미지에 음식이 없으면 {"error": "no_food_detected"}를 반환하세요'],
+    format: '다른 텍스트 없이, 정확히 다음 형식의 유효한 JSON으로만 답하세요:',
+    sprachname: '한국어',
+    beispielName: '닭가슴살',
+    beispielBeschreibung: '식사에 대한 짧은 설명',
+  },
 };
 
 export function mahlzeitPrompt(sprache) {

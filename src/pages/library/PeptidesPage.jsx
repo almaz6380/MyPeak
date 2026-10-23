@@ -26,12 +26,12 @@ const SECTION_COLORS = [
 // zwei der drei Fundstellen fehlte selbst dieser Rueckfall, dort stand nichts.
 // Der Helfer faellt sauber auf EN, dann DE zurueck.
 const categoryNames = {
-  all: { de: 'Alle', en: 'All', es: 'Todos', fr: 'Tous', pt: 'Todos', ar: 'الكل', nl: 'Alle', pl: 'Wszystkie', it: 'Tutti', tr: 'Tümü', ja: 'すべて' },
-  healing: { de: 'Heilung & Recovery', en: 'Healing & Recovery', es: 'Curación y recuperación', fr: 'Guérison et récupération', pt: 'Cura e recuperação', ar: 'الشفاء والاستشفاء', nl: 'Herstel & recovery', pl: 'Regeneracja i leczenie', it: 'Guarigione e recupero', tr: 'İyileşme & Recovery', ja: '回復・リカバリー' },
-  gh: { de: 'Wachstumshormon', en: 'Growth Hormone', es: 'Hormona del crecimiento', fr: 'Hormone de croissance', pt: 'Hormônio do crescimento', ar: 'هرمون النمو', nl: 'Groeihormoon', pl: 'Hormon wzrostu', it: 'Ormone della crescita', tr: 'Büyüme hormonu', ja: '成長ホルモン' },
-  fatloss: { de: 'Fettabbau', en: 'Fat Loss', es: 'Pérdida de grasa', fr: 'Perte de graisse', pt: 'Perda de gordura', ar: 'حرق الدهون', nl: 'Vetverlies', pl: 'Redukcja tłuszczu', it: 'Perdita di grasso', tr: 'Yağ yakımı', ja: '脂肪燃焼' },
-  antiaging: { de: 'Anti-Aging', en: 'Anti-Aging', es: 'Antienvejecimiento', fr: 'Anti-âge', pt: 'Antienvelhecimento', ar: 'مقاومة الشيخوخة', nl: 'Anti-aging', pl: 'Anti-aging', it: 'Anti-aging', tr: 'Anti-aging', ja: 'アンチエイジング' },
-  cognitive: { de: 'Kognition', en: 'Cognition', es: 'Cognición', fr: 'Cognition', pt: 'Cognição', ar: 'الإدراك', nl: 'Cognitie', pl: 'Funkcje poznawcze', it: 'Cognizione', tr: 'Bilişsel performans', ja: '認知機能' },
+  all: { de: 'Alle', en: 'All', es: 'Todos', fr: 'Tous', pt: 'Todos', ar: 'الكل', nl: 'Alle', pl: 'Wszystkie', it: 'Tutti', tr: 'Tümü', ja: 'すべて', ko: '전체' },
+  healing: { de: 'Heilung & Recovery', en: 'Healing & Recovery', es: 'Curación y recuperación', fr: 'Guérison et récupération', pt: 'Cura e recuperação', ar: 'الشفاء والاستشفاء', nl: 'Herstel & recovery', pl: 'Regeneracja i leczenie', it: 'Guarigione e recupero', tr: 'İyileşme & Recovery', ja: '回復・リカバリー', ko: '회복·재생' },
+  gh: { de: 'Wachstumshormon', en: 'Growth Hormone', es: 'Hormona del crecimiento', fr: 'Hormone de croissance', pt: 'Hormônio do crescimento', ar: 'هرمون النمو', nl: 'Groeihormoon', pl: 'Hormon wzrostu', it: 'Ormone della crescita', tr: 'Büyüme hormonu', ja: '成長ホルモン', ko: '성장 호르몬' },
+  fatloss: { de: 'Fettabbau', en: 'Fat Loss', es: 'Pérdida de grasa', fr: 'Perte de graisse', pt: 'Perda de gordura', ar: 'حرق الدهون', nl: 'Vetverlies', pl: 'Redukcja tłuszczu', it: 'Perdita di grasso', tr: 'Yağ yakımı', ja: '脂肪燃焼', ko: '지방 감량' },
+  antiaging: { de: 'Anti-Aging', en: 'Anti-Aging', es: 'Antienvejecimiento', fr: 'Anti-âge', pt: 'Antienvelhecimento', ar: 'مقاومة الشيخوخة', nl: 'Anti-aging', pl: 'Anti-aging', it: 'Anti-aging', tr: 'Anti-aging', ja: 'アンチエイジング', ko: '안티에이징' },
+  cognitive: { de: 'Kognition', en: 'Cognition', es: 'Cognición', fr: 'Cognition', pt: 'Cognição', ar: 'الإدراك', nl: 'Cognitie', pl: 'Funkcje poznawcze', it: 'Cognizione', tr: 'Bilişsel performans', ja: '認知機能', ko: '인지 기능' },
 };
 
 export default function PeptidesPage({ onBack }) {
