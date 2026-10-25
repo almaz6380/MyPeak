@@ -446,7 +446,8 @@ def _betrag(text):
     return str(int(ganz)), int((rest + '000000000')[:9])
 
 
-def setze_abo(tok, produkt, preise=None, titel=None, lang='de-DE', dry_run=False):
+def setze_abo(tok, produkt, preise=None, titel=None, lang='de-DE', dry_run=False,
+              beschreibung=None):
     """Abopreise (nur EUR-Regionen) und/oder den Anzeigenamen setzen.
 
     ⚠️ Nur die EUR-Regionen. Play rechnet die uebrigen Waehrungen NUR in der
@@ -467,16 +468,34 @@ def setze_abo(tok, produkt, preise=None, titel=None, lang='de-DE', dry_run=False
     abo = call(tok, 'GET', url)
 
     if titel:
-        listings = abo.get('listings', [])
+        if beschreibung and len(beschreibung) > 80:
+            sys.exit(f'Beschreibung zu lang: {len(beschreibung)} von 80 Zeichen.')
+        listings = abo.setdefault('listings', [])
         treffer = [l for l in listings if l.get('languageCode') == lang]
-        if not treffer:
-            sys.exit(f'Keine Lokalisierung {lang} an {produkt}.')
-        alt = treffer[0].get('title')
-        print(f'  Titel {lang}: {alt!r} -> {titel!r}')
-        treffer[0]['title'] = titel
+        if treffer:
+            print(f'  Titel {lang}: {treffer[0].get("title")!r} -> {titel!r}')
+            eintrag = treffer[0]
+        else:
+            # Eine fehlende Sprache am Abo blockiert den Wechsel der
+            # Standardsprache des Eintrags (403 „provide translations for all
+            # your in-app products", 23.10.2026). Deshalb hier anlegen.
+            if not beschreibung:
+                sys.exit(f'Keine Lokalisierung {lang} an {produkt} — zum Anlegen '
+                         '--abo-beschreibung angeben.')
+            print(f'  Lokalisierung {lang} neu: {titel!r}')
+            eintrag = {'languageCode': lang}
+            listings.append(eintrag)
+        eintrag['title'] = titel
+        if beschreibung:
+            print(f'  Beschreibung {lang}: {beschreibung!r}')
+            eintrag['description'] = beschreibung
         if not dry_run:
             call(tok, 'PATCH', f'{url}?updateMask=listings&{REG}', data=abo)
-            print('    gesetzt')
+            neu = call(tok, 'GET', url).get('listings', [])
+            da = [l for l in neu if l.get('languageCode') == lang]
+            if not da or da[0].get('title') != titel:
+                sys.exit(f'Nachgelesen: {lang} fehlt oder hat den falschen Titel.')
+            print(f'    gesetzt und nachgelesen ({len(neu)} Sprachen am Abo)')
 
     if preise:
         for bp in abo.get('basePlans', []):
@@ -529,6 +548,9 @@ def main():
                    help='EUR-Preise je Basis-Tarif, z. B. monthly=4,99;annual=44,99')
     p.add_argument('--abo-titel', metavar='TEXT',
                    help='Anzeigename des Abos in --lang')
+    p.add_argument('--abo-beschreibung', metavar='TEXT',
+                   help='Beschreibung des Abos in --lang (max. 80 Zeichen); '
+                        'Pflicht, wenn die Sprache am Abo neu angelegt wird')
     p.add_argument('--screenshots', metavar='VERZEICHNIS',
                    help='Store-Eintrag-Screenshots ersetzen (z. B. store-assets/android)')
     p.add_argument('--listing', metavar='JSON',
@@ -564,7 +586,8 @@ def main():
         if a.abo_preise:
             preise = dict(teil.split('=', 1)
                           for teil in a.abo_preise.split(';') if teil)
-        return setze_abo(tok, a.abo_setzen, preise, a.abo_titel, a.lang, a.dry_run)
+        return setze_abo(tok, a.abo_setzen, preise, a.abo_titel, a.lang, a.dry_run,
+                         a.abo_beschreibung)
     if a.status:
         return zeige_status(tok, a.track)
     if a.screenshots:

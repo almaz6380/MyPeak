@@ -76,9 +76,15 @@ jobs:
               # Nur der Anzeigename. Getrennt vom Preis, weil der Preis-PATCH
               # die komplette Regionstabelle mitvalidiert und an Altlasten
               # scheitert (BG hat EUR gespeichert, Katalog 2022/02 will BGN).
+              # Fuer en-US auch die Beschreibung: ohne englisches Abo-Listing
+              # laesst Play die Standardsprache nicht auf en-US umstellen.
+              EXTRA=()
+              if [ "$LANG_INPUT" = "en-US" ]; then
+                EXTRA=(--abo-beschreibung 'Ad-free FullRep with AI coach, label scan, AI meal plan and stats.')
+              fi
               python3 scripts/play-upload.py \
                 --abo-setzen mypeak_premium_monthly \
-                --abo-titel 'FullRep Premium' "${GEMEINSAM[@]}"
+                --abo-titel 'FullRep Premium' "${EXTRA[@]}" "${GEMEINSAM[@]}"
               ;;
             abo-setzen)
               # Preis nur fuer die EUR-Regionen und den Anzeigenamen. Play
