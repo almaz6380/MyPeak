@@ -23,7 +23,8 @@ neuen liegen fertig im Repo und gehen mit 1.6.0 hoch
 
 ### Version 1.6.0 vorbereitet: 13 Sprachen, drei Features (22./23.10.2026) — NICHT AUSGELIEFERT
 
-Branch `claude/clever-wright-skzprt`, alles gepusht, **kein PR, kein Build, keine Migration in Prod**.
+Branch `claude/clever-wright-skzprt`, alles gepusht, **kein PR, kein Store-Upload**. Migrationen sind
+seit 23.10. in Prod (siehe „Ausgeführt am 23.10.“).
 Versionen stehen schon auf Android vc26 / iOS Build 17 / 1.6.0.
 
 **Neue Sprachen:** it, nl, pl, tr, ja, ko, zh (vereinfacht; zh-TW landet bewusst auch dort).
@@ -61,11 +62,11 @@ Stellen gemeldet (Gym-Lehnwörter, Quark/Hüttenkäse ohne Gegenstück, Knopfnam
 3. **Workouts nach Apple Health / Health Connect schreiben** — eigenes Opt-in im Profil, eigenes
    kleines Plugin im App-Projekt (`HealthExportPlugin.swift` über `FullRepBridgeViewController`
    im Main.storyboard, `HealthExportPlugin.kt` mit Kotlin fürs App-Modul), nur Art/Start/Ende.
-   ⚠ **Nie kompiliert** — hier gibt es weder Xcode noch Android-SDK.
+   ✅ **Kompiliert auf beiden Plattformen** (CI, 23.10.). Am Gerät noch nie gelaufen.
 
 **Store-Standardsprache Englisch** (Josefs Wunsch): `asc.py --primaersprache en-US` bzw.
 Workflow-Modus `primaersprache`, `play-upload.py --standardsprache en-US` bzw. Modus
-`standardsprache`. Beide mit Trockenlauf, **noch nicht ausgeführt**.
+`standardsprache`. **Play: erledigt am 25.10.** iOS: offen, siehe unten.
 
 **Ausgeführt am 23.10. (Josefs „ja“):**
 - ✅ Beide Migrationen in Prod, nachgelesen: Spalten `supplements.calories/protein/carbs/fat/fiber`,
@@ -80,20 +81,24 @@ Workflow-Modus `primaersprache`, `play-upload.py --standardsprache en-US` bzw. M
   Vermutlich ist die Primärsprache nur änderbar, solange eine bearbeitbare Version offen ist
   (1.5.6 liegt in der Prüfung). Neuer Versuch erst mit offener 1.6.0, sonst von Hand in ASC
   (App-Informationen → Primärsprache).
-- ❌ **Play-Standardsprache:** 403 „Before you can change default language, you need to provide
-  translations for all your in-app products.“ Das Abo `mypeak_premium_monthly` hat nur ein
-  de-DE-Listing. Erst muss ein en-US-Titel und eine en-US-Beschreibung am Abo stehen (Console oder API,
-  `regionsVersion` beachten), dann `standardsprache` erneut. Der Edit wurde verworfen, nichts geändert.
+- ✅ **Play-Standardsprache ist seit 25.10. en-US.** Der erste Versuch am 23.10. scheiterte mit 403
+  „Before you can change default language, you need to provide translations for all your
+  in-app products“. Grund: Das Abo `mypeak_premium_monthly` hatte nur ein de-DE-Listing.
+  - Jetzt legt `play-upload.py --abo-titel … --abo-beschreibung …` eine fehlende Sprache am Abo an
+    (Workflow-Modus `abo-titel`, lang `en-US`).
+  - en-US „FullRep Premium“ ist gesetzt und nachgelesen, damit hat das Abo 2 Sprachen.
+  - Danach lief `standardsprache` durch: validiert, committet.
+  - ⚠ **Merksatz:** Die Standardsprache des Eintrags verlangt dieselbe Sprache an jedem In-App-Produkt.
 
 **Offen, je mit eigenem „ja“ von Josef, in dieser Reihenfolge:**
-1. Migrationen in Prod: `20261022120000_supplement_naehrwerte.sql` und
-   `20261022130000_sprache_13.sql` (ohne die zweite geht die Wahl einer neuen Sprache still verloren).
-2. Kompilier-Läufe: `ios-release.yml` mit `nur_kompilieren`, `android-release.yml` ohne Upload.
+1. ~~Migrationen in Prod~~ ✅ 23.10.
+2. ~~Kompilier-Läufe~~ ✅ 23.10.
 3. **Play-Gesundheitsformular:** WRITE_EXERCISE ist eine neue Health-Berechtigung. Ersten
    Android-Build von Hand in den internen Test, Formular ergänzen, Genehmigung abwarten
    (Ablauf siehe „Health hat drei Hürden“). Datensicherheit und Apple App-Datenschutz prüfen.
 4. Store: Version 1.6.0 anlegen, `--lokalisieren` für die neuen Locales, Play `texte` je Sprache
-   (nacheinander!), Screenshots je Sprache rendern, Primär-/Standardsprache auf en-US.
+   (nacheinander!), Screenshots je Sprache rendern, **iOS-Primärsprache auf en-US**
+   (`asc.yml` Modus `primaersprache`, erst wenn 1.6.0 offen ist; Play ist schon umgestellt).
 5. Gerätetest Health-Export, dann Builds hochladen und einreichen.
 
 ### Startsprache = Gerätesprache + Sprachwahl speichert endlich (11.10.2026)
