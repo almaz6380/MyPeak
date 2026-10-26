@@ -73,9 +73,14 @@ Workflow-Modus `primaersprache`, `play-upload.py --standardsprache en-US` bzw. M
   `nutrition_entries_source_check` mit `supplement`, `user_settings_language_check` mit 13 Codes.
 - ✅ iOS `nur_kompilieren` (Lauf 39994389018): `BUILD SUCCEEDED`, das Swift-Plugin kompiliert.
 - ✅ Android-Build vc26 (Lauf 39994392780) grün, also kompiliert auch das Kotlin-Plugin.
-  ⚠ **Das AAB fehlt trotzdem:** „Artifact storage quota has been hit“. Der Upload-Schritt hat
-  `continue-on-error`, deshalb ist der Lauf grün. Lösung: alte Artefakte löschen (Repo → Actions →
-  Caches/Artefakte) oder Speicher in den Billing-Einstellungen erhöhen, dann den Lauf neu starten.
+  ⚠ **Das AAB fehlt trotzdem:** „Artifact storage quota has been hit“ (23. und 25.10.). Der
+  Upload-Schritt hat `continue-on-error`, deshalb ist der Lauf grün.
+  - **Aufräumen ohne Klicken:** `release-preflight.yml` mit Eingabe `artefakte = anzeigen | loeschen`.
+    Dabei bleiben die R8-Mappings erhalten.
+  - Am 26.10. gelöscht: 9 alte AABs/IPAs (1.5.3–1.5.6), 203 MB.
+  - GitHub rechnet die Belegung erst nach 6–12 h neu.
+  - ⚠ Das Kontingent gilt vermutlich **kontoweit**, also auch für Mahjong, Swaply und Anigosha. Ist es danach
+    immer noch voll, liegt der Rest in den anderen Repos.
 - ❌ **iOS-Primärsprache:** Der PATCH `apps/{id}` mit `primaryLocale=en-US` wird von Apple mit
   Erfolg beantwortet, der Wert bleibt aber `de-DE` (nachgelesen). Das Skript bricht deshalb ab.
   Vermutlich ist die Primärsprache nur änderbar, solange eine bearbeitbare Version offen ist
