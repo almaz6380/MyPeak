@@ -857,27 +857,27 @@ def setze_abo_screenshot(tok):
 # "submitted together with this version", die Abos standen aber auf
 # MISSING_METADATA und fuhren nicht mit — genau dafuer kam 2.1(b) ein zweites
 # Mal. Diesen Absatz erst schreiben, wenn beide Abos READY_TO_SUBMIT sind.
-PRUEFNOTIZ = """What is new in 1.5.0 (previous App Store version: 1.0)
+PRUEFNOTIZ = """What is new in 1.6.0 (previous App Store version: 1.5.6)
 
-Five languages were added
-The interface, the knowledge library, the recipes and the legal texts are now
-available in German, English, Spanish, French, Portuguese and Arabic. Arabic
-lays out right to left. The language is chosen in Profile > Language.
+Seven languages were added
+Italian, Dutch, Polish, Turkish, Japanese, Korean and Simplified Chinese join
+German, English, Spanish, French, Portuguese and Arabic (13 in total). The
+language follows the device and can be changed in Profile > Language.
 
-Apple Health - read only
-FullRep reads two things, and only after the user turns the switch on in
-Profile > Apple Health: step count (shown on the home screen) and body weight
-(added to the existing weight history). The app writes nothing to Health.
-NSHealthUpdateUsageDescription is present because the linked framework
-requires a purpose string, not because the app writes data.
+Apple Health - workouts can now be written (new, opt-in)
+Profile > Apple Health has a separate switch "Save workouts to Health". Only
+when it is on and the user grants write access, a finished workout is saved
+as an HKWorkout with its type, start and end time. Nothing else is written.
+Reading (step count, body weight) is unchanged and has its own switch. This is
+why NSHealthUpdateUsageDescription is now actually used.
 
-Home screen redesign
-Calories are shown as a ring with the four macros below it; the workout
-scheduled for today can be started from the home screen; the weight trend is
-always visible.
+Supplements with nutrition values (optional)
+A supplement can carry calories and macros per serving; ticking it off adds
+them to the day's nutrition total, unticking removes them again.
 
-Home screen widget
-Shows the current streak, the level and the number of workouts this week.
+Streak and level in guest mode
+Guests now collect XP and a streak on the device; they move into the account
+when the user registers.
 
 Subscriptions (unchanged, already approved)
   mypeak_premium_monthly - EUR 4.99 / month

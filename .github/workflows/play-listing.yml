@@ -8,7 +8,7 @@ on:
       mode:
         description: 'Was aktualisiert wird'
         type: choice
-        options: [screenshots, texte, grafiken, abos, abo-setzen, abo-titel, website, standardsprache]
+        options: [screenshots, texte, grafiken, sprachen, abos, abo-setzen, abo-titel, website, standardsprache]
         default: screenshots
       lang:
         description: 'Sprache des Store-Eintrags'
@@ -122,6 +122,25 @@ jobs:
               echo
               python3 scripts/play-upload.py \
                 --feature "$FEATURE" "${GEMEINSAM[@]}"
+              ;;
+            sprachen)
+              # Neue Sprache komplett: Texte, dann Screenshots, dann Grafiken,
+              # je Sprache nacheinander. lang = kommagetrennte Liste. Ein Lauf
+              # statt drei je Sprache, und weil alles in EINEM Job laeuft, ist
+              # nie mehr als ein Edit offen.
+              IFS=',' read -ra LISTE <<< "$LANG_INPUT"
+              for L in "${LISTE[@]}"; do
+                S="${L%%-*}"
+                OPT=(--lang "$L"); [ "$DRY_RUN" = "true" ] && OPT+=(--dry-run)
+                echo "═══ $L: Texte ═══"
+                python3 scripts/play-upload.py --listing "store-assets/play-listing.$L.json" "${OPT[@]}"
+                echo "═══ $L: Screenshots ═══"
+                python3 scripts/play-upload.py --screenshots "store-assets/$S/android" "${OPT[@]}"
+                echo "═══ $L: Symbol ═══"
+                python3 scripts/play-upload.py --icon store-assets/android/icon-512.png "${OPT[@]}"
+                echo "═══ $L: Vorstellungsgrafik ═══"
+                python3 scripts/play-upload.py --feature "store-assets/$S/android/feature-graphic.png" "${OPT[@]}"
+              done
               ;;
             *)
               # Je Sprache eigener Ordner (scripts/store-rahmen.mjs): de-DE
