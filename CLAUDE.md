@@ -21,11 +21,23 @@ neuen liegen fertig im Repo und gehen mit 1.6.0 hoch
 
 ## Aktueller Stand
 
-### Version 1.6.0 vorbereitet: 13 Sprachen, drei Features (22./23.10.2026) — NICHT AUSGELIEFERT
+### Version 1.6.0: 13 Sprachen, drei Features (22.–26.10.2026) — AUSGELIEFERT 26.10.
 
-Branch `claude/clever-wright-skzprt`, alles gepusht, **kein PR, kein Store-Upload**. Migrationen sind
-seit 23.10. in Prod (siehe „Ausgeführt am 23.10.“).
-Versionen stehen schon auf Android vc26 / iOS Build 17 / 1.6.0.
+Branch `claude/clever-wright-skzprt`, alles gepusht, **kein PR, nicht in `main`**. Migrationen sind
+seit 23.10. in Prod (siehe „Ausgeführt am 23.10.“). Android vc26 / iOS Build 17 / 1.6.0.
+
+**Ausgeliefert am 26.10. auf Josefs Anweisung „direkt in Produktion, du machst alles“:**
+
+| | Stand |
+|---|---|
+| Android | **vc26 auf `production`, an alle** (`android-release` 40390735707), validiert und committet. **Kein 403 wegen WRITE_EXERCISE** — anders als am 03.09. nahm Play das Bundle ohne Handupload an |
+| Play-Eintrag | it-IT, nl-NL, pl-PL, tr-TR, ja-JP, ko-KR, zh-CN je Texte, 6 Screenshots, Symbol, Vorstellungsgrafik — ein Lauf mit neuem Modus `sprachen` (lang = Kommaliste) |
+| iOS | Build 17 hochgeladen (`ios-release` 40390740257) → 1.5.6 war APPROVED → Version 1.6.0 angelegt → `lokalisieren` (14 Locales, 7 neu: nl-NL, pl, it, tr, ja, ko, zh-Hans) → Build 17 zugewiesen → Screenshots für 15 Sprachen → `beschreibung` → Prüfnotiz neu (beschreibt den Health-**Schreib**zugriff) → **eingereicht**, Einreichung `be67d991-317a-4858-b04b-1fab15d7fc64`, `WAITING_FOR_REVIEW`. Beide Abos `APPROVED` |
+| iOS-Primärsprache | **en-US** (nachgelesen; mit offener 1.6.0 meldete `primaersprache` „schon gesetzt“) |
+| Web/API | **nicht live** — die neuen Coach-/Mahlzeit-Prompts in `api/` gehen erst mit einem Merge nach `main`. Bis dahin antwortet der Coach für it/nl/pl/tr/ja/ko/zh auf Englisch |
+
+⚠ **Offen:** Play-Gesundheitsformular und Datensicherheit um WRITE_EXERCISE ergänzen (Google kann
+das nachträglich verlangen), Apple App-Datenschutz prüfen, Gerätetest Health-Export (lief nie am Gerät).
 
 **Neue Sprachen:** it, nl, pl, tr, ja, ko, zh (vereinfacht; zh-TW landet bewusst auch dort).
 Je Sprache Oberfläche, alle 222 Bibliothekseinträge, Rechtstexte (mit „Vorrang der deutschen
@@ -95,16 +107,16 @@ Workflow-Modus `primaersprache`, `play-upload.py --standardsprache en-US` bzw. M
   - Danach lief `standardsprache` durch: validiert, committet.
   - ⚠ **Merksatz:** Die Standardsprache des Eintrags verlangt dieselbe Sprache an jedem In-App-Produkt.
 
-**Offen, je mit eigenem „ja“ von Josef, in dieser Reihenfolge:**
+**Abarbeitungsliste (Stand 26.10., alles bis auf 3 und den Gerätetest erledigt, siehe Tabelle oben):**
 1. ~~Migrationen in Prod~~ ✅ 23.10.
 2. ~~Kompilier-Läufe~~ ✅ 23.10.
-3. **Play-Gesundheitsformular:** WRITE_EXERCISE ist eine neue Health-Berechtigung. Ersten
+3. **Play-Gesundheitsformular** (der Upload ging am 26.10. ohne durch, offen bleibt die Erklärung selbst): WRITE_EXERCISE ist eine neue Health-Berechtigung. Ersten
    Android-Build von Hand in den internen Test, Formular ergänzen, Genehmigung abwarten
    (Ablauf siehe „Health hat drei Hürden“). Datensicherheit und Apple App-Datenschutz prüfen.
-4. Store: Version 1.6.0 anlegen, `--lokalisieren` für die neuen Locales, Play `texte` je Sprache
+4. ✅ 26.10. Store: Version 1.6.0 anlegen, `--lokalisieren` für die neuen Locales, Play `texte` je Sprache
    (nacheinander!), Screenshots je Sprache rendern, **iOS-Primärsprache auf en-US**
    (`asc.yml` Modus `primaersprache`, erst wenn 1.6.0 offen ist; Play ist schon umgestellt).
-5. Gerätetest Health-Export, dann Builds hochladen und einreichen.
+5. Builds hochladen und einreichen ✅ 26.10.; Gerätetest Health-Export offen.
 
 ### Startsprache = Gerätesprache + Sprachwahl speichert endlich (11.10.2026)
 
