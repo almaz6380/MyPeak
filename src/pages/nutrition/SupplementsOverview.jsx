@@ -10,6 +10,7 @@ import {
   getSupplementLogs,
   logSupplementTaken,
   unlogSupplementTaken,
+  hatNaehrwerte,
   getTodayScheduledSupplements,
   getSupplementProgress,
 } from '../../data/supplementStorage';
@@ -205,6 +206,11 @@ export default function SupplementsOverview({ onBack, onManage, onAdd }) {
                         {supp.dosage_amount} {supp.dosage_unit}
                         {supp.brand && ` · ${supp.brand}`}
                       </p>
+                      {hatNaehrwerte(supp) && (
+                        <p className="text-[11px] text-primary-600 dark:text-primary-400 mt-0.5">
+                          {t('supplements.nutritionBadge', { kcal: Math.round(supp.calories || 0), protein: Math.round((supp.protein || 0) * 10) / 10 })}
+                        </p>
+                      )}
                     </div>
                   </div>
                 );

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Check, Pill } from 'lucide-react';
+import { ArrowLeft, Check, ChevronDown, Pill } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { saveSupplement, updateSupplement } from '../../data/supplementStorage';
+import { saveSupplement, updateSupplement, NAEHRWERT_FELDER, naehrwerteBereinigen, hatNaehrwerte } from '../../data/supplementStorage';
 
 const FORMS = ['tablet', 'powder', 'liquid'];
 const UNITS = ['Stück', 'mg', 'g', 'ml', 'IU'];
@@ -23,6 +23,10 @@ export default function AddSupplement({ onBack, onSaved, editSupplement }) {
   const [dosageUnit, setDosageUnit] = useState(editSupplement?.dosage_unit || 'Stück');
   const [notes, setNotes] = useState(editSupplement?.notes || '');
   const [schedule, setSchedule] = useState(editSupplement?.schedule || {});
+  const [naehrwerte, setNaehrwerte] = useState(() =>
+    Object.fromEntries(NAEHRWERT_FELDER.map((f) => [f, editSupplement?.[f]?.toString() ?? '']))
+  );
+  const [naehrwerteOffen, setNaehrwerteOffen] = useState(() => hatNaehrwerte(editSupplement));
   const [saving, setSaving] = useState(false);
 
   // Get selected time slots (union of all days)
@@ -83,6 +87,7 @@ export default function AddSupplement({ onBack, onSaved, editSupplement }) {
       dosage_unit: dosageUnit,
       notes: notes.trim(),
       schedule,
+      ...naehrwerteBereinigen(naehrwerte),
     };
 
     if (isEditing) {
@@ -250,6 +255,41 @@ export default function AddSupplement({ onBack, onSaved, editSupplement }) {
             </div>
           </div>
         )}
+
+        {/* Nährwerte je Einnahme (optional) */}
+        <div className="karte p-0 overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setNaehrwerteOffen((o) => !o)}
+            className="w-full px-4 py-3.5 flex items-center justify-between text-start"
+          >
+            <span>
+              <span className="block text-sm font-medium">{t('supplements.nutritionTitle')}</span>
+              <span className="block text-xs text-slate-500 dark:text-slate-400">{t('supplements.nutritionHint')}</span>
+            </span>
+            <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${naehrwerteOffen ? 'rotate-180' : ''}`} />
+          </button>
+          {naehrwerteOffen && (
+            <div className="px-4 pb-4 grid grid-cols-2 gap-2">
+              {NAEHRWERT_FELDER.map((f) => (
+                <label key={f} className="block">
+                  <span className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
+                    {t(`nutrition.${f}`)} <span dir="ltr">({f === 'calories' ? 'kcal' : 'g'})</span>
+                  </span>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    min="0"
+                    value={naehrwerte[f]}
+                    onChange={(e) => setNaehrwerte((n) => ({ ...n, [f]: e.target.value }))}
+                    placeholder="0"
+                    className="w-full px-3 py-2.5 bg-white dark:bg-surface-dark-alt border border-slate-200 dark:border-slate-700 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Notes */}
         <div>

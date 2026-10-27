@@ -11,7 +11,8 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 const WURZEL = join(dirname(fileURLToPath(import.meta.url)), '..');
-const SPRACHEN = ['de', 'en', 'es', 'fr', 'pt', 'ar'];
+// Aus der App selbst, damit eine neue Sprache hier nicht vergessen werden kann
+import { SPRACHEN } from '../src/lib/sprache.js';
 
 const flach = (o, p = '') => Object.entries(o).flatMap(([k, v]) =>
   (v && typeof v === 'object' ? flach(v, `${p}${k}.`) : [[p + k, v]]));
@@ -45,7 +46,16 @@ const grundform = (k) => k.replace(FORMEN, '');
 const grundformen = new Set([...tabellen.de.keys()].filter((k) => FORMEN.test(k)).map(grundform));
 
 for (const s of SPRACHEN.filter((x) => x !== 'de')) {
-  for (const k of tabellen.de.keys()) if (!tabellen[s].has(k)) meckern(`${s}: Schlüssel fehlt — ${k}`);
+  // Eine Mehrzahlform, die die Sprache gar nicht hat (Japanisch kennt nur
+  // `other`), fehlt nicht — i18next fragt sie nie ab. Ob die nötigen Formen
+  // da sind, prüft die Mehrzahl-Auflösung weiter unten gegen i18next selbst.
+  const formen = new Set(new Intl.PluralRules(s).resolvedOptions().pluralCategories);
+  for (const k of tabellen.de.keys()) {
+    if (tabellen[s].has(k)) continue;
+    const f = k.match(FORMEN)?.[1];
+    if (f && !formen.has(f)) continue;
+    meckern(`${s}: Schlüssel fehlt — ${k}`);
+  }
   for (const k of tabellen[s].keys()) {
     if (tabellen.de.has(k)) continue;
     if (FORMEN.test(k) && grundformen.has(grundform(k))) continue;
@@ -236,9 +246,17 @@ for (const s of SPRACHEN) {
   const seite = await kontext.newPage();
   const konsole = [];
   seite.on('pageerror', (e) => konsole.push(String(e)));
-  await seite.addInitScript((sp) => localStorage.setItem('language', sp), s);
+  // Gastmodus + Splash übersprungen: sonst prüft man nur den Startbildschirm
+  // (15 Zeichen Text) und nicht die App.
+  await seite.addInitScript((sp) => {
+    localStorage.setItem('language', sp);
+    localStorage.setItem('guestMode', 'true');
+    localStorage.setItem('splashSeen', 'true');
+  }, s);
   await seite.goto(process.env.URL || 'http://localhost:4173/', { waitUntil: 'networkidle' });
   const text = await seite.locator('body').innerText();
+  const lang = await seite.evaluate(() => document.documentElement.lang);
+  if (lang !== s) meckern(`${s}: <html lang> ist „${lang}" — Sprachpaket nicht geladen?`);
   const roh = [...text.matchAll(/\b(ui|common|training|nutrition|home|profile)\.[a-zA-Z0-9_]+/g)].map((m) => m[0]);
   if (roh.length) meckern(`${s}: rohe Schlüssel sichtbar — ${[...new Set(roh)].join(', ')}`);
   if (konsole.length) meckern(`${s}: Seitenfehler — ${konsole.join(' | ')}`);

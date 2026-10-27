@@ -8,7 +8,7 @@ on:
       mode:
         description: 'Was aktualisiert wird'
         type: choice
-        options: [screenshots, texte, grafiken, abos, abo-setzen, abo-titel, website]
+        options: [screenshots, texte, grafiken, sprachen, abos, abo-setzen, abo-titel, website, standardsprache]
         default: screenshots
       lang:
         description: 'Sprache des Store-Eintrags'
@@ -64,6 +64,10 @@ jobs:
           fi
 
           case "$MODE" in
+            standardsprache)
+              # Rueckfall-Sprache fuer Laender ohne eigenes Listing (seit 22.10.2026 en-US)
+              python3 scripts/play-upload.py --standardsprache en-US "${GEMEINSAM[@]}"
+              ;;
             website)
               # Website im Eintrag (contactWebsite). Daran haengt app-ads.txt.
               python3 scripts/play-upload.py --website https://fullrep.pages.dev "${GEMEINSAM[@]}"
@@ -72,9 +76,15 @@ jobs:
               # Nur der Anzeigename. Getrennt vom Preis, weil der Preis-PATCH
               # die komplette Regionstabelle mitvalidiert und an Altlasten
               # scheitert (BG hat EUR gespeichert, Katalog 2022/02 will BGN).
+              # Fuer en-US auch die Beschreibung: ohne englisches Abo-Listing
+              # laesst Play die Standardsprache nicht auf en-US umstellen.
+              EXTRA=()
+              if [ "$LANG_INPUT" = "en-US" ]; then
+                EXTRA=(--abo-beschreibung 'Ad-free FullRep with AI coach, label scan, AI meal plan and stats.')
+              fi
               python3 scripts/play-upload.py \
                 --abo-setzen mypeak_premium_monthly \
-                --abo-titel 'FullRep Premium' "${GEMEINSAM[@]}"
+                --abo-titel 'FullRep Premium' "${EXTRA[@]}" "${GEMEINSAM[@]}"
               ;;
             abo-setzen)
               # Preis nur fuer die EUR-Regionen und den Anzeigenamen. Play
@@ -112,6 +122,25 @@ jobs:
               echo
               python3 scripts/play-upload.py \
                 --feature "$FEATURE" "${GEMEINSAM[@]}"
+              ;;
+            sprachen)
+              # Neue Sprache komplett: Texte, dann Screenshots, dann Grafiken,
+              # je Sprache nacheinander. lang = kommagetrennte Liste. Ein Lauf
+              # statt drei je Sprache, und weil alles in EINEM Job laeuft, ist
+              # nie mehr als ein Edit offen.
+              IFS=',' read -ra LISTE <<< "$LANG_INPUT"
+              for L in "${LISTE[@]}"; do
+                S="${L%%-*}"
+                OPT=(--lang "$L"); [ "$DRY_RUN" = "true" ] && OPT+=(--dry-run)
+                echo "═══ $L: Texte ═══"
+                python3 scripts/play-upload.py --listing "store-assets/play-listing.$L.json" "${OPT[@]}"
+                echo "═══ $L: Screenshots ═══"
+                python3 scripts/play-upload.py --screenshots "store-assets/$S/android" "${OPT[@]}"
+                echo "═══ $L: Symbol ═══"
+                python3 scripts/play-upload.py --icon store-assets/android/icon-512.png "${OPT[@]}"
+                echo "═══ $L: Vorstellungsgrafik ═══"
+                python3 scripts/play-upload.py --feature "store-assets/$S/android/feature-graphic.png" "${OPT[@]}"
+              done
               ;;
             *)
               # Je Sprache eigener Ordner (scripts/store-rahmen.mjs): de-DE

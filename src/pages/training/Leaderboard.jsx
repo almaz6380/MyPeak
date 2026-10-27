@@ -14,9 +14,9 @@ export default function Leaderboard({ onBack }) {
   const category = getLeaderboardCategory();
 
   const categoryInfo = {
-    volume: { de: 'Gesamtvolumen', en: 'Total Volume', es: 'Volumen total', fr: 'Volume total', pt: 'Volume total', ar: 'إجمالي الحجم', icon: Dumbbell, unit: 'kg', color: 'text-blue-500' },
-    streak: { de: 'Trainings-Streak', en: 'Training Streak', es: 'Racha de entrenamiento', fr: 'Série d\'entraînement', pt: 'Sequência de treinos', ar: 'تتابع التمارين', icon: Flame, unit: t('ui.days'), color: 'text-orange-500' },
-    workouts: { de: 'Anzahl Trainings', en: 'Workout Count', es: 'Número de entrenamientos', fr: 'Nombre de séances', pt: 'Número de treinos', ar: 'عدد الحصص', icon: TrendingUp, unit: '', color: 'text-green-500' },
+    volume: { de: 'Gesamtvolumen', en: 'Total Volume', es: 'Volumen total', fr: 'Volume total', pt: 'Volume total', ar: 'إجمالي الحجم', nl: 'Totaal volume', pl: 'Łączna objętość', it: 'Volume totale', tr: 'Toplam hacim', ja: '総ボリューム', ko: '총 볼륨', zh: '总训练量', icon: Dumbbell, unit: 'kg', color: 'text-blue-500' },
+    streak: { de: 'Trainings-Streak', en: 'Training Streak', es: 'Racha de entrenamiento', fr: 'Série d\'entraînement', pt: 'Sequência de treinos', ar: 'تتابع التمارين', nl: 'Trainingsstreak', pl: 'Seria treningów', it: 'Streak di allenamento', tr: 'Antrenman serisi', ja: 'トレーニング連続日数', ko: '연속 운동일', zh: '训练连续天数', icon: Flame, unit: t('ui.days'), color: 'text-orange-500' },
+    workouts: { de: 'Anzahl Trainings', en: 'Workout Count', es: 'Número de entrenamientos', fr: 'Nombre de séances', pt: 'Número de treinos', ar: 'عدد الحصص', nl: 'Aantal trainingen', pl: 'Liczba treningów', it: 'Numero di allenamenti', tr: 'Antrenman sayısı', ja: 'トレーニング回数', ko: '운동 횟수', zh: '训练次数', icon: TrendingUp, unit: '', color: 'text-green-500' },
   };
 
   const info = categoryInfo[category];

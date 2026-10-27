@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
-import './i18n'
+import { spracheBereit } from './i18n'
 import { ThemeProvider } from './context/ThemeContext'
 import { AuthProvider } from './context/AuthContext'
 import { SubscriptionProvider } from './context/SubscriptionContext'
@@ -16,7 +16,9 @@ import { initAds } from './lib/ads'
 // gezählt. Ausgerechnet die kaputten Ladevorgänge fehlten damit in der
 // Statistik, also die, die man am dringendsten sehen will.
 
-createRoot(document.getElementById('root')).render(
+// Erst rendern, wenn die Startsprache geladen ist (siehe i18n/index.js) —
+// sonst blitzt beim Start kurz Englisch auf.
+spracheBereit.finally(() => createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ErrorBoundary>
       <BrowserRouter>
@@ -30,7 +32,7 @@ createRoot(document.getElementById('root')).render(
       </BrowserRouter>
     </ErrorBoundary>
   </StrictMode>,
-)
+))
 
 // Werbung (nur nativ) initialisieren — inkl. DSGVO-Einwilligung.
 // Verzögert, damit der App-Start nicht blockiert wird.

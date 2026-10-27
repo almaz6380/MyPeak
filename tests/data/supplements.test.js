@@ -158,3 +158,48 @@ describe('Supplemente', () => {
     });
   });
 });
+
+describe('Supplement-Nährwerte', () => {
+  const EINTRAEGE = `nutrition_entries_${TAG}`;
+  const shake = () => ({ ...supp('Proteinshake'), calories: '120', protein: '24,5', carbs: '', fat: 2 });
+
+  it('speichert Nährwerte bereinigt (Komma, leer = null)', async () => {
+    const { data } = await saveSupplement(GAST, shake());
+    expect(data).toMatchObject({ calories: 120, protein: 24.5, carbs: null, fat: 2, fiber: null });
+  });
+
+  it('trägt beim Abhaken einen Ernährungseintrag ein und beim Abwählen wieder aus', async () => {
+    const { data } = await saveSupplement(GAST, shake());
+    await logSupplementTaken(GAST, data.id, TAG, 'morning');
+    const [eintrag] = readLocal(EINTRAEGE);
+    expect(eintrag).toMatchObject({
+      food_name: 'Proteinshake', calories: 120, protein: 24.5, meal_slot: 'snack',
+      source: 'supplement', source_id: `supp:${data.id}:morning`,
+    });
+
+    await unlogSupplementTaken(GAST, data.id, TAG, 'morning');
+    expect(readLocal(EINTRAEGE)).toEqual([]);
+    expect(supabase.__calls).toHaveLength(0);
+  });
+
+  it('zählt einen Doppeltipp nicht doppelt', async () => {
+    const { data } = await saveSupplement(GAST, shake());
+    await logSupplementTaken(GAST, data.id, TAG, 'morning');
+    await logSupplementTaken(GAST, data.id, TAG, 'morning');
+    expect(readLocal(EINTRAEGE)).toHaveLength(1);
+  });
+
+  it('trägt je Einnahmezeit getrennt ein', async () => {
+    const { data } = await saveSupplement(GAST, shake());
+    await logSupplementTaken(GAST, data.id, TAG, 'morning');
+    await logSupplementTaken(GAST, data.id, TAG, 'evening');
+    await unlogSupplementTaken(GAST, data.id, TAG, 'morning');
+    expect(readLocal(EINTRAEGE).map((e) => e.source_id)).toEqual([`supp:${data.id}:evening`]);
+  });
+
+  it('legt ohne Nährwerte keinen Eintrag an', async () => {
+    const { data } = await saveSupplement(GAST, supp('Vitamin D'));
+    await logSupplementTaken(GAST, data.id, TAG, 'morning');
+    expect(readLocal(EINTRAEGE)).toBeNull();
+  });
+});

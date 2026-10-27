@@ -60,7 +60,7 @@ FORTSCHRITT & MOTIVATION
 AUSSERDEM
 • Supplement-Tracker mit Wochenplan und Einnahme-Übersicht
 • Zyklustracking mit phasengerechten Trainings- und Ernährungsempfehlungen
-• Dunkler und heller Modus, sechs Sprachen (Deutsch, Englisch, Spanisch, Französisch, Portugiesisch, Arabisch), kg oder lbs
+• Dunkler und heller Modus, 13 Sprachen (Deutsch, Englisch, Spanisch, Französisch, Portugiesisch, Arabisch, Italienisch, Niederländisch, Polnisch, Türkisch, Japanisch, Koreanisch, Chinesisch), kg oder lbs
 • Gastmodus: Erst ausprobieren, dann registrieren
 • Funktioniert auch offline — deine Daten synchronisieren sich automatisch
 
@@ -103,7 +103,7 @@ PROGRESS & MOTIVATION
 ALSO INCLUDED
 • Supplement tracker with weekly schedule
 • Cycle tracking with phase-based training and nutrition tips
-• Dark and light mode, six languages (German, English, Spanish, French, Portuguese, Arabic), kg or lbs
+• Dark and light mode, 13 languages (German, English, Spanish, French, Portuguese, Arabic, Italian, Dutch, Polish, Turkish, Japanese, Korean, Chinese), kg or lbs
 • Guest mode: try everything before signing up
 • Works offline — your data syncs automatically
 
@@ -356,6 +356,167 @@ Apple indexiert ihn ohnehin.
 Unicode-Zeichen, nicht Bytes (sonst wäre jedes arabische Feld rechnerisch
 dreimal zu lang) und schlägt an, bevor ein Upload nach Minuten mit einer
 Längenmeldung abbricht.
+
+---
+
+### Niederländisch — Name (max. 30 Zeichen)
+```
+FullRep: Training & Voeding
+```
+
+### Niederländisch — Untertitel (max. 30 Zeichen)
+```
+Workouttracker & AI-coach
+```
+
+### Niederländisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+fitness,gym,sportschool,calorieën,macros,afvallen,spieropbouw,dieet,eiwit,gewicht,kcal,afslanken
+```
+
+### Niederländisch — Werbetext (max. 170 Zeichen)
+```
+Log je workouts, houd calorieën bij, zie je voortgang — alles in één app.
+Met barcodescanner, fotoherkenning met AI en 21 kant-en-klare programma’s.
+```
+
+---
+
+### Polnisch — Name (max. 30 Zeichen)
+```
+FullRep: Trening i dieta
+```
+
+### Polnisch — Untertitel (max. 30 Zeichen)
+```
+Trening, kalorie i makro
+```
+
+### Polnisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+siłownia,fitness,odchudzanie,mięśnie,białko,ćwiczenia,waga,licznik,kcal,redukcja,masa,gym,workout
+```
+
+### Polnisch — Werbetext (max. 170 Zeichen)
+```
+Zapisuj treningi, licz kalorie, śledź postępy — wszystko w jednej aplikacji.
+Ze skanerem kodów, rozpoznawaniem zdjęć przez AI i 21 gotowymi programami.
+```
+
+---
+
+### Italienisch — Name (max. 30 Zeichen)
+```
+FullRep: Allenamento e Dieta
+```
+
+### Italienisch — Untertitel (max. 30 Zeichen)
+```
+Workout, calorie e macro
+```
+
+### Italienisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+palestra,fitness,dimagrire,massa,muscoli,pesi,scheda,proteine,nutrizione,peso,bodybuilding,ricette
+```
+
+### Italienisch — Werbetext (max. 170 Zeichen)
+```
+Registra i workout, tieni d’occhio le calorie e guarda i tuoi progressi — tutto in un’app.
+Con scanner barcode, riconoscimento foto con IA e 21 programmi pronti.
+```
+
+---
+
+### Türkisch — Name (max. 30 Zeichen)
+```
+FullRep: Antrenman & Beslenme
+```
+
+### Türkisch — Untertitel (max. 30 Zeichen)
+```
+Workout, kalori ve makrolar
+```
+
+### Türkisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+spor,fitness,gym,kilo,zayıflama,kas,ağırlık,program,protein,diyet,vücutgeliştirme,tarif,beslenme
+```
+
+### Türkisch — Werbetext (max. 170 Zeichen)
+```
+Antrenmanlarını kaydet, kalorini takip et ve ilerlemeni gör — hepsi tek uygulamada.
+Barkod tarayıcı, AI fotoğraf tanıma ve 21 hazır programla.
+```
+
+---
+
+### Japanisch — Name (max. 30 Zeichen)
+```
+FullRep: 筋トレ記録＆食事管理
+```
+
+### Japanisch — Untertitel (max. 30 Zeichen)
+```
+ワークアウト・カロリー・PFC管理
+```
+
+### Japanisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+筋トレ,ジム,ダイエット,カロリー計算,PFC,マクロ,たんぱく質,体重記録,ワークアウト,トレーニング,食事記録,減量,増量,レシピ,プロテイン,サプリ,ボディメイク,HIIT,腹筋
+```
+
+### Japanisch — Werbetext (max. 170 Zeichen)
+```
+ワークアウトを記録し、カロリーを管理し、進捗をひと目で確認 — すべてを 1 つのアプリで。
+バーコードスキャナー、AI による写真認識、21 の既製プログラムつき。
+```
+
+---
+
+### Koreanisch — Name (max. 30 Zeichen)
+```
+FullRep: 운동 기록 & 식단 관리
+```
+
+### Koreanisch — Untertitel (max. 30 Zeichen)
+```
+헬스 기록 · 칼로리 · 탄단지 관리
+```
+
+### Koreanisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+헬스,운동기록,다이어트,칼로리계산,식단관리,탄단지,단백질,체중기록,웨이트,근력운동,홈트,벌크업,감량,레시피,프로틴,영양제,바디프로필,HIIT,복근
+```
+
+### Koreanisch — Werbetext (max. 170 Zeichen)
+```
+운동을 기록하고, 칼로리를 관리하고, 진행 상황을 한눈에 확인하세요 — 모두 하나의 앱에서.
+바코드 스캐너, AI 사진 인식, 21가지 기본 프로그램이 함께해요.
+```
+
+---
+
+### Chinesisch — Name (max. 30 Zeichen)
+```
+FullRep：健身记录与饮食管理
+```
+
+### Chinesisch — Untertitel (max. 30 Zeichen)
+```
+训练记录·热量计算·宏量营养素
+```
+
+### Chinesisch — Keywords (max. 100 Zeichen, kommagetrennt, keine Leerzeichen)
+```
+健身,健身房,撸铁,增肌,减脂,减肥,热量,卡路里,蛋白质,宏量营养素,体重记录,训练计划,饮食记录,食谱,补剂,蛋白粉,HIIT,有氧,腹肌,力量训练
+```
+
+### Chinesisch — Werbetext (max. 170 Zeichen)
+```
+记录训练、管理热量、进度一目了然——全部在一个应用里。
+带条形码扫描、AI 照片识别和 21 套现成训练计划。
+```
 
 ---
 

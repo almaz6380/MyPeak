@@ -448,6 +448,8 @@ function _dedupeRecentFoods(data, limit) {
   const seen = new Set();
   const unique = [];
   for (const entry of data) {
+    // Abgehakte Supplements sind keine Lebensmittel zum Wiederauswählen
+    if (entry.source === 'supplement') continue;
     const key = entry.food_name + (entry.brand || '');
     if (!seen.has(key)) {
       seen.add(key);

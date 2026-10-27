@@ -19,6 +19,13 @@ const LOCALES = {
   fr: 'fr-FR',
   pt: 'pt-BR',
   ar: 'ar-EG-u-nu-latn',
+  nl: 'nl-NL',
+  pl: 'pl-PL',
+  it: 'it-IT',
+  tr: 'tr-TR',
+  ja: 'ja-JP',
+  ko: 'ko-KR',
+  zh: 'zh-CN',
 };
 
 // BCP-47-Locale zur aktuellen Oberflächensprache.

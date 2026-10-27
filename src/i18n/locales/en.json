@@ -388,7 +388,8 @@
     "editHeight": "Change Height",
     "editGoal": "Change Goal",
     "editActivity": "Change Activity Level",
-    "editExperience": "Change Training Experience"
+    "editExperience": "Change Training Experience",
+    "healthExport": "Save workouts to Health"
   },
   "common": {
     "welcome": "Welcome",
@@ -1027,7 +1028,7 @@
     "termsHeading": "Terms of Use",
     "termsText1": "By using FullRep, you agree to use the app responsibly. The app does not replace medical advice. Always consult a doctor for health-related questions.",
     "privacyHeading": "Privacy",
-    "privacyText1": "Your data is stored with our processors Supabase and Vercel. For individual features, data goes to Google (photo analysis, AI coach, ads in the apps), Anthropic (AI coach) and RevenueCat (Premium). Details are in the privacy policy. You can delete your account and all data at any time.",
+    "privacyText1": "Your data is stored with our processors Supabase and Cloudflare. For individual features, data goes to Google (photo analysis, AI coach, ads in the apps), Anthropic (AI coach) and RevenueCat (Premium). Details are in the privacy policy. You can delete your account and all data at any time.",
     "termsAccept": "I accept the terms of use and privacy policy",
     "healthConsentHeading": "Health data",
     "healthConsentText": "Weight, body measurements, nutrition and training data and – if you enable them – cycle data and Apple Health/Health Connect are health data (Art. 9 GDPR). We need your explicit consent for this. You can withdraw it at any time by deleting your account.",
@@ -1172,7 +1173,10 @@
     "slot_midday": "Midday",
     "slot_pre_workout": "Pre-Workout",
     "slot_post_workout": "Post-Workout",
-    "slot_evening": "Evening"
+    "slot_evening": "Evening",
+    "nutritionTitle": "Nutrition (optional)",
+    "nutritionHint": "Per serving — counts toward your daily totals when you tick it off",
+    "nutritionBadge": "{{kcal}} kcal · {{protein}} g protein"
   },
   "cycle": {
     "title": "Cycle Tracking",

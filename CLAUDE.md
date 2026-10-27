@@ -9,15 +9,116 @@ Eine Fitness- und Ernährungs-App, die Training-Tracking und Ernährungs-Trackin
 `fullrep.vercel.app` — das Vercel-Konto ist gesperrt (402), siehe „Umzug auf Cloudflare“
 **Git-Repository:** https://github.com/almaz6380/MyPeak (Repo-Name unverändert)
 **Zielplattform:** Web-App → PWA → später App Store (iOS + Android)
-**Sprachen:** Deutsch, Englisch, Spanisch, Französisch, Portugiesisch (pt-BR),
-Arabisch (RTL) — **vollständig**, Oberfläche wie Inhaltsbibliotheken (siehe 4b,
-4c und 4e); Store-Seiten in beiden Stores ebenfalls sechssprachig (seit 1.5.3)
+**Sprachen (13, seit 1.6.0):** Deutsch, Englisch, Spanisch, Französisch, Portugiesisch (pt-BR),
+Arabisch (RTL), Italienisch, Niederländisch, Polnisch, Türkisch, Japanisch, Koreanisch,
+Chinesisch (vereinfacht) — **vollständig**, Oberfläche wie Inhaltsbibliotheken (siehe 4b,
+4c, 4e und „Version 1.6.0“). Store-Seiten in allen 13 Sprachen live seit 1.6.0 (26.10.)
 **Geschäftsmodell:** Freemium mit 7 Tagen kostenloser Testphase
 **Zielgruppe:** Fitnessstudio-Besucher (Geräte + freie Gewichte), Anfänger bis Fortgeschrittene
 
 ---
 
 ## Aktueller Stand
+
+### Version 1.6.0: 13 Sprachen, drei Features (22.–26.10.2026) — AUSGELIEFERT 26.10.
+
+Gemergt nach `main` als PR #77 am 27.10.2026. Migrationen sind
+seit 23.10. in Prod (siehe „Ausgeführt am 23.10.“). Android vc26 / iOS Build 17 / 1.6.0.
+
+**Ausgeliefert am 26.10. auf Josefs Anweisung „direkt in Produktion, du machst alles“:**
+
+| | Stand |
+|---|---|
+| Android | **vc26 auf `production`, an alle** (`android-release` 40390735707), validiert und committet. **Kein 403 wegen WRITE_EXERCISE** — anders als am 03.09. nahm Play das Bundle ohne Handupload an |
+| Play-Eintrag | it-IT, nl-NL, pl-PL, tr-TR, ja-JP, ko-KR, zh-CN je Texte, 6 Screenshots, Symbol, Vorstellungsgrafik — ein Lauf mit neuem Modus `sprachen` (lang = Kommaliste) |
+| iOS | Build 17 hochgeladen (`ios-release` 40390740257) → 1.5.6 war APPROVED → Version 1.6.0 angelegt → `lokalisieren` (14 Locales, 7 neu: nl-NL, pl, it, tr, ja, ko, zh-Hans) → Build 17 zugewiesen → Screenshots für 15 Sprachen → `beschreibung` → Prüfnotiz neu (beschreibt den Health-**Schreib**zugriff) → **eingereicht**, Einreichung `be67d991-317a-4858-b04b-1fab15d7fc64`, `WAITING_FOR_REVIEW`. Beide Abos `APPROVED` |
+| iOS-Primärsprache | **en-US** (nachgelesen; mit offener 1.6.0 meldete `primaersprache` „schon gesetzt“) |
+| Web/API | **live seit 27.10.** — gemergt als PR #77 (Squash), Cloudflare baut von `main` |
+
+⚠ **Offen:** Play-Gesundheitsformular und Datensicherheit um WRITE_EXERCISE ergänzen (Google kann
+das nachträglich verlangen), Apple App-Datenschutz prüfen, Gerätetest Health-Export (lief nie am Gerät).
+**Nur von Hand machbar:** Die Health-Apps-Erklärung hat keinen API-Endpunkt. Datensicherheit hat einen
+(`applications.dataSafety`), verlangt aber das KOMPLETTE Formular als CSV — nur aus dem Console-Export,
+ein selbst gebautes CSV würde Josefs Angaben vom 27.09. überschreiben.
+
+**Neue Sprachen:** it, nl, pl, tr, ja, ko, zh (vereinfacht; zh-TW landet bewusst auch dort).
+Je Sprache Oberfläche, alle 222 Bibliothekseinträge, Rechtstexte (mit „Vorrang der deutschen
+Fassung“, Notrufnummer des Landes), Coach-/Mahlzeit-Prompt, Play-Text und iOS-Felder,
+134 Beschriftungstabellen. `pruefe-inhalte`: 2442 Einträge, 0 offen. Übersetzt von
+Sub-Agents, **nicht muttersprachlich gegengelesen** — die Agents haben je ~5 unsichere
+Stellen gemeldet (Gym-Lehnwörter, Quark/Hüttenkäse ohne Gegenstück, Knopfnamen).
+⚠ Die Commit-Titel zählen um eins falsch („achte Sprache“ für nl …): nl ist die 7., zh die 13.
+
+**Wie man eine Sprache einträgt** (wiederholbar, an 7 Sprachen erprobt):
+- Agents schreiben nur eigene Dateien: `locales/<c>.json`, `src/data/<c>/` (9 Pakete),
+  `legal/uebersetzungen/<c>.js`, `store-assets/play-listing.<locale>.json` und Schnipsel.
+- `python3 scripts/sprache-eintragen.py <c> <schnipsel-ordner> --tabellen <c>.json` trägt
+  sie in alle gemeinsamen Dateien ein (Sprachlisten App+API, Paket-Lader, Prompts,
+  Store-Skripte, asc.py, store-texte.md, Tests) und importiert die Tabellen.
+- `scripts/sprachtabellen.mjs export|import` ordnet über **de+en zu, nicht über die Zeile** —
+  die Zeilennummer verschiebt sich, sobald eine andere Sprache eingetragen wurde.
+- Danach: `npm test`, `pruefe-sprachen --browser`, `pruefe-inhalte`, `pruefe-store-texte`, Build.
+
+**Technik dazu:**
+- Sprachpakete werden **nachgeladen** (`spracheWechseln()` in `src/i18n/index.js`), nur de/en
+  sind fest im Bündel; `main.jsx` wartet höchstens 1,5 s auf die Startsprache.
+- CJK-Schriften per `:lang()` in `index.css`, `keep-all` für Koreanisch.
+- Mengenskalierung kennt die Löffel aller 13 Sprachen, Japanisch mit Zahl dahinter (大さじ1).
+- `pruefe-sprachen` liest die Sprachliste aus `src/lib/sprache.js`, die Browserprobe läuft im
+  Gastmodus; fehlende Mehrzahlformen, die eine Sprache nicht hat (ja/ko/zh: nur `other`),
+  zählen nicht mehr als Fehler.
+
+**Features:**
+1. **Gäste sammeln XP und Streak** (`guest_xp` in localStorage), `resync.js` führt sie bei
+   der Registrierung ins Konto zusammen. Nebenbei: Gast-Cardio verlor beim Hochladen den `type`.
+2. **Supplements mit Nährwerten** (optional, je Einnahme). Abhaken legt einen Ernährungseintrag
+   an (`source 'supplement'`, `source_id supp:<id>:<slot>`), Abwählen entfernt ihn.
+3. **Workouts nach Apple Health / Health Connect schreiben** — eigenes Opt-in im Profil, eigenes
+   kleines Plugin im App-Projekt (`HealthExportPlugin.swift` über `FullRepBridgeViewController`
+   im Main.storyboard, `HealthExportPlugin.kt` mit Kotlin fürs App-Modul), nur Art/Start/Ende.
+   ✅ **Kompiliert auf beiden Plattformen** (CI, 23.10.). Am Gerät noch nie gelaufen.
+
+**Store-Standardsprache Englisch** (Josefs Wunsch): `asc.py --primaersprache en-US` bzw.
+Workflow-Modus `primaersprache`, `play-upload.py --standardsprache en-US` bzw. Modus
+`standardsprache`. **Play: erledigt am 25.10.** iOS: offen, siehe unten.
+
+**Ausgeführt am 23.10. (Josefs „ja“):**
+- ✅ Beide Migrationen in Prod, nachgelesen: Spalten `supplements.calories/protein/carbs/fat/fiber`,
+  `nutrition_entries_source_check` mit `supplement`, `user_settings_language_check` mit 13 Codes.
+- ✅ iOS `nur_kompilieren` (Lauf 39994389018): `BUILD SUCCEEDED`, das Swift-Plugin kompiliert.
+- ✅ Android-Build vc26 (Lauf 39994392780) grün, also kompiliert auch das Kotlin-Plugin.
+  ⚠ **Das AAB fehlt trotzdem:** „Artifact storage quota has been hit“ (23. und 25.10.). Der
+  Upload-Schritt hat `continue-on-error`, deshalb ist der Lauf grün.
+  - **Aufräumen ohne Klicken:** `release-preflight.yml` mit Eingabe `artefakte = anzeigen | loeschen`.
+    Dabei bleiben die R8-Mappings erhalten.
+  - Am 26.10. gelöscht: 9 alte AABs/IPAs (1.5.3–1.5.6), 203 MB.
+  - GitHub rechnet die Belegung erst nach 6–12 h neu.
+  - ⚠ Das Kontingent gilt vermutlich **kontoweit**, also auch für Mahjong, Swaply und Anigosha. Ist es danach
+    immer noch voll, liegt der Rest in den anderen Repos.
+- ❌ **iOS-Primärsprache:** Der PATCH `apps/{id}` mit `primaryLocale=en-US` wird von Apple mit
+  Erfolg beantwortet, der Wert bleibt aber `de-DE` (nachgelesen). Das Skript bricht deshalb ab.
+  Vermutlich ist die Primärsprache nur änderbar, solange eine bearbeitbare Version offen ist
+  (1.5.6 liegt in der Prüfung). Neuer Versuch erst mit offener 1.6.0, sonst von Hand in ASC
+  (App-Informationen → Primärsprache).
+- ✅ **Play-Standardsprache ist seit 25.10. en-US.** Der erste Versuch am 23.10. scheiterte mit 403
+  „Before you can change default language, you need to provide translations for all your
+  in-app products“. Grund: Das Abo `mypeak_premium_monthly` hatte nur ein de-DE-Listing.
+  - Jetzt legt `play-upload.py --abo-titel … --abo-beschreibung …` eine fehlende Sprache am Abo an
+    (Workflow-Modus `abo-titel`, lang `en-US`).
+  - en-US „FullRep Premium“ ist gesetzt und nachgelesen, damit hat das Abo 2 Sprachen.
+  - Danach lief `standardsprache` durch: validiert, committet.
+  - ⚠ **Merksatz:** Die Standardsprache des Eintrags verlangt dieselbe Sprache an jedem In-App-Produkt.
+
+**Abarbeitungsliste (Stand 26.10., alles bis auf 3 und den Gerätetest erledigt, siehe Tabelle oben):**
+1. ~~Migrationen in Prod~~ ✅ 23.10.
+2. ~~Kompilier-Läufe~~ ✅ 23.10.
+3. **Play-Gesundheitsformular** (der Upload ging am 26.10. ohne durch, offen bleibt die Erklärung selbst): WRITE_EXERCISE ist eine neue Health-Berechtigung. Ersten
+   Android-Build von Hand in den internen Test, Formular ergänzen, Genehmigung abwarten
+   (Ablauf siehe „Health hat drei Hürden“). Datensicherheit und Apple App-Datenschutz prüfen.
+4. ✅ 26.10. Store: Version 1.6.0 anlegen, `--lokalisieren` für die neuen Locales, Play `texte` je Sprache
+   (nacheinander!), Screenshots je Sprache rendern, **iOS-Primärsprache auf en-US**
+   (`asc.yml` Modus `primaersprache`, erst wenn 1.6.0 offen ist; Play ist schon umgestellt).
+5. Builds hochladen und einreichen ✅ 26.10.; Gerätetest Health-Export offen.
 
 ### Startsprache = Gerätesprache + Sprachwahl speichert endlich (11.10.2026)
 
@@ -2423,7 +2524,7 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
 
 - **Framework:** React 18 + Vite
 - **Styling:** Tailwind CSS (Mobile-first)
-- **i18n:** react-i18next (de, en, es, fr, pt, ar; neue Sprache = eine Zeile in `src/lib/sprache.js`)
+- **i18n:** react-i18next, 13 Sprachen; nur de/en fest im Bündel, der Rest wird nachgeladen. Neue Sprache: siehe `scripts/sprache-eintragen.py`
 - **Backend:** Supabase (Auth + PostgreSQL-Datenbank)
 - **Hosting:** Cloudflare Pages (seit 04.10.2026, automatisches Deployment über GitHub; vorher Vercel)
 - **Besucherzählung:** Cloudflare Web Analytics seit 08.10.2026 — von Josef im Pages-Projekt `fullrep`

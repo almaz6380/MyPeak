@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Check, Play, Pause } from 'lucide-react';
 import { saveWorkout } from '../../data/workoutStorage';
 import { awardWorkoutCompletion } from '../../data/socialStorage';
+import { workoutExportieren } from '../../lib/health';
 import { maybeAskForReview } from '../../lib/review';
 import { useAuth } from '../../context/AuthContext';
 import { getExerciseById } from '../../data/exercises';
@@ -39,6 +40,7 @@ export default function ActiveHiit({ config, onFinish, onDiscard }) {
     };
     await saveWorkout(user.id, workout);
     await awardWorkoutCompletion(user.id, workout);
+    workoutExportieren(user.id, workout);
     // Bewertungsanfrage ab dem 2. Training jeder Art (s. lib/review.js), nur nativ.
     setTimeout(() => { maybeAskForReview(user.id); }, 1500);
     onFinish();

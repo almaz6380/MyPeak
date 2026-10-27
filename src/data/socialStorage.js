@@ -252,11 +252,11 @@ export const XP_VALUES = {
 
 // Titel basierend auf Level
 export function getLevelTitle(level) {
-  if (level >= 51) return { de: 'GOAT', en: 'GOAT', es: 'GOAT', fr: 'GOAT', pt: 'GOAT', ar: 'الأعظم', emoji: '🐐' };
-  if (level >= 31) return { de: 'Legende', en: 'Legend', es: 'Leyenda', fr: 'Légende', pt: 'Lenda', ar: 'أسطورة', emoji: '👑' };
-  if (level >= 16) return { de: 'Champion', en: 'Champion', es: 'Campeón', fr: 'Champion', pt: 'Campeão', ar: 'بطل', emoji: '🏆' };
-  if (level >= 6) return { de: 'Warrior', en: 'Warrior', es: 'Guerrero', fr: 'Guerrier', pt: 'Guerreiro', ar: 'محارب', emoji: '⚔️' };
-  return { de: 'Rookie', en: 'Rookie', es: 'Novato', fr: 'Débutant', pt: 'Novato', ar: 'مبتدئ', emoji: '🌱' };
+  if (level >= 51) return { de: 'GOAT', en: 'GOAT', es: 'GOAT', fr: 'GOAT', pt: 'GOAT', ar: 'الأعظم', nl: 'GOAT', pl: 'GOAT', it: 'GOAT', tr: 'GOAT', ja: 'GOAT', ko: 'GOAT', zh: 'GOAT', emoji: '🐐' };
+  if (level >= 31) return { de: 'Legende', en: 'Legend', es: 'Leyenda', fr: 'Légende', pt: 'Lenda', ar: 'أسطورة', nl: 'Legende', pl: 'Legenda', it: 'Leggenda', tr: 'Efsane', ja: 'レジェンド', ko: '레전드', zh: '传奇', emoji: '👑' };
+  if (level >= 16) return { de: 'Champion', en: 'Champion', es: 'Campeón', fr: 'Champion', pt: 'Campeão', ar: 'بطل', nl: 'Kampioen', pl: 'Champion', it: 'Campione', tr: 'Şampiyon', ja: 'チャンピオン', ko: '챔피언', zh: '冠军', emoji: '🏆' };
+  if (level >= 6) return { de: 'Warrior', en: 'Warrior', es: 'Guerrero', fr: 'Guerrier', pt: 'Guerreiro', ar: 'محارب', nl: 'Strijder', pl: 'Warrior', it: 'Guerriero', tr: 'Savaşçı', ja: 'ウォリアー', ko: '워리어', zh: '战士', emoji: '⚔️' };
+  return { de: 'Rookie', en: 'Rookie', es: 'Novato', fr: 'Débutant', pt: 'Novato', ar: 'مبتدئ', nl: 'Rookie', pl: 'Rookie', it: 'Novellino', tr: 'Çaylak', ja: 'ルーキー', ko: '루키', zh: '新秀', emoji: '🌱' };
 }
 
 // XP pro Level (progressiv: Level 1=100, Level 2=150, Level 3=200...)
@@ -282,9 +282,33 @@ export function hasGoldenFrame(level) {
 }
 
 const XP_KEY = 'user_xp';
+// Gäste sammeln XP/Streak nur auf dem Gerät, unter eigenem Schlüssel: Nach der
+// Registrierung liest getXP() zuerst den Cache des Kontos, und dessen
+// Hintergrund-Refresh würde einen gemeinsamen Schlüssel still überschreiben.
+// resync.js führt GUEST_XP_KEY ins Konto zusammen und löscht ihn danach.
+export const GUEST_XP_KEY = 'guest_xp';
+const LEER_XP = { total_xp: 0, level: 1, streak_days: 0 };
+
+function gastXP() {
+  try { return { ...LEER_XP, ...JSON.parse(localStorage.getItem(GUEST_XP_KEY)) }; } catch { return { ...LEER_XP }; }
+}
+
+// Speichert XP-Felder: Gäste nur lokal, Konten in Supabase + Cache.
+async function xpSchreiben(userId, felder, bisher) {
+  const neu = { ...bisher, ...felder };
+  if (isGuest(userId)) {
+    localStorage.setItem(GUEST_XP_KEY, JSON.stringify(neu));
+    return;
+  }
+  await supabase
+    .from('user_xp')
+    .upsert({ user_id: userId, ...felder, updated_at: new Date().toISOString() });
+  // Cache aktualisieren, damit Home/Profil sofort frische Werte zeigen
+  localStorage.setItem(XP_KEY, JSON.stringify(neu));
+}
 
 export async function getXP(userId) {
-  if (isGuest(userId)) return { total_xp: 0, level: 1, streak_days: 0 };
+  if (isGuest(userId)) return gastXP();
 
   // localStorage first — instant
   const cached = localStorage.getItem(XP_KEY);
@@ -327,31 +351,17 @@ export async function getXP(userId) {
 
 // Returns { oldLevel, newLevel, xpGained } for level-up detection
 export async function addXP(userId, amount) {
-  if (isGuest(userId)) return { oldLevel: 1, newLevel: 1, xpGained: 0 };
-
   const current = await getXP(userId);
   const oldLevel = calculateLevel(current.total_xp || 0).level;
   const newXP = (current.total_xp || 0) + amount;
   const { level: newLevel } = calculateLevel(newXP);
 
-  await supabase
-    .from('user_xp')
-    .upsert({
-      user_id: userId,
-      total_xp: newXP,
-      level: newLevel,
-      updated_at: new Date().toISOString(),
-    });
-
-  // Cache aktualisieren, damit Home/Profil sofort frische Werte zeigen
-  localStorage.setItem(XP_KEY, JSON.stringify({ ...current, total_xp: newXP, level: newLevel }));
+  await xpSchreiben(userId, { total_xp: newXP, level: newLevel }, current);
 
   return { oldLevel, newLevel, xpGained: amount };
 }
 
 export async function updateStreak(userId) {
-  if (isGuest(userId)) return null;
-
   const xp = await getXP(userId);
   const today = todayLocal();
   // „Gestern" DST-sicher: von der Tagesmitte einen Kalendertag zurück (fixe
@@ -378,25 +388,12 @@ export async function updateStreak(userId) {
   const { level: newLevel } = calculateLevel(newTotalXP);
   const oldLevel = calculateLevel(xp.total_xp || 0).level;
 
-  await supabase
-    .from('user_xp')
-    .upsert({
-      user_id: userId,
-      total_xp: newTotalXP,
-      level: newLevel,
-      streak_days: newStreak,
-      last_workout_date: today,
-      updated_at: new Date().toISOString(),
-    });
-
-  // Cache aktualisieren, damit Home/Profil sofort frische Werte zeigen
-  localStorage.setItem(XP_KEY, JSON.stringify({
-    ...xp,
+  await xpSchreiben(userId, {
     total_xp: newTotalXP,
     level: newLevel,
     streak_days: newStreak,
     last_workout_date: today,
-  }));
+  }, xp);
 
   return { oldLevel, newLevel, xpGained: totalXPGain, streak: newStreak };
 }

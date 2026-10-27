@@ -59,4 +59,22 @@ describe('Mengen in Zutatenzeilen skalieren', () => {
   it('skaliert mehrere Angaben in derselben Zeile', () => {
     expect(skaliereMenge('100 g Mehl und 50 ml Milch', 2)).toBe('200 g Mehl und 100 ml Milch');
   });
+
+  it('kennt die Löffel der neuen Sprachen', () => {
+    expect(skaliereMenge('1 cucch. di miele', 2)).toBe('2 cucch. di miele');
+    expect(skaliereMenge('1/2 cucchiaino di sale', 2)).toBe('1 cucchiaino di sale');
+    expect(skaliereMenge('1 el olijfolie', 2)).toBe('2 el olijfolie');
+    expect(skaliereMenge('1 łyżka miodu', 3)).toBe('3 łyżka miodu');
+    expect(skaliereMenge('1/2 łyżeczki soli', 2)).toBe('1 łyżeczki soli');
+    expect(skaliereMenge('5 łyżek mąki', 2)).toBe('10 łyżek mąki');
+    expect(skaliereMenge('1 yk bal', 2)).toBe('2 yk bal');
+    expect(skaliereMenge('1/2 çk tuz', 2)).toBe('1 çk tuz');
+    expect(skaliereMenge('꿀 1큰술', 2)).toBe('꿀 2큰술');
+    expect(skaliereMenge('盐 1/2茶匙', 2)).toBe('盐 1茶匙');
+  });
+
+  it('skaliert japanische Löffel mit der Zahl dahinter', () => {
+    expect(skaliereMenge('はちみつ 大さじ1', 2)).toBe('はちみつ 大さじ2');
+    expect(skaliereMenge('塩 小さじ1/2', 2)).toBe('塩 小さじ1');
+  });
 });

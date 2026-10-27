@@ -51,6 +51,24 @@
   html {
     background-color: var(--color-surface-alt);
   }
+
+  /* CJK: Inter hat keine Glyphen dafuer, der Browser faellt je Zeichen auf eine
+     Systemschrift zurueck. Ohne Angabe nimmt er fuer Japanisch gern eine
+     chinesische Schrift (Han-Vereinheitlichung: dasselbe Zeichen, andere
+     Form). `lang` setzt useTextrichtung am <html>. Inter bleibt vorn, damit
+     Ziffern und lateinische Woerter gleich aussehen wie in den anderen
+     Sprachen. */
+  html:lang(ja) {
+    font-family: 'Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans CJK JP', 'Noto Sans JP', 'Yu Gothic', sans-serif;
+  }
+  html:lang(ko) {
+    font-family: 'Inter', 'Apple SD Gothic Neo', 'Noto Sans CJK KR', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    /* Koreanisch trennt zwischen Woertern, nicht mitten im Wort */
+    word-break: keep-all;
+  }
+  html:lang(zh) {
+    font-family: 'Inter', 'PingFang SC', 'Noto Sans CJK SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  }
   html.dark {
     background-color: var(--color-surface-dark);
 

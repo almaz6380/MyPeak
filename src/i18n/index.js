@@ -2,10 +2,6 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import de from './locales/de.json';
 import en from './locales/en.json';
-import es from './locales/es.json';
-import fr from './locales/fr.json';
-import pt from './locales/pt.json';
-import ar from './locales/ar.json';
 import { CUSTOM_NAME_PREFIX } from '../data/exercises';
 import { SPRACHEN } from '../lib/sprache';
 
@@ -34,23 +30,48 @@ function gespeicherteSprache() {
 
 const savedLanguage = gespeicherteSprache() || geraeteSprache();
 
+// Nur Deutsch (fallbackLng) und Englisch (Rueckfall der Beschriftungstabellen)
+// sind fest im Bündel. Jede weitere Sprache ist ein eigener Chunk, den nur
+// laedt, wer sie eingestellt hat — bei 13 Sprachen à ~90 kB waeren es sonst
+// ueber 1 MB Text in jedem App-Start. Eine neue `locales/<code>.json` findet
+// der Glob von selbst; freigeschaltet wird sie erst ueber SPRACHEN.
+//
+// Portugiesisch ist pt-BR unter dem Code `pt` (Brasilien ist der weitaus
+// groesste Markt, Portugal versteht pt-BR). Chinesisch ist `zh` =
+// Vereinfacht; zh-TW/zh-Hant landen bewusst ebenfalls dort, solange es keine
+// traditionelle Fassung gibt.
+const NACHLADBAR = import.meta.glob(['./locales/*.json', '!./locales/de.json', '!./locales/en.json']);
+
+export async function spracheLaden(code) {
+  if (i18n.hasResourceBundle(code, 'translation')) return;
+  const laden = NACHLADBAR[`./locales/${code}.json`];
+  if (!laden) return;
+  const modul = await laden();
+  i18n.addResourceBundle(code, 'translation', modul.default ?? modul, true, true);
+}
+
+// Statt i18n.changeLanguage direkt: erst das Paket holen, dann umschalten —
+// sonst zeigt die Oberflaeche kurz Deutsch (fallbackLng) statt der Wahl.
+export async function spracheWechseln(code) {
+  try {
+    await spracheLaden(code);
+  } catch (e) {
+    console.warn('[i18n] Sprachpaket nicht ladbar:', code, e);
+  }
+  return i18n.changeLanguage(code);
+}
+
+const fest = savedLanguage === 'de' || savedLanguage === 'en';
+
 i18n.use(initReactI18next).init({
   resources: {
     de: { translation: de },
     en: { translation: en },
-    // Spanisch seit 1.4.0, Franzoesisch/Portugiesisch/Arabisch seit 1.5.0.
-    // Fehlt ein Schluessel, greift fallbackLng (de). Die Inhaltsbibliotheken
-    // liegen als eigene Sprachpakete daneben, nicht hier — siehe
-    // src/data/uebersetzungen.js.
-    es: { translation: es },
-    fr: { translation: fr },
-    // Portugiesisch ist pt-BR unter dem Code `pt`: Brasilien ist der weitaus
-    // groesste lusophone Markt, Portugal versteht pt-BR, ein zweiter Code
-    // waere doppelte Pflege.
-    pt: { translation: pt },
-    ar: { translation: ar },
   },
-  lng: savedLanguage,
+  // Bis das Paket der Startsprache da ist, Englisch statt Deutsch: ein
+  // Japaner versteht eher Englisch. Meist sind es ohnehin nur Millisekunden,
+  // main.jsx wartet darauf (spracheBereit).
+  lng: fest ? savedLanguage : 'en',
   fallbackLng: 'de',
   // Nur ein Namespace — ':' in dynamischen Strings (z. B. Custom-Übungsnamen)
   // darf nie als Namespace-Trenner interpretiert werden.
@@ -66,5 +87,14 @@ i18n.use(initReactI18next).init({
       ? key.slice(CUSTOM_NAME_PREFIX.length)
       : key,
 });
+
+// main.jsx rendert erst, wenn die Startsprache geladen ist — hoechstens
+// 1,5 s, danach lieber englisch als gar nicht.
+export const spracheBereit = fest
+  ? Promise.resolve()
+  : Promise.race([
+    spracheWechseln(savedLanguage),
+    new Promise((r) => setTimeout(r, 1500)),
+  ]);
 
 export default i18n;

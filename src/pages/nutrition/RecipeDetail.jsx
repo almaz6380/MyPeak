@@ -9,27 +9,27 @@ import { saveNutritionEntry } from '../../data/nutritionStorage';
 import { todayLocal } from '../../lib/dateUtils';
 
 const DIFFICULTY = {
-  easy: { de: 'Einfach', en: 'Easy', es: 'Fácil', fr: 'Facile', pt: 'Fácil', ar: 'سهل', color: 'text-green-500 bg-green-50 dark:bg-green-900/20' },
-  medium: { de: 'Mittel', en: 'Medium', es: 'Media', fr: 'Moyen', pt: 'Média', ar: 'متوسط', color: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' },
-  hard: { de: 'Schwer', en: 'Hard', es: 'Difícil', fr: 'Difficile', pt: 'Difícil', ar: 'صعب', color: 'text-red-500 bg-red-50 dark:bg-red-900/20' },
+  easy: { de: 'Einfach', en: 'Easy', es: 'Fácil', fr: 'Facile', pt: 'Fácil', ar: 'سهل', nl: 'Makkelijk', pl: 'Łatwy', it: 'Facile', tr: 'Kolay', ja: 'かんたん', ko: '쉬움', zh: '简单', color: 'text-green-500 bg-green-50 dark:bg-green-900/20' },
+  medium: { de: 'Mittel', en: 'Medium', es: 'Media', fr: 'Moyen', pt: 'Média', ar: 'متوسط', nl: 'Gemiddeld', pl: 'Średni', it: 'Media', tr: 'Orta', ja: 'ふつう', ko: '보통', zh: '中等', color: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' },
+  hard: { de: 'Schwer', en: 'Hard', es: 'Difícil', fr: 'Difficile', pt: 'Difícil', ar: 'صعب', nl: 'Moeilijk', pl: 'Trudny', it: 'Difficile', tr: 'Zor', ja: '難しい', ko: '어려움', zh: '困难', color: 'text-red-500 bg-red-50 dark:bg-red-900/20' },
 };
 
 const TAG_LABELS = {
-  normal: { de: 'Normal', en: 'Normal', es: 'Normal', fr: 'Normal', pt: 'Normal', ar: 'عادي' },
-  vegetarian: { de: 'Vegetarisch', en: 'Vegetarian', es: 'Vegetariana', fr: 'Végétarien', pt: 'Vegetariana', ar: 'نباتي' },
-  vegan: { de: 'Vegan', en: 'Vegan', es: 'Vegana', fr: 'Végétalien', pt: 'Vegana', ar: 'نباتي صرف' },
-  keto: { de: 'Keto', en: 'Keto', es: 'Keto', fr: 'Céto', pt: 'Keto', ar: 'كيتو' },
-  lowcarb: { de: 'Low Carb', en: 'Low Carb', es: 'Baja en carbohidratos', fr: 'Pauvre en glucides', pt: 'Baixo carboidrato', ar: 'قليل الكربوهيدرات' },
-  highcarb: { de: 'High Carb', en: 'High Carb', es: 'Alta en carbohidratos', fr: 'Riche en glucides', pt: 'Alto carboidrato', ar: 'عالي الكربوهيدرات' },
-  glutenfree: { de: 'Glutenfrei', en: 'Gluten-free', es: 'Sin gluten', fr: 'Sans gluten', pt: 'Sem glúten', ar: 'خالٍ من الغلوتين' },
-  lactosefree: { de: 'Laktosefrei', en: 'Lactose-free', es: 'Sin lactosa', fr: 'Sans lactose', pt: 'Sem lactose', ar: 'خالٍ من اللاكتوز' },
+  normal: { de: 'Normal', en: 'Normal', es: 'Normal', fr: 'Normal', pt: 'Normal', ar: 'عادي', nl: 'Normaal', pl: 'Standardowa', it: 'Normale', tr: 'Normal', ja: '通常', ko: '일반', zh: '普通' },
+  vegetarian: { de: 'Vegetarisch', en: 'Vegetarian', es: 'Vegetariana', fr: 'Végétarien', pt: 'Vegetariana', ar: 'نباتي', nl: 'Vegetarisch', pl: 'Wegetariańska', it: 'Vegetariana', tr: 'Vejetaryen', ja: 'ベジタリアン', ko: '채식', zh: '素食' },
+  vegan: { de: 'Vegan', en: 'Vegan', es: 'Vegana', fr: 'Végétalien', pt: 'Vegana', ar: 'نباتي صرف', nl: 'Veganistisch', pl: 'Wegańska', it: 'Vegana', tr: 'Vegan', ja: 'ヴィーガン', ko: '비건', zh: '纯素' },
+  keto: { de: 'Keto', en: 'Keto', es: 'Keto', fr: 'Céto', pt: 'Keto', ar: 'كيتو', nl: 'Keto', pl: 'Keto', it: 'Keto', tr: 'Keto', ja: 'ケト', ko: '키토', zh: '生酮' },
+  lowcarb: { de: 'Low Carb', en: 'Low Carb', es: 'Baja en carbohidratos', fr: 'Pauvre en glucides', pt: 'Baixo carboidrato', ar: 'قليل الكربوهيدرات', nl: 'Low carb', pl: 'Low carb', it: 'Low carb', tr: 'Düşük karbonhidrat', ja: '低糖質', ko: '저탄수', zh: '低碳水' },
+  highcarb: { de: 'High Carb', en: 'High Carb', es: 'Alta en carbohidratos', fr: 'Riche en glucides', pt: 'Alto carboidrato', ar: 'عالي الكربوهيدرات', nl: 'High carb', pl: 'High carb', it: 'High carb', tr: 'Yüksek karbonhidrat', ja: '高糖質', ko: '고탄수', zh: '高碳水' },
+  glutenfree: { de: 'Glutenfrei', en: 'Gluten-free', es: 'Sin gluten', fr: 'Sans gluten', pt: 'Sem glúten', ar: 'خالٍ من الغلوتين', nl: 'Glutenvrij', pl: 'Bez glutenu', it: 'Senza glutine', tr: 'Glutensiz', ja: 'グルテンフリー', ko: '글루텐 프리', zh: '无麸质' },
+  lactosefree: { de: 'Laktosefrei', en: 'Lactose-free', es: 'Sin lactosa', fr: 'Sans lactose', pt: 'Sem lactose', ar: 'خالٍ من اللاكتوز', nl: 'Lactosevrij', pl: 'Bez laktozy', it: 'Senza lattosio', tr: 'Laktozsuz', ja: '乳糖不使用', ko: '유당 프리', zh: '无乳糖' },
 };
 
 const MEAL_SLOTS = [
-  { key: 'breakfast', de: 'Frühstück', en: 'Breakfast', es: 'Desayuno', fr: 'Petit-déjeuner', pt: 'Café da manhã', ar: 'الإفطار' },
-  { key: 'lunch', de: 'Mittagessen', en: 'Lunch', es: 'Comida', fr: 'Déjeuner', pt: 'Almoço', ar: 'الغداء' },
-  { key: 'dinner', de: 'Abendessen', en: 'Dinner', es: 'Cena', fr: 'Dîner', pt: 'Jantar', ar: 'العشاء' },
-  { key: 'snack', de: 'Snack', en: 'Snack', es: 'Tentempié', fr: 'Collation', pt: 'Lanche', ar: 'وجبة خفيفة' },
+  { key: 'breakfast', de: 'Frühstück', en: 'Breakfast', es: 'Desayuno', fr: 'Petit-déjeuner', pt: 'Café da manhã', ar: 'الإفطار', nl: 'Ontbijt', pl: 'Śniadanie', it: 'Colazione', tr: 'Kahvaltı', ja: '朝食', ko: '아침', zh: '早餐' },
+  { key: 'lunch', de: 'Mittagessen', en: 'Lunch', es: 'Comida', fr: 'Déjeuner', pt: 'Almoço', ar: 'الغداء', nl: 'Lunch', pl: 'Obiad', it: 'Pranzo', tr: 'Öğle yemeği', ja: '昼食', ko: '점심', zh: '午餐' },
+  { key: 'dinner', de: 'Abendessen', en: 'Dinner', es: 'Cena', fr: 'Dîner', pt: 'Jantar', ar: 'العشاء', nl: 'Diner', pl: 'Kolacja', it: 'Cena', tr: 'Akşam yemeği', ja: '夕食', ko: '저녁', zh: '晚餐' },
+  { key: 'snack', de: 'Snack', en: 'Snack', es: 'Tentempié', fr: 'Collation', pt: 'Lanche', ar: 'وجبة خفيفة', nl: 'Snack', pl: 'Przekąska', it: 'Spuntino', tr: 'Ara öğün', ja: '間食', ko: '간식', zh: '零食' },
 ];
 
 export default function RecipeDetail({ recipe, onBack, onSaved }) {

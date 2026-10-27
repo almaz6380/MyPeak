@@ -203,6 +203,46 @@ def setze_namen(tok):
 
 
 
+# ── Primärsprache ──────────────────────────────────────────────────────────
+# Die Primärsprache ist der Rückfall für jedes Land, für das es keine eigene
+# Lokalisierung gibt (22.10.2026: de-DE -> en-US, auf Josefs Wunsch — wer in
+# Schweden oder Indien sucht, liest eher Englisch als Deutsch). Apple nimmt
+# sie nur an, wenn es in dieser Sprache schon eine appInfoLocalization gibt;
+# das prüfen wir vorher selbst, statt Apples Fehlermeldung zu deuten.
+
+def setze_primaersprache(tok, locale):
+    aid = app_id(tok)
+    app = api(tok, f'apps/{aid}')
+    alt = app['data']['attributes'].get('primaryLocale')
+    print(f'Primärsprache: {alt} -> {locale}')
+    if alt == locale:
+        print('Schon gesetzt, nichts zu tun.')
+        return
+
+    vorhanden = False
+    for info in api(tok, f'apps/{aid}/appInfos').get('data', []):
+        for loc in api(tok, f'appInfos/{info["id"]}/appInfoLocalizations').get('data', []):
+            la = loc['attributes']
+            if la.get('locale') == locale and la.get('name'):
+                vorhanden = True
+                print(f'  {locale} vorhanden: {la.get("name")!r} / {la.get("subtitle")!r}')
+    if not vorhanden:
+        sys.exit(f'Keine Lokalisierung {locale} mit Namen — erst --lokalisieren {locale}.')
+
+    if TROCKEN:
+        print('--dry-run: nichts gesendet.')
+        return
+    res = api(tok, f'apps/{aid}', 'PATCH', {
+        'data': {'type': 'apps', 'id': aid, 'attributes': {'primaryLocale': locale}},
+    }, fatal=False)
+    if res.get('_fehler'):
+        sys.exit(f'Abgelehnt: {fehler_text(res)}')
+    neu = api(tok, f'apps/{aid}')['data']['attributes'].get('primaryLocale')
+    print(f'Nachgelesen: primaryLocale = {neu}')
+    if neu != locale:
+        sys.exit('Apple meldet Erfolg, der Wert steht aber nicht da.')
+
+
 # ── Version anlegen ────────────────────────────────────────────────────────
 # Nach einer Freigabe gibt es in ASC keine offene Version mehr; alle
 # schreibenden Befehle hier brauchen aber eine. Die Oberflaeche nennt das
@@ -210,30 +250,70 @@ def setze_namen(tok):
 # appStoreVersions — plus der Text "Neu in dieser Version", der bei einem
 # Update Pflicht ist.
 
-WHATS_NEW = """FullRep startet jetzt in der Sprache deines Geräts. Und deine Sprachwahl \
-bleibt erhalten: Spanisch, Französisch, Portugiesisch und Arabisch sprangen nach \
-der nächsten Anmeldung bisher auf Deutsch zurück. Dazu kleinere Verbesserungen."""
+WHATS_NEW = """FullRep spricht jetzt 13 Sprachen: neu sind Italienisch, Niederländisch, \
+Polnisch, Türkisch, Japanisch, Koreanisch und Chinesisch. Auf Wunsch speichert FullRep \
+deine Workouts in Apple Health. Supplements mit Nährwerten zählen beim Abhaken in deine \
+Tageswerte, und auch im Gastmodus wachsen Streak und Level."""
 
 # "Neu in dieser Version" fuer die weiteren Sprachen der Store-Seite. Apple
 # verlangt den Text bei einem Update fuer JEDE Lokalisierung der Version —
 # lokalisieren() setzt ihn mit, sonst scheitert die Einreichung.
 WHATS_NEW_SPRACHEN = {
-    'en': "FullRep now starts in your device language, and your language choice "
-          "sticks: Spanish, French, Portuguese and Arabic used to fall back to "
-          "German after your next sign-in. Plus smaller improvements.",
-    'es': "FullRep ahora se abre en el idioma de tu dispositivo y tu elección de "
-          "idioma se mantiene: el español, el francés, el portugués y el árabe "
-          "volvían al alemán al iniciar sesión de nuevo. Además, pequeñas mejoras.",
-    'fr': "FullRep démarre désormais dans la langue de ton appareil, et ton choix "
-          "de langue est conservé : l’espagnol, le français, le portugais et "
-          "l’arabe repassaient en allemand à la connexion suivante. Et quelques "
-          "petites améliorations.",
-    'pt': "O FullRep agora abre no idioma do seu aparelho, e sua escolha de idioma "
-          "fica salva: espanhol, francês, português e árabe voltavam para o alemão "
-          "no próximo login. Além de pequenas melhorias.",
-    'ar': "يبدأ FullRep الآن بلغة جهازك، وتبقى اللغة التي تختارها محفوظة: كانت "
-          "الإسبانية والفرنسية والبرتغالية والعربية تعود إلى الألمانية عند تسجيل "
-          "الدخول التالي. بالإضافة إلى تحسينات صغيرة.",
+    'en': "FullRep now speaks 13 languages: new are Italian, Dutch, Polish, Turkish, "
+          "Japanese, Korean and Chinese. If you like, FullRep saves your workouts to "
+          "Apple Health. Supplements with nutrition values count toward your daily "
+          "totals when you tick them off, and your streak and level now grow in guest "
+          "mode too.",
+    'es': "FullRep ya habla 13 idiomas: nuevos son el italiano, el neerlandés, el polaco, "
+          "el turco, el japonés, el coreano y el chino. Si quieres, FullRep guarda tus "
+          "entrenos en Apple Salud. Los suplementos con valores nutricionales cuentan en "
+          "tus totales del día al marcarlos, y la racha y el nivel también crecen en modo "
+          "invitado.",
+    'fr': "FullRep parle désormais 13 langues : nouveaux, l’italien, le néerlandais, le "
+          "polonais, le turc, le japonais, le coréen et le chinois. Si tu le souhaites, "
+          "FullRep enregistre tes séances dans Apple Santé. Les compléments avec valeurs "
+          "nutritionnelles comptent dans tes totaux du jour quand tu les coches, et ta "
+          "série et ton niveau progressent aussi en mode invité.",
+    'pt': "O FullRep agora fala 13 idiomas: novos são italiano, holandês, polonês, turco, "
+          "japonês, coreano e chinês. Se quiser, o FullRep salva seus treinos no Apple "
+          "Saúde. Suplementos com valores nutricionais entram nos seus totais do dia ao "
+          "marcar, e a sequência e o nível também crescem no modo convidado.",
+    'ar': "يتحدث FullRep الآن 13 لغة: الجديد هو الإيطالية والهولندية والبولندية والتركية "
+          "واليابانية والكورية والصينية. إن رغبت، يحفظ FullRep تمارينك في Apple Health. "
+          "وتُحتسب المكملات ذات القيم الغذائية ضمن مجموعك اليومي عند تحديدها، كما تنمو "
+          "سلسلتك ومستواك في وضع الضيف أيضًا.",
+    'nl': "FullRep spreekt nu 13 talen, nieuw zijn Italiaans, Nederlands, Pools, "
+          "Turks, Japans, Koreaans en Chinees. Als je wilt, slaat FullRep je workouts "
+          "op in Apple Health of Health Connect. Supplementen met voedingswaarden "
+          "tellen bij het afvinken mee in je dagtotalen, en ook in de gastmodus "
+          "groeien je streak en level.",
+    'pl': "FullRep mówi teraz w 13 językach — nowe to włoski, niderlandzki, polski, "
+          "turecki, japoński, koreański i chiński. Na życzenie FullRep zapisuje twoje "
+          "treningi w Apple Health lub Health Connect. Suplementy z wartościami "
+          "odżywczymi po odhaczeniu wliczają się do twoich wartości dziennych, a seria "
+          "i poziom rosną także w trybie gościa.",
+    'it': "FullRep ora parla 13 lingue: le novità sono italiano, olandese, polacco, "
+          "turco, giapponese, coreano e cinese. Se vuoi, FullRep salva i tuoi workout "
+          "in Apple Health o Health Connect. Gli integratori con valori nutrizionali "
+          "contano nei tuoi valori giornalieri quando li spunti, e anche in modalità "
+          "ospite streak e livello crescono.",
+    'tr': "FullRep artık 13 dil konuşuyor: yeni diller İtalyanca, Felemenkçe, Lehçe, "
+          "Türkçe, Japonca, Korece ve Çince. İstersen FullRep antrenmanlarını Apple "
+          "Health’e kaydeder. Besin değerleri olan takviyeler işaretlediğinde günlük "
+          "değerlerine eklenir ve misafir modunda da seri (streak) ve seviye artar.",
+    'ja': "FullRep が 13 言語に対応しました。新たにイタリア語、オランダ語、ポーランド語、"
+          "トルコ語、日本語、韓国語、中国語が加わりました。ご希望に応じて、FullRep は"
+          "ワークアウトを Apple Health に保存します。栄養成分値のあるサプリメントは、"
+          "チェックすると 1 日の摂取量に加算されます。ゲストモードでもストリークと"
+          "レベルが上がるようになりました。",
+    'ko': "이제 FullRep을 13개 언어로 사용할 수 있어요. 이탈리아어, 네덜란드어, 폴란드어, "
+          "튀르키예어, 일본어, 한국어, 중국어가 새로 추가되었어요. 원하면 FullRep이 "
+          "운동을 Apple Health에 저장해요. 영양 성분이 있는 보충제는 체크하면 "
+          "하루 섭취량에 더해져요. 게스트 모드에서도 이제 스트릭과 레벨이 올라가요.",
+    'zh': "FullRep 现已支持 13 种语言：新增意大利语、荷兰语、波兰语、土耳其语、"
+          "日语、韩语和中文。如果你愿意，FullRep 会把你的训练保存到 Apple Health。"
+          "带有营养成分的补剂在勾选后会计入你当天的总摄入量，访客模式下连续打卡"
+          "和等级现在也会增长。",
 }
 
 
@@ -429,6 +509,13 @@ SPRACHEN = {
     'fr-FR': ('Französisch', 'fr-FR', 'fr'),
     'pt-BR': ('Portugiesisch', 'pt-BR', 'pt'),
     'ar-SA': ('Arabisch', 'ar', 'ar'),
+    'nl-NL': ('Niederländisch', 'nl-NL', 'nl'),
+    'pl': ('Polnisch', 'pl-PL', 'pl'),
+    'it': ('Italienisch', 'it-IT', 'it'),
+    'tr': ('Türkisch', 'tr-TR', 'tr'),
+    'ja': ('Japanisch', 'ja-JP', 'ja'),
+    'ko': ('Koreanisch', 'ko-KR', 'ko'),
+    'zh-Hans': ('Chinesisch', 'zh-CN', 'zh'),
 }
 
 # 3.1.2: Der Link auf die Nutzungsbedingungen muss in JEDER Beschreibung
@@ -480,6 +567,69 @@ ASSINATURA — FULLREP PREMIUM
 • يتجدد الاشتراك تلقائيًا ما لم يُلغَ قبل 24 ساعة على الأقل من نهاية الفترة الحالية — يمكنك إدارته وإلغاؤه من إعدادات Apple ID
 • شروط الاستخدام: https://fullrep.pages.dev/legal/terms
 • سياسة الخصوصية: https://fullrep.pages.dev/legal/privacy""",
+    'nl': """
+
+ABONNEMENT — FULLREP PREMIUM
+• Maand- of jaarabonnement met automatische verlenging; de prijs in jouw valuta zie je vóór de aankoop in de app
+• 7 dagen gratis proberen, de proefperiode stopt vanzelf en wordt geen betaald abonnement
+• De betaling wordt bij het bevestigen van de aankoop van je Apple ID afgeschreven
+• Het abonnement wordt automatisch verlengd, tenzij je het uiterlijk 24 uur vóór het einde van de lopende periode opzegt — beheer en opzeggen via de instellingen van je Apple ID
+• Gebruiksvoorwaarden: https://fullrep.pages.dev/legal/terms
+• Privacyverklaring: https://fullrep.pages.dev/legal/privacy""",
+    'pl': """
+
+SUBSKRYPCJA — FULLREP PREMIUM
+• Subskrypcja miesięczna lub roczna z automatycznym odnowieniem; cena w twojej walucie jest wyświetlana w aplikacji przed zakupem
+• 7 dni bezpłatnego okresu próbnego, który kończy się sam i nie przechodzi w płatną subskrypcję
+• Płatność jest pobierana z twojego Apple ID w momencie potwierdzenia zakupu
+• Subskrypcja odnawia się automatycznie, chyba że anulujesz ją co najmniej 24 godziny przed końcem okresu — zarządzaj nią i anuluj ją w ustawieniach swojego Apple ID
+• Warunki korzystania: https://fullrep.pages.dev/legal/terms
+• Polityka prywatności: https://fullrep.pages.dev/legal/privacy""",
+    'it': """
+
+ABBONAMENTO — FULLREP PREMIUM
+• Abbonamento mensile o annuale con rinnovo automatico; il prezzo nella tua valuta viene mostrato nell’app prima dell’acquisto
+• 7 giorni di prova gratuita che terminano da soli e non diventano un abbonamento a pagamento
+• Il pagamento viene addebitato sul tuo ID Apple alla conferma dell’acquisto
+• L’abbonamento si rinnova automaticamente, a meno che non venga disdetto almeno 24 ore prima della fine del periodo in corso — gestiscilo e disdicilo nelle impostazioni del tuo ID Apple
+• Condizioni d’uso: https://fullrep.pages.dev/legal/terms
+• Informativa sulla privacy: https://fullrep.pages.dev/legal/privacy""",
+    'tr': """
+
+ABONELİK — FULLREP PREMIUM
+• Otomatik yenilenen aylık veya yıllık abonelik; kendi para birimindeki fiyat satın almadan önce uygulamada gösterilir
+• 7 günlük ücretsiz deneme kendiliğinden sona erer ve ücretli bir aboneliğe dönüşmez
+• Ödeme, satın almayı onayladığında Apple Kimliğinden tahsil edilir
+• Mevcut dönemin bitiminden en az 24 saat önce iptal edilmezse abonelik otomatik olarak yenilenir — Apple Kimliği ayarlarından yönetebilir ve iptal edebilirsin
+• Kullanım koşulları: https://fullrep.pages.dev/legal/terms
+• Gizlilik politikası: https://fullrep.pages.dev/legal/privacy""",
+    'ja': """
+
+サブスクリプション — FULLREP PREMIUM
+• 月額または年額の自動更新サブスクリプション。お使いの通貨での価格は購入前にアプリ内で表示されます
+• 7 日間の無料トライアルは自動的に終了し、有料サブスクリプションには移行しません
+• 代金は購入の確定時に Apple ID に請求されます
+• サブスクリプションは、現在の期間が終了する少なくとも 24 時間前までに解約しない限り自動的に更新されます — Apple ID の設定で管理・解約できます
+• 利用規約: https://fullrep.pages.dev/legal/terms
+• プライバシーポリシー: https://fullrep.pages.dev/legal/privacy""",
+    'ko': """
+
+구독 — FULLREP PREMIUM
+• 월간 또는 연간 자동 갱신 구독이에요. 현지 통화 기준 가격은 구매 전에 앱에서 확인할 수 있어요
+• 7일 무료 체험은 자동으로 종료되며 유료 구독으로 전환되지 않아요
+• 요금은 구매를 확정할 때 Apple ID로 청구돼요
+• 구독은 현재 기간이 끝나기 최소 24시간 전까지 해지하지 않으면 자동으로 갱신돼요 — Apple ID 설정에서 관리하고 해지할 수 있어요
+• 이용약관: https://fullrep.pages.dev/legal/terms
+• 개인정보 처리방침: https://fullrep.pages.dev/legal/privacy""",
+    'zh': """
+
+订阅 — FULLREP PREMIUM
+• 按月或按年自动续订的订阅。以你所在货币计的价格会在购买前于应用内显示
+• 7 天免费试用会自动结束，不会转为付费订阅
+• 确认购买时，费用从你的 Apple ID 扣除
+• 除非在当前周期结束前至少 24 小时取消，订阅会自动续订——可在 Apple ID 设置中管理和取消
+• 使用条款：https://fullrep.pages.dev/legal/terms
+• 隐私政策：https://fullrep.pages.dev/legal/privacy""",
 }
 
 
@@ -707,27 +857,27 @@ def setze_abo_screenshot(tok):
 # "submitted together with this version", die Abos standen aber auf
 # MISSING_METADATA und fuhren nicht mit — genau dafuer kam 2.1(b) ein zweites
 # Mal. Diesen Absatz erst schreiben, wenn beide Abos READY_TO_SUBMIT sind.
-PRUEFNOTIZ = """What is new in 1.5.0 (previous App Store version: 1.0)
+PRUEFNOTIZ = """What is new in 1.6.0 (previous App Store version: 1.5.6)
 
-Five languages were added
-The interface, the knowledge library, the recipes and the legal texts are now
-available in German, English, Spanish, French, Portuguese and Arabic. Arabic
-lays out right to left. The language is chosen in Profile > Language.
+Seven languages were added
+Italian, Dutch, Polish, Turkish, Japanese, Korean and Simplified Chinese join
+German, English, Spanish, French, Portuguese and Arabic (13 in total). The
+language follows the device and can be changed in Profile > Language.
 
-Apple Health - read only
-FullRep reads two things, and only after the user turns the switch on in
-Profile > Apple Health: step count (shown on the home screen) and body weight
-(added to the existing weight history). The app writes nothing to Health.
-NSHealthUpdateUsageDescription is present because the linked framework
-requires a purpose string, not because the app writes data.
+Apple Health - workouts can now be written (new, opt-in)
+Profile > Apple Health has a separate switch "Save workouts to Health". Only
+when it is on and the user grants write access, a finished workout is saved
+as an HKWorkout with its type, start and end time. Nothing else is written.
+Reading (step count, body weight) is unchanged and has its own switch. This is
+why NSHealthUpdateUsageDescription is now actually used.
 
-Home screen redesign
-Calories are shown as a ring with the four macros below it; the workout
-scheduled for today can be started from the home screen; the weight trend is
-always visible.
+Supplements with nutrition values (optional)
+A supplement can carry calories and macros per serving; ticking it off adds
+them to the day's nutrition total, unticking removes them again.
 
-Home screen widget
-Shows the current streak, the level and the number of workouts this week.
+Streak and level in guest mode
+Guests now collect XP and a streak on the device; they move into the account
+when the user registers.
 
 Subscriptions (unchanged, already approved)
   mypeak_premium_monthly - EUR 4.99 / month
@@ -1397,6 +1547,8 @@ def main():
                         'abo-screenshot, pruefnotiz, einreichen')
     p.add_argument('--trotzdem', action='store_true',
                    help='einreichen, auch wenn Abos nicht mitkoennen')
+    p.add_argument('--primaersprache', metavar='LOCALE',
+                   help='Primärsprache der App setzen, z. B. en-US')
     p.add_argument('--dry-run', action='store_true',
                    help='nur zeigen, nichts an Apple senden')
     a = p.parse_args()
@@ -1407,7 +1559,7 @@ def main():
            a.screenshots, a.abo_screenshot,
            a.warum, a.einreichungen, a.aufraeumen, a.abo_namen, a.abo_notiz,
            a.inhaberrechte, a.exportfrage, a.pruefnotiz,
-           a.einreichen, a.alles]
+           a.einreichen, a.alles, a.primaersprache]
     if not any(tat):
         p.error('Einen Befehl angeben, z. B. --status')
 
@@ -1434,6 +1586,8 @@ def main():
             print(f'\n═══ {titel} ═══')
             fn()
         return
+    if a.primaersprache:
+        setze_primaersprache(tok, a.primaersprache)
     if a.version_anlegen:
         version_anlegen(tok, a.version_anlegen)
     if a.beschreibung:

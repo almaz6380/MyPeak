@@ -357,7 +357,8 @@
     "editHeight": "Modifier la taille",
     "editGoal": "Modifier l'objectif",
     "editActivity": "Modifier le niveau d'activité",
-    "editExperience": "Modifier l'expérience d'entraînement"
+    "editExperience": "Modifier l'expérience d'entraînement",
+    "healthExport": "Enregistrer les séances dans Santé"
   },
   "common": {
     "welcome": "Bienvenue",
@@ -996,7 +997,7 @@
     "termsHeading": "Conditions d'utilisation",
     "termsText1": "En utilisant FullRep, tu t'engages à utiliser l'application de façon responsable. Elle ne remplace pas un avis médical. Consulte toujours un médecin pour toute question de santé.",
     "privacyHeading": "Confidentialité",
-    "privacyText1": "Tes données sont hébergées chez nos sous-traitants Supabase et Vercel. Pour certaines fonctions, des données sont transmises à Google (analyse de photos, coach IA, publicité dans les apps), Anthropic (coach IA) et RevenueCat (Premium). Les détails figurent dans la politique de confidentialité. Tu peux supprimer ton compte et toutes tes données à tout moment.",
+    "privacyText1": "Tes données sont hébergées chez nos sous-traitants Supabase et Cloudflare. Pour certaines fonctions, des données sont transmises à Google (analyse de photos, coach IA, publicité dans les apps), Anthropic (coach IA) et RevenueCat (Premium). Les détails figurent dans la politique de confidentialité. Tu peux supprimer ton compte et toutes tes données à tout moment.",
     "termsAccept": "J'accepte les conditions d'utilisation et la politique de confidentialité",
     "healthConsentHeading": "Données de santé",
     "healthConsentText": "Le poids, les mensurations, les données de nutrition et d'entraînement ainsi que – si tu les actives – les données de cycle et Apple Health/Health Connect sont des données de santé (art. 9 RGPD). Nous avons besoin de ton consentement explicite. Tu peux le retirer à tout moment en supprimant ton compte.",
@@ -1141,7 +1142,10 @@
     "slot_midday": "Midi",
     "slot_pre_workout": "Avant la séance",
     "slot_post_workout": "Après la séance",
-    "slot_evening": "Soir"
+    "slot_evening": "Soir",
+    "nutritionTitle": "Valeurs nutritionnelles (facultatif)",
+    "nutritionHint": "Par prise — s'ajoute à tes totaux du jour quand tu le coches",
+    "nutritionBadge": "{{kcal}} kcal · {{protein}} g de protéines"
   },
   "cycle": {
     "title": "Suivi du cycle",

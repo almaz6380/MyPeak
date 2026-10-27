@@ -6,11 +6,24 @@ name: Release-Preflight
 # Ausgegeben wird ausschliesslich "gesetzt" oder "FEHLT" — nie ein Wert, nie eine
 # Laenge, nie ein Praefix. Ein Schluessel, der irgendwo im Klartext auftaucht,
 # gilt als verbrannt.
+#
+# Zweite Aufgabe (seit 26.10.2026): Artefakt-Speicher aufraeumen. Ist er voll,
+# laufen Builds gruen durch, legen aber kein AAB ab („Artifact storage quota has
+# been hit“, am 23. und 25.10. so passiert). Von Hand geht das am Handy nur
+# Lauf fuer Lauf. Steht hier statt in einer eigenen Datei, weil sich ein
+# Workflow, den es auf main noch nicht gibt, nicht per Dispatch starten laesst.
 on:
   workflow_dispatch:
+    inputs:
+      artefakte:
+        description: 'Artefakte: nein = nur Secrets pruefen, anzeigen = auflisten, loeschen = alles ausser R8-Mappings loeschen'
+        type: choice
+        options: [nein, anzeigen, loeschen]
+        default: nein
 
 jobs:
   preflight:
+    if: inputs.artefakte == '' || inputs.artefakte == 'nein'
     runs-on: ubuntu-latest
     steps:
       - name: Secrets pruefen
@@ -103,4 +116,44 @@ jobs:
             exit 1
           else
             echo "Alle Secrets vorhanden."
+          fi
+
+  artefakte:
+    if: inputs.artefakte == 'anzeigen' || inputs.artefakte == 'loeschen'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Artefakte auflisten und ggf. loeschen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODUS: ${{ inputs.artefakte }}
+        run: |
+          # R8-Mappings bleiben: Ohne sie sind Absturzberichte aus der Play
+          # Console unlesbar, und sie sind klein. Alte AABs/IPAs liegen ohnehin
+          # in den Stores.
+          gh api --paginate "repos/$GITHUB_REPOSITORY/actions/artifacts?per_page=100" \
+            --jq '.artifacts[] | [.id, .name, .size_in_bytes, .created_at, .expired] | @tsv' \
+            > liste.tsv
+          summe=0; frei=0; anzahl=0; geloescht=0
+          while IFS=$'\t' read -r id name groesse datum abgelaufen; do
+            anzahl=$((anzahl + 1)); summe=$((summe + groesse))
+            if [ "$abgelaufen" = "true" ]; then continue; fi
+            case "$name" in
+              *-mapping) printf '  bleibt   %8s KB  %s  %s\n' $((groesse / 1024)) "${datum%T*}" "$name"; continue ;;
+            esac
+            printf '  %-8s %8s KB  %s  %s\n' "$([ "$MODUS" = loeschen ] && echo weg || echo -)" \
+              $((groesse / 1024)) "${datum%T*}" "$name"
+            frei=$((frei + groesse))
+            if [ "$MODUS" = "loeschen" ]; then
+              gh api -X DELETE "repos/$GITHUB_REPOSITORY/actions/artifacts/$id" && geloescht=$((geloescht + 1))
+            fi
+          done < liste.tsv
+          echo
+          echo "Artefakte: $anzahl, zusammen $((summe / 1024 / 1024)) MB"
+          echo "Davon loeschbar: $((frei / 1024 / 1024)) MB"
+          if [ "$MODUS" = "loeschen" ]; then
+            echo "Geloescht: $geloescht. GitHub rechnet den Speicher erst in 6–12 h neu."
+          else
+            echo "Nur angezeigt, nichts geloescht."
           fi

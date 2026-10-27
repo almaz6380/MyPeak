@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { isGuest } from '../context/AuthContext';
+import { GUEST_XP_KEY, calculateLevel } from './socialStorage';
 
 // ── Zentraler Sync: lädt alle noch nicht synchronisierten (local_) Einträge
 // in die Cloud. Deckt zwei Fälle ab:
@@ -21,12 +22,16 @@ export async function syncLocalDataToCloud(userId) {
     await syncCustomPlans(userId);
     await syncWeeklySchedules(userId);
     await syncCustomExercises(userId);
+    // Supplements VOR den Ernährungseinträgen: Ein abgehaktes Supplement mit
+    // Nährwerten trägt seine Kennung in source_id, die hier erst auf die
+    // Cloud-Kennung umgeschrieben wird.
+    await syncSupplements(userId);
     await syncNutritionEntries(userId);
     await syncCustomMeals(userId);
     await syncWater(userId);
     await syncWeight(userId);
-    await syncSupplements(userId);
     await syncKeyedUpserts(userId);
+    await syncGastXP(userId);
   } catch (err) {
     console.error('Cloud-Sync fehlgeschlagen (wird beim nächsten Start erneut versucht):', err);
   } finally {
@@ -43,6 +48,38 @@ export function registerOnlineSync() {
   });
 }
 
+// Gast-XP/Streak ins Konto übernehmen. Zusammengeführt wird großzügig für den
+// Nutzer: mehr XP gewinnt, der Streak kommt aus dem jüngeren Trainingstag.
+// Läuft auch bei einem Bestandskonto, das sich nach einer Gastsitzung anmeldet.
+async function syncGastXP(userId) {
+  const gast = readJson(GUEST_XP_KEY, null);
+  if (!gast) return;
+
+  const { data: konto, error } = await supabase
+    .from('user_xp')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error) return;
+
+  const k = konto || {};
+  const totalXP = Math.max(k.total_xp || 0, gast.total_xp || 0);
+  const gastJuenger = (gast.last_workout_date || '') > (k.last_workout_date || '');
+  const zeile = {
+    user_id: userId,
+    total_xp: totalXP,
+    level: calculateLevel(totalXP).level,
+    streak_days: gastJuenger ? (gast.streak_days || 0) : (k.streak_days || 0),
+    last_workout_date: gastJuenger ? gast.last_workout_date : (k.last_workout_date ?? null),
+    updated_at: new Date().toISOString(),
+  };
+  const { error: fehler } = await supabase.from('user_xp').upsert(zeile);
+  if (fehler) return;
+
+  localStorage.setItem('user_xp', JSON.stringify(zeile));
+  localStorage.removeItem(GUEST_XP_KEY);
+}
+
 function readJson(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
 }
@@ -56,13 +93,15 @@ async function syncWorkouts(userId) {
   const locals = cached.filter((w) => isLocal(w.id));
   if (!locals.length) return;
 
-  const rows = locals.map((w) => ({ user_id: userId, date: w.date, duration: w.duration, exercises: w.exercises }));
+  // type mitnehmen: ohne ihn wird ein Gast-Cardio/HIIT-Workout nach der
+  // Registrierung zum Krafttraining (Verlauf, PRs, Heatmap).
+  const rows = locals.map((w) => ({ user_id: userId, date: w.date, duration: w.duration, type: w.type ?? null, exercises: w.exercises }));
   const { data, error } = await supabase.from('workouts').insert(rows).select();
   if (error || !data) return;
 
   const localIds = new Set(locals.map((w) => w.id));
   const current = readJson('workouts', []).filter((w) => !localIds.has(w.id));
-  const cloudRows = data.map((row) => ({ id: row.id, date: row.date, duration: row.duration, exercises: row.exercises }));
+  const cloudRows = data.map((row) => ({ id: row.id, date: row.date, duration: row.duration, type: row.type ?? undefined, exercises: row.exercises }));
   localStorage.setItem('workouts', JSON.stringify([...cloudRows, ...current]));
 }
 
@@ -218,6 +257,8 @@ async function syncSupplements(userId) {
           user_id: userId, name: s.name, brand: s.brand || null, form: s.form || 'tablet',
           dosage_amount: s.dosage_amount || 1, dosage_unit: s.dosage_unit || 'Stück',
           notes: s.notes || '', barcode: s.barcode || null, schedule: s.schedule || {},
+          calories: s.calories ?? null, protein: s.protein ?? null, carbs: s.carbs ?? null,
+          fat: s.fat ?? null, fiber: s.fiber ?? null,
         })
         .select()
         .single();
@@ -226,6 +267,18 @@ async function syncSupplements(userId) {
     if (idMap.size) {
       const current = readJson('supplements_list', []);
       localStorage.setItem('supplements_list', JSON.stringify(current.map((s) => idMap.get(s.id) || s)));
+      // Verweise der Supplement-Ernährungseinträge (supp:<id>:<slot>) mitziehen
+      for (const key of keysWithPrefix('nutrition_entries_')) {
+        const eintraege = readJson(key, []);
+        let geaendert = false;
+        for (const e of eintraege) {
+          if (e.source !== 'supplement' || !e.source_id) continue;
+          const [, altId, slot] = e.source_id.split(':');
+          const neu = idMap.get(altId);
+          if (neu) { e.source_id = `supp:${neu.id}:${slot}`; geaendert = true; }
+        }
+        if (geaendert) localStorage.setItem(key, JSON.stringify(eintraege));
+      }
     }
   }
 

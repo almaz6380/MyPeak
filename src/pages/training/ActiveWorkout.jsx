@@ -8,6 +8,7 @@ import { useActiveWorkout } from '../../context/ActiveWorkoutContext';
 import { getExerciseById } from '../../data/exercises';
 import { hasDemo } from '../../data/exerciseDemos';
 import { updateStreak, addXP, XP_VALUES } from '../../data/socialStorage';
+import { workoutExportieren } from '../../lib/health';
 import { checkAchievements } from '../../data/achievements';
 import LevelUpAnimation from '../../components/LevelUpAnimation';
 import AchievementToast from '../../components/AchievementToast';
@@ -129,6 +130,8 @@ export default function ActiveWorkout({ onFinish, onDiscard, onAddExercise }) {
 
     // Save to localStorage + Supabase (fire-and-forget, never blocks)
     saveWorkout(user.id, workout).catch((err) => console.error('Save workout error:', err));
+    // Nach Health (nur mit Opt-in im Profil, nur nativ), ebenfalls ohne zu warten
+    workoutExportieren(user.id, { ...workout, type: 'strength' }, { start: ctx.workout.startTime });
 
     // PR gegen die zuvor gelesenen Rekorde bestimmen
     const newPrs = {};
