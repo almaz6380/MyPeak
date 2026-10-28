@@ -2,6 +2,9 @@ import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { getXP } from '../data/socialStorage';
 import { getWorkouts } from '../data/workoutStorage';
+import { getNutritionEntries, getNutritionGoals } from '../data/nutritionStorage';
+import { schritteHeute } from './health';
+import { todayLocal } from './dateUtils';
 
 // Datenbruecke zum Homescreen-Widget.
 //
@@ -20,8 +23,12 @@ import { getWorkouts } from '../data/workoutStorage';
 //            von standard["FullRepWidget.widget.daten"] in die App-Group-Suite
 //            group.at.gallab.mypeak — erst DIE kann die Widget-Extension lesen.
 //
-// Geschrieben wird bei App-Start und nach jedem gespeicherten Workout —
-// mehr Frische braucht ein Streak-Widget nicht. Die Aktualisierung der
+// Seit 1.6.1 zeigen die Widgets Makros (kcal + P/K/F gegen das Ziel) und
+// Schritte statt Streak. Geschrieben wird bei App-Start, nach jedem Workout
+// und bei jeder Aenderung auf der Ernaehrungsseite. `datum` sagt dem Widget,
+// fuer welchen Tag die Zahlen gelten — nach Mitternacht zeigt es 0 statt der
+// Werte von gestern. Schritte liest das iOS-Widget selbst aus Health; der
+// Wert hier ist nur der Rueckfall, wenn das nicht geht (Geraet gesperrt). Die Aktualisierung der
 // Widget-ANZEIGE stossen die nativen Seiten an (MainActivity.onPause bzw.
 // WidgetKits Timeline-Refresh), nicht dieses Modul.
 //
@@ -48,13 +55,30 @@ export async function widgetDatenAktualisieren(userId) {
       await Preferences.configure({ group: GROUP });
       konfiguriert = true;
     }
-    const [xp, workouts] = await Promise.all([getXP(userId), getWorkouts(userId)]);
+    const heute = todayLocal();
+    const [xp, workouts, eintraege, ziele, schritte] = await Promise.all([
+      getXP(userId), getWorkouts(userId),
+      getNutritionEntries(userId, heute), getNutritionGoals(userId),
+      schritteHeute(userId),
+    ]);
     const start = wochenstart();
     const woche = (workouts || []).filter((w) => w?.date && new Date(`${w.date}T12:00:00`) >= start).length;
+    const summe = (feld) => Math.round((eintraege || []).reduce((a, e) => a + (Number(e?.[feld]) || 0), 0));
     const daten = {
       streak: xp?.streak_days || 0,
       level: xp?.level || 1,
       workoutsWoche: woche,
+      datum: heute,
+      kcal: summe('calories'),
+      kcalZiel: Math.round(Number(ziele?.calories) || 0),
+      protein: summe('protein'),
+      proteinZiel: Math.round(Number(ziele?.protein) || 0),
+      carbs: summe('carbs'),
+      carbsZiel: Math.round(Number(ziele?.carbs) || 0),
+      fat: summe('fat'),
+      fatZiel: Math.round(Number(ziele?.fat) || 0),
+      // null = Health nicht verbunden; das Widget zeigt dann einen Hinweis statt 0
+      schritte: schritte ?? null,
       // fuer die Widget-Anzeige „Stand: …" und als Frische-Merkmal
       stand: new Date().toISOString(),
     };

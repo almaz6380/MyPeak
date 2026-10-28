@@ -9,6 +9,7 @@ import CardPhotoMotif from '../../components/CardPhotoMotif';
 import MacroRing from './MacroRing';
 import FullRepLogo from '../../components/FullRepLogo';
 import { useAuth } from '../../context/AuthContext';
+import { widgetDatenAktualisieren } from '../../lib/widgetDaten';
 import { getNutritionEntries, getNutritionGoals, deleteNutritionEntry, saveNutritionGoals, getWaterTotal, addWater, removeWaterAmount } from '../../data/nutritionStorage';
 import { toLocalDateString } from '../../lib/dateUtils';
 import { appSprache } from '../../lib/sprache';
@@ -48,6 +49,12 @@ export default function DailyOverview({ onAddFood, onEditEntry, onOpenTDEE, onOp
   useEffect(() => {
     if (user) loadDateData();
   }, [user, selectedDate]);
+
+  // Makro-Widget: nach jeder Aenderung der Tageswerte frisch schreiben
+  // (der AppDelegate reicht es beim Verlassen der App ans Widget weiter).
+  useEffect(() => {
+    if (user?.id) widgetDatenAktualisieren(user.id);
+  }, [user, entries, goals]);
 
   async function loadDateData() {
     const [entriesData, waterData] = await Promise.all([

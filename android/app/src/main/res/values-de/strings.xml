@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <!-- Nur die Widget-Texte: alles andere lebt in der App-i18n (WebView). -->
+    <string name="widget_kcal">kcal übrig</string>
+    <string name="widget_protein">Protein</string>
+    <string name="widget_carbs">KH</string>
+    <string name="widget_fat">Fett</string>
+    <string name="widget_schritte">Schritte</string>
+    <string name="widget_beschreibung">Kalorien, Makros und Schritte von heute auf einen Blick.</string>
+</resources>

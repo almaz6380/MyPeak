@@ -8,5 +8,10 @@
 	<array>
 		<string>group.at.gallab.mypeak</string>
 	</array>
+	<!-- Seit 1.6.1 liest das Schritte-Widget selbst aus HealthKit (mit der
+	     Freigabe der App). Die HEALTHKIT-Faehigkeit an der Widget-Bundle-ID
+	     schaltet ios-release.yml per scripts/ios-profile.py ein. -->
+	<key>com.apple.developer.healthkit</key>
+	<true/>
 </dict>
 </plist>
