@@ -250,70 +250,48 @@ def setze_primaersprache(tok, locale):
 # appStoreVersions — plus der Text "Neu in dieser Version", der bei einem
 # Update Pflicht ist.
 
-WHATS_NEW = """FullRep spricht jetzt 13 Sprachen: neu sind Italienisch, Niederländisch, \
-Polnisch, Türkisch, Japanisch, Koreanisch und Chinesisch. Auf Wunsch speichert FullRep \
-deine Workouts in Apple Health. Supplements mit Nährwerten zählen beim Abhaken in deine \
-Tageswerte, und auch im Gastmodus wachsen Streak und Level."""
+WHATS_NEW = """FullRep gibt es jetzt auch auf dem Sperrbildschirm: Streak, Workouts \
+dieser Woche und Level als rundes, rechteckiges oder einzeiliges Widget. Neu auf dem \
+Homescreen ist zusätzlich ein kleines Widget."""
 
 # "Neu in dieser Version" fuer die weiteren Sprachen der Store-Seite. Apple
 # verlangt den Text bei einem Update fuer JEDE Lokalisierung der Version —
 # lokalisieren() setzt ihn mit, sonst scheitert die Einreichung.
 WHATS_NEW_SPRACHEN = {
-    'en': "FullRep now speaks 13 languages: new are Italian, Dutch, Polish, Turkish, "
-          "Japanese, Korean and Chinese. If you like, FullRep saves your workouts to "
-          "Apple Health. Supplements with nutrition values count toward your daily "
-          "totals when you tick them off, and your streak and level now grow in guest "
-          "mode too.",
-    'es': "FullRep ya habla 13 idiomas: nuevos son el italiano, el neerlandés, el polaco, "
-          "el turco, el japonés, el coreano y el chino. Si quieres, FullRep guarda tus "
-          "entrenos en Apple Salud. Los suplementos con valores nutricionales cuentan en "
-          "tus totales del día al marcarlos, y la racha y el nivel también crecen en modo "
-          "invitado.",
-    'fr': "FullRep parle désormais 13 langues : nouveaux, l’italien, le néerlandais, le "
-          "polonais, le turc, le japonais, le coréen et le chinois. Si tu le souhaites, "
-          "FullRep enregistre tes séances dans Apple Santé. Les compléments avec valeurs "
-          "nutritionnelles comptent dans tes totaux du jour quand tu les coches, et ta "
-          "série et ton niveau progressent aussi en mode invité.",
-    'pt': "O FullRep agora fala 13 idiomas: novos são italiano, holandês, polonês, turco, "
-          "japonês, coreano e chinês. Se quiser, o FullRep salva seus treinos no Apple "
-          "Saúde. Suplementos com valores nutricionais entram nos seus totais do dia ao "
-          "marcar, e a sequência e o nível também crescem no modo convidado.",
-    'ar': "يتحدث FullRep الآن 13 لغة: الجديد هو الإيطالية والهولندية والبولندية والتركية "
-          "واليابانية والكورية والصينية. إن رغبت، يحفظ FullRep تمارينك في Apple Health. "
-          "وتُحتسب المكملات ذات القيم الغذائية ضمن مجموعك اليومي عند تحديدها، كما تنمو "
-          "سلسلتك ومستواك في وضع الضيف أيضًا.",
-    'nl': "FullRep spreekt nu 13 talen, nieuw zijn Italiaans, Nederlands, Pools, "
-          "Turks, Japans, Koreaans en Chinees. Als je wilt, slaat FullRep je workouts "
-          "op in Apple Health of Health Connect. Supplementen met voedingswaarden "
-          "tellen bij het afvinken mee in je dagtotalen, en ook in de gastmodus "
-          "groeien je streak en level.",
-    'pl': "FullRep mówi teraz w 13 językach — nowe to włoski, niderlandzki, polski, "
-          "turecki, japoński, koreański i chiński. Na życzenie FullRep zapisuje twoje "
-          "treningi w Apple Health lub Health Connect. Suplementy z wartościami "
-          "odżywczymi po odhaczeniu wliczają się do twoich wartości dziennych, a seria "
-          "i poziom rosną także w trybie gościa.",
-    'it': "FullRep ora parla 13 lingue: le novità sono italiano, olandese, polacco, "
-          "turco, giapponese, coreano e cinese. Se vuoi, FullRep salva i tuoi workout "
-          "in Apple Health o Health Connect. Gli integratori con valori nutrizionali "
-          "contano nei tuoi valori giornalieri quando li spunti, e anche in modalità "
-          "ospite streak e livello crescono.",
-    'tr': "FullRep artık 13 dil konuşuyor: yeni diller İtalyanca, Felemenkçe, Lehçe, "
-          "Türkçe, Japonca, Korece ve Çince. İstersen FullRep antrenmanlarını Apple "
-          "Health’e kaydeder. Besin değerleri olan takviyeler işaretlediğinde günlük "
-          "değerlerine eklenir ve misafir modunda da seri (streak) ve seviye artar.",
-    'ja': "FullRep が 13 言語に対応しました。新たにイタリア語、オランダ語、ポーランド語、"
-          "トルコ語、日本語、韓国語、中国語が加わりました。ご希望に応じて、FullRep は"
-          "ワークアウトを Apple Health に保存します。栄養成分値のあるサプリメントは、"
-          "チェックすると 1 日の摂取量に加算されます。ゲストモードでもストリークと"
-          "レベルが上がるようになりました。",
-    'ko': "이제 FullRep을 13개 언어로 사용할 수 있어요. 이탈리아어, 네덜란드어, 폴란드어, "
-          "튀르키예어, 일본어, 한국어, 중국어가 새로 추가되었어요. 원하면 FullRep이 "
-          "운동을 Apple Health에 저장해요. 영양 성분이 있는 보충제는 체크하면 "
-          "하루 섭취량에 더해져요. 게스트 모드에서도 이제 스트릭과 레벨이 올라가요.",
-    'zh': "FullRep 现已支持 13 种语言：新增意大利语、荷兰语、波兰语、土耳其语、"
-          "日语、韩语和中文。如果你愿意，FullRep 会把你的训练保存到 Apple Health。"
-          "带有营养成分的补剂在勾选后会计入你当天的总摄入量，访客模式下连续打卡"
-          "和等级现在也会增长。",
+    'en': "FullRep is now on your Lock Screen: streak, workouts this week and level as "
+          "a circular, rectangular or inline widget. There is also a new small Home "
+          "Screen widget.",
+    'es': "FullRep ya está en tu pantalla de bloqueo: racha, entrenos de esta semana y "
+          "nivel como widget circular, rectangular o en línea. Además hay un nuevo "
+          "widget pequeño para la pantalla de inicio.",
+    'fr': "FullRep arrive sur ton écran verrouillé : série, séances de la semaine et "
+          "niveau en widget rond, rectangulaire ou en ligne. Un nouveau petit widget "
+          "existe aussi pour l’écran d’accueil.",
+    'pt': "O FullRep agora está na tela bloqueada: sequência, treinos da semana e nível "
+          "como widget circular, retangular ou em linha. Há também um novo widget "
+          "pequeno para a tela de início.",
+    'ar': "أصبح FullRep الآن على شاشة القفل: السلسلة وتمارين هذا الأسبوع والمستوى "
+          "كأداة دائرية أو مستطيلة أو في سطر واحد. وهناك أيضًا أداة صغيرة جديدة "
+          "للشاشة الرئيسية.",
+    'nl': "FullRep staat nu ook op je toegangsscherm: streak, workouts van deze week en "
+          "level als rond, rechthoekig of inline widget. Nieuw is ook een kleine widget "
+          "voor het beginscherm.",
+    'pl': "FullRep jest teraz na ekranie blokady: seria, treningi w tym tygodniu i "
+          "poziom jako okrągły, prostokątny lub jednowierszowy widżet. Nowy jest też "
+          "mały widżet na ekran początkowy.",
+    'it': "FullRep ora è anche sulla schermata di blocco: streak, workout della "
+          "settimana e livello come widget circolare, rettangolare o in linea. In più "
+          "c’è un nuovo widget piccolo per la schermata Home.",
+    'tr': "FullRep artık kilit ekranında: seri, bu haftaki antrenmanlar ve seviye; "
+          "yuvarlak, dikdörtgen veya satır içi widget olarak. Ana ekran için yeni bir "
+          "küçük widget da var.",
+    'ja': "FullRep がロック画面に対応しました。ストリーク、今週のワークアウト数、レベルを"
+          "円形・長方形・1 行のウィジェットで表示できます。ホーム画面用の小さな"
+          "ウィジェットも追加されました。",
+    'ko': "이제 잠금 화면에서도 FullRep을 볼 수 있어요. 스트릭, 이번 주 운동 횟수, 레벨을 "
+          "원형·직사각형·한 줄 위젯으로 표시해요. 홈 화면용 작은 위젯도 새로 추가됐어요.",
+    'zh': "FullRep 现已登陆锁定屏幕：以圆形、矩形或单行小组件显示连续打卡、本周训练"
+          "次数和等级。主屏幕还新增了一个小尺寸小组件。",
 }
 
 
@@ -857,7 +835,14 @@ def setze_abo_screenshot(tok):
 # "submitted together with this version", die Abos standen aber auf
 # MISSING_METADATA und fuhren nicht mit — genau dafuer kam 2.1(b) ein zweites
 # Mal. Diesen Absatz erst schreiben, wenn beide Abos READY_TO_SUBMIT sind.
-PRUEFNOTIZ = """What is new in 1.6.0 (previous App Store version: 1.5.6)
+PRUEFNOTIZ = """What is new in 1.6.1 (previous App Store version: 1.6.0)
+
+Lock Screen widget (new)
+The existing FullRep widget (streak, workouts this week, level) now also
+offers the Lock Screen sizes (circular, rectangular, inline) and a small
+Home Screen size. It only reads values the app already shows; no new data.
+
+Already in 1.6.0 (approved):
 
 Seven languages were added
 Italian, Dutch, Polish, Turkish, Japanese, Korean and Simplified Chinese join

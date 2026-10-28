@@ -20,6 +20,27 @@ Chinesisch (vereinfacht) — **vollständig**, Oberfläche wie Inhaltsbibliothek
 
 ## Aktueller Stand
 
+### Version 1.6.1 (nur iOS, Build 18): Widget auf dem Sperrbildschirm (28.10.2026)
+
+Josef fand FullRep nicht unter „Widgets hinzufügen“ auf dem **Sperrbildschirm**. Ursache:
+`FullRepWidget.swift` kannte nur `.systemMedium` (Homescreen). Jetzt ab iOS 16 zusätzlich
+`accessoryCircular` (Flamme + Streak), `accessoryRectangular` (Streak/Woche/Level mit Symbolen),
+`accessoryInline` und `systemSmall`. Einfarbig, Symbole statt Wörter (die Extension hat keine
+Übersetzungen). Deployment-Target bleibt 15.0, die neuen Familien hängen an `#available(16)`.
+
+| | Stand |
+|---|---|
+| iOS | Build 18 hochgeladen (`ios-release` 40740706842, **`laeufer: mac`**) → Version 1.6.1 angelegt → `lokalisieren` → Build 18 zugewiesen → Prüfnotiz → **eingereicht**, Einreichung `10ce0fc3-c272-47c9-8a22-3014f36bf1df`, `WAITING_FOR_REVIEW` |
+| Android | unverändert vc26 — Android hat keine Sperrbildschirm-Widgets |
+
+⚠ **GitHub-eigene Runner sind am 28.10. gesperrt:** „The job was not started because recent
+account payments have failed or your spending limit needs to be increased“. Erst sah es nach
+fehlenden Mac-Kapazitäten aus („not acquired by Runner … capacity constraints“), auch
+`ubuntu-latest` startete aber nicht. **Alles lief deshalb auf Josefs Mac** (`laeufer: mac` —
+`ios-release.yml`, `asc.yml` und `play-listing.yml` können das). Josef muss unter
+github.com/settings/billing die Zahlung bzw. das Limit klären. Bis dahin laufen auch `tests.yml` und die
+täglichen `cron.yml`-Aufrufe (Backup!) nicht.
+
 ### Version 1.6.0: 13 Sprachen, drei Features (22.–26.10.2026) — AUSGELIEFERT 26.10.
 
 Gemergt nach `main` als PR #77 am 27.10.2026. Migrationen sind
