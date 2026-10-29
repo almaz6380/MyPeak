@@ -33,6 +33,19 @@ Josef fand FullRep nicht unter „Widgets hinzufügen“ auf dem **Sperrbildschi
 | iOS | Build 18 hochgeladen (`ios-release` 40740706842, **`laeufer: mac`**) → Version 1.6.1 angelegt → `lokalisieren` → Build 18 zugewiesen → Prüfnotiz → **eingereicht**, Einreichung `10ce0fc3-c272-47c9-8a22-3014f36bf1df`, `WAITING_FOR_REVIEW` |
 | Android | unverändert vc26 — Android hat keine Sperrbildschirm-Widgets |
 
+**Nachtrag 28./29.10.: Widgets zeigen Makros und Schritte statt Streak** (Josefs Wunsch, `faece8e`).
+- iOS bekommt zwei Widgets, beide für Homescreen und Sperrbildschirm:
+  - „Makros“ mit kcal-Ring und P/KH/F, behält die alte kind
+  - „Schritte“ liest HealthKit selbst, dafür HealthKit an der Widget-Bundle-ID
+- Android bekommt eine Zeile: kcal übrig / P / KH / F / Schritte.
+
+| | Stand |
+|---|---|
+| Android | **vc27 (1.6.1) auf `production`, an alle** (`android-release` 40910636773, GitHub-Rechner), committet |
+| iOS | **Build 19 blockiert:** `ios-release` 40910615252 brach beim Profilabruf mit `403 FORBIDDEN_ERROR.PLA_NOT_ACCEPTED` ab. Josef muss in developer.apple.com die neue Program License Agreement annehmen, sonst geht kein ASC-API-Aufruf. Build 18 (Streak-Widget) bleibt bis dahin in der Prüfung, bewusst nicht zurückgezogen. Danach: Upload Build 19 → `aufraeumen` → `build 19` → `lokalisieren` → `pruefnotiz` → `einreichen` |
+
+GitHub-Rechner laufen seit 29.10. wieder (Cron und Android grün), die Sperre ist also aufgehoben.
+
 ⚠ **GitHub-eigene Runner sind am 28.10. gesperrt:** „The job was not started because recent
 account payments have failed or your spending limit needs to be increased“. Erst sah es nach
 fehlenden Mac-Kapazitäten aus („not acquired by Runner … capacity constraints“), auch
