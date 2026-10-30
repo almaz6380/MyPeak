@@ -833,7 +833,7 @@ def setze_abo_screenshot(tok):
 # "submitted together with this version", die Abos standen aber auf
 # MISSING_METADATA und fuhren nicht mit — genau dafuer kam 2.1(b) ein zweites
 # Mal. Diesen Absatz erst schreiben, wenn beide Abos READY_TO_SUBMIT sind.
-PRUEFNOTIZ = """What is new in 1.6.1 (previous App Store version: 1.6.0)
+PRUEFNOTIZ = """What is new in 1.6.2 (previous App Store version: 1.6.1)
 
 Widgets (new)
 Two widgets for the Home Screen and the Lock Screen: "Macros" shows today's
