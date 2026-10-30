@@ -44,6 +44,19 @@ Josef fand FullRep nicht unter „Widgets hinzufügen“ auf dem **Sperrbildschi
 | Android | **vc27 (1.6.1) auf `production`, an alle** (`android-release` 40910636773, GitHub-Rechner), committet |
 | iOS | **1.6.2 (Build 19) eingereicht** am 30.10., Einreichung `7127a185-9289-47b3-8e89-521e39e9de63`, `WAITING_FOR_REVIEW`. Zuerst blockierte `403 PLA_NOT_ACCEPTED` (Josef hat in ASC → Geschäftliches → Verträge den neuen Vertrag angenommen), dann lehnte Apple 1.6.1 ab, weil 1.6.1 (Build 18, Streak-Widget) inzwischen **freigegeben** war → `MARKETING_VERSION` 1.6.2. Ablauf auf GitHub-Rechnern: `ios-release` 41110743425 → `version-anlegen 1.6.2` → `lokalisieren` → `build 19` → `pruefnotiz` → `einreichen` |
 
+**Nachtrag 30.10.: Schritte selbst zählen + verbrannte Kalorien** (Josefs Wunsch, `245971e`).
+- **Eigenes Plugin `Schritte`:**
+  - iOS: `CMPedometer` in `HealthExportPlugin.swift`, Berechtigung „Bewegung & Fitness“.
+  - Android: `SchrittePlugin.kt` liest den Sensor `TYPE_STEP_COUNTER`. Der `SchrittWorker` (WorkManager) misst alle 15 min und führt die Tagesbasis in den SharedPreferences `FullRepWidget`. Kein Foreground-Service.
+  - Opt-in im Profil „Schritte selbst zählen“. Gezeigt wird das Höhere aus Health und Gerät.
+- **Aktive Kalorien:** aus Health (`READ_ACTIVE_CALORIES`, Android `READ_ACTIVE_CALORIES_BURNED`). Sichtbar auf der Startseite, im iOS-Schritte-Widget und als 6. Spalte im Android-Widget.
+- Datenschutz ×13 ergänzt, Stand 30.10.
+
+| | Stand |
+|---|---|
+| iOS | **1.6.2 / Build 20 eingereicht**, Einreichung `67b15fcd-89c9-4b2d-b51f-6860afeef437`, `WAITING_FOR_REVIEW`. Ablauf: Build 19 zurückgezogen (`aufraeumen`), dann `lokalisieren`, `version-anlegen` (setzt das de-DE-„Neu“), `build 20`, `pruefnotiz`, `einreichen` |
+| Android | **vc28 von Play abgelehnt (403):** „You must let us know whether your app includes any health features“. Grund ist die neue Health-Berechtigung `READ_ACTIVE_CALORIES_BURNED`, also derselbe Henne-Ei-Ablauf wie am 03.09. Das AAB (`FullRep-1.6.2-vc28`, Lauf 41116771496) hat Josef im Chat bekommen. **Josef muss** es von Hand in den internen Test laden, im Gesundheitsformular `READ_ACTIVE_CALORIES_BURNED` begründen und danach die Produktion freigeben |
+
 ⚠ **Merksatz:** `PLA_NOT_ACCEPTED` heißt, ein Apple-Vertrag wartet auf Josef (ASC → Geschäftliches → Verträge). Und eine freigegebene Versionsnummer ist für neue Builds zu.
 
 GitHub-Rechner laufen seit 29.10. wieder (Cron und Android grün), die Sperre ist also aufgehoben.
