@@ -47,7 +47,8 @@
     "macroFiber": "Lif",
     "workoutsToday": "Bugün {{count}} antrenman",
     "workoutsToday_one": "Bugün {{count}} antrenman",
-    "workoutsToday_other": "Bugün {{count}} antrenman"
+    "workoutsToday_other": "Bugün {{count}} antrenman",
+    "kcalBurned": "{{n}} kcal yakıldı"
   },
   "planBuilder": {
     "title": "Haftalık plan oluştur",
@@ -390,7 +391,8 @@
     "editGoal": "Hedefi değiştir",
     "editActivity": "Aktivite seviyesini değiştir",
     "editExperience": "Antrenman deneyimini değiştir",
-    "healthExport": "Antrenmanları Health'e kaydet"
+    "healthExport": "Antrenmanları Health'e kaydet",
+    "countSteps": "Adımları telefonla say"
   },
   "common": {
     "welcome": "Hoş geldin",

@@ -250,48 +250,59 @@ def setze_primaersprache(tok, locale):
 # appStoreVersions — plus der Text "Neu in dieser Version", der bei einem
 # Update Pflicht ist.
 
-WHATS_NEW = """FullRep gibt es jetzt auch auf dem Sperrbildschirm: Streak, Workouts \
-dieser Woche und Level als rundes, rechteckiges oder einzeiliges Widget. Neu auf dem \
-Homescreen ist zusätzlich ein kleines Widget."""
+WHATS_NEW = """Neue Widgets für Homescreen und Sperrbildschirm: deine Kalorien und Makros \
+von heute (Protein, Kohlenhydrate, Fett) und deine Schritte – rund, rechteckig oder als \
+Zeile über der Uhr. FullRep zählt deine Schritte jetzt auch selbst (ohne Apple Health) und \
+zeigt deine verbrannten Kalorien."""
 
 # "Neu in dieser Version" fuer die weiteren Sprachen der Store-Seite. Apple
 # verlangt den Text bei einem Update fuer JEDE Lokalisierung der Version —
 # lokalisieren() setzt ihn mit, sonst scheitert die Einreichung.
 WHATS_NEW_SPRACHEN = {
-    'en': "FullRep is now on your Lock Screen: streak, workouts this week and level as "
-          "a circular, rectangular or inline widget. There is also a new small Home "
-          "Screen widget.",
-    'es': "FullRep ya está en tu pantalla de bloqueo: racha, entrenos de esta semana y "
-          "nivel como widget circular, rectangular o en línea. Además hay un nuevo "
-          "widget pequeño para la pantalla de inicio.",
-    'fr': "FullRep arrive sur ton écran verrouillé : série, séances de la semaine et "
-          "niveau en widget rond, rectangulaire ou en ligne. Un nouveau petit widget "
-          "existe aussi pour l’écran d’accueil.",
-    'pt': "O FullRep agora está na tela bloqueada: sequência, treinos da semana e nível "
-          "como widget circular, retangular ou em linha. Há também um novo widget "
-          "pequeno para a tela de início.",
-    'ar': "أصبح FullRep الآن على شاشة القفل: السلسلة وتمارين هذا الأسبوع والمستوى "
-          "كأداة دائرية أو مستطيلة أو في سطر واحد. وهناك أيضًا أداة صغيرة جديدة "
-          "للشاشة الرئيسية.",
-    'nl': "FullRep staat nu ook op je toegangsscherm: streak, workouts van deze week en "
-          "level als rond, rechthoekig of inline widget. Nieuw is ook een kleine widget "
-          "voor het beginscherm.",
-    'pl': "FullRep jest teraz na ekranie blokady: seria, treningi w tym tygodniu i "
-          "poziom jako okrągły, prostokątny lub jednowierszowy widżet. Nowy jest też "
-          "mały widżet na ekran początkowy.",
-    'it': "FullRep ora è anche sulla schermata di blocco: streak, workout della "
-          "settimana e livello come widget circolare, rettangolare o in linea. In più "
-          "c’è un nuovo widget piccolo per la schermata Home.",
-    'tr': "FullRep artık kilit ekranında: seri, bu haftaki antrenmanlar ve seviye; "
-          "yuvarlak, dikdörtgen veya satır içi widget olarak. Ana ekran için yeni bir "
-          "küçük widget da var.",
-    'ja': "FullRep がロック画面に対応しました。ストリーク、今週のワークアウト数、レベルを"
-          "円形・長方形・1 行のウィジェットで表示できます。ホーム画面用の小さな"
-          "ウィジェットも追加されました。",
-    'ko': "이제 잠금 화면에서도 FullRep을 볼 수 있어요. 스트릭, 이번 주 운동 횟수, 레벨을 "
-          "원형·직사각형·한 줄 위젯으로 표시해요. 홈 화면용 작은 위젯도 새로 추가됐어요.",
-    'zh': "FullRep 现已登陆锁定屏幕：以圆形、矩形或单行小组件显示连续打卡、本周训练"
-          "次数和等级。主屏幕还新增了一个小尺寸小组件。",
+    'en': "New widgets for the Home Screen and Lock Screen: today's calories and macros "
+          "(protein, carbs, fat) and your steps – circular, rectangular or as a line "
+          "above the clock. FullRep now also counts your steps itself (no Apple Health "
+          "needed) and shows your burned calories.",
+    'es': "Nuevos widgets para la pantalla de inicio y de bloqueo: tus calorías y macros "
+          "de hoy (proteína, carbohidratos, grasa) y tus pasos, en formato circular, "
+          "rectangular o en una línea sobre el reloj. FullRep ahora también cuenta tus pasos "
+          "(sin Salud) y muestra las calorías quemadas.",
+    'fr': "Nouveaux widgets pour l’écran d’accueil et l’écran verrouillé : tes calories et "
+          "macros du jour (protéines, glucides, lipides) et tes pas – rond, rectangulaire "
+          "ou en ligne au-dessus de l’heure. FullRep compte désormais aussi tes pas lui-même "
+          "(sans Santé) et affiche les calories brûlées.",
+    'pt': "Novos widgets para a tela de início e a tela bloqueada: suas calorias e macros "
+          "de hoje (proteína, carboidratos, gordura) e seus passos – circular, retangular "
+          "ou em uma linha acima do relógio. O FullRep agora também conta seus passos "
+          "(sem o Saúde) e mostra as calorias queimadas.",
+    'ar': "أدوات جديدة للشاشة الرئيسية وشاشة القفل: سعراتك ومغذياتك لليوم (بروتين، "
+          "كربوهيدرات، دهون) وخطواتك – دائرية أو مستطيلة أو في سطر فوق الساعة. "
+          "يعدّ FullRep خطواتك الآن بنفسه (دون تطبيق الصحة) ويعرض السعرات المحروقة.",
+    'nl': "Nieuwe widgets voor het beginscherm en toegangsscherm: je calorieën en macro's "
+          "van vandaag (eiwit, koolhydraten, vet) en je stappen – rond, rechthoekig of als "
+          "regel boven de klok. FullRep telt je stappen nu ook zelf (zonder Gezondheid) en "
+          "toont je verbrande calorieën.",
+    'pl': "Nowe widżety na ekran początkowy i ekran blokady: dzisiejsze kalorie i makro "
+          "(białko, węglowodany, tłuszcz) oraz twoje kroki – okrągłe, prostokątne lub "
+          "jako wiersz nad zegarem. FullRep liczy teraz kroki także sam (bez Zdrowia) "
+          "i pokazuje spalone kalorie.",
+    'it': "Nuovi widget per la schermata Home e di blocco: calorie e macro di oggi "
+          "(proteine, carboidrati, grassi) e i tuoi passi – rotondo, rettangolare o in "
+          "una riga sopra l’orologio. Ora FullRep conta anche da solo i tuoi passi (senza "
+          "Salute) e mostra le calorie bruciate.",
+    'tr': "Ana ekran ve kilit ekranı için yeni widget’lar: bugünkü kalorilerin ve "
+          "makroların (protein, karbonhidrat, yağ) ile adımların – yuvarlak, dikdörtgen "
+          "veya saatin üstünde tek satır. FullRep artık adımlarını kendisi de sayıyor "
+          "(Sağlık olmadan) ve yakılan kalorileri gösteriyor.",
+    'ja': "ホーム画面とロック画面に新しいウィジェット：今日のカロリーとマクロ（たんぱく質・"
+          "炭水化物・脂質）、そして歩数を、円形・長方形・時計の上の 1 行で表示します。"
+          "FullRep がヘルスケアなしでも歩数を計測し、消費カロリーも表示します。",
+    'ko': "홈 화면과 잠금 화면용 새 위젯: 오늘의 칼로리와 매크로(단백질, 탄수화물, 지방), "
+          "그리고 걸음 수를 원형·직사각형·시계 위 한 줄로 보여 줘요. "
+          "이제 FullRep이 건강 앱 없이도 걸음 수를 세고 소모 칼로리를 보여 줘요.",
+    'zh': "主屏幕和锁定屏幕新增小组件：今日热量与宏量营养素（蛋白质、碳水、脂肪）以及"
+          "你的步数，可选圆形、矩形或时钟上方单行显示。"
+          "FullRep 现在无需健康也能自己计步，并显示已消耗的卡路里。",
 }
 
 
@@ -835,12 +846,26 @@ def setze_abo_screenshot(tok):
 # "submitted together with this version", die Abos standen aber auf
 # MISSING_METADATA und fuhren nicht mit — genau dafuer kam 2.1(b) ein zweites
 # Mal. Diesen Absatz erst schreiben, wenn beide Abos READY_TO_SUBMIT sind.
-PRUEFNOTIZ = """What is new in 1.6.1 (previous App Store version: 1.6.0)
+PRUEFNOTIZ = """What is new in 1.6.2 (previous App Store version: 1.6.1)
 
-Lock Screen widget (new)
-The existing FullRep widget (streak, workouts this week, level) now also
-offers the Lock Screen sizes (circular, rectangular, inline) and a small
-Home Screen size. It only reads values the app already shows; no new data.
+Widgets (new)
+Two widgets for the Home Screen and the Lock Screen: "Macros" shows today's
+remaining calories and protein/carbs/fat against the user's goals (values the
+app already shows), "Steps" shows today's step count. The step widget reads
+the step count from HealthKit with the read permission the user already
+granted to the app in Profile > Apple Health; nothing is written and nothing
+leaves the device. Without that permission the widget shows a hint instead.
+
+Step counting without Apple Health (new, opt-in)
+Profile > "Count steps on this phone" asks for Motion & Fitness access
+(NSMotionUsageDescription) and reads today's step count with CMPedometer.
+The value is shown on the home screen and in the step widget only; it stays
+on the device and is never sent to a server.
+
+Active calories (new, read-only)
+With the existing Apple Health connection the app now also reads today's
+activeEnergyBurned (shown on the home screen and in the step widget). Read
+only, nothing is written.
 
 Already in 1.6.0 (approved):
 

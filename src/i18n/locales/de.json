@@ -46,7 +46,8 @@
     "macroFat": "Fett",
     "macroFiber": "Ballaststoffe",
     "workoutsToday": "{{count}} Workout heute",
-    "workoutsToday_other": "{{count}} Workouts heute"
+    "workoutsToday_other": "{{count}} Workouts heute",
+    "kcalBurned": "{{n}} kcal verbrannt"
   },
   "planBuilder": {
     "title": "Wochenplan erstellen",
@@ -389,7 +390,8 @@
     "editGoal": "Ziel ändern",
     "editActivity": "Aktivitätslevel ändern",
     "editExperience": "Trainingserfahrung ändern",
-    "healthExport": "Workouts nach Health schreiben"
+    "healthExport": "Workouts nach Health schreiben",
+    "countSteps": "Schritte selbst zählen"
   },
   "common": {
     "welcome": "Willkommen",

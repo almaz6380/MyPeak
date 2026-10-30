@@ -1,9 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <!-- Nur die Widget-Texte: alles andere lebt in der App-i18n (WebView).
-         RemoteViews folgt der SYSTEMsprache, nicht der App-Sprachwahl. -->
-    <string name="widget_streak">Streak</string>
-    <string name="widget_woche">Week</string>
-    <string name="widget_level">Level</string>
-    <string name="widget_beschreibung">Streak, workouts this week and level at a glance.</string>
-</resources>

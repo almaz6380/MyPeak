@@ -8,12 +8,15 @@ on:
       mode:
         description: 'Was aktualisiert wird'
         type: choice
-        options: [screenshots, texte, grafiken, sprachen, abos, abo-setzen, abo-titel, website, standardsprache]
+        options: [screenshots, texte, grafiken, sprachen, abos, abo-setzen, abo-titel, website, standardsprache, hochstufen]
         default: screenshots
       lang:
         description: 'Sprache des Store-Eintrags'
         default: 'de-DE'
         required: true
+      version_code:
+        description: 'Nur fuer hochstufen: versionCode, der schon in einem Track liegt'
+        default: ''
       dry_run:
         description: 'Trockenlauf (nur anzeigen, nichts aendern)'
         type: boolean
@@ -46,6 +49,7 @@ jobs:
           MODE: ${{ inputs.mode }}
           LANG_INPUT: ${{ inputs.lang }}
           DRY_RUN: ${{ inputs.dry_run }}
+          VERSION_CODE: ${{ inputs.version_code }}
         run: |
           set -euo pipefail
           if [ -z "${PLAY_KEY_JSON:-}" ]; then
@@ -64,6 +68,17 @@ jobs:
           fi
 
           case "$MODE" in
+            hochstufen)
+              # Einen schon hochgeladenen versionCode (z. B. aus dem internen
+              # Test, nach Handupload wegen des Health-Formulars) ohne neuen
+              # Upload an alle in Produktion geben.
+              if [ -z "$VERSION_CODE" ]; then
+                echo "version_code fehlt." >&2; exit 1
+              fi
+              # ⚠ --promote kennt keinen Trockenlauf: dry_run gilt hier nicht.
+              python3 scripts/play-upload.py --promote "$VERSION_CODE" --track production --complete \
+                --notes 'Neu: FullRep zählt deine Schritte jetzt auch selbst und zeigt verbrannte Kalorien – in der App und im Widget.'
+              ;;
             standardsprache)
               # Rueckfall-Sprache fuer Laender ohne eigenes Listing (seit 22.10.2026 en-US)
               python3 scripts/play-upload.py --standardsprache en-US "${GEMEINSAM[@]}"

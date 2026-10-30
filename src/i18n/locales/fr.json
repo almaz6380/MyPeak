@@ -46,7 +46,8 @@
     "macroFat": "Lipides",
     "macroFiber": "Fibres",
     "workoutsToday": "{{count}} séance aujourd’hui",
-    "workoutsToday_other": "{{count}} séances aujourd’hui"
+    "workoutsToday_other": "{{count}} séances aujourd’hui",
+    "kcalBurned": "{{n}} kcal brûlées"
   },
   "training": {
     "title": "Entraînement",
@@ -358,7 +359,8 @@
     "editGoal": "Modifier l'objectif",
     "editActivity": "Modifier le niveau d'activité",
     "editExperience": "Modifier l'expérience d'entraînement",
-    "healthExport": "Enregistrer les séances dans Santé"
+    "healthExport": "Enregistrer les séances dans Santé",
+    "countSteps": "Compter les pas avec le téléphone"
   },
   "common": {
     "welcome": "Bienvenue",

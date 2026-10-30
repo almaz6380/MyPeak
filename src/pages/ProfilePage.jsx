@@ -9,7 +9,7 @@ import { spracheWechseln } from '../i18n';
 import FullRepLogo from '../components/FullRepLogo';
 import CardPhotoMotif from '../components/CardPhotoMotif';
 import { supabase } from '../lib/supabase';
-import { Moon, Sun, Globe, Weight, LogOut, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2, ShieldCheck, Crown, HeartPulse, BarChart3 } from 'lucide-react';
+import { Moon, Sun, Globe, Weight, LogOut, ChevronRight, Pencil, X, Check, Loader2, Copy, QrCode, Trophy, FileText, Trash2, ShieldCheck, Crown, HeartPulse, BarChart3, Footprints } from 'lucide-react';
 import { useSubscription } from '../context/SubscriptionContext';
 import { getOrCreateFriendCode, getXP, getLevelTitle, calculateLevel, hasGoldenFrame } from '../data/socialStorage';
 import AchievementGallery from '../components/progress/AchievementGallery';
@@ -17,10 +17,10 @@ import { canChangeAdConsent, changeAdConsent } from '../lib/ads';
 import { clearAllLocalPhotos } from '../data/exercisePhotos';
 import { API_BASIS } from '../data/apiBasis';
 import { Capacitor } from '@capacitor/core';
-import { healthVerfuegbar, istVerbunden, verbinden, trennen, gewichtImportieren, exportAktiv, exportEinschalten, exportAusschalten } from '../lib/health';
+import { healthVerfuegbar, istVerbunden, verbinden, trennen, gewichtImportieren, exportAktiv, exportEinschalten, exportAusschalten, schritteZaehlenAktiv, schritteZaehlenEinschalten, schritteZaehlenAusschalten } from '../lib/health';
 
 // Sichtbare Build-Kennung — muss bei jedem neuen Store-Build mitgezogen werden (siehe android/app/build.gradle)
-const APP_VERSION = '1.6.1 (18)';
+const APP_VERSION = '1.6.2 (20)';
 
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
@@ -43,6 +43,7 @@ export default function ProfilePage() {
   const [deletePassword, setDeletePassword] = useState('');
   const [healthOn, setHealthOn] = useState(() => istVerbunden(user?.id));
   const [exportOn, setExportOn] = useState(() => exportAktiv(user?.id));
+  const [zaehlenOn, setZaehlenOn] = useState(() => schritteZaehlenAktiv());
   const [showWithdrawConsent, setShowWithdrawConsent] = useState(false);
   const [withdrawing, setWithdrawing] = useState(false);
   const [withdrawError, setWithdrawError] = useState(null);
@@ -138,6 +139,8 @@ export default function ProfilePage() {
       }
       exportAusschalten(user.id);
       setExportOn(false);
+      schritteZaehlenAusschalten();
+      setZaehlenOn(false);
       setShowWithdrawConsent(false);
       await refreshProfile();
     } catch {
@@ -457,6 +460,32 @@ export default function ProfilePage() {
                 className={`relative w-12 h-7 rounded-full transition-colors ${healthOn ? 'bg-primary-500' : 'bg-slate-300'}`}
               >
                 <span className={`absolute top-0.5 start-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${healthOn ? 'translate-x-5 rtl:-translate-x-5' : ''}`} />
+              </button>
+            }
+          />
+        )}
+
+        {/* Schritte selbst zaehlen (Bewegungssensor) — eigenes Opt-in, ohne
+            Health. Bleibt aus, wenn das System die Freigabe verweigert. */}
+        {healthVerfuegbar() && (
+          <SettingRow
+            icon={<Footprints className="w-5 h-5" />}
+            label={t('profile.countSteps')}
+            action={
+              <button
+                aria-label={t('profile.countSteps')}
+                onClick={async () => {
+                  if (zaehlenOn) {
+                    schritteZaehlenAusschalten();
+                    setZaehlenOn(false);
+                    return;
+                  }
+                  const res = await schritteZaehlenEinschalten();
+                  setZaehlenOn(res.ok);
+                }}
+                className={`relative w-12 h-7 rounded-full transition-colors ${zaehlenOn ? 'bg-primary-500' : 'bg-slate-300'}`}
+              >
+                <span className={`absolute top-0.5 start-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${zaehlenOn ? 'translate-x-5 rtl:-translate-x-5' : ''}`} />
               </button>
             }
           />

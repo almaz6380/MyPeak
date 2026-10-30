@@ -17,8 +17,8 @@ android {
         applicationId "at.gallab.mypeak"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 26
-        versionName "1.6.0"
+        versionCode 28
+        versionName "1.6.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -79,6 +79,8 @@ dependencies {
     // (dort nur implementation, also für uns nicht sichtbar)
     implementation 'androidx.health.connect:connect-client:1.2.0-alpha01'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
+    // SchrittePlugin.kt: liest den Schrittzähler alle 15 Minuten im Hintergrund
+    implementation 'androidx.work:work-runtime-ktx:2.10.0'
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"

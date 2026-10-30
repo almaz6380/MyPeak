@@ -158,7 +158,7 @@ jobs:
             --out "$PROFDIR/mypeak-ci-app.mobileprovision"
           "$RUNNER_TEMP/venv/bin/python" scripts/ios-profile.py \
             --bundle at.gallab.mypeak.widget --name "FullRep Widget AppStore" \
-            --bundle-anlegen "FullRep Widget" --faehigkeit APP_GROUPS \
+            --bundle-anlegen "FullRep Widget" --faehigkeit APP_GROUPS --faehigkeit HEALTHKIT \
             --out "$PROFDIR/mypeak-ci-widget.mobileprovision"
 
       - name: ExportOptions schreiben

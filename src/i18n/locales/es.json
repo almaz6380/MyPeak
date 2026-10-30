@@ -46,7 +46,8 @@
     "macroFat": "Grasas",
     "macroFiber": "Fibra",
     "workoutsToday": "{{count}} entreno hoy",
-    "workoutsToday_other": "{{count}} entrenos hoy"
+    "workoutsToday_other": "{{count}} entrenos hoy",
+    "kcalBurned": "{{n}} kcal quemadas"
   },
   "planBuilder": {
     "title": "Crear plan semanal",
@@ -389,7 +390,8 @@
     "editGoal": "Cambiar objetivo",
     "editActivity": "Cambiar nivel de actividad",
     "editExperience": "Cambiar experiencia de entreno",
-    "healthExport": "Guardar entrenos en Salud"
+    "healthExport": "Guardar entrenos en Salud",
+    "countSteps": "Contar pasos con el móvil"
   },
   "common": {
     "welcome": "Bienvenido",

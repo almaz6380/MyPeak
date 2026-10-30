@@ -1,6 +1,7 @@
 import Foundation
 import Capacitor
 import HealthKit
+import CoreMotion
 
 /// Workouts nach Apple Health SCHREIBEN — Gegenstueck zu capacitor-health,
 /// das nur lesen kann. Geschrieben wird genau ein HKWorkout je Training
@@ -119,10 +120,67 @@ public class HealthExportPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 }
 
+/// Schritte direkt vom Bewegungschip (Core Motion) — ohne Apple Health.
+/// Der Chip zaehlt auch bei geschlossener App; CMPedometer liest bis zu 7 Tage
+/// zurueck. Braucht nur „Bewegung & Fitness" (NSMotionUsageDescription), keine
+/// Capability und kein neues Profil. Steht in dieser Datei, damit das pbxproj
+/// keine weitere Quelldatei braucht.
+@objc(SchrittePlugin)
+public class SchrittePlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "SchrittePlugin"
+    public let jsName = "Schritte"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "heute", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "erlauben", returnType: CAPPluginReturnPromise),
+    ]
+
+    private let pedometer = CMPedometer()
+
+    private func status() -> String {
+        guard CMPedometer.isStepCountingAvailable() else { return "nicht_verfuegbar" }
+        switch CMPedometer.authorizationStatus() {
+        case .authorized: return "erlaubt"
+        case .denied, .restricted: return "verweigert"
+        default: return "offen"
+        }
+    }
+
+    /// Die erste Abfrage loest den Systemdialog aus — einen eigenen
+    /// „Anfragen"-Aufruf hat Core Motion nicht.
+    @objc func erlauben(_ call: CAPPluginCall) {
+        abfragen { schritte in call.resolve(self.antwort(schritte)) }
+    }
+
+    @objc func heute(_ call: CAPPluginCall) {
+        let s = status()
+        // Nie von selbst nachfragen: Ohne Zustimmung im Profil bleibt es still.
+        guard s == "erlaubt" else {
+            call.resolve(["status": s])
+            return
+        }
+        abfragen { schritte in call.resolve(self.antwort(schritte)) }
+    }
+
+    private func antwort(_ schritte: Int?) -> [String: Any] {
+        var a: [String: Any] = ["status": status()]
+        if let n = schritte { a["schritte"] = n }
+        return a
+    }
+
+    private func abfragen(_ fertig: @escaping (Int?) -> Void) {
+        guard CMPedometer.isStepCountingAvailable() else { return fertig(nil) }
+        let start = Calendar.current.startOfDay(for: Date())
+        pedometer.queryPedometerData(from: start, to: Date()) { daten, _ in
+            fertig(daten.map { $0.numberOfSteps.intValue })
+        }
+    }
+}
+
 /// Main.storyboard zeigt auf diese Klasse statt auf CAPBridgeViewController,
-/// damit HealthExportPlugin angemeldet wird.
+/// damit die eigenen Plugins angemeldet werden.
 class FullRepBridgeViewController: CAPBridgeViewController {
     override open func capacitorDidLoad() {
         bridge?.registerPluginInstance(HealthExportPlugin())
+        bridge?.registerPluginInstance(SchrittePlugin())
     }
 }

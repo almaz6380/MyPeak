@@ -87,8 +87,9 @@
     <queries>
         <package android:name="com.google.android.apps.healthdata" />
     </queries>
-    <!-- ⚠ Genau die zwei, die health.js auch wirklich abfragt (schritteHeute,
-         gewichtImportieren). READ_ACTIVE_CALORIES_BURNED stand hier bis 1.5.0
+    <!-- ⚠ Genau die, die health.js auch wirklich abfragt (schritteHeute,
+         gewichtImportieren, seit 1.6.2 verbrannteKcalHeute).
+         READ_ACTIVE_CALORIES_BURNED stand hier bis 1.5.0
          mit, wurde aber nirgends gelesen: Google verlangt in der
          Health-Apps-Erklaerung fuer JEDE angeforderte Berechtigung eine
          Begruendung, und eine ungenutzte ist ein Ablehnungsgrund. Sie
@@ -97,6 +98,15 @@
          nachziehen — Formular UND Datenschutztext. -->
     <uses-permission android:name="android.permission.health.READ_STEPS" />
     <uses-permission android:name="android.permission.health.READ_WEIGHT" />
+    <!-- Seit 1.6.2: aktive (verbrannte) Kalorien fuer Startseite und Widget
+         (verbrannteKcalHeute in health.js). Begruendet im Play-Formular,
+         genannt im Datenschutztext. -->
+    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" />
+    <!-- Seit 1.6.2: Schritte selbst zaehlen (SchrittePlugin.kt, Sensor
+         TYPE_STEP_COUNTER). Laufzeitberechtigung ab Android 10, eigenes
+         Opt-in im Profil. Kein Foreground-Service: ein WorkManager-Job liest
+         den Zaehler alle 15 Minuten kurz aus. -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <!-- Seit 1.6.0: Workouts nach Health Connect schreiben (HealthExportPlugin.kt),
          eigenes Opt-in im Profil. Nur Trainingseinheiten — Typ, Start, Ende,
          Titel. ⚠ Neue Berechtigung = neuer Eintrag im Play-Formular
@@ -132,7 +142,6 @@
          mehr zusammen. -->
     <uses-permission android:name="android.permission.health.READ_EXERCISE" tools:node="remove" />
     <uses-permission android:name="android.permission.health.READ_DISTANCE" tools:node="remove" />
-    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" tools:node="remove" />
     <uses-permission android:name="android.permission.health.READ_TOTAL_CALORIES_BURNED" tools:node="remove" />
     <uses-permission android:name="android.permission.health.READ_HEART_RATE" tools:node="remove" />
     <uses-permission android:name="android.permission.health.READ_EXERCISE_ROUTE" tools:node="remove" />

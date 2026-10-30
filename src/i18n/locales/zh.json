@@ -46,7 +46,8 @@
     "macroFat": "脂肪",
     "macroFiber": "膳食纤维",
     "workoutsToday": "今天 {{count}} 次训练",
-    "workoutsToday_other": "今天 {{count}} 次训练"
+    "workoutsToday_other": "今天 {{count}} 次训练",
+    "kcalBurned": "已消耗 {{n}} 千卡"
   },
   "planBuilder": {
     "title": "创建周计划",
@@ -388,7 +389,8 @@
     "editGoal": "修改目标",
     "editActivity": "修改活动水平",
     "editExperience": "修改训练经验",
-    "healthExport": "将训练保存到健康"
+    "healthExport": "将训练保存到健康",
+    "countSteps": "用手机计步"
   },
   "common": {
     "welcome": "欢迎",

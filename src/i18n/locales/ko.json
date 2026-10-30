@@ -46,7 +46,8 @@
     "macroFat": "지방",
     "macroFiber": "식이섬유",
     "workoutsToday": "오늘 운동 {{count}}회",
-    "workoutsToday_other": "오늘 운동 {{count}}회"
+    "workoutsToday_other": "오늘 운동 {{count}}회",
+    "kcalBurned": "{{n}} kcal 소모"
   },
   "planBuilder": {
     "title": "주간 플랜 만들기",
@@ -388,7 +389,8 @@
     "editGoal": "목표 변경",
     "editActivity": "활동 수준 변경",
     "editExperience": "운동 경력 변경",
-    "healthExport": "운동을 건강 앱에 저장"
+    "healthExport": "운동을 건강 앱에 저장",
+    "countSteps": "휴대폰으로 걸음 수 측정"
   },
   "common": {
     "welcome": "환영해요",
