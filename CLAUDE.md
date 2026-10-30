@@ -20,6 +20,23 @@ Chinesisch (vereinfacht) — **vollständig**, Oberfläche wie Inhaltsbibliothek
 
 ## Aktueller Stand
 
+### Version 1.6.3 (iOS Build 21 / Android vc29): Schritte-Karte + Verlauf (30.10.2026)
+
+Josef fand die Schritte nicht: Sie standen nur als graue Zeile in der dunklen Heute-Karte.
+- **Startseite:** eigene Schritte-Karte. Sie zeigt einen Ring gegen das Tagesziel (Standard 10.000) und die aktiven kcal. Ohne Quelle erscheint dort der Knopf „Schritte zählen einschalten“. Im Browser fehlt die Karte.
+- **`/steps`** (`StepsPage.jsx`, frei): Tagesbalken für 7/30/90 Tage, Schnitt, bester Tag, „Ziel erreicht“, kcal und ein einstellbares Ziel (localStorage `fullrep.schritte.ziel`).
+- **Statistiken:** neuer Abschnitt „Schritte“ (gleicher Verlauf).
+- **Quelle je Tag:** `schritteVerlauf()` in `health.js` nimmt pro Tag das Höchste aus
+  - Health (Tagesbuckets; iOS liefert ms, Android lokale Zeit),
+  - dem Geräte-Zähler (`Schritte.verlauf`: iOS CMPedometer max. 7 Tage; Android `schritt.verlauf`, der Endstand jedes Tages, verbucht beim Tageswechsel) und
+  - dem eigenen Protokoll `fullrep.schritte.verlauf`.
+- Rechenteil: `schritteVerschmelzen` und `schrittAuswertung` in `statistik.js`, getestet in `tests/lib/schritte.test.js`.
+
+| | Stand |
+|---|---|
+| iOS | 1.6.2 (Build 20) zurückgezogen, Version in 1.6.3 umbenannt, **Build 21 eingereicht** (Einreichung `5b11a42f-cf45-4557-b797-4b8ead34b31f`, `WAITING_FOR_REVIEW`) |
+| Android | **vc29 (1.6.3) auf `production`, an alle** (`android-release` 41140313822). Keine neue Berechtigung, deshalb direkt per API |
+
 ### Version 1.6.1 (nur iOS, Build 18): Widget auf dem Sperrbildschirm (28.10.2026)
 
 Josef fand FullRep nicht unter „Widgets hinzufügen“ auf dem **Sperrbildschirm**. Ursache:
