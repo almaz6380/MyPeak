@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Homescreen-Widget: kcal uebrig / Protein / KH / Fett / Schritte
+<!-- Homescreen-Widget: kcal uebrig / Protein / KH / Fett / Schritte / verbrannt
      nebeneinander, FullRep-Look: Schwarz mit Amber, Makrofarben wie in der App.
      RemoteViews kann kein CSS — Farben und Radius kommen aus dem
      drawable-Hintergrund. -->
@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#FBBF24"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:maxLines="1"
             android:text="–" />
@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#3B82F6"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:maxLines="1"
             android:text="–" />
@@ -71,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#10B981"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:maxLines="1"
             android:text="–" />
@@ -95,7 +95,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#F43F5E"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:maxLines="1"
             android:text="–" />
@@ -119,7 +119,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#FFF8E7"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:maxLines="1"
             android:text="–" />
@@ -130,5 +130,29 @@
             android:textSize="10sp"
             android:maxLines="1"
             android:text="@string/widget_schritte" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+        <TextView
+            android:id="@+id/widget_verbrannt_wert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FB923C"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:text="–" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#A8A29E"
+            android:textSize="10sp"
+            android:maxLines="1"
+            android:text="@string/widget_verbrannt" />
     </LinearLayout>
 </LinearLayout>

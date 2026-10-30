@@ -13,5 +13,6 @@
     <string name="widget_carbs">Carbs</string>
     <string name="widget_fat">Fat</string>
     <string name="widget_schritte">Steps</string>
-    <string name="widget_beschreibung">Today\'s calories, macros and steps at a glance.</string>
+    <string name="widget_verbrannt">kcal burned</string>
+    <string name="widget_beschreibung">Today\'s calories, macros, steps and burned calories at a glance.</string>
 </resources>

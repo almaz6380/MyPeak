@@ -13,7 +13,7 @@ import { getWorkouts, getActiveSchedule } from '../data/workoutStorage';
 import { resolveScheduledDay } from '../data/programResolver';
 import { getXP } from '../data/socialStorage';
 import { widgetDatenAktualisieren } from '../lib/widgetDaten';
-import { istVerbunden, schritteHeute, gewichtImportieren } from '../lib/health';
+import { istVerbunden, schritteHeute, verbrannteKcalHeute, gewichtImportieren, schritteZaehlenAktiv } from '../lib/health';
 import { getSupplements, getSupplementLogs, getTodayScheduledSupplements, getSupplementProgress } from '../data/supplementStorage';
 import { getCycleSettings, getCyclePhase, getPhaseRecommendations } from '../data/cycleStorage';
 import { getWeightEntries, saveWeightEntry } from '../data/weightStorage';
@@ -92,14 +92,20 @@ export default function HomePage() {
     if (user?.id) widgetDatenAktualisieren(user.id);
   }, [user?.id]);
 
-  // Health (Opt-in): Schritte fuer die Trainings-Karte lesen und neue
-  // Gewichtseintraege aus Health uebernehmen. Beides still — schlaegt es
-  // fehl, sieht die Seite aus wie ohne Verbindung.
+  // Health bzw. eigener Schrittzaehler (je Opt-in): Schritte und verbrannte
+  // kcal fuer die Trainings-Karte lesen und neue Gewichtseintraege aus Health
+  // uebernehmen. Alles still — schlaegt es fehl, sieht die Seite aus wie ohne.
   const [healthSteps, setHealthSteps] = useState(null);
+  const [kcalVerbrannt, setKcalVerbrannt] = useState(null);
   useEffect(() => {
-    if (!user?.id || !istVerbunden(user.id)) { setHealthSteps(null); return; }
+    const health = !!user?.id && istVerbunden(user.id);
+    if (!user?.id || (!health && !schritteZaehlenAktiv())) {
+      setHealthSteps(null); setKcalVerbrannt(null); return;
+    }
     let alive = true;
     schritteHeute(user.id).then((s) => { if (alive) setHealthSteps(s); });
+    if (!health) return () => { alive = false; };
+    verbrannteKcalHeute(user.id).then((k) => { if (alive) setKcalVerbrannt(k); });
     gewichtImportieren(user.id).then((n) => {
       // Frisch importierte Eintraege sollen den Verlauf sofort zeigen.
       if (alive && n > 0) loadDashboard(() => alive);
@@ -410,10 +416,13 @@ export default function HomePage() {
                 <p className="text-[11px] text-slate-400 mt-1">
                   {[
                     t('home.workoutsToday', { count: dayWorkouts }),
-                    // Schritte aus Apple Health / Health Connect — nur wenn die
-                    // Verbindung im Profil aktiv ist und ein Wert lesbar war.
+                    // Schritte aus Health und/oder dem eigenen Zaehler, verbrannte
+                    // kcal aus Health — nur mit Opt-in und lesbarem Wert.
                     healthSteps !== null
                       ? `${healthSteps.toLocaleString(datumsLocale(lang))} ${t('home.steps')}`
+                      : null,
+                    kcalVerbrannt > 0
+                      ? t('home.kcalBurned', { n: kcalVerbrannt.toLocaleString(datumsLocale(lang)) })
                       : null,
                   ].filter(Boolean).join(' · ')}
                 </p>

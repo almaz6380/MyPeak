@@ -19,6 +19,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         registerPlugin(HealthExportPlugin.class);
+        registerPlugin(SchrittePlugin.class);
         super.onCreate(savedInstanceState);
     }
 

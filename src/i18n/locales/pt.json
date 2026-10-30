@@ -46,7 +46,8 @@
     "macroFat": "Gorduras",
     "macroFiber": "Fibras",
     "workoutsToday": "{{count}} treino hoje",
-    "workoutsToday_other": "{{count}} treinos hoje"
+    "workoutsToday_other": "{{count}} treinos hoje",
+    "kcalBurned": "{{n}} kcal queimadas"
   },
   "training": {
     "title": "Treino",
@@ -358,7 +359,8 @@
     "editGoal": "Alterar objetivo",
     "editActivity": "Alterar nível de atividade",
     "editExperience": "Alterar experiência de treino",
-    "healthExport": "Salvar treinos no Saúde"
+    "healthExport": "Salvar treinos no Saúde",
+    "countSteps": "Contar passos com o celular"
   },
   "common": {
     "welcome": "Bem-vindo",

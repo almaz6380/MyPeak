@@ -1,6 +1,7 @@
 import WidgetKit
 import SwiftUI
 import HealthKit
+import CoreMotion
 
 // Zwei Widgets (seit 1.6.1, vorher Streak/Woche/Level):
 //   Makros   — kcal uebrig + Protein/Kohlenhydrate/Fett gegen das Ziel
@@ -12,9 +13,11 @@ import HealthKit
 // UserDefaults.standard (Key "FullRepWidget.widget.daten"); der AppDelegate
 // kopiert den Wert beim Verlassen der App in die App-Group-Suite
 // group.at.gallab.mypeak und stoesst WidgetCenter an (src/lib/widgetDaten.js).
-// Schritte liest das Widget zusaetzlich selbst aus HealthKit, damit sie auch
-// ohne App-Start mitlaufen; geht das nicht (Geraet gesperrt, keine Freigabe),
-// gilt der Wert aus der App.
+// Schritte liest das Widget zusaetzlich selbst aus HealthKit und vom
+// Bewegungschip (CMPedometer, seit 1.6.2), damit sie auch ohne App-Start
+// mitlaufen; es zeigt das Hoechste der Quellen. Geht keine (Geraet gesperrt,
+// keine Freigabe), gilt der Wert aus der App. Dasselbe fuer die aktiven
+// (verbrannten) Kalorien, die nur aus HealthKit kommen.
 //
 // Der Makro-Widget behaelt die alte kind "FullRepWidget": Wer das alte
 // Streak-Widget platziert hat, sieht damit ab dem Update die Makros statt
@@ -44,6 +47,7 @@ struct Daten: Decodable {
     let fat: Int?
     let fatZiel: Int?
     let schritte: Int?
+    let kcalVerbrannt: Int?
 }
 
 private func heuteString() -> String {
@@ -378,50 +382,76 @@ struct FullRepMakros: Widget {
 struct SchrittEintrag: TimelineEntry {
     let date: Date
     let schritte: Int?
+    let kcal: Int?
 }
 
 struct SchrittVersorger: TimelineProvider {
     private let store = HKHealthStore()
+    private let pedometer = CMPedometer()
 
-    // Erst HealthKit (frisch), sonst der Wert aus der App (nur, wenn er von
-    // heute ist). nil = weder noch, z. B. Health nie verbunden.
-    private func holen(_ fertig: @escaping (Int?) -> Void) {
-        let ausApp: Int? = {
-            guard let d = lesen(), d.datum == heuteString() else { return nil }
-            return d.schritte
-        }()
+    private func summe(_ id: HKQuantityTypeIdentifier, _ einheit: HKUnit,
+                       _ fertig: @escaping (Int?) -> Void) {
         guard HKHealthStore.isHealthDataAvailable(),
-              let typ = HKQuantityType.quantityType(forIdentifier: .stepCount) else {
-            fertig(ausApp); return
-        }
+              let typ = HKQuantityType.quantityType(forIdentifier: id) else { return fertig(nil) }
         let start = Calendar.current.startOfDay(for: Date())
         let filter = HKQuery.predicateForSamples(withStart: start, end: Date(), options: .strictStartDate)
         let abfrage = HKStatisticsQuery(quantityType: typ, quantitySamplePredicate: filter,
                                         options: .cumulativeSum) { _, ergebnis, fehler in
-            if fehler == nil, let summe = ergebnis?.sumQuantity() {
-                let n = Int(summe.doubleValue(for: .count()))
-                // Gesperrtes Geraet liefert 0 statt eines Fehlers, wenn keine
-                // Daten lesbar sind — dann ist der App-Wert die bessere Zahl.
-                fertig(max(n, ausApp ?? 0))
-            } else {
-                fertig(ausApp)
-            }
+            // Gesperrtes Geraet liefert 0 statt eines Fehlers, wenn keine
+            // Daten lesbar sind — max() mit den anderen Quellen faengt das ab.
+            fertig(fehler == nil ? ergebnis?.sumQuantity().map { Int($0.doubleValue(for: einheit)) } : nil)
         }
         store.execute(abfrage)
     }
 
+    private func vomChip(_ fertig: @escaping (Int?) -> Void) {
+        // Nur mit Zustimmung aus der App; das Widget fragt nie selbst.
+        guard CMPedometer.isStepCountingAvailable(),
+              CMPedometer.authorizationStatus() == .authorized else { return fertig(nil) }
+        pedometer.queryPedometerData(from: Calendar.current.startOfDay(for: Date()), to: Date()) { daten, _ in
+            fertig(daten.map { $0.numberOfSteps.intValue })
+        }
+    }
+
+    // Das Hoechste aus HealthKit, Bewegungschip und dem Wert der App (nur,
+    // wenn er von heute ist). nil = keine Quelle, z. B. nichts freigegeben.
+    private func holen(_ fertig: @escaping (Int?, Int?) -> Void) {
+        let heute = lesen().flatMap { $0.datum == heuteString() ? $0 : nil }
+        var schritte: [Int] = heute?.schritte.map { [$0] } ?? []
+        var kcal: [Int] = heute?.kcalVerbrannt.map { [$0] } ?? []
+        let gruppe = DispatchGroup()
+        let sperre = NSLock()
+
+        gruppe.enter()
+        summe(.stepCount, .count()) { n in
+            sperre.lock(); if let n = n { schritte.append(n) }; sperre.unlock(); gruppe.leave()
+        }
+        gruppe.enter()
+        vomChip { n in
+            sperre.lock(); if let n = n { schritte.append(n) }; sperre.unlock(); gruppe.leave()
+        }
+        gruppe.enter()
+        summe(.activeEnergyBurned, .kilocalorie()) { n in
+            sperre.lock(); if let n = n { kcal.append(n) }; sperre.unlock(); gruppe.leave()
+        }
+
+        gruppe.notify(queue: .main) {
+            fertig(schritte.max(), kcal.max())
+        }
+    }
+
     func placeholder(in context: Context) -> SchrittEintrag {
-        SchrittEintrag(date: Date(), schritte: 6240)
+        SchrittEintrag(date: Date(), schritte: 6240, kcal: 320)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SchrittEintrag) -> Void) {
-        holen { n in completion(SchrittEintrag(date: Date(), schritte: n ?? 6240)) }
+        holen { n, k in completion(SchrittEintrag(date: Date(), schritte: n ?? 6240, kcal: k ?? 320)) }
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<SchrittEintrag>) -> Void) {
-        holen { n in
+        holen { n, k in
             let naechste = Calendar.current.date(byAdding: .minute, value: 15, to: Date()) ?? Date().addingTimeInterval(900)
-            completion(Timeline(entries: [SchrittEintrag(date: Date(), schritte: n)], policy: .after(naechste)))
+            completion(Timeline(entries: [SchrittEintrag(date: Date(), schritte: n, kcal: k)], policy: .after(naechste)))
         }
     }
 }
@@ -431,6 +461,7 @@ struct SchrittAnsicht: View {
     @Environment(\.widgetFamily) private var familie
 
     private var n: Int? { eintrag.schritte }
+    private var kcal: Int? { eintrag.kcal.flatMap { $0 > 0 ? $0 : nil } }
     private var anteil: Double { min(1, Double(n ?? 0) / SCHRITTZIEL) }
 
     var body: some View {
@@ -468,6 +499,13 @@ struct SchrittAnsicht: View {
                 .foregroundColor(grau)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
+            if let k = kcal {
+                Label("\(zahl(k)) kcal", systemImage: "flame.fill")
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundColor(amber)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
         }
         .padding(8)
         .modifier(Grund())
@@ -494,8 +532,10 @@ struct SchrittAnsicht: View {
                 Text(n.map { zahl($0) } ?? "–").widgetAccentable()
             }
             .font(.system(size: 18, weight: .bold, design: .rounded))
-            Text(n == nil ? w.ohneHealth : w.schritte)
+            Text(n == nil ? w.ohneHealth : (kcal.map { "\(w.schritte) · \(zahl($0)) kcal" } ?? w.schritte))
                 .font(.system(size: 12, weight: .medium))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
             Gauge(value: anteil) { EmptyView() }
                 .gaugeStyle(.accessoryLinearCapacity)
         }
@@ -505,7 +545,8 @@ struct SchrittAnsicht: View {
 
     @available(iOSApplicationExtension 16.0, *)
     private var zeile: some View {
-        Label(n.map { "\(zahl($0)) \(w.schritte)" } ?? w.ohneHealth, systemImage: "figure.walk")
+        Label(n.map { "\(zahl($0)) \(w.schritte)" + (kcal.map { " · \(zahl($0)) kcal" } ?? "") } ?? w.ohneHealth,
+              systemImage: "figure.walk")
             .modifier(KlarerGrund())
     }
 }

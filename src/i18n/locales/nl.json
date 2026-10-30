@@ -46,7 +46,8 @@
     "macroFat": "Vet",
     "macroFiber": "Vezels",
     "workoutsToday": "{{count}} workout vandaag",
-    "workoutsToday_other": "{{count}} workouts vandaag"
+    "workoutsToday_other": "{{count}} workouts vandaag",
+    "kcalBurned": "{{n}} kcal verbrand"
   },
   "planBuilder": {
     "title": "Weekschema maken",
@@ -389,7 +390,8 @@
     "editGoal": "Doel wijzigen",
     "editActivity": "Activiteitsniveau wijzigen",
     "editExperience": "Trainingservaring wijzigen",
-    "healthExport": "Workouts opslaan in Health"
+    "healthExport": "Workouts opslaan in Health",
+    "countSteps": "Stappen tellen met je telefoon"
   },
   "common": {
     "welcome": "Welkom",

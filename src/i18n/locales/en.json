@@ -46,7 +46,8 @@
     "macroFat": "Fat",
     "macroFiber": "Fiber",
     "workoutsToday": "{{count}} workout today",
-    "workoutsToday_other": "{{count}} workouts today"
+    "workoutsToday_other": "{{count}} workouts today",
+    "kcalBurned": "{{n}} kcal burned"
   },
   "planBuilder": {
     "title": "Create Weekly Plan",
@@ -389,7 +390,8 @@
     "editGoal": "Change Goal",
     "editActivity": "Change Activity Level",
     "editExperience": "Change Training Experience",
-    "healthExport": "Save workouts to Health"
+    "healthExport": "Save workouts to Health",
+    "countSteps": "Count steps on this phone"
   },
   "common": {
     "welcome": "Welcome",

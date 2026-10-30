@@ -48,7 +48,8 @@
     "workoutsToday": "{{count}} allenamento oggi",
     "workoutsToday_one": "{{count}} allenamento oggi",
     "workoutsToday_many": "{{count}} allenamenti oggi",
-    "workoutsToday_other": "{{count}} allenamenti oggi"
+    "workoutsToday_other": "{{count}} allenamenti oggi",
+    "kcalBurned": "{{n}} kcal bruciate"
   },
   "planBuilder": {
     "title": "Crea piano settimanale",
@@ -392,7 +393,8 @@
     "editGoal": "Cambia obiettivo",
     "editActivity": "Cambia livello di attività",
     "editExperience": "Cambia esperienza di allenamento",
-    "healthExport": "Salva gli allenamenti in Salute"
+    "healthExport": "Salva gli allenamenti in Salute",
+    "countSteps": "Conta i passi con il telefono"
   },
   "common": {
     "welcome": "Benvenuto",

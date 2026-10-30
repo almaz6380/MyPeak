@@ -55,6 +55,9 @@
 -keep class com.fit_up.health.capacitor.** { *; }
 # Eigenes Plugin im App-Projekt: Capacitor findet @PluginMethod per Reflexion
 -keep class at.gallab.mypeak.HealthExportPlugin { *; }
+-keep class at.gallab.mypeak.SchrittePlugin { *; }
+# WorkManager baut den Worker per Reflexion
+-keep class at.gallab.mypeak.SchrittWorker { *; }
 
 # ── Google Mobile Ads / UMP ──────────────────────────────────────────────
 # Werbe-IDs und Einwilligung laufen ueber Reflection in GMS. Die AAR bringt

@@ -5,8 +5,12 @@ import { getExerciseById } from '../data/exercises';
 
 // Apple Health / Google Health Connect, zwei getrennte Opt-ins im Profil.
 //
-// LESEN (capacitor-health): Schritte heute anzeigen und Gewicht aus Health in
-// den FullRep-Gewichtsverlauf uebernehmen.
+// LESEN (capacitor-health): Schritte und aktive (verbrannte) Kalorien heute
+// anzeigen und Gewicht aus Health in den FullRep-Gewichtsverlauf uebernehmen.
+//
+// SCHRITTE OHNE HEALTH (seit 1.6.2, eigenes Plugin „Schritte": Core Motion auf
+// iOS, Schrittzaehler-Sensor auf Android): eigenes Opt-in im Profil. Gezeigt
+// wird immer das Hoehere aus Health und Geraet.
 //
 // SCHREIBEN (seit 1.6.0, eigenes Plugin „HealthExport" im App-Projekt:
 // ios/App/App/HealthExportPlugin.swift, android/…/HealthExportPlugin.kt):
@@ -45,7 +49,7 @@ export async function verbinden(userId) {
     // 1.5.0 mit, ohne dass es je abgefragt wurde — im Systemdialog erschien
     // damit eine Zeile, der nie eine Funktion gegenueberstand.
     await Health.requestHealthPermissions({
-      permissions: ['READ_STEPS', 'READ_WEIGHT'],
+      permissions: ['READ_STEPS', 'READ_WEIGHT', 'READ_ACTIVE_CALORIES'],
     });
     // ⚠ iOS verraet NICHT, ob der Nutzer zugestimmt hat (HealthKit-Prinzip:
     // Abgelehnt sieht aus wie „keine Daten"). Die Flagge heisst deshalb
@@ -64,21 +68,76 @@ export function trennen(userId) {
   localStorage.removeItem(FLAGGE(userId));
 }
 
-// Schritte heute (lokale Tagesgrenzen). null = nicht verbunden/nicht lesbar.
-export async function schritteHeute(userId) {
+// Summe heute (lokale Tagesgrenzen) aus Health. null = nicht verbunden/nicht lesbar.
+async function heuteAusHealth(userId, dataType) {
   if (!istVerbunden(userId)) return null;
   try {
     const start = new Date(); start.setHours(0, 0, 0, 0);
     const res = await Health.queryAggregated({
       startDate: start.toISOString(),
       endDate: new Date().toISOString(),
-      dataType: 'steps',
+      dataType,
       bucket: 'day',
     });
     const summe = (res?.aggregatedData || []).reduce((a, b) => a + (b?.value || 0), 0);
     return Math.round(summe);
   } catch (e) {
-    console.warn('[health] Schritte nicht lesbar:', e);
+    console.warn(`[health] ${dataType} nicht lesbar:`, e);
+    return null;
+  }
+}
+
+// Schritte heute: das Hoehere aus Health und dem eigenen Schrittzaehler.
+// null = keine Quelle (weder Health verbunden noch Schritte zaehlen erlaubt).
+export async function schritteHeute(userId) {
+  const [ausHealth, vomGeraet] = await Promise.all([
+    heuteAusHealth(userId, 'steps'),
+    schritteVomGeraet(),
+  ]);
+  if (ausHealth == null && vomGeraet == null) return null;
+  return Math.max(ausHealth ?? 0, vomGeraet ?? 0);
+}
+
+// Aktive (verbrannte) Kalorien heute, nur aus Health.
+export function verbrannteKcalHeute(userId) {
+  return heuteAusHealth(userId, 'active-calories');
+}
+
+// ── Schritte selbst zaehlen (ohne Health) ───────────────────────
+
+const Schritte = registerPlugin('Schritte');
+const ZAEHLEN_FLAGGE = 'fullrep.schritte.zaehlen';
+
+export function schritteZaehlenAktiv() {
+  return localStorage.getItem(ZAEHLEN_FLAGGE) === 'true';
+}
+
+// Fragt die Bewegungs-Berechtigung an. Der Schalter bleibt aus, wenn das
+// System ablehnt oder das Geraet keinen Schrittzaehler hat.
+export async function schritteZaehlenEinschalten() {
+  if (!healthVerfuegbar()) return { ok: false, grund: 'nur_nativ' };
+  try {
+    const { status } = await Schritte.erlauben();
+    if (status !== 'erlaubt') return { ok: false, grund: status === 'nicht_verfuegbar' ? 'nicht_verfuegbar' : 'abgelehnt' };
+    localStorage.setItem(ZAEHLEN_FLAGGE, 'true');
+    return { ok: true };
+  } catch (e) {
+    console.warn('[schritte] Freigabe fehlgeschlagen:', e);
+    return { ok: false, grund: 'fehler' };
+  }
+}
+
+// Nur die App-Flagge; die Systemberechtigung verwaltet das OS.
+export function schritteZaehlenAusschalten() {
+  localStorage.removeItem(ZAEHLEN_FLAGGE);
+}
+
+async function schritteVomGeraet() {
+  if (!healthVerfuegbar() || !schritteZaehlenAktiv()) return null;
+  try {
+    const { status, schritte } = await Schritte.heute();
+    return status === 'erlaubt' && Number.isFinite(schritte) ? schritte : null;
+  } catch {
     return null;
   }
 }

@@ -49,7 +49,8 @@
     "workoutsToday_one": "{{count}} trening dziś",
     "workoutsToday_few": "{{count}} treningi dziś",
     "workoutsToday_many": "{{count}} treningów dziś",
-    "workoutsToday_other": "{{count}} treningu dziś"
+    "workoutsToday_other": "{{count}} treningu dziś",
+    "kcalBurned": "{{n}} kcal spalone"
   },
   "planBuilder": {
     "title": "Utwórz plan tygodniowy",
@@ -394,7 +395,8 @@
     "editGoal": "Zmień cel",
     "editActivity": "Zmień poziom aktywności",
     "editExperience": "Zmień doświadczenie treningowe",
-    "healthExport": "Zapisuj treningi w Zdrowiu"
+    "healthExport": "Zapisuj treningi w Zdrowiu",
+    "countSteps": "Licz kroki telefonem"
   },
   "common": {
     "welcome": "Witaj",

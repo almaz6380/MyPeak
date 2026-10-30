@@ -46,7 +46,8 @@
     "macroFat": "脂質",
     "macroFiber": "食物繊維",
     "workoutsToday": "今日のワークアウト {{count}}回",
-    "workoutsToday_other": "今日のワークアウト {{count}}回"
+    "workoutsToday_other": "今日のワークアウト {{count}}回",
+    "kcalBurned": "{{n}} kcal 消費"
   },
   "planBuilder": {
     "title": "週間プランを作成",
@@ -388,7 +389,8 @@
     "editGoal": "目標を変更",
     "editActivity": "活動レベルを変更",
     "editExperience": "トレーニング経験を変更",
-    "healthExport": "ワークアウトをヘルスケアに保存"
+    "healthExport": "ワークアウトをヘルスケアに保存",
+    "countSteps": "スマホで歩数を計測"
   },
   "common": {
     "welcome": "ようこそ",

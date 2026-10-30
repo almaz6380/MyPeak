@@ -3,7 +3,7 @@ import { Preferences } from '@capacitor/preferences';
 import { getXP } from '../data/socialStorage';
 import { getWorkouts } from '../data/workoutStorage';
 import { getNutritionEntries, getNutritionGoals } from '../data/nutritionStorage';
-import { schritteHeute } from './health';
+import { schritteHeute, verbrannteKcalHeute } from './health';
 import { todayLocal } from './dateUtils';
 
 // Datenbruecke zum Homescreen-Widget.
@@ -56,10 +56,10 @@ export async function widgetDatenAktualisieren(userId) {
       konfiguriert = true;
     }
     const heute = todayLocal();
-    const [xp, workouts, eintraege, ziele, schritte] = await Promise.all([
+    const [xp, workouts, eintraege, ziele, schritte, kcalVerbrannt] = await Promise.all([
       getXP(userId), getWorkouts(userId),
       getNutritionEntries(userId, heute), getNutritionGoals(userId),
-      schritteHeute(userId),
+      schritteHeute(userId), verbrannteKcalHeute(userId),
     ]);
     const start = wochenstart();
     const woche = (workouts || []).filter((w) => w?.date && new Date(`${w.date}T12:00:00`) >= start).length;
@@ -77,8 +77,10 @@ export async function widgetDatenAktualisieren(userId) {
       carbsZiel: Math.round(Number(ziele?.carbs) || 0),
       fat: summe('fat'),
       fatZiel: Math.round(Number(ziele?.fat) || 0),
-      // null = Health nicht verbunden; das Widget zeigt dann einen Hinweis statt 0
+      // null = weder Health noch Schrittzaehler; das Widget zeigt dann einen Hinweis statt 0
       schritte: schritte ?? null,
+      // aktive Kalorien aus Health, null ohne Verbindung
+      kcalVerbrannt: kcalVerbrannt ?? null,
       // fuer die Widget-Anzeige „Stand: …" und als Frische-Merkmal
       stand: new Date().toISOString(),
     };

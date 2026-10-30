@@ -46,7 +46,8 @@
     "macroFat": "دهون",
     "macroFiber": "ألياف",
     "workoutsToday": "{{count}} تمرين اليوم",
-    "workoutsToday_other": "{{count}} تمارين اليوم"
+    "workoutsToday_other": "{{count}} تمارين اليوم",
+    "kcalBurned": "{{n}} سعرة محروقة"
   },
   "training": {
     "title": "التمرين",
@@ -358,7 +359,8 @@
     "editGoal": "تغيير الهدف",
     "editActivity": "تغيير مستوى النشاط",
     "editExperience": "تغيير الخبرة التدريبية",
-    "healthExport": "حفظ التمارين في تطبيق الصحة"
+    "healthExport": "حفظ التمارين في تطبيق الصحة",
+    "countSteps": "احسب الخطوات بالهاتف"
   },
   "common": {
     "welcome": "مرحبًا",

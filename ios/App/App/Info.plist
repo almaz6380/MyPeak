@@ -51,8 +51,10 @@
 	<false/>
 	<key>NSCameraUsageDescription</key>
 	<string>FullRep nutzt die Kamera, um Barcodes von Lebensmitteln zu scannen und Mahlzeiten zu fotografieren.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>FullRep zählt deine Schritte mit dem Bewegungssensor des iPhones und zeigt sie in der App und im Widget an — nur wenn du das im Profil einschaltest.</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>FullRep liest Schritte und Gewicht aus Apple Health, um sie in der App anzuzeigen — nur wenn du die Verbindung im Profil einschaltest.</string>
+	<string>FullRep liest Schritte, Gewicht und aktive Kalorien aus Apple Health, um sie in der App anzuzeigen — nur wenn du die Verbindung im Profil einschaltest.</string>
 	<!-- Seit 1.6.0 schreibt FullRep tatsächlich: abgeschlossene Workouts als
 	     HKWorkout (HealthExportPlugin.swift), nur nach eigenem Opt-in im
 	     Profil. Bis 1.5.x stand hier „schreibt keine Daten" — der Schlüssel war
