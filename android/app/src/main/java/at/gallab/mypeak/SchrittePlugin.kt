@@ -15,6 +15,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
 import com.getcapacitor.PermissionState
 import com.getcapacitor.Plugin
@@ -28,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -98,14 +100,39 @@ class SchrittePlugin : Plugin() {
             call.resolve(antwort)
         }
     }
+
+    /** Tageswerte der letzten `tage` Tage (abgeschlossene Tage + heute). */
+    @PluginMethod
+    fun verlauf(call: PluginCall) {
+        val tage = (call.getInt("tage") ?: 7).coerceIn(1, SchrittZaehler.VERLAUF_MAX)
+        CoroutineScope(Dispatchers.IO).launch {
+            val heute = SchrittZaehler.messen(context)
+            val liste = JSArray()
+            val p = context.getSharedPreferences(SchrittZaehler.PREFS, Context.MODE_PRIVATE)
+            val alt = SchrittZaehler.verlaufLesen(p)
+            val grenze = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+                .format(Date(System.currentTimeMillis() - (tage - 1) * 86_400_000L))
+            for (datum in alt.keys()) {
+                if (datum >= grenze) liste.put(JSObject().put("datum", datum).put("schritte", alt.getInt(datum)))
+            }
+            if (heute != null) liste.put(JSObject().put("datum", SchrittZaehler.heute()).put("schritte", heute))
+            call.resolve(JSObject().put("tage", liste))
+        }
+    }
 }
 
 /** Sensor lesen und Tageswerte verbuchen — gemeinsam für Plugin und Worker. */
 object SchrittZaehler {
-    private const val PREFS = "FullRepWidget"
+    const val PREFS = "FullRepWidget"
     const val TAG = "schritt.tag"
     const val BASIS = "schritt.basis"
     const val LETZTER = "schritt.letzter"
+    /** JSON datum → Schritte der abgeschlossenen Tage (seit 1.6.3). */
+    const val VERLAUF = "schritt.verlauf"
+    const val VERLAUF_MAX = 120
+
+    fun verlaufLesen(p: SharedPreferences): JSONObject =
+        try { JSONObject(p.getString(VERLAUF, "{}") ?: "{}") } catch (_: Exception) { JSONObject() }
 
     fun heute(): String = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
 
@@ -156,6 +183,15 @@ object SchrittZaehler {
         val letzter = p.getLong(LETZTER, -1)
         var basis = p.getLong(BASIS, zaehler)
         if (altTag != tag) {
+            // Der alte Tag ist vorbei: seinen letzten Stand in den Verlauf.
+            // Gezählt ist bis zur letzten Messung (höchstens 15 min vor Mitternacht).
+            if (altTag != null && letzter >= 0) {
+                val verlauf = verlaufLesen(p)
+                verlauf.put(altTag, (letzter - basis).coerceAtLeast(0))
+                val tage = verlauf.keys().asSequence().toList().sorted()
+                tage.take((tage.size - VERLAUF_MAX).coerceAtLeast(0)).forEach { verlauf.remove(it) }
+                p.edit().putString(VERLAUF, verlauf.toString()).apply()
+            }
             basis = when {
                 letzter < 0 -> zaehler          // allererste Messung: ab jetzt zählen
                 zaehler >= letzter -> letzter   // normaler Tageswechsel

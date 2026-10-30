@@ -54,19 +54,22 @@ export default function ProgressRing({
             />
           </g>
         </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span
-            className="font-extrabold leading-none text-slate-900 dark:text-white tabular-nums"
-            style={{ fontSize: size >= 130 ? 38 : 30 }}
-          >
-            {Math.round(zahl ?? value)}
-          </span>
-          {label && (
-            <span className="mt-1 text-[11px] font-semibold text-primary-700 dark:text-primary-400">
-              {label}
+        {/* zahl={false}: nur der Ring, z. B. klein neben einer eigenen Zahl. */}
+        {zahl !== false && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span
+              className="font-extrabold leading-none text-slate-900 dark:text-white tabular-nums"
+              style={{ fontSize: size >= 130 ? 38 : 30 }}
+            >
+              {Math.round(zahl ?? value)}
             </span>
-          )}
-        </div>
+            {label && (
+              <span className="mt-1 text-[11px] font-semibold text-primary-700 dark:text-primary-400">
+                {label}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1643,5 +1643,21 @@
     "statsCurrent": "Huidig",
     "statsChange": "Verandering",
     "statsPerWeekWeight": "per week"
+  },
+  "steps": {
+    "title": "Stappen",
+    "ofGoal": "van {{n}}",
+    "enable": "Stappen tellen aanzetten",
+    "enableText": "FullRep telt je stappen met de bewegingssensor van je telefoon, zonder Apple Health of Health Connect.",
+    "enableFailed": "Niet toegestaan of geen stappenteller. Je kunt het toestaan in de instellingen van je telefoon.",
+    "avgPerDay": "Gem. per dag",
+    "bestDay": "Beste dag ({{datum}})",
+    "bestDayLabel": "Beste dag",
+    "goalReached": "Doel gehaald",
+    "kcalTotal": "Verbrand (actief)",
+    "goal": "Dagdoel",
+    "goalHint": "Geldt voor kaart en geschiedenis",
+    "noSource": "Nog geen bron: zet „Stappen tellen” of Apple Health / Health Connect aan in je profiel.",
+    "olderOnlyHealth": "Oudere dagen zijn er alleen met Apple Health / Health Connect (profiel)."
   }
 }

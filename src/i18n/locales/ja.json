@@ -1642,5 +1642,21 @@
     "statsCurrent": "現在",
     "statsChange": "変化",
     "statsPerWeekWeight": "週あたり"
+  },
+  "steps": {
+    "title": "歩数",
+    "ofGoal": "/ {{n}}",
+    "enable": "歩数カウントをオンにする",
+    "enableText": "FullRepはスマホのモーションセンサーで歩数を数えます。Apple HealthやHealth Connectは不要です。",
+    "enableFailed": "許可されていないか、歩数計がありません。スマホの設定で許可できます。",
+    "avgPerDay": "1日平均",
+    "bestDay": "最高の日（{{datum}}）",
+    "bestDayLabel": "最高の日",
+    "goalReached": "目標達成",
+    "kcalTotal": "消費（アクティブ）",
+    "goal": "1日の目標",
+    "goalHint": "カードと履歴に使用",
+    "noSource": "まだデータ元がありません。プロフィールで「歩数を数える」またはApple Health / Health Connectをオンにしてください。",
+    "olderOnlyHealth": "過去の日はApple Health / Health Connect（プロフィール）でのみ表示されます。"
   }
 }

@@ -2,6 +2,8 @@ import { Capacitor, registerPlugin } from '@capacitor/core';
 import { Health } from 'capacitor-health';
 import { saveWeightEntry, getWeightEntries } from '../data/weightStorage';
 import { getExerciseById } from '../data/exercises';
+import { schritteVerschmelzen } from './statistik';
+import { toLocalDateString } from './dateUtils';
 
 // Apple Health / Google Health Connect, zwei getrennte Opt-ins im Profil.
 //
@@ -101,6 +103,106 @@ export async function schritteHeute(userId) {
 // Aktive (verbrannte) Kalorien heute, nur aus Health.
 export function verbrannteKcalHeute(userId) {
   return heuteAusHealth(userId, 'active-calories');
+}
+
+// ── Schritte-Verlauf und Ziel ───────────────────────────────────
+
+const VERLAUF_KEY = 'fullrep.schritte.verlauf';
+const ZIEL_KEY = 'fullrep.schritte.ziel';
+const VERLAUF_MAX_TAGE = 120;
+
+export function schrittQuelleAktiv(userId) {
+  return istVerbunden(userId) || schritteZaehlenAktiv();
+}
+
+export function schrittZiel() {
+  const n = Number(localStorage.getItem(ZIEL_KEY));
+  return n >= 1000 ? n : 10000;
+}
+
+export function schrittZielSetzen(n) {
+  localStorage.setItem(ZIEL_KEY, String(Math.round(n)));
+}
+
+function protokollLesen() {
+  try {
+    const o = JSON.parse(localStorage.getItem(VERLAUF_KEY) || '{}');
+    return o && typeof o === 'object' ? o : {};
+  } catch {
+    return {};
+  }
+}
+
+// Eigenes Protokoll: jeder gelesene Tageswert landet hier (das Höchste des
+// Tages gewinnt). Füllt Lücken, wo Health fehlt und der Chip nicht weit genug
+// zurückreicht.
+export function schritteProtokollieren(schritte, kcal, datum = toLocalDateString(new Date())) {
+  if (!Number.isFinite(schritte) && !Number.isFinite(kcal)) return;
+  const o = protokollLesen();
+  const alt = o[datum] || {};
+  o[datum] = {
+    s: Math.max(alt.s ?? 0, Number.isFinite(schritte) ? schritte : 0),
+    k: Math.max(alt.k ?? 0, Number.isFinite(kcal) ? kcal : 0),
+  };
+  const tage = Object.keys(o).sort();
+  for (const d of tage.slice(0, Math.max(0, tage.length - VERLAUF_MAX_TAGE))) delete o[d];
+  try { localStorage.setItem(VERLAUF_KEY, JSON.stringify(o)); } catch { /* voll: egal */ }
+}
+
+// Datum eines Health-Tagesbuckets: iOS liefert Millisekunden, Android eine
+// lokale Zeit ohne Zone („2026-10-30T00:00").
+function bucketDatum(start) {
+  if (typeof start === 'number') return toLocalDateString(new Date(start));
+  return String(start || '').slice(0, 10);
+}
+
+async function tageAusHealth(userId, dataType, start) {
+  if (!istVerbunden(userId)) return [];
+  try {
+    const res = await Health.queryAggregated({
+      startDate: start.toISOString(),
+      endDate: new Date().toISOString(),
+      dataType,
+      bucket: 'day',
+    });
+    return (res?.aggregatedData || [])
+      .filter((b) => Number.isFinite(b?.value) && b.value >= 0)
+      .map((b) => ({ datum: bucketDatum(b.startDate), wert: Math.round(b.value) }));
+  } catch (e) {
+    console.warn(`[health] Verlauf ${dataType} nicht lesbar:`, e);
+    return [];
+  }
+}
+
+async function verlaufVomGeraet(tage) {
+  if (!healthVerfuegbar() || !schritteZaehlenAktiv()) return [];
+  try {
+    const { tage: liste } = await Schritte.verlauf({ tage });
+    return (liste || []).filter((t) => t?.datum && Number.isFinite(t.schritte));
+  } catch {
+    return [];
+  }
+}
+
+// Schritte (und aktive kcal) der letzten `tage` Tage, je Tag das Höchste aus
+// Health, dem Geräte-Zähler und dem eigenen Protokoll. Ohne Quelle: leere Tage.
+export async function schritteVerlauf(userId, tage) {
+  const start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - (tage - 1));
+  const [hSchritte, hKcal, geraet] = await Promise.all([
+    tageAusHealth(userId, 'steps', start),
+    tageAusHealth(userId, 'active-calories', start),
+    verlaufVomGeraet(tage),
+  ]);
+  // 0 im Protokoll heisst „nicht gelesen", nicht „nicht gegangen".
+  const protokoll = Object.entries(protokollLesen()).map(([datum, w]) => ({
+    datum, schritte: w.s || undefined, kcal: w.k || undefined,
+  }));
+  return schritteVerschmelzen([
+    hSchritte.map((b) => ({ datum: b.datum, schritte: b.wert })),
+    hKcal.map((b) => ({ datum: b.datum, kcal: b.wert })),
+    geraet,
+    protokoll,
+  ], tage);
 }
 
 // ── Schritte selbst zaehlen (ohne Health) ───────────────────────

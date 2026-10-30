@@ -253,7 +253,7 @@ def setze_primaersprache(tok, locale):
 WHATS_NEW = """Neue Widgets für Homescreen und Sperrbildschirm: deine Kalorien und Makros \
 von heute (Protein, Kohlenhydrate, Fett) und deine Schritte – rund, rechteckig oder als \
 Zeile über der Uhr. FullRep zählt deine Schritte jetzt auch selbst (ohne Apple Health) und \
-zeigt deine verbrannten Kalorien."""
+zeigt deine verbrannten Kalorien. Neu: eine eigene Schritte-Karte auf der Startseite und ein Verlauf mit Tagesziel (7, 30 oder 90 Tage)."""
 
 # "Neu in dieser Version" fuer die weiteren Sprachen der Store-Seite. Apple
 # verlangt den Text bei einem Update fuer JEDE Lokalisierung der Version —
@@ -262,47 +262,47 @@ WHATS_NEW_SPRACHEN = {
     'en': "New widgets for the Home Screen and Lock Screen: today's calories and macros "
           "(protein, carbs, fat) and your steps – circular, rectangular or as a line "
           "above the clock. FullRep now also counts your steps itself (no Apple Health "
-          "needed) and shows your burned calories.",
+          "needed) and shows your burned calories. New: a step card on the home screen and a step history with a daily goal (7, 30 or 90 days).",
     'es': "Nuevos widgets para la pantalla de inicio y de bloqueo: tus calorías y macros "
           "de hoy (proteína, carbohidratos, grasa) y tus pasos, en formato circular, "
           "rectangular o en una línea sobre el reloj. FullRep ahora también cuenta tus pasos "
-          "(sin Salud) y muestra las calorías quemadas.",
+          "(sin Salud) y muestra las calorías quemadas. Nuevo: una tarjeta de pasos en el inicio y un historial con objetivo diario (7, 30 o 90 días).",
     'fr': "Nouveaux widgets pour l’écran d’accueil et l’écran verrouillé : tes calories et "
           "macros du jour (protéines, glucides, lipides) et tes pas – rond, rectangulaire "
           "ou en ligne au-dessus de l’heure. FullRep compte désormais aussi tes pas lui-même "
-          "(sans Santé) et affiche les calories brûlées.",
+          "(sans Santé) et affiche les calories brûlées. Nouveau : une carte Pas sur l’accueil et un historique avec objectif quotidien (7, 30 ou 90 jours).",
     'pt': "Novos widgets para a tela de início e a tela bloqueada: suas calorias e macros "
           "de hoje (proteína, carboidratos, gordura) e seus passos – circular, retangular "
           "ou em uma linha acima do relógio. O FullRep agora também conta seus passos "
-          "(sem o Saúde) e mostra as calorias queimadas.",
+          "(sem o Saúde) e mostra as calorias queimadas. Novo: um cartão de passos na tela inicial e um histórico com meta diária (7, 30 ou 90 dias).",
     'ar': "أدوات جديدة للشاشة الرئيسية وشاشة القفل: سعراتك ومغذياتك لليوم (بروتين، "
           "كربوهيدرات، دهون) وخطواتك – دائرية أو مستطيلة أو في سطر فوق الساعة. "
-          "يعدّ FullRep خطواتك الآن بنفسه (دون تطبيق الصحة) ويعرض السعرات المحروقة.",
+          "يعدّ FullRep خطواتك الآن بنفسه (دون تطبيق الصحة) ويعرض السعرات المحروقة. جديد: بطاقة للخطوات في الصفحة الرئيسية وسجل مع هدف يومي (7 أو 30 أو 90 يومًا).",
     'nl': "Nieuwe widgets voor het beginscherm en toegangsscherm: je calorieën en macro's "
           "van vandaag (eiwit, koolhydraten, vet) en je stappen – rond, rechthoekig of als "
           "regel boven de klok. FullRep telt je stappen nu ook zelf (zonder Gezondheid) en "
-          "toont je verbrande calorieën.",
+          "toont je verbrande calorieën. Nieuw: een stappenkaart op het startscherm en een geschiedenis met dagdoel (7, 30 of 90 dagen).",
     'pl': "Nowe widżety na ekran początkowy i ekran blokady: dzisiejsze kalorie i makro "
           "(białko, węglowodany, tłuszcz) oraz twoje kroki – okrągłe, prostokątne lub "
           "jako wiersz nad zegarem. FullRep liczy teraz kroki także sam (bez Zdrowia) "
-          "i pokazuje spalone kalorie.",
+          "i pokazuje spalone kalorie. Nowość: karta kroków na ekranie głównym i historia z celem dziennym (7, 30 lub 90 dni).",
     'it': "Nuovi widget per la schermata Home e di blocco: calorie e macro di oggi "
           "(proteine, carboidrati, grassi) e i tuoi passi – rotondo, rettangolare o in "
           "una riga sopra l’orologio. Ora FullRep conta anche da solo i tuoi passi (senza "
-          "Salute) e mostra le calorie bruciate.",
+          "Salute) e mostra le calorie bruciate. Novità: una scheda passi nella home e uno storico con obiettivo giornaliero (7, 30 o 90 giorni).",
     'tr': "Ana ekran ve kilit ekranı için yeni widget’lar: bugünkü kalorilerin ve "
           "makroların (protein, karbonhidrat, yağ) ile adımların – yuvarlak, dikdörtgen "
           "veya saatin üstünde tek satır. FullRep artık adımlarını kendisi de sayıyor "
-          "(Sağlık olmadan) ve yakılan kalorileri gösteriyor.",
+          "(Sağlık olmadan) ve yakılan kalorileri gösteriyor. Yeni: ana sayfada adım kartı ve günlük hedefli adım geçmişi (7, 30 veya 90 gün).",
     'ja': "ホーム画面とロック画面に新しいウィジェット：今日のカロリーとマクロ（たんぱく質・"
           "炭水化物・脂質）、そして歩数を、円形・長方形・時計の上の 1 行で表示します。"
-          "FullRep がヘルスケアなしでも歩数を計測し、消費カロリーも表示します。",
+          "FullRep がヘルスケアなしでも歩数を計測し、消費カロリーも表示します。新機能：ホームに歩数カード、1日の目標付きの歩数履歴（7・30・90日）。",
     'ko': "홈 화면과 잠금 화면용 새 위젯: 오늘의 칼로리와 매크로(단백질, 탄수화물, 지방), "
           "그리고 걸음 수를 원형·직사각형·시계 위 한 줄로 보여 줘요. "
-          "이제 FullRep이 건강 앱 없이도 걸음 수를 세고 소모 칼로리를 보여 줘요.",
+          "이제 FullRep이 건강 앱 없이도 걸음 수를 세고 소모 칼로리를 보여 줘요. 새 기능: 홈 화면의 걸음 수 카드와 하루 목표가 있는 걸음 수 기록(7·30·90일).",
     'zh': "主屏幕和锁定屏幕新增小组件：今日热量与宏量营养素（蛋白质、碳水、脂肪）以及"
           "你的步数，可选圆形、矩形或时钟上方单行显示。"
-          "FullRep 现在无需健康也能自己计步，并显示已消耗的卡路里。",
+          "FullRep 现在无需健康也能自己计步，并显示已消耗的卡路里。新功能：首页步数卡片，以及带每日目标的步数历史（7、30 或 90 天）。",
 }
 
 
@@ -846,7 +846,15 @@ def setze_abo_screenshot(tok):
 # "submitted together with this version", die Abos standen aber auf
 # MISSING_METADATA und fuhren nicht mit — genau dafuer kam 2.1(b) ein zweites
 # Mal. Diesen Absatz erst schreiben, wenn beide Abos READY_TO_SUBMIT sind.
-PRUEFNOTIZ = """What is new in 1.6.2 (previous App Store version: 1.6.1)
+PRUEFNOTIZ = """What is new in 1.6.3 (previous App Store version: 1.6.1)
+
+Step card and step history (new)
+The home screen has its own step card (today's steps against a daily goal,
+active calories). Tapping it opens a step history (7/30/90 days) built from
+the same sources as before: HealthKit (read only) and CMPedometer, plus the
+daily values the app has already shown. Everything stays on the device.
+
+Also new since 1.6.1 (1.6.2 was not released):
 
 Widgets (new)
 Two widgets for the Home Screen and the Lock Screen: "Macros" shows today's

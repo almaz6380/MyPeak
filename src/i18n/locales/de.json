@@ -1643,5 +1643,21 @@
     "statsCurrent": "Aktuell",
     "statsChange": "Veränderung",
     "statsPerWeekWeight": "pro Woche"
+  },
+  "steps": {
+    "title": "Schritte",
+    "ofGoal": "von {{n}}",
+    "enable": "Schritte zählen einschalten",
+    "enableText": "FullRep zählt deine Schritte mit dem Bewegungssensor deines Handys – ohne Apple Health oder Health Connect.",
+    "enableFailed": "Nicht erlaubt oder kein Schrittzähler. Du kannst es in den Einstellungen des Handys freigeben.",
+    "avgPerDay": "Ø pro Tag",
+    "bestDay": "Bester Tag ({{datum}})",
+    "bestDayLabel": "Bester Tag",
+    "goalReached": "Ziel erreicht",
+    "kcalTotal": "Verbrannt (aktiv)",
+    "goal": "Tagesziel",
+    "goalHint": "Gilt für Karte und Verlauf",
+    "noSource": "Noch keine Quelle: Schalte im Profil „Schritte selbst zählen“ oder Apple Health / Health Connect ein.",
+    "olderOnlyHealth": "Ältere Tage gibt es nur mit Apple Health / Health Connect (Profil)."
   }
 }

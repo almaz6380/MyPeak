@@ -1644,5 +1644,21 @@
     "statsCurrent": "Güncel",
     "statsChange": "Değişim",
     "statsPerWeekWeight": "haftalık"
+  },
+  "steps": {
+    "title": "Adımlar",
+    "ofGoal": "/ {{n}}",
+    "enable": "Adım saymayı aç",
+    "enableText": "FullRep adımlarını telefonunun hareket sensörüyle sayar; Apple Health veya Health Connect gerekmez.",
+    "enableFailed": "İzin verilmedi ya da adım sayar yok. Telefon ayarlarından izin verebilirsin.",
+    "avgPerDay": "Günlük ort.",
+    "bestDay": "En iyi gün ({{datum}})",
+    "bestDayLabel": "En iyi gün",
+    "goalReached": "Hedefe ulaşıldı",
+    "kcalTotal": "Yakılan (aktif)",
+    "goal": "Günlük hedef",
+    "goalHint": "Kart ve geçmiş için geçerli",
+    "noSource": "Henüz kaynak yok: profilinde „Adımları say” ya da Apple Health / Health Connect'i aç.",
+    "olderOnlyHealth": "Eski günler yalnızca Apple Health / Health Connect ile görünür (profil)."
   }
 }

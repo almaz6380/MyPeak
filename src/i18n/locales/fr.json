@@ -1643,5 +1643,21 @@
     "statsCurrent": "Actuel",
     "statsChange": "Évolution",
     "statsPerWeekWeight": "par semaine"
+  },
+  "steps": {
+    "title": "Pas",
+    "ofGoal": "sur {{n}}",
+    "enable": "Activer le comptage des pas",
+    "enableText": "FullRep compte tes pas avec le capteur de mouvement de ton téléphone, sans Apple Health ni Health Connect.",
+    "enableFailed": "Non autorisé ou pas de podomètre. Tu peux l'autoriser dans les réglages du téléphone.",
+    "avgPerDay": "Moy. par jour",
+    "bestDay": "Meilleur jour ({{datum}})",
+    "bestDayLabel": "Meilleur jour",
+    "goalReached": "Objectif atteint",
+    "kcalTotal": "Brûlées (actives)",
+    "goal": "Objectif quotidien",
+    "goalHint": "Pour la carte et l'historique",
+    "noSource": "Aucune source : active « Compter les pas » ou Apple Health / Health Connect dans ton profil.",
+    "olderOnlyHealth": "Les jours plus anciens ne sont disponibles qu'avec Apple Health / Health Connect (profil)."
   }
 }

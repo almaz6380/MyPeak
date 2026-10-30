@@ -1648,5 +1648,21 @@
     "statsCurrent": "Obecnie",
     "statsChange": "Zmiana",
     "statsPerWeekWeight": "na tydzień"
+  },
+  "steps": {
+    "title": "Kroki",
+    "ofGoal": "z {{n}}",
+    "enable": "Włącz liczenie kroków",
+    "enableText": "FullRep liczy twoje kroki czujnikiem ruchu telefonu – bez Apple Health i Health Connect.",
+    "enableFailed": "Brak zgody lub brak krokomierza. Możesz zezwolić w ustawieniach telefonu.",
+    "avgPerDay": "Śr. dziennie",
+    "bestDay": "Najlepszy dzień ({{datum}})",
+    "bestDayLabel": "Najlepszy dzień",
+    "goalReached": "Cel osiągnięty",
+    "kcalTotal": "Spalone (aktywne)",
+    "goal": "Cel dzienny",
+    "goalHint": "Dla karty i historii",
+    "noSource": "Brak źródła: włącz „Licz kroki” lub Apple Health / Health Connect w profilu.",
+    "olderOnlyHealth": "Starsze dni są dostępne tylko z Apple Health / Health Connect (profil)."
   }
 }

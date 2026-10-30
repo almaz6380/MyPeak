@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Dumbbell, Apple, Scale, Loader2 } from 'lucide-react';
+import { ArrowLeft, Dumbbell, Apple, Scale, Footprints, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { getWorkouts } from '../data/workoutStorage';
@@ -12,6 +12,9 @@ import { wochenUebersicht, topUebungen, ernaehrungsSchnitt, gewichtsTrend } from
 import { toLocalDateString } from '../lib/dateUtils';
 import { datumsLocale } from '../lib/datumsformat';
 import PremiumGesperrt from '../components/PremiumGesperrt';
+import { schritteVerlauf, schrittZiel, schrittQuelleAktiv } from '../lib/health';
+import { schrittAuswertung } from '../lib/statistik';
+import { SchrittBalken } from './StepsPage';
 
 const WOCHEN = 8;
 
@@ -94,6 +97,7 @@ export default function StatsPage() {
           <Training a={auswertung} t={t} locale={datumsLocale(i18n.language)} />
           <Ernaehrung a={auswertung} t={t} />
           <Gewicht a={auswertung} t={t} />
+          {schrittQuelleAktiv(user.id) && <Schritte userId={user.id} zeitraum={zeitraum} t={t} locale={datumsLocale(i18n.language)} />}
         </>
       )}
     </div>
@@ -228,6 +232,30 @@ function Gewicht({ a, t }) {
         <Kennzahl wert={`${vorzeichen(g.aenderungKg)} kg`} text={t('premium.statsChange')} />
         {g.proWocheKg !== null && <Kennzahl wert={`${vorzeichen(g.proWocheKg)} kg`} text={t('premium.statsPerWeekWeight')} />}
       </div>
+    </Karte>
+  );
+}
+
+// Schritte im gewählten Zeitraum — derselbe Verlauf wie auf /steps.
+function Schritte({ userId, zeitraum, t, locale }) {
+  const [verlauf, setVerlauf] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    schritteVerlauf(userId, zeitraum).then((v) => { if (alive) setVerlauf(v); }).catch(() => {});
+    return () => { alive = false; };
+  }, [userId, zeitraum]);
+  if (!verlauf) return null;
+  const ziel = schrittZiel();
+  const a = schrittAuswertung(verlauf, ziel);
+  const tagFmt = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'numeric' });
+  return (
+    <Karte icon={Footprints} titel={t('steps.title')}>
+      <div className="flex gap-2 mb-4">
+        <Kennzahl wert={a.schnitt.toLocaleString(locale)} text={t('steps.avgPerDay')} />
+        <Kennzahl wert={a.bester ? a.bester.schritte.toLocaleString(locale) : '–'} text={t('steps.bestDayLabel')} />
+        <Kennzahl wert={`${a.zielErreicht}/${a.tageGemessen}`} text={t('steps.goalReached')} />
+      </div>
+      <SchrittBalken verlauf={verlauf} ziel={ziel} beschriftung={(d) => tagFmt.format(new Date(d + 'T12:00:00'))} dicht={zeitraum > 7} />
     </Karte>
   );
 }

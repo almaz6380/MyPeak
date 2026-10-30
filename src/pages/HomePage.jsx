@@ -13,7 +13,10 @@ import { getWorkouts, getActiveSchedule } from '../data/workoutStorage';
 import { resolveScheduledDay } from '../data/programResolver';
 import { getXP } from '../data/socialStorage';
 import { widgetDatenAktualisieren } from '../lib/widgetDaten';
-import { istVerbunden, schritteHeute, verbrannteKcalHeute, gewichtImportieren, schritteZaehlenAktiv } from '../lib/health';
+import {
+  istVerbunden, schritteHeute, verbrannteKcalHeute, gewichtImportieren, schritteZaehlenAktiv,
+  healthVerfuegbar, schrittZiel, schritteProtokollieren, schritteZaehlenEinschalten,
+} from '../lib/health';
 import { getSupplements, getSupplementLogs, getTodayScheduledSupplements, getSupplementProgress } from '../data/supplementStorage';
 import { getCycleSettings, getCyclePhase, getPhaseRecommendations } from '../data/cycleStorage';
 import { getWeightEntries, saveWeightEntry } from '../data/weightStorage';
@@ -97,21 +100,33 @@ export default function HomePage() {
   // uebernehmen. Alles still — schlaegt es fehl, sieht die Seite aus wie ohne.
   const [healthSteps, setHealthSteps] = useState(null);
   const [kcalVerbrannt, setKcalVerbrannt] = useState(null);
+  // Hochgezählt nach „Schritte zählen einschalten" auf der Karte, damit der
+  // Effekt sofort liest statt erst beim nächsten Start.
+  const [schrittQuelle, setSchrittQuelle] = useState(0);
+  const [schrittFehler, setSchrittFehler] = useState(null);
   useEffect(() => {
     const health = !!user?.id && istVerbunden(user.id);
     if (!user?.id || (!health && !schritteZaehlenAktiv())) {
       setHealthSteps(null); setKcalVerbrannt(null); return;
     }
     let alive = true;
-    schritteHeute(user.id).then((s) => { if (alive) setHealthSteps(s); });
+    // Jeder gelesene Tageswert geht ins eigene Protokoll (Verlauf auf /steps).
+    schritteHeute(user.id).then((s) => { if (alive) setHealthSteps(s); schritteProtokollieren(s, null); });
     if (!health) return () => { alive = false; };
-    verbrannteKcalHeute(user.id).then((k) => { if (alive) setKcalVerbrannt(k); });
+    verbrannteKcalHeute(user.id).then((k) => { if (alive) setKcalVerbrannt(k); schritteProtokollieren(null, k); });
     gewichtImportieren(user.id).then((n) => {
       // Frisch importierte Eintraege sollen den Verlauf sofort zeigen.
       if (alive && n > 0) loadDashboard(() => alive);
     });
     return () => { alive = false; };
-  }, [user?.id]);
+  }, [user?.id, schrittQuelle]);
+
+  async function schritteEinschalten() {
+    setSchrittFehler(null);
+    const r = await schritteZaehlenEinschalten();
+    if (r.ok) setSchrittQuelle((n) => n + 1);
+    else setSchrittFehler(r.grund);
+  }
 
   async function loadDashboard(isAlive = () => true) {
     try {
@@ -347,6 +362,48 @@ export default function HomePage() {
             </button>
           </div>
 
+          {/* Schritte (seit 1.6.3 eigene Karte; vorher eine graue Zeile in der
+              dunklen Heute-Karte, die niemand fand). Nur in der App — im
+              Browser gibt es weder Health noch einen Schrittzähler. Ohne
+              Quelle lädt die Karte zum Einschalten ein, statt zu fehlen. */}
+          {healthVerfuegbar() && (healthSteps !== null ? (
+            <button
+              onClick={() => navigate('/steps')}
+              className="karte relative overflow-hidden w-full p-4 text-start hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center gap-4">
+                <ProgressRing value={healthSteps} goal={schrittZiel()} zahl={false} size={64} stroke={8} />
+                <div className="min-w-0 flex-1">
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{t('steps.title')}</span>
+                  <p className="text-2xl font-extrabold text-slate-900 dark:text-white tabular-nums leading-tight">
+                    {healthSteps.toLocaleString(datumsLocale(lang))}
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    {[
+                      t('steps.ofGoal', { n: schrittZiel().toLocaleString(datumsLocale(lang)) }),
+                      kcalVerbrannt > 0
+                        ? t('home.kcalBurned', { n: kcalVerbrannt.toLocaleString(datumsLocale(lang)) })
+                        : null,
+                    ].filter(Boolean).join(' · ')}
+                  </p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-slate-300 rtl:-scale-x-100" />
+              </div>
+            </button>
+          ) : (
+            <div className="karte w-full p-4">
+              <p className="text-sm font-semibold text-slate-900 dark:text-white">{t('steps.title')}</p>
+              <p className="text-xs text-slate-400 mt-0.5 mb-3">{t('steps.enableText')}</p>
+              <button
+                onClick={schritteEinschalten}
+                className="w-full py-2.5 rounded-xl bg-primary-500 text-white text-sm font-semibold"
+              >
+                {t('steps.enable')}
+              </button>
+              {schrittFehler && <p className="text-xs text-rose-500 mt-2">{t('steps.enableFailed')}</p>}
+            </div>
+          ))}
+
           {/* Cycle Widget (female only) */}
           {showCycle && cyclePhase && (
             <button
@@ -416,15 +473,9 @@ export default function HomePage() {
                 <p className="text-[11px] text-slate-400 mt-1">
                   {[
                     t('home.workoutsToday', { count: dayWorkouts }),
-                    // Schritte aus Health und/oder dem eigenen Zaehler, verbrannte
-                    // kcal aus Health — nur mit Opt-in und lesbarem Wert.
-                    healthSteps !== null
-                      ? `${healthSteps.toLocaleString(datumsLocale(lang))} ${t('home.steps')}`
-                      : null,
-                    kcalVerbrannt > 0
-                      ? t('home.kcalBurned', { n: kcalVerbrannt.toLocaleString(datumsLocale(lang)) })
-                      : null,
-                  ].filter(Boolean).join(' · ')}
+                    // Schritte und verbrannte kcal stehen seit 1.6.3 in der
+                    // eigenen Schritte-Karte darüber.
+                  ].join(' · ')}
                 </p>
               </div>
               <span

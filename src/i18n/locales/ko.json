@@ -1642,5 +1642,21 @@
     "statsCurrent": "현재",
     "statsChange": "변화",
     "statsPerWeekWeight": "주당"
+  },
+  "steps": {
+    "title": "걸음 수",
+    "ofGoal": "/ {{n}}",
+    "enable": "걸음 수 세기 켜기",
+    "enableText": "FullRep은 휴대폰의 모션 센서로 걸음 수를 셉니다. Apple Health나 Health Connect가 필요 없습니다.",
+    "enableFailed": "허용되지 않았거나 걸음 수 센서가 없습니다. 휴대폰 설정에서 허용할 수 있습니다.",
+    "avgPerDay": "하루 평균",
+    "bestDay": "최고의 날 ({{datum}})",
+    "bestDayLabel": "최고의 날",
+    "goalReached": "목표 달성",
+    "kcalTotal": "소모 (활동)",
+    "goal": "하루 목표",
+    "goalHint": "카드와 기록에 적용",
+    "noSource": "아직 데이터 출처가 없습니다. 프로필에서 ‘걸음 수 세기’ 또는 Apple Health / Health Connect를 켜세요.",
+    "olderOnlyHealth": "이전 날짜는 Apple Health / Health Connect(프로필)에서만 볼 수 있습니다."
   }
 }
