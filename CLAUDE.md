@@ -55,7 +55,7 @@ Josef fand FullRep nicht unter „Widgets hinzufügen“ auf dem **Sperrbildschi
 | | Stand |
 |---|---|
 | iOS | **1.6.2 / Build 20 eingereicht**, Einreichung `67b15fcd-89c9-4b2d-b51f-6860afeef437`, `WAITING_FOR_REVIEW`. Ablauf: Build 19 zurückgezogen (`aufraeumen`), dann `lokalisieren`, `version-anlegen` (setzt das de-DE-„Neu“), `build 20`, `pruefnotiz`, `einreichen` |
-| Android | **vc28 von Play abgelehnt (403):** „You must let us know whether your app includes any health features“. Grund ist die neue Health-Berechtigung `READ_ACTIVE_CALORIES_BURNED`, also derselbe Henne-Ei-Ablauf wie am 03.09. Das AAB (`FullRep-1.6.2-vc28`, Lauf 41116771496) hat Josef im Chat bekommen. **Josef muss** es von Hand in den internen Test laden, im Gesundheitsformular `READ_ACTIVE_CALORIES_BURNED` begründen und danach die Produktion freigeben |
+| Android | **vc28 (1.6.2) auf `production`, an alle** (30.10. abends). Der erste API-Upload scheiterte mit 403 wegen der neuen Health-Berechtigung `READ_ACTIVE_CALORIES_BURNED`. Josef hat das AAB von Hand in den internen Test geladen und im Gesundheitsformular `ACTIVITY_RECOGNITION` und `READ_ACTIVE_CALORIES_BURNED` begründet. Danach ging `play-listing.yml` mit dem neuen Modus **`hochstufen`** (`version_code` 28, Lauf 41127585941) durch, Edit committet. ⚠ **Merksatz:** Nach dem Handupload in den internen Test und dem ausgefüllten Formular muss man nicht auf Googles Genehmigung warten. `hochstufen` hebt denselben versionCode sofort in die Produktion |
 
 ⚠ **Merksatz:** `PLA_NOT_ACCEPTED` heißt, ein Apple-Vertrag wartet auf Josef (ASC → Geschäftliches → Verträge). Und eine freigegebene Versionsnummer ist für neue Builds zu.
 
