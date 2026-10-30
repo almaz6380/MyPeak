@@ -42,7 +42,9 @@ Josef fand FullRep nicht unter „Widgets hinzufügen“ auf dem **Sperrbildschi
 | | Stand |
 |---|---|
 | Android | **vc27 (1.6.1) auf `production`, an alle** (`android-release` 40910636773, GitHub-Rechner), committet |
-| iOS | **Build 19 blockiert:** `ios-release` 40910615252 brach beim Profilabruf mit `403 FORBIDDEN_ERROR.PLA_NOT_ACCEPTED` ab. Josef muss in developer.apple.com die neue Program License Agreement annehmen, sonst geht kein ASC-API-Aufruf. Build 18 (Streak-Widget) bleibt bis dahin in der Prüfung, bewusst nicht zurückgezogen. Danach: Upload Build 19 → `aufraeumen` → `build 19` → `lokalisieren` → `pruefnotiz` → `einreichen` |
+| iOS | **1.6.2 (Build 19) eingereicht** am 30.10., Einreichung `7127a185-9289-47b3-8e89-521e39e9de63`, `WAITING_FOR_REVIEW`. Zuerst blockierte `403 PLA_NOT_ACCEPTED` (Josef hat in ASC → Geschäftliches → Verträge den neuen Vertrag angenommen), dann lehnte Apple 1.6.1 ab, weil 1.6.1 (Build 18, Streak-Widget) inzwischen **freigegeben** war → `MARKETING_VERSION` 1.6.2. Ablauf auf GitHub-Rechnern: `ios-release` 41110743425 → `version-anlegen 1.6.2` → `lokalisieren` → `build 19` → `pruefnotiz` → `einreichen` |
+
+⚠ **Merksatz:** `PLA_NOT_ACCEPTED` heißt, ein Apple-Vertrag wartet auf Josef (ASC → Geschäftliches → Verträge). Und eine freigegebene Versionsnummer ist für neue Builds zu.
 
 GitHub-Rechner laufen seit 29.10. wieder (Cron und Android grün), die Sperre ist also aufgehoben.
 
