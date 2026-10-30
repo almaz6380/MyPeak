@@ -1642,5 +1642,21 @@
     "statsCurrent": "当前",
     "statsChange": "变化",
     "statsPerWeekWeight": "每周"
+  },
+  "steps": {
+    "title": "步数",
+    "ofGoal": "/ {{n}}",
+    "enable": "开启计步",
+    "enableText": "FullRep 使用手机的运动传感器计算步数，无需 Apple Health 或 Health Connect。",
+    "enableFailed": "未获允许或没有计步器。可在手机设置中允许。",
+    "avgPerDay": "日均",
+    "bestDay": "最佳一天（{{datum}}）",
+    "bestDayLabel": "最佳一天",
+    "goalReached": "达成目标",
+    "kcalTotal": "消耗（活动）",
+    "goal": "每日目标",
+    "goalHint": "用于卡片和历史记录",
+    "noSource": "还没有数据来源：请在个人资料中开启“自己计步”或 Apple Health / Health Connect。",
+    "olderOnlyHealth": "更早的日期仅在开启 Apple Health / Health Connect（个人资料）后可见。"
   }
 }

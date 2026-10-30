@@ -112,3 +112,43 @@ export function gewichtsTrend(eintraege, abDatum) {
     proWocheKg: tage >= 7 ? Math.round((aenderung / tage) * 7 * 100) / 100 : null,
   };
 }
+
+// Schritte je Tag aus mehreren Quellen (Health, Geräte-Zähler, eigenes
+// Protokoll) zu EINER Liste verschmelzen: je Tag das Höchste, weil jede Quelle
+// höchstens unterschätzt (Health ohne Uhr, Gerät erst ab Freigabe). Liefert
+// genau `tage` Einträge bis einschließlich `heute`, fehlende Tage mit null.
+export function schritteVerschmelzen(quellen, tage, heute = new Date()) {
+  const schritte = new Map();
+  const kcal = new Map();
+  for (const quelle of quellen || []) {
+    for (const e of quelle || []) {
+      if (!e?.datum) continue;
+      if (Number.isFinite(e.schritte)) schritte.set(e.datum, Math.max(schritte.get(e.datum) ?? 0, e.schritte));
+      if (Number.isFinite(e.kcal)) kcal.set(e.datum, Math.max(kcal.get(e.datum) ?? 0, e.kcal));
+    }
+  }
+  const mittag = new Date(heute.getFullYear(), heute.getMonth(), heute.getDate(), 12);
+  const liste = [];
+  for (let i = tage - 1; i >= 0; i -= 1) {
+    const datum = toLocalDateString(verschoben(mittag, -i));
+    liste.push({ datum, schritte: schritte.get(datum) ?? null, kcal: kcal.get(datum) ?? null });
+  }
+  return liste;
+}
+
+// Kennzahlen zum Schritte-Verlauf. Tage ohne Wert zählen nicht in den Schnitt —
+// „nicht gemessen" ist etwas anderes als „nicht gegangen".
+export function schrittAuswertung(verlauf, ziel) {
+  const gemessen = (verlauf || []).filter((t) => Number.isFinite(t.schritte));
+  const summe = gemessen.reduce((s, t) => s + t.schritte, 0);
+  const bester = gemessen.reduce((b, t) => (!b || t.schritte > b.schritte ? t : b), null);
+  const kcal = (verlauf || []).reduce((s, t) => s + (Number.isFinite(t.kcal) ? t.kcal : 0), 0);
+  return {
+    tageGemessen: gemessen.length,
+    schnitt: gemessen.length ? Math.round(summe / gemessen.length) : 0,
+    summe,
+    bester,
+    zielErreicht: ziel > 0 ? gemessen.filter((t) => t.schritte >= ziel).length : 0,
+    kcalSumme: Math.round(kcal),
+  };
+}

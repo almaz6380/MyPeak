@@ -132,6 +132,7 @@ public class SchrittePlugin: CAPPlugin, CAPBridgedPlugin {
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "heute", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "erlauben", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "verlauf", returnType: CAPPluginReturnPromise),
     ]
 
     private let pedometer = CMPedometer()
@@ -159,6 +160,43 @@ public class SchrittePlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
         abfragen { schritte in call.resolve(self.antwort(schritte)) }
+    }
+
+    /// Tageswerte der letzten `tage` Tage. Core Motion haelt nur 7 Tage vor,
+    /// aeltere Tage fehlen in der Antwort (der Verlauf nimmt dann Health bzw.
+    /// das eigene Protokoll der App).
+    @objc func verlauf(_ call: CAPPluginCall) {
+        guard status() == "erlaubt" else {
+            call.resolve(["tage": []])
+            return
+        }
+        let tage = min(max(call.getInt("tage") ?? 7, 1), 7)
+        let kalender = Calendar.current
+        let heute = kalender.startOfDay(for: Date())
+        let format = DateFormatter()
+        format.calendar = Calendar(identifier: .gregorian)
+        format.locale = Locale(identifier: "en_US_POSIX")
+        format.dateFormat = "yyyy-MM-dd"
+
+        let gruppe = DispatchGroup()
+        let sperre = NSLock()
+        var liste: [[String: Any]] = []
+        for i in 0..<tage {
+            guard let start = kalender.date(byAdding: .day, value: -i, to: heute),
+                  let ende = kalender.date(byAdding: .day, value: 1, to: start) else { continue }
+            gruppe.enter()
+            pedometer.queryPedometerData(from: start, to: min(ende, Date())) { daten, _ in
+                if let n = daten?.numberOfSteps.intValue {
+                    sperre.lock()
+                    liste.append(["datum": format.string(from: start), "schritte": n])
+                    sperre.unlock()
+                }
+                gruppe.leave()
+            }
+        }
+        gruppe.notify(queue: .main) {
+            call.resolve(["tage": liste])
+        }
     }
 
     private func antwort(_ schritte: Int?) -> [String: Any] {

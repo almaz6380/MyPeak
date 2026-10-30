@@ -1647,5 +1647,21 @@
     "statsCurrent": "الحالي",
     "statsChange": "التغيّر",
     "statsPerWeekWeight": "أسبوعيًا"
+  },
+  "steps": {
+    "title": "الخطوات",
+    "ofGoal": "من {{n}}",
+    "enable": "تشغيل عدّ الخطوات",
+    "enableText": "يعدّ FullRep خطواتك بمستشعر الحركة في هاتفك، دون Apple Health أو Health Connect.",
+    "enableFailed": "غير مسموح أو لا يوجد عدّاد خطوات. يمكنك السماح بذلك من إعدادات الهاتف.",
+    "avgPerDay": "المتوسط اليومي",
+    "bestDay": "أفضل يوم ({{datum}})",
+    "bestDayLabel": "أفضل يوم",
+    "goalReached": "تحقّق الهدف",
+    "kcalTotal": "المحروق (نشط)",
+    "goal": "الهدف اليومي",
+    "goalHint": "للبطاقة والسجل",
+    "noSource": "لا يوجد مصدر بعد: فعّل «عدّ الخطوات» أو Apple Health / Health Connect من ملفك الشخصي.",
+    "olderOnlyHealth": "الأيام الأقدم متاحة فقط مع Apple Health / Health Connect (الملف الشخصي)."
   }
 }

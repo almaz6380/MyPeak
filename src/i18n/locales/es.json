@@ -1643,5 +1643,21 @@
     "statsCurrent": "Actual",
     "statsChange": "Cambio",
     "statsPerWeekWeight": "por semana"
+  },
+  "steps": {
+    "title": "Pasos",
+    "ofGoal": "de {{n}}",
+    "enable": "Activar el conteo de pasos",
+    "enableText": "FullRep cuenta tus pasos con el sensor de movimiento de tu móvil, sin Apple Health ni Health Connect.",
+    "enableFailed": "No permitido o no hay contador de pasos. Puedes permitirlo en los ajustes del móvil.",
+    "avgPerDay": "Media diaria",
+    "bestDay": "Mejor día ({{datum}})",
+    "bestDayLabel": "Mejor día",
+    "goalReached": "Objetivo alcanzado",
+    "kcalTotal": "Quemadas (activas)",
+    "goal": "Objetivo diario",
+    "goalHint": "Para la tarjeta y el historial",
+    "noSource": "Aún no hay fuente: activa «Contar pasos» o Apple Health / Health Connect en tu perfil.",
+    "olderOnlyHealth": "Los días anteriores solo están disponibles con Apple Health / Health Connect (perfil)."
   }
 }

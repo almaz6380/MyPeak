@@ -1643,5 +1643,21 @@
     "statsCurrent": "Current",
     "statsChange": "Change",
     "statsPerWeekWeight": "per week"
+  },
+  "steps": {
+    "title": "Steps",
+    "ofGoal": "of {{n}}",
+    "enable": "Turn on step counting",
+    "enableText": "FullRep counts your steps with your phone's motion sensor – no Apple Health or Health Connect needed.",
+    "enableFailed": "Not allowed or no step counter. You can allow it in your phone's settings.",
+    "avgPerDay": "Avg per day",
+    "bestDay": "Best day ({{datum}})",
+    "bestDayLabel": "Best day",
+    "goalReached": "Goal reached",
+    "kcalTotal": "Burned (active)",
+    "goal": "Daily goal",
+    "goalHint": "Used for the card and history",
+    "noSource": "No source yet: turn on “Count steps” or Apple Health / Health Connect in your profile.",
+    "olderOnlyHealth": "Older days are only available with Apple Health / Health Connect (profile)."
   }
 }

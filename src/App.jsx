@@ -20,6 +20,7 @@ import ProgressPhotosPage from './pages/progress/ProgressPhotosPage';
 import CoachPage from './pages/CoachPage';
 import MealPlanPage from './pages/nutrition/MealPlanPage';
 import StatsPage from './pages/StatsPage';
+import StepsPage from './pages/StepsPage';
 import AuthPage from './pages/auth/AuthPage';
 import UpdatePasswordPage from './pages/auth/UpdatePasswordPage';
 import OnboardingPage from './pages/onboarding/OnboardingPage';
@@ -114,6 +115,7 @@ function AppRoutes() {
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/cycle" element={<CycleDetailPage onBack={() => window.history.back()} />} />
       <Route path="/progress" element={<ProgressPhotosPage />} />
+      <Route path="/steps" element={<StepsPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
