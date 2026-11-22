@@ -1,5 +1,53 @@
 import { corsBehandeln } from './_cors.js';
 import { apiSprache } from './_sprache.js';
+import { sbFetch } from './_premium.js';
+
+// ── Tageskontingent fuer die Foto-Analyse (seit 11/2026) ──────────
+// Bis dahin war das Mahlzeit-Foto fuer jedes Konto unbegrenzt — jeder Aufruf
+// kostet einen Gemini-Bildaufruf, und ein einzelnes Konto konnte beliebig
+// viele ausloesen. Gratis bleibt die Funktion, aber gedeckelt; Premium und
+// Testphase bekommen deutlich mehr.
+//
+// FAIL-OPEN, anders als die Anmeldung: Ist die Tabelle `photo_usage` (noch)
+// nicht da oder Supabase nicht erreichbar, laeuft die Analyse wie bisher.
+// Ein Zaehler, der klemmt, darf eine funktionierende Funktion nicht abschalten
+// — und so kann der Code vor der Migration ausgerollt werden.
+export const FOTO_LIMIT_GRATIS = 3;
+export const FOTO_LIMIT_PREMIUM = 30;
+
+const heuteUTC = () => new Date().toISOString().slice(0, 10);
+
+// Liefert { limit, benutzt } oder null (= nicht pruefbar, durchlassen).
+async function fotoKontingent(supabaseUrl, serviceKey, userId, datum) {
+  if (!serviceKey || !userId) return null;
+  try {
+    const [subRes, nutzRes] = await Promise.all([
+      sbFetch(supabaseUrl, serviceKey, `subscriptions?user_id=eq.${userId}&select=trial_ends_at,premium_until`),
+      sbFetch(supabaseUrl, serviceKey, `photo_usage?user_id=eq.${userId}&date=eq.${datum}&select=count`),
+    ]);
+    if (!nutzRes.ok) return null;
+    const sub = (subRes.ok ? await subRes.json() : [])[0] || {};
+    const jetzt = Date.now();
+    const premium = [sub.premium_until, sub.trial_ends_at]
+      .some((d) => d && new Date(d).getTime() > jetzt);
+    const benutzt = (await nutzRes.json())[0]?.count || 0;
+    return { limit: premium ? FOTO_LIMIT_PREMIUM : FOTO_LIMIT_GRATIS, benutzt, premium };
+  } catch {
+    return null;
+  }
+}
+
+async function fotoZaehlen(supabaseUrl, serviceKey, userId, datum, benutzt) {
+  try {
+    await sbFetch(supabaseUrl, serviceKey, 'photo_usage', {
+      method: 'POST',
+      headers: { Prefer: 'resolution=merge-duplicates' },
+      body: JSON.stringify({ user_id: userId, date: datum, count: benutzt + 1, updated_at: new Date().toISOString() }),
+    });
+  } catch (err) {
+    console.error('Foto-Kontingent nicht hochgezaehlt (nicht fatal):', err?.message);
+  }
+}
 
 // ── Prompt je Sprache ─────────────────────────────────────────────
 //
@@ -270,6 +318,17 @@ export default async function handler(req, res) {
     return res.status(413).json({ error: 'Image too large. Please use a compressed image under 3MB.' });
   }
 
+  // Kontingent VOR dem Modellaufruf pruefen — sonst kostet auch die
+  // abgewiesene Anfrage Geld.
+  let userId = null;
+  try { userId = (await userRes.json())?.id || null; } catch { /* ohne Kennung kein Zaehler */ }
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const datum = heuteUTC();
+  const kontingent = await fotoKontingent(supabaseUrl, serviceKey, userId, datum);
+  if (kontingent && kontingent.benutzt >= kontingent.limit) {
+    return res.status(429).json({ error: 'quota_exceeded', limit: kontingent.limit, premium: kontingent.premium });
+  }
+
   const prompt = mahlzeitPrompt(apiSprache(language));
 
   // ⚠ Modellname synchron mit api/coach.js halten und NIE raten — mit
@@ -351,6 +410,11 @@ export default async function handler(req, res) {
         return res.status(422).json({ error: 'Could not parse AI response' });
       }
 
+      // Gezaehlt wird nur, was wirklich etwas erkannt hat — ein Foto ohne
+      // Essen soll kein Kontingent kosten.
+      if (kontingent && !parsed?.error) {
+        await fotoZaehlen(supabaseUrl, serviceKey, userId, datum, kontingent.benutzt);
+      }
       return res.status(200).json(parsed);
     } catch (err) {
       lastError = err;

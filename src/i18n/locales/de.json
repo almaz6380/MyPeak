@@ -1590,7 +1590,9 @@
     "yourDailyCalorieAndMacroGoals": "Deine täglichen Kalorien- und Makro-Ziele werden auf folgende Werte gesetzt:",
     "trialFreeNoAutoRenew": "{{TRIAL_DAYS}} Tage kostenlos testen. Die Testphase endet automatisch und wird nicht zu einem bezahlten Abo – keine Zahlung, keine Kündigung nötig.",
     "subscriptionDisclosure": "FullRep Premium ist ein Abo mit automatischer Verlängerung: {{preis}} pro {{zeitraum}}. Bezahlt wird bei Bestätigung des Kaufs über dein {{store}}-Konto. Das Abo verlängert sich automatisch um denselben Zeitraum zum dann gültigen Preis, wenn du es nicht mindestens 24 Stunden vor Ende des laufenden Zeitraums kündigst. Verwalten und kündigen kannst du es jederzeit in den Einstellungen deines {{store}}-Kontos.",
-    "termsOfUseEula": "Nutzungsbedingungen (EULA)"
+    "termsOfUseEula": "Nutzungsbedingungen (EULA)",
+    "photoQuotaFree": "Die kostenlosen Foto-Analysen für heute sind aufgebraucht. Morgen geht es weiter – oder ohne Tagesgrenze mit Premium.",
+    "photoQuotaPremium": "Für heute sind alle Foto-Analysen aufgebraucht. Morgen geht es weiter."
   },
   "premium": {
     "aiUnavailable": "Die KI ist gerade nicht erreichbar. Bitte versuche es gleich noch einmal.",

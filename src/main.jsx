@@ -8,7 +8,6 @@ import { AuthProvider } from './context/AuthContext'
 import { SubscriptionProvider } from './context/SubscriptionContext'
 import ErrorBoundary from './components/ErrorBoundary'
 import App from './App.jsx'
-import { initAds } from './lib/ads'
 
 // ⚠ VOR dem Rendern. Gemessen am 20.09.2026: Wirft der Supabase-Client beim
 // Start (etwa weil die Umgebungsvariablen fehlen), bleibt die Seite weiss —
@@ -34,9 +33,8 @@ spracheBereit.finally(() => createRoot(document.getElementById('root')).render(
   </StrictMode>,
 ))
 
-// Werbung (nur nativ) initialisieren — inkl. DSGVO-Einwilligung.
-// Verzögert, damit der App-Start nicht blockiert wird.
-setTimeout(() => { initAds(); }, 1500);
+// Werbung (nur nativ) startet der SubscriptionContext — erst nach dem
+// Onboarding und nur ohne Premium (lib/ads.js, `werbungDarfStarten`).
 
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {

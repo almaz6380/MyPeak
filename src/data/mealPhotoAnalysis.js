@@ -65,6 +65,9 @@ export async function analyzeMealPhoto(base64Image, language = 'de') {
         throw new Error('image_too_large');
       }
       if (response.status === 429) {
+        // Zwei verschiedene 429: das eigene Tageskontingent (warten hilft heute
+        // nicht mehr) und Googles Rate-Limit (gleich noch einmal versuchen).
+        if (err.error === 'quota_exceeded') throw new Error(err.premium ? 'photo_quota_premium' : 'photo_quota');
         throw new Error('rate_limit');
       }
       if (response.status === 502) {

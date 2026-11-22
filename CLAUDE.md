@@ -20,6 +20,16 @@ Chinesisch (vereinfacht) — **vollständig**, Oberfläche wie Inhaltsbibliothek
 
 ## Aktueller Stand
 
+### Für das nächste Update vorbereitet: Werbe-Technik + Foto-Kontingent (22.11.2026)
+
+Code auf `claude/optimistic-darwin-k01rmb`. **Nicht gebaut, nicht gemergt, Migration nicht eingespielt**, Versionen stehen noch auf 1.6.3.
+
+- **Vollbildwerbung wird vorgeladen** (`ladeVor()` in `src/lib/ads.js`). Vorher lud sie erst beim Auslösen und platzte Sekunden später in den nächsten Bildschirm. Ist keine Anzeige geladen, entfällt die Einblendung und zählt nicht gegen Abstand und Sitzungsdeckel. `maybeShowInterstitial()` meldet jetzt, ob wirklich eine lief.
+- **Das Anzeigen-SDK startet nicht mehr pauschal 1,5 s nach dem App-Start**, sondern aus dem `SubscriptionContext`, sobald Onboarding fertig, Abo-Stand gelesen und kein Premium (`werbungDarfStarten`). Kein Werbe-Einwilligungsdialog mehr im Onboarding oder für Premium. „Werbe-Einwilligung ändern“ im Profil startet das SDK bei Bedarf selbst.
+- **Mahlzeit-Foto hat ein Tageskontingent** (`api/analyze-meal.js`): gratis 3, Premium/Testphase 30 (`FOTO_LIMIT_*`). Antwort `429 quota_exceeded`; die App zeigt `ui.photoQuotaFree` (mit Knopf zur Paywall) bzw. `ui.photoQuotaPremium`, beide ×13. Gezählt wird nur eine gelungene Analyse.
+  - Tabelle `photo_usage`, Migration **`20261122120000_photo_usage.sql`**. ⚠ **Der Endpunkt ist fail-open:** Ohne die Tabelle läuft alles wie bisher, gedeckelt wird erst nach dem Einspielen.
+- **Offen: Belohnungsvideo** (eine Coach-Frage bzw. ein Nährwert-Scan per Video für Gratis-Nutzer). Dafür müssen in AdMob zuerst zwei Anzeigenblöcke vom Typ „Belohnt“ angelegt werden (iOS + Android).
+
 ### Version 1.6.3 (iOS Build 21 / Android vc29): Schritte-Karte + Verlauf (30.10.2026)
 
 Josef fand die Schritte nicht: Sie standen nur als graue Zeile in der dunklen Heute-Karte.

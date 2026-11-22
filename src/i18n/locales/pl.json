@@ -1595,7 +1595,9 @@
     "yourDailyCalorieAndMacroGoals": "Twoje dzienne cele kaloryczne i makroskładników zostaną ustawione na:",
     "trialFreeNoAutoRenew": "Wypróbuj za darmo przez {{TRIAL_DAYS}} dni. Okres próbny kończy się automatycznie i nie zamienia się w płatną subskrypcję – bez płatności, nic nie trzeba anulować.",
     "subscriptionDisclosure": "FullRep Premium to automatycznie odnawiana subskrypcja: {{preis}} za {{zeitraum}}. Płatność zostanie pobrana z twojego konta {{store}} po potwierdzeniu zakupu. Subskrypcja odnawia się automatycznie na ten sam okres po aktualnej cenie, chyba że anulujesz ją co najmniej 24 godziny przed końcem bieżącego okresu. Możesz nią zarządzać i anulować ją w każdej chwili w ustawieniach konta {{store}}.",
-    "termsOfUseEula": "Warunki korzystania (EULA)"
+    "termsOfUseEula": "Warunki korzystania (EULA)",
+    "photoQuotaFree": "Darmowe analizy zdjęć na dziś zostały wykorzystane. Jutro będą kolejne – albo kontynuuj z Premium.",
+    "photoQuotaPremium": "Wszystkie analizy zdjęć na dziś zostały wykorzystane. Jutro będą kolejne."
   },
   "premium": {
     "aiUnavailable": "AI jest w tej chwili niedostępna. Spróbuj ponownie za chwilę.",

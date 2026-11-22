@@ -1589,7 +1589,9 @@
     "yourDailyCalorieAndMacroGoals": "1日のカロリーとマクロの目標は次のように設定されます：",
     "trialFreeNoAutoRenew": "{{TRIAL_DAYS}}日間無料でお試しいただけます。トライアルは自動で終了し、有料サブスクリプションには移行しません。支払いも解約手続きも不要です。",
     "subscriptionDisclosure": "FullRepプレミアムは自動更新のサブスクリプションです：{{preis}}／{{zeitraum}}。お支払いは購入確定時に{{store}}アカウントに請求されます。現在の期間が終了する24時間以上前に解約しない限り、サブスクリプションはその時点の価格で同じ期間ごとに自動更新されます。{{store}}アカウントの設定からいつでも管理・解約できます。",
-    "termsOfUseEula": "利用規約（EULA）"
+    "termsOfUseEula": "利用規約（EULA）",
+    "photoQuotaFree": "本日の無料の写真解析は上限に達しました。明日また利用できます。プレミアムならすぐに続けられます。",
+    "photoQuotaPremium": "本日の写真解析は上限に達しました。明日また利用できます。"
   },
   "premium": {
     "aiUnavailable": "現在AIに接続できません。しばらくしてからもう一度お試しください。",

@@ -1593,7 +1593,9 @@
     "yourDailyCalorieAndMacroGoals": "I tuoi obiettivi giornalieri di calorie e macro verranno impostati su:",
     "trialFreeNoAutoRenew": "Provalo gratis per {{TRIAL_DAYS}} giorni. La prova termina automaticamente e non si trasforma in un abbonamento a pagamento – nessun pagamento, niente da disdire.",
     "subscriptionDisclosure": "FullRep Premium è un abbonamento a rinnovo automatico: {{preis}} ogni {{zeitraum}}. Il pagamento viene addebitato sul tuo account {{store}} alla conferma dell’acquisto. L’abbonamento si rinnova automaticamente per lo stesso periodo al prezzo in vigore in quel momento, a meno che tu non lo disdica almeno 24 ore prima della fine del periodo in corso. Puoi gestirlo e disdirlo in qualsiasi momento nelle impostazioni del tuo account {{store}}.",
-    "termsOfUseEula": "Condizioni d’uso (EULA)"
+    "termsOfUseEula": "Condizioni d’uso (EULA)",
+    "photoQuotaFree": "Hai usato le analisi foto gratuite di oggi. Domani ne avrai altre, oppure continua con Premium.",
+    "photoQuotaPremium": "Hai usato tutte le analisi foto di oggi. Domani ne avrai altre."
   },
   "premium": {
     "aiUnavailable": "L’IA non è raggiungibile al momento. Riprova tra poco.",
