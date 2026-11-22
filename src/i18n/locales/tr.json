@@ -1591,7 +1591,9 @@
     "yourDailyCalorieAndMacroGoals": "Günlük kalori ve makro hedeflerin şöyle ayarlanacak:",
     "trialFreeNoAutoRenew": "{{TRIAL_DAYS}} gün ücretsiz dene. Deneme süresi kendiliğinden sona erer ve ücretli bir aboneliğe dönüşmez – ödeme yok, iptal edilecek bir şey yok.",
     "subscriptionDisclosure": "FullRep Premium otomatik yenilenen bir aboneliktir: {{preis}} / {{zeitraum}}. Ödeme, satın alma onaylandığında {{store}} hesabından tahsil edilir. Mevcut dönemin bitiminden en az 24 saat önce iptal etmezsen abonelik aynı süre için o anki geçerli fiyattan otomatik olarak yenilenir. Aboneliği istediğin zaman {{store}} hesap ayarlarından yönetebilir ve iptal edebilirsin.",
-    "termsOfUseEula": "Kullanım Koşulları (EULA)"
+    "termsOfUseEula": "Kullanım Koşulları (EULA)",
+    "photoQuotaFree": "Bugünkü ücretsiz fotoğraf analizlerini kullandın. Yarın devam edebilirsin – ya da Premium ile hemen sürdür.",
+    "photoQuotaPremium": "Bugünkü tüm fotoğraf analizlerini kullandın. Yarın devam edebilirsin."
   },
   "premium": {
     "aiUnavailable": "Yapay zekâya şu anda ulaşılamıyor. Lütfen birazdan tekrar dene.",

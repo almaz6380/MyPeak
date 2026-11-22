@@ -1589,7 +1589,9 @@
     "yourDailyCalorieAndMacroGoals": "你的每日热量和宏量营养素目标将设为：",
     "trialFreeNoAutoRenew": "免费试用 {{TRIAL_DAYS}} 天。试用期结束后自动终止，不会转为付费订阅——无需付款，也无需取消。",
     "subscriptionDisclosure": "FullRep Premium 是自动续订的订阅：每{{zeitraum}} {{preis}}。确认购买时将从你的 {{store}} 账户扣款。除非你在当前周期结束前至少 24 小时取消，否则订阅会按当时的价格自动续订相同周期。你可以随时在 {{store}} 账户设置中管理和取消订阅。",
-    "termsOfUseEula": "使用条款（EULA）"
+    "termsOfUseEula": "使用条款（EULA）",
+    "photoQuotaFree": "今天的免费照片分析次数已用完。明天可继续使用，或升级高级版立即继续。",
+    "photoQuotaPremium": "今天的照片分析次数已用完。明天可继续使用。"
   },
   "premium": {
     "aiUnavailable": "AI 暂时无法连接，请稍后再试。",

@@ -231,4 +231,63 @@ describe('/api/analyze-meal', () => {
       expect(res.body.error).toBe('ai_unavailable');
     });
   });
+  // Tageskontingent (seit 11/2026): gratis 3 Fotos, Premium/Testphase 30.
+  describe('Tageskontingent', () => {
+    const abo = (zeile) => ({
+      match: (url) => url.includes('/rest/v1/subscriptions'),
+      respond: () => jsonResponse(zeile ? [zeile] : []),
+    });
+    const zaehler = (count, status = 200) => ({
+      match: (url, init) => url.includes('/rest/v1/photo_usage') && (init?.method || 'GET') === 'GET',
+      respond: () => (status === 200 ? jsonResponse(count === null ? [] : [{ count }]) : textResponse('fehlt', status)),
+    });
+    const schreiben = {
+      match: (url, init) => url.includes('/rest/v1/photo_usage') && init?.method === 'POST',
+      respond: () => jsonResponse({}, 201),
+    };
+    const morgen = new Date(Date.now() + 86_400_000).toISOString();
+
+    it('weist das 4. Foto eines Gratis-Kontos ab — ohne Modellaufruf', async () => {
+      setEnv(ENV_FULL);
+      const fetchMock = installFetch([authRoute(), abo(null), zaehler(3), geminiText(ANTWORT)]);
+      const res = makeRes();
+      await handler(angemeldet(), res);
+      expect(res.statusCode).toBe(429);
+      expect(res.body).toEqual({ error: 'quota_exceeded', limit: 3, premium: false });
+      expectNoModelCall(fetchMock);
+    });
+
+    it('lässt Premium über die Gratis-Grenze hinaus', async () => {
+      setEnv(ENV_FULL);
+      installFetch([authRoute(), abo({ premium_until: morgen }), zaehler(3), schreiben, geminiText(ANTWORT)]);
+      const res = makeRes();
+      await handler(angemeldet(), res);
+      expect(res.statusCode).toBe(200);
+    });
+
+    it('zählt eine gelungene Analyse hoch', async () => {
+      setEnv(ENV_FULL);
+      const fetchMock = installFetch([authRoute(), abo(null), zaehler(1), schreiben, geminiText(ANTWORT)]);
+      await handler(angemeldet(), makeRes());
+      const post = fetchMock.to('photo_usage').find((c) => c.init.method === 'POST');
+      expect(post.body.count).toBe(2);
+    });
+
+    it('zählt ein Foto ohne Essen nicht', async () => {
+      setEnv(ENV_FULL);
+      const fetchMock = installFetch([authRoute(), abo(null), zaehler(0), geminiText('{"error":"no_food_detected"}')]);
+      const res = makeRes();
+      await handler(angemeldet(), res);
+      expect(res.statusCode).toBe(200);
+      expect(fetchMock.to('photo_usage').some((c) => c.init.method === 'POST')).toBe(false);
+    });
+
+    it('läuft weiter, wenn die Tabelle fehlt (fail-open)', async () => {
+      setEnv(ENV_FULL);
+      installFetch([authRoute(), abo(null), zaehler(null, 404), geminiText(ANTWORT)]);
+      const res = makeRes();
+      await handler(angemeldet(), res);
+      expect(res.statusCode).toBe(200);
+    });
+  });
 });

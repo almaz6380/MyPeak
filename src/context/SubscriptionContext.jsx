@@ -1,22 +1,25 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { getSubscription, startTrial as startTrialStorage, computeAccess } from '../data/subscriptionStorage';
-import { setAdsPremiumStatus } from '../lib/ads';
+import { setAdsPremiumStatus, initAds, werbungDarfStarten } from '../lib/ads';
 import PaywallPage from '../pages/PaywallPage';
 
 const SubscriptionContext = createContext();
 
 export function SubscriptionProvider({ children }) {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [sub, setSub] = useState(null);
+  // Für welchen Nutzer der Abo-Stand schon gelesen ist — vorher ist „kein
+  // Premium“ nur „noch nicht bekannt“, und die Werbung darf nicht starten.
+  const [subGeladenFuer, setSubGeladenFuer] = useState(null);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [paywallReason, setPaywallReason] = useState(null);
 
   // Abo-Status laden, sobald ein Nutzer da ist (auch Gast).
   useEffect(() => {
-    if (!user?.id) { setSub(null); return; }
+    if (!user?.id) { setSub(null); setSubGeladenFuer(null); return; }
     let active = true;
-    getSubscription(user.id).then((s) => { if (active) setSub(s); });
+    getSubscription(user.id).then((s) => { if (active) { setSub(s); setSubGeladenFuer(user.id); } });
     return () => { active = false; };
   }, [user?.id]);
 
@@ -33,6 +36,19 @@ export function SubscriptionProvider({ children }) {
   useEffect(() => {
     setAdsPremiumStatus(access.isPremium);
   }, [access.isPremium]);
+
+  // Werbung samt Einwilligungsdialog erst starten, wenn klar ist, dass sie
+  // gebraucht wird: Onboarding fertig und kein Premium. Kurz verzögert, damit
+  // der Dialog nicht in den Aufbau der Startseite fällt.
+  const onboardingFertig = Boolean(profile?.onboarding_completed);
+  const aboGeladen = Boolean(user?.id) && subGeladenFuer === user?.id;
+  useEffect(() => {
+    if (!werbungDarfStarten({
+      nutzerDa: Boolean(user?.id), aboGeladen, premium: access.isPremium, onboardingFertig,
+    })) return undefined;
+    const uhr = setTimeout(() => { initAds(); }, 1500);
+    return () => clearTimeout(uhr);
+  }, [user?.id, aboGeladen, access.isPremium, onboardingFertig]);
 
   const startTrial = useCallback(async () => {
     if (!user?.id) return null;

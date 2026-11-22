@@ -1559,7 +1559,9 @@
     "yourDailyCalorieAndMacroGoals": "Suas metas diárias de calorias e macros serão definidas como:",
     "trialFreeNoAutoRenew": "Experimente grátis por {{TRIAL_DAYS}} dias. O teste termina automaticamente e não vira uma assinatura paga – sem pagamento e sem nada para cancelar.",
     "subscriptionDisclosure": "O FullRep Premium é uma assinatura com renovação automática: {{preis}} por {{zeitraum}}. O pagamento é cobrado na sua conta {{store}} ao confirmar a compra. A assinatura é renovada automaticamente pelo mesmo período, pelo preço vigente na época, a menos que você a cancele pelo menos 24 horas antes do fim do período atual. Você pode gerenciá-la e cancelá-la a qualquer momento nas configurações da sua conta {{store}}.",
-    "termsOfUseEula": "Termos de uso (EULA)"
+    "termsOfUseEula": "Termos de uso (EULA)",
+    "photoQuotaFree": "Você usou as análises de foto gratuitas de hoje. Amanhã tem mais – ou continue com o Premium.",
+    "photoQuotaPremium": "Você usou todas as análises de foto de hoje. Amanhã tem mais."
   },
   "planBuilder": {
     "title": "Criar plano semanal",

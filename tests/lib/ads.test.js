@@ -11,6 +11,8 @@ const {
   INTERSTITIAL_MIN_GAP_MS,
   INTERSTITIAL_START_SPERRE_MS,
   INTERSTITIAL_MAX_PRO_SITZUNG,
+  werbungDarfStarten,
+  maybeShowInterstitial,
 } = await import('../../src/lib/ads.js');
 
 const START = 1_000_000;
@@ -39,5 +41,35 @@ describe('interstitialErlaubt', () => {
     const jetzt = START + 10 * 60_000;
     expect(interstitialErlaubt({ ...basis, gezeigt: INTERSTITIAL_MAX_PRO_SITZUNG - 1, jetzt })).toBe(true);
     expect(interstitialErlaubt({ ...basis, gezeigt: INTERSTITIAL_MAX_PRO_SITZUNG, jetzt })).toBe(false);
+  });
+});
+
+describe('werbungDarfStarten', () => {
+  const alles = { nutzerDa: true, aboGeladen: true, premium: false, onboardingFertig: true };
+
+  it('startet für Gratis-Nutzer nach dem Onboarding', () => {
+    expect(werbungDarfStarten(alles)).toBe(true);
+  });
+
+  it('nicht im Onboarding — dort gehört kein Werbe-Einwilligungsdialog hin', () => {
+    expect(werbungDarfStarten({ ...alles, onboardingFertig: false })).toBe(false);
+  });
+
+  it('nicht für Premium', () => {
+    expect(werbungDarfStarten({ ...alles, premium: true })).toBe(false);
+  });
+
+  it('nicht, solange der Abo-Stand noch nicht gelesen ist', () => {
+    expect(werbungDarfStarten({ ...alles, aboGeladen: false })).toBe(false);
+  });
+
+  it('nicht ohne Nutzer (Anmeldeseite)', () => {
+    expect(werbungDarfStarten({ ...alles, nutzerDa: false })).toBe(false);
+  });
+});
+
+describe('maybeShowInterstitial ohne Plugin', () => {
+  it('meldet „nichts gezeigt“ und löst auf', async () => {
+    expect(await maybeShowInterstitial()).toBe(false);
   });
 });

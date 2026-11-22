@@ -3,10 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Camera, RotateCcw, Sparkles, Loader2 } from 'lucide-react';
 import OilLevelPicker from '../../components/OilLevelPicker';
 import MealAnalysisResult from './MealAnalysisResult';
+import { useSubscription } from '../../context/SubscriptionContext';
 import { compressMealPhoto, analyzeMealPhoto, applyOilAdjustment } from '../../data/mealPhotoAnalysis';
 
 export default function MealPhotoCapture({ onClose, onAddItems, language = 'de' }) {
   const { t, i18n } = useTranslation();
+  const { openPaywall } = useSubscription();
   const lang = i18n.language || language;
   const fileInputRef = useRef(null);
 
@@ -137,6 +139,10 @@ export default function MealPhotoCapture({ onClose, onAddItems, language = 'de' 
                       ? (t('ui.requestTimedOutPleaseTryAgain'))
                       : error === 'image_too_large'
                         ? (t('ui.imageTooLargePleaseUseA'))
+                        : error === 'photo_quota'
+                          ? t('ui.photoQuotaFree')
+                        : error === 'photo_quota_premium'
+                          ? t('ui.photoQuotaPremium')
                         : error === 'rate_limit'
                           ? (t('ui.tooManyRequestsPleaseWaitA'))
                           : error === 'auth_required'
@@ -147,6 +153,11 @@ export default function MealPhotoCapture({ onClose, onAddItems, language = 'de' 
                 </p>
                 {error === 'no_food' && (
                   <p className="text-white/40 text-xs mt-1">{t('nutrition.noFoodDetectedDesc')}</p>
+                )}
+                {error === 'photo_quota' && (
+                  <button onClick={() => openPaywall('meal_photo')} className="mt-2 text-primary-400 text-xs font-medium">
+                    {t('ui.unlockPremium')}
+                  </button>
                 )}
                 {(error === 'timeout' || error === 'ai_service_unavailable' || error === 'rate_limit') && (
                   <button onClick={handleAnalyze} className="mt-2 text-primary-400 text-xs font-medium">

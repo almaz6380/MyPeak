@@ -1590,7 +1590,9 @@
     "yourDailyCalorieAndMacroGoals": "Tus objetivos diarios de calorías y macronutrientes se fijarán en estos valores:",
     "trialFreeNoAutoRenew": "Pruébalo gratis durante {{TRIAL_DAYS}} días. La prueba termina automáticamente y no se convierte en una suscripción de pago: sin pagos y sin nada que cancelar.",
     "subscriptionDisclosure": "FullRep Premium es una suscripción de renovación automática: {{preis}} por {{zeitraum}}. El pago se carga a tu cuenta de {{store}} al confirmar la compra. La suscripción se renueva automáticamente por el mismo periodo al precio vigente en ese momento, salvo que la canceles al menos 24 horas antes de que termine el periodo en curso. Puedes gestionarla y cancelarla en cualquier momento en los ajustes de tu cuenta de {{store}}.",
-    "termsOfUseEula": "Condiciones de uso (EULA)"
+    "termsOfUseEula": "Condiciones de uso (EULA)",
+    "photoQuotaFree": "Has usado los análisis de fotos gratuitos de hoy. Mañana habrá más, o sigue ahora con Premium.",
+    "photoQuotaPremium": "Has usado todos los análisis de fotos de hoy. Mañana habrá más."
   },
   "premium": {
     "aiUnavailable": "La IA no está disponible en este momento. Inténtalo de nuevo en un momento.",

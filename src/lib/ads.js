@@ -21,8 +21,6 @@ const TEST = {
   android: { interstitial: 'ca-app-pub-3940256099942544/1033173712' },
 };
 
-// Platzhalter — vor Launch durch echte FullRep-Anzeigenblöcke ersetzen
-// (Konto pub-8860791993288062).
 // Echte FullRep-Anzeigenblöcke (Konto pub-8860791993288062).
 const PROD = {
   ios: { interstitial: 'ca-app-pub-8860791993288062/5028931559' },
@@ -92,6 +90,9 @@ export function canChangeAdConsent() {
 }
 
 export async function changeAdConsent() {
+  // Premium-Nutzer haben das SDK nie gestartet — wer die Einwilligung ändern
+  // will, startet es damit selbst.
+  await initAds();
   if (!ready) return;
   try {
     await AdMob.resetConsentInfo();
@@ -104,19 +105,36 @@ export async function changeAdConsent() {
   }
 }
 
-export async function initAds() {
-  if (!isNative) return; // Im Browser: keine Ads.
-  try {
-    const mod = await import('@capacitor-community/admob');
-    AdMob = mod.AdMob;
+// Startet das Anzeigen-SDK samt Einwilligungsdialog — höchstens einmal.
+//
+// Aufgerufen wird das NICHT mehr pauschal beim App-Start (bis 1.6.3: 1,5 s
+// nach dem Start, auch mitten im Onboarding und für Premium-Nutzer), sondern
+// vom SubscriptionContext, sobald feststeht: Onboarding fertig UND kein
+// Premium. Wer zahlt oder noch seine Daten eingibt, sieht keinen
+// Werbe-Einwilligungsdialog.
+let initLauf = null;
+export function initAds() {
+  if (!isNative) return Promise.resolve(); // Im Browser: keine Ads.
+  initLauf ??= (async () => {
+    try {
+      const mod = await import('@capacitor-community/admob');
+      AdMob = mod.AdMob;
 
-    await warteAufTrackingAntwort();
-    await runConsentFlow();
-    await AdMob.initialize({ initializeForTesting: USE_TEST_ADS });
-    ready = true;
-  } catch (e) {
-    console.warn('AdMob-Init fehlgeschlagen:', e);
-  }
+      await warteAufTrackingAntwort();
+      await runConsentFlow();
+      await AdMob.initialize({ initializeForTesting: USE_TEST_ADS });
+      ready = true;
+      ladeVor();
+    } catch (e) {
+      console.warn('AdMob-Init fehlgeschlagen:', e);
+    }
+  })();
+  return initLauf;
+}
+
+// Wann die Werbung überhaupt starten darf — reine Funktion, damit testbar.
+export function werbungDarfStarten({ nutzerDa, aboGeladen, premium, onboardingFertig }) {
+  return Boolean(nutzerDa && aboGeladen && !premium && onboardingFertig);
 }
 
 // ---------------------------------------------------------------------------
@@ -152,6 +170,8 @@ let shownThisSession = 0;
 let premiumUser = false;
 export function setAdsPremiumStatus(isPremium) {
   premiumUser = !!isPremium;
+  // Premium abgelaufen und das SDK läuft schon: eine Anzeige bereitlegen.
+  if (!premiumUser && ready && !geladen) ladeVor();
 }
 
 // Nach einer Bewertungsanfrage (lib/review.js) die Werbung fuer die normale
@@ -161,20 +181,56 @@ export function werbungPausieren() {
   lastInterstitial = Date.now();
 }
 
+// ---------------------------------------------------------------------------
+//  Vorladen. Bis 1.6.3 wurde die Anzeige erst im Moment des Auslösens geladen:
+//  Der Aufrufer wechselte derweil den Bildschirm, und das Vollbild platzte
+//  Sekunden später in die nächste Ansicht. Jetzt liegt immer eine geladene
+//  Anzeige bereit; ist keine da (keine Füllung, kein Netz), entfällt die
+//  Einblendung — und sie zählt dann auch NICHT gegen Abstand und Sitzungsdeckel.
+// ---------------------------------------------------------------------------
+let geladen = null; // Promise<boolean> des laufenden/letzten Vorladens
+const LADE_GEDULD_MS = 1200;
+
+function ladeVor() {
+  if (!ready || premiumUser) return;
+  geladen = AdMob.prepareInterstitial({ adId: ids().interstitial, isTesting: USE_TEST_ADS })
+    .then(() => true)
+    .catch((e) => {
+      console.warn('Interstitial nicht geladen:', e);
+      return false;
+    });
+}
+
+// Gibt zurück, ob wirklich eine Anzeige gezeigt wurde.
 export async function maybeShowInterstitial() {
-  if (!ready) return;
-  if (premiumUser) return; // Premium = werbefrei
+  if (!ready) return false;
+  if (premiumUser) return false; // Premium = werbefrei
   actionCount += 1;
   const jetzt = Date.now();
   if (!interstitialErlaubt({
     jetzt, appStart, letzte: lastInterstitial, gezeigt: shownThisSession, aktion: actionCount,
-  })) return;
-  lastInterstitial = jetzt;
-  shownThisSession += 1;
+  })) return false;
+  const laden = geladen;
+  if (!laden) { ladeVor(); return false; }
   try {
-    await AdMob.prepareInterstitial({ adId: ids().interstitial, isTesting: USE_TEST_ADS });
+    const da = await Promise.race([
+      laden,
+      new Promise((r) => setTimeout(() => r('spaet'), LADE_GEDULD_MS)),
+    ]);
+    // Lädt noch: diesmal ohne Anzeige weiter, das Laden läuft für die nächste
+    // Gelegenheit fertig. Fehlgeschlagen: neu versuchen.
+    if (da === 'spaet') return false;
+    if (!da) { ladeVor(); return false; }
+    geladen = null;
     await AdMob.showInterstitial();
+    lastInterstitial = Date.now();
+    shownThisSession += 1;
+    ladeVor(); // gleich die nächste bereitlegen
+    return true;
   } catch (e) {
     console.warn('Interstitial-Ad fehlgeschlagen:', e);
+    geladen = null;
+    ladeVor();
+    return false;
   }
 }

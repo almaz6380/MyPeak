@@ -1590,7 +1590,9 @@
     "yourDailyCalorieAndMacroGoals": "Je dagelijkse calorie- en macrodoelen worden ingesteld op:",
     "trialFreeNoAutoRenew": "Probeer het {{TRIAL_DAYS}} dagen gratis. De proefperiode eindigt automatisch en wordt geen betaald abonnement – geen betaling, niets op te zeggen.",
     "subscriptionDisclosure": "FullRep Premium is een automatisch verlengend abonnement: {{preis}} per {{zeitraum}}. De betaling wordt bij bevestiging van de aankoop via je {{store}}-account in rekening gebracht. Het abonnement wordt automatisch verlengd met dezelfde periode tegen de dan geldende prijs, tenzij je het minstens 24 uur voor het einde van de lopende periode opzegt. Je kunt het op elk moment beheren en opzeggen in de instellingen van je {{store}}-account.",
-    "termsOfUseEula": "Gebruiksvoorwaarden (EULA)"
+    "termsOfUseEula": "Gebruiksvoorwaarden (EULA)",
+    "photoQuotaFree": "Je hebt de gratis foto-analyses van vandaag gebruikt. Morgen kun je verder – of ga nu door met Premium.",
+    "photoQuotaPremium": "Je hebt alle foto-analyses van vandaag gebruikt. Morgen kun je verder."
   },
   "premium": {
     "aiUnavailable": "De AI is nu niet bereikbaar. Probeer het zo meteen opnieuw.",
