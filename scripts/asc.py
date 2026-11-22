@@ -250,59 +250,24 @@ def setze_primaersprache(tok, locale):
 # appStoreVersions — plus der Text "Neu in dieser Version", der bei einem
 # Update Pflicht ist.
 
-WHATS_NEW = """Neue Widgets für Homescreen und Sperrbildschirm: deine Kalorien und Makros \
-von heute (Protein, Kohlenhydrate, Fett) und deine Schritte – rund, rechteckig oder als \
-Zeile über der Uhr. FullRep zählt deine Schritte jetzt auch selbst (ohne Apple Health) und \
-zeigt deine verbrannten Kalorien. Neu: eine eigene Schritte-Karte auf der Startseite und ein Verlauf mit Tagesziel (7, 30 oder 90 Tage)."""
+WHATS_NEW = """Ruhigerer Start: kein Werbe-Einwilligungsdialog mehr während der Einrichtung und für Premium-Mitglieder, und Vollbildwerbung platzt nicht mehr verspätet in den nächsten Bildschirm. Die Foto-Analyse von Mahlzeiten hat jetzt ein faires Tageslimit (mehr mit Premium). Kleine Korrekturen."""
 
 # "Neu in dieser Version" fuer die weiteren Sprachen der Store-Seite. Apple
 # verlangt den Text bei einem Update fuer JEDE Lokalisierung der Version —
 # lokalisieren() setzt ihn mit, sonst scheitert die Einreichung.
 WHATS_NEW_SPRACHEN = {
-    'en': "New widgets for the Home Screen and Lock Screen: today's calories and macros "
-          "(protein, carbs, fat) and your steps – circular, rectangular or as a line "
-          "above the clock. FullRep now also counts your steps itself (no Apple Health "
-          "needed) and shows your burned calories. New: a step card on the home screen and a step history with a daily goal (7, 30 or 90 days).",
-    'es': "Nuevos widgets para la pantalla de inicio y de bloqueo: tus calorías y macros "
-          "de hoy (proteína, carbohidratos, grasa) y tus pasos, en formato circular, "
-          "rectangular o en una línea sobre el reloj. FullRep ahora también cuenta tus pasos "
-          "(sin Salud) y muestra las calorías quemadas. Nuevo: una tarjeta de pasos en el inicio y un historial con objetivo diario (7, 30 o 90 días).",
-    'fr': "Nouveaux widgets pour l’écran d’accueil et l’écran verrouillé : tes calories et "
-          "macros du jour (protéines, glucides, lipides) et tes pas – rond, rectangulaire "
-          "ou en ligne au-dessus de l’heure. FullRep compte désormais aussi tes pas lui-même "
-          "(sans Santé) et affiche les calories brûlées. Nouveau : une carte Pas sur l’accueil et un historique avec objectif quotidien (7, 30 ou 90 jours).",
-    'pt': "Novos widgets para a tela de início e a tela bloqueada: suas calorias e macros "
-          "de hoje (proteína, carboidratos, gordura) e seus passos – circular, retangular "
-          "ou em uma linha acima do relógio. O FullRep agora também conta seus passos "
-          "(sem o Saúde) e mostra as calorias queimadas. Novo: um cartão de passos na tela inicial e um histórico com meta diária (7, 30 ou 90 dias).",
-    'ar': "أدوات جديدة للشاشة الرئيسية وشاشة القفل: سعراتك ومغذياتك لليوم (بروتين، "
-          "كربوهيدرات، دهون) وخطواتك – دائرية أو مستطيلة أو في سطر فوق الساعة. "
-          "يعدّ FullRep خطواتك الآن بنفسه (دون تطبيق الصحة) ويعرض السعرات المحروقة. جديد: بطاقة للخطوات في الصفحة الرئيسية وسجل مع هدف يومي (7 أو 30 أو 90 يومًا).",
-    'nl': "Nieuwe widgets voor het beginscherm en toegangsscherm: je calorieën en macro's "
-          "van vandaag (eiwit, koolhydraten, vet) en je stappen – rond, rechthoekig of als "
-          "regel boven de klok. FullRep telt je stappen nu ook zelf (zonder Gezondheid) en "
-          "toont je verbrande calorieën. Nieuw: een stappenkaart op het startscherm en een geschiedenis met dagdoel (7, 30 of 90 dagen).",
-    'pl': "Nowe widżety na ekran początkowy i ekran blokady: dzisiejsze kalorie i makro "
-          "(białko, węglowodany, tłuszcz) oraz twoje kroki – okrągłe, prostokątne lub "
-          "jako wiersz nad zegarem. FullRep liczy teraz kroki także sam (bez Zdrowia) "
-          "i pokazuje spalone kalorie. Nowość: karta kroków na ekranie głównym i historia z celem dziennym (7, 30 lub 90 dni).",
-    'it': "Nuovi widget per la schermata Home e di blocco: calorie e macro di oggi "
-          "(proteine, carboidrati, grassi) e i tuoi passi – rotondo, rettangolare o in "
-          "una riga sopra l’orologio. Ora FullRep conta anche da solo i tuoi passi (senza "
-          "Salute) e mostra le calorie bruciate. Novità: una scheda passi nella home e uno storico con obiettivo giornaliero (7, 30 o 90 giorni).",
-    'tr': "Ana ekran ve kilit ekranı için yeni widget’lar: bugünkü kalorilerin ve "
-          "makroların (protein, karbonhidrat, yağ) ile adımların – yuvarlak, dikdörtgen "
-          "veya saatin üstünde tek satır. FullRep artık adımlarını kendisi de sayıyor "
-          "(Sağlık olmadan) ve yakılan kalorileri gösteriyor. Yeni: ana sayfada adım kartı ve günlük hedefli adım geçmişi (7, 30 veya 90 gün).",
-    'ja': "ホーム画面とロック画面に新しいウィジェット：今日のカロリーとマクロ（たんぱく質・"
-          "炭水化物・脂質）、そして歩数を、円形・長方形・時計の上の 1 行で表示します。"
-          "FullRep がヘルスケアなしでも歩数を計測し、消費カロリーも表示します。新機能：ホームに歩数カード、1日の目標付きの歩数履歴（7・30・90日）。",
-    'ko': "홈 화면과 잠금 화면용 새 위젯: 오늘의 칼로리와 매크로(단백질, 탄수화물, 지방), "
-          "그리고 걸음 수를 원형·직사각형·시계 위 한 줄로 보여 줘요. "
-          "이제 FullRep이 건강 앱 없이도 걸음 수를 세고 소모 칼로리를 보여 줘요. 새 기능: 홈 화면의 걸음 수 카드와 하루 목표가 있는 걸음 수 기록(7·30·90일).",
-    'zh': "主屏幕和锁定屏幕新增小组件：今日热量与宏量营养素（蛋白质、碳水、脂肪）以及"
-          "你的步数，可选圆形、矩形或时钟上方单行显示。"
-          "FullRep 现在无需健康也能自己计步，并显示已消耗的卡路里。新功能：首页步数卡片，以及带每日目标的步数历史（7、30 或 90 天）。",
+    'en': 'Calmer start: no ad consent dialog during setup or for Premium members, and full-screen ads no longer pop up late in the next screen. Meal photo analysis now has a fair daily limit (more with Premium). Small fixes.',
+    'es': 'Inicio más tranquilo: sin diálogo de consentimiento publicitario durante la configuración ni para Premium, y los anuncios a pantalla completa ya no aparecen tarde en la pantalla siguiente. El análisis de fotos de comida tiene ahora un límite diario (más con Premium). Pequeñas correcciones.',
+    'fr': 'Démarrage plus calme : plus de fenêtre de consentement publicitaire pendant la configuration ni pour les membres Premium, et les publicités plein écran n’apparaissent plus en retard sur l’écran suivant. L’analyse photo des repas a désormais une limite quotidienne (plus avec Premium). Petites corrections.',
+    'pt': 'Início mais tranquilo: sem diálogo de consentimento de anúncios durante a configuração nem para Premium, e os anúncios em tela cheia não aparecem mais atrasados na tela seguinte. A análise de fotos de refeições agora tem um limite diário (mais com o Premium). Pequenas correções.',
+    'ar': 'بداية أهدأ: لا نافذة موافقة على الإعلانات أثناء الإعداد ولا لمشتركي بريميوم، ولم تعد الإعلانات بملء الشاشة تظهر متأخرة في الشاشة التالية. أصبح لتحليل صور الوجبات حد يومي (أكثر مع بريميوم). إصلاحات صغيرة.',
+    'nl': 'Rustigere start: geen advertentietoestemming meer tijdens het instellen of voor Premium, en schermvullende advertenties verschijnen niet meer te laat in het volgende scherm. De maaltijdfoto-analyse heeft nu een daglimiet (meer met Premium). Kleine verbeteringen.',
+    'pl': 'Spokojniejszy start: bez okna zgody na reklamy podczas konfiguracji i dla Premium, a reklamy pełnoekranowe nie pojawiają się już z opóźnieniem na kolejnym ekranie. Analiza zdjęć posiłków ma teraz dzienny limit (więcej w Premium). Drobne poprawki.',
+    'it': 'Avvio più tranquillo: niente richiesta di consenso pubblicitario durante la configurazione né per Premium, e gli annunci a schermo intero non compaiono più in ritardo nella schermata successiva. L’analisi delle foto dei pasti ha ora un limite giornaliero (di più con Premium). Piccole correzioni.',
+    'tr': 'Daha sakin başlangıç: kurulum sırasında ve Premium üyeler için reklam izni penceresi yok; tam ekran reklamlar artık sonraki ekranda geç çıkmıyor. Öğün fotoğrafı analizinin artık günlük sınırı var (Premium’da daha fazla). Küçük düzeltmeler.',
+    'ja': 'より落ち着いた起動：初期設定中やプレミアム会員には広告の同意ダイアログを表示しません。全画面広告が次の画面で遅れて出ることもなくなりました。食事写真の解析に1日の上限を設けました（プレミアムはより多く）。細かな修正。',
+    'ko': '더 차분한 시작: 설정 중이거나 프리미엄 회원에게는 광고 동의 창이 뜨지 않으며, 전면 광고가 다음 화면에서 늦게 나타나지 않습니다. 식사 사진 분석에 하루 한도가 생겼습니다(프리미엄은 더 많이). 소소한 수정.',
+    'zh': '启动更安静：设置过程中以及高级版会员不再弹出广告授权窗口，全屏广告也不会再延迟出现在下一个页面。餐食照片分析现在有每日上限（高级版更多）。小幅修复。',
 }
 
 
@@ -846,7 +811,17 @@ def setze_abo_screenshot(tok):
 # "submitted together with this version", die Abos standen aber auf
 # MISSING_METADATA und fuhren nicht mit — genau dafuer kam 2.1(b) ein zweites
 # Mal. Diesen Absatz erst schreiben, wenn beide Abos READY_TO_SUBMIT sind.
-PRUEFNOTIZ = """What is new in 1.6.3 (previous App Store version: 1.6.1)
+PRUEFNOTIZ = """What is new in 1.6.4 (previous App Store version: 1.6.3)
+
+Maintenance release, no new permissions.
+- The ad SDK and the consent dialog now start only after onboarding and only
+  for users without Premium (before: 1.5 s after every launch).
+- Interstitials are preloaded, so they no longer appear late on the next screen.
+- Meal photo analysis has a daily limit (3 per day free, 30 with Premium or
+  trial); when the limit is reached the app shows a message and, for free
+  users, a button to the paywall.
+
+Background from 1.6.3 (approved):
 
 Step card and step history (new)
 The home screen has its own step card (today's steps against a daily goal,
