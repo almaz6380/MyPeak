@@ -20,9 +20,16 @@ Chinesisch (vereinfacht) — **vollständig**, Oberfläche wie Inhaltsbibliothek
 
 ## Aktueller Stand
 
-### Für das nächste Update vorbereitet: Werbe-Technik + Foto-Kontingent (22.11.2026)
+### Version 1.6.4 (iOS Build 22 / Android vc30): Werbe-Technik + Foto-Kontingent (22.11.2026)
 
-Code auf `claude/optimistic-darwin-k01rmb`. **Nicht gebaut, nicht gemergt, Migration nicht eingespielt**, Versionen stehen noch auf 1.6.3.
+Gemergt als PR #81, alles auf GitHub-Rechnern, je am Protokoll geprüft:
+
+| | Stand |
+|---|---|
+| Web/API | live mit dem Merge (Cloudflare baut von `main`) |
+| Android | **vc30 (1.6.4) auf `production`** (`android-release` 45037868381) |
+| iOS | Build 22 hochgeladen (`ios-release` 45037865181) → `version-anlegen 1.6.4` → `lokalisieren` → `build 22` → `pruefnotiz` → **eingereicht**, Einreichung `54aedaf8-03ff-429a-992c-5f7808ab33a7`, `WAITING_FOR_REVIEW`. 1.6.3 war vorher freigegeben, beide Abos `APPROVED` |
+| Migration `photo_usage` | ⚠ **von Josef im SQL Editor einzuspielen** (Text am 22.11. im Chat). Bis dahin ist das Foto unbegrenzt (fail-open). Nachprüfen, ob die Tabelle da ist |
 
 - **Vollbildwerbung wird vorgeladen** (`ladeVor()` in `src/lib/ads.js`). Vorher lud sie erst beim Auslösen und platzte Sekunden später in den nächsten Bildschirm. Ist keine Anzeige geladen, entfällt die Einblendung und zählt nicht gegen Abstand und Sitzungsdeckel. `maybeShowInterstitial()` meldet jetzt, ob wirklich eine lief.
 - **Das Anzeigen-SDK startet nicht mehr pauschal 1,5 s nach dem App-Start**, sondern aus dem `SubscriptionContext`, sobald Onboarding fertig, Abo-Stand gelesen und kein Premium (`werbungDarfStarten`). Kein Werbe-Einwilligungsdialog mehr im Onboarding oder für Premium. „Werbe-Einwilligung ändern“ im Profil startet das SDK bei Bedarf selbst.
