@@ -2603,6 +2603,18 @@ Systematischer Bug-Hunt (Lint + 4 parallele Code-Audits über Storage, Training,
 
 ---
 
+## „Mehr von WellApps" (23.11.2026)
+
+Im Profil, direkt über „Rechtliches": die sechs anderen Apps des Studios, je Zeile Symbol, Name, Kurzzeile.
+- Liste: `src/lib/wellapps.js` (`WELLAPPS`, eigene id `fullrep` wird ausgefiltert), Anzeige: `src/components/MehrVonWellApps.jsx`.
+- Symbole liegen im Bündel (`src/assets/wellapps/<id>.webp`, 144×144), nichts wird nachgeladen, kein Klick wird gezählt.
+- Link: iOS (nativ oder iPhone/iPad-Browser) → `apps.apple.com/app/id…`, sonst Play. Als `<a target="_blank">`, in der Store-App öffnet er außerhalb der WebView.
+- Texte: `wellapps.title`, `wellapps.worldHistory`, `wellapps.tagline.<id>` in allen 13 Sprachdateien. „WellApps" und die App-Namen bleiben unübersetzt (außer Weltgeschichte).
+- **App ergänzen:** Zeile in `WELLAPPS`, Symbol, Kurzzeile in jeder Sprache — und dasselbe in den anderen sechs Apps. Die Liste ist in allen sieben Apps gleich.
+- Nur hier zeigen: nie im Training, in Dialogen oder beim Start. Test: `tests/lib/wellapps.test.js`.
+
+---
+
 ## Technischer Stack
 
 - **Framework:** React 18 + Vite

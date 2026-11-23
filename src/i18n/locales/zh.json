@@ -1660,5 +1660,17 @@
     "goalHint": "用于卡片和历史记录",
     "noSource": "还没有数据来源：请在个人资料中开启“自己计步”或 Apple Health / Health Connect。",
     "olderOnlyHealth": "更早的日期仅在开启 Apple Health / Health Connect（个人资料）后可见。"
+  },
+  "wellapps": {
+    "title": "更多 WellApps 应用",
+    "worldHistory": "世界历史",
+    "tagline": {
+      "mahjong": "麻将连连看、对战与立直麻将",
+      "fixthemix": "果汁吧里的颜色排序",
+      "anigosha": "动漫问答与对战",
+      "swaply": "用好习惯替换坏习惯",
+      "weltgeschichte": "时代、时间线与问答",
+      "watten": "阿尔卑斯经典纸牌游戏"
+    }
   }
 }

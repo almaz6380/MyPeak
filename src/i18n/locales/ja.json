@@ -1660,5 +1660,17 @@
     "goalHint": "カードと履歴に使用",
     "noSource": "まだデータ元がありません。プロフィールで「歩数を数える」またはApple Health / Health Connectをオンにしてください。",
     "olderOnlyHealth": "過去の日はApple Health / Health Connect（プロフィール）でのみ表示されます。"
+  },
+  "wellapps": {
+    "title": "WellAppsの他のアプリ",
+    "worldHistory": "世界史",
+    "tagline": {
+      "mahjong": "麻雀ソリティア、対戦、リーチ麻雀",
+      "fixthemix": "ジュースバーで色分けパズル",
+      "anigosha": "アニメクイズ＆対戦",
+      "swaply": "悪い習慣を良い習慣に置き換える",
+      "weltgeschichte": "時代、年表、クイズ",
+      "watten": "アルプス地方の伝統カードゲーム"
+    }
   }
 }

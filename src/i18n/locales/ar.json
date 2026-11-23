@@ -1665,5 +1665,17 @@
     "goalHint": "للبطاقة والسجل",
     "noSource": "لا يوجد مصدر بعد: فعّل «عدّ الخطوات» أو Apple Health / Health Connect من ملفك الشخصي.",
     "olderOnlyHealth": "الأيام الأقدم متاحة فقط مع Apple Health / Health Connect (الملف الشخصي)."
+  },
+  "wellapps": {
+    "title": "المزيد من WellApps",
+    "worldHistory": "تاريخ العالم",
+    "tagline": {
+      "mahjong": "ماهجونغ سوليتير، مبارزات وريتشي",
+      "fixthemix": "فرز الألوان في بار العصائر",
+      "anigosha": "اختبار الأنمي والمبارزات",
+      "swaply": "استبدل العادات السيئة بعادات جيدة",
+      "weltgeschichte": "عصور، خط زمني واختبارات",
+      "watten": "ألعاب ورق كلاسيكية من جبال الألب"
+    }
   }
 }

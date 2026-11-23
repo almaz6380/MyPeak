@@ -1661,5 +1661,17 @@
     "goalHint": "Vale para o cartão e o histórico",
     "noSource": "Ainda sem fonte: ative “Contar passos” ou Apple Health / Health Connect no perfil.",
     "olderOnlyHealth": "Dias anteriores só com Apple Health / Health Connect (perfil)."
+  },
+  "wellapps": {
+    "title": "Mais da WellApps",
+    "worldHistory": "História Mundial",
+    "tagline": {
+      "mahjong": "Mahjong solitário, duelos e Riichi",
+      "fixthemix": "Organize cores no bar de sucos",
+      "anigosha": "Quiz de anime e duelos",
+      "swaply": "Troque maus hábitos por bons",
+      "weltgeschichte": "Épocas, linha do tempo e quiz",
+      "watten": "Jogos de cartas clássicos dos Alpes"
+    }
   }
 }

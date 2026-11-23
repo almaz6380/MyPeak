@@ -1664,5 +1664,17 @@
     "goalHint": "Vale per la scheda e lo storico",
     "noSource": "Nessuna fonte: attiva «Conta i passi» o Apple Health / Health Connect nel profilo.",
     "olderOnlyHealth": "I giorni precedenti sono disponibili solo con Apple Health / Health Connect (profilo)."
+  },
+  "wellapps": {
+    "title": "Altro da WellApps",
+    "worldHistory": "Storia del Mondo",
+    "tagline": {
+      "mahjong": "Solitario mahjong, duelli e Riichi",
+      "fixthemix": "Ordina i colori al bar dei succhi",
+      "anigosha": "Quiz anime e duelli",
+      "swaply": "Sostituisci le cattive abitudini",
+      "weltgeschichte": "Epoche, linea del tempo e quiz",
+      "watten": "Giochi di carte classici delle Alpi"
+    }
   }
 }

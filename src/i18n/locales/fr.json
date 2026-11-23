@@ -1661,5 +1661,17 @@
     "goalHint": "Pour la carte et l'historique",
     "noSource": "Aucune source : active « Compter les pas » ou Apple Health / Health Connect dans ton profil.",
     "olderOnlyHealth": "Les jours plus anciens ne sont disponibles qu'avec Apple Health / Health Connect (profil)."
+  },
+  "wellapps": {
+    "title": "Plus de WellApps",
+    "worldHistory": "Histoire du monde",
+    "tagline": {
+      "mahjong": "Mahjong solitaire, duels et Riichi",
+      "fixthemix": "Tri de couleurs au bar à jus",
+      "anigosha": "Quiz anime et duels",
+      "swaply": "Remplacez vos mauvaises habitudes",
+      "weltgeschichte": "Époques, frise chronologique et quiz",
+      "watten": "Jeux de cartes classiques des Alpes"
+    }
   }
 }
