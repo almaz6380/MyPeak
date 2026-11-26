@@ -1661,5 +1661,17 @@
     "goalHint": "Geldt voor kaart en geschiedenis",
     "noSource": "Nog geen bron: zet „Stappen tellen” of Apple Health / Health Connect aan in je profiel.",
     "olderOnlyHealth": "Oudere dagen zijn er alleen met Apple Health / Health Connect (profiel)."
+  },
+  "wellapps": {
+    "title": "Meer van WellApps",
+    "worldHistory": "Wereldgeschiedenis",
+    "tagline": {
+      "mahjong": "Mahjong-solitaire, duels & Riichi",
+      "fixthemix": "Kleuren sorteren in de sapbar",
+      "anigosha": "Animequiz & duels",
+      "swaply": "Ruil slechte gewoontes voor goede",
+      "weltgeschichte": "Tijdperken, tijdlijn & quiz",
+      "watten": "Klassieke kaartspellen uit de Alpen"
+    }
   }
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import MehrVonWellApps from '../components/MehrVonWellApps';
 import { useTranslation } from 'react-i18next';
 import { appSprache, beschriftung, SPRACHEN, SPRACHNAMEN } from '../lib/sprache';
 import { Link } from 'react-router-dom';
@@ -518,6 +519,9 @@ export default function ProfilePage() {
           />
         )}
       </div>
+
+      {/* Die anderen Apps des Studios — bewusst unten, direkt vor den Rechtslinks */}
+      <MehrVonWellApps />
 
       {/* Legal */}
       <div className="karte overflow-hidden mb-4">

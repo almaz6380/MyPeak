@@ -1661,5 +1661,17 @@
     "goalHint": "Gilt für Karte und Verlauf",
     "noSource": "Noch keine Quelle: Schalte im Profil „Schritte selbst zählen“ oder Apple Health / Health Connect ein.",
     "olderOnlyHealth": "Ältere Tage gibt es nur mit Apple Health / Health Connect (Profil)."
+  },
+  "wellapps": {
+    "title": "Mehr von WellApps",
+    "worldHistory": "Weltgeschichte",
+    "tagline": {
+      "mahjong": "Mahjong-Solitaire, Duelle & Riichi",
+      "fixthemix": "Farben sortieren in der Saftbar",
+      "anigosha": "Anime-Quiz & Duelle",
+      "swaply": "Schlechte Gewohnheiten tauschen",
+      "weltgeschichte": "Epochen, Zeitleiste & Quiz",
+      "watten": "Kartenspiele mit dem doppeldeutschen Blatt"
+    }
   }
 }

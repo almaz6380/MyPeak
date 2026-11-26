@@ -1662,5 +1662,17 @@
     "goalHint": "Kart ve geçmiş için geçerli",
     "noSource": "Henüz kaynak yok: profilinde „Adımları say” ya da Apple Health / Health Connect'i aç.",
     "olderOnlyHealth": "Eski günler yalnızca Apple Health / Health Connect ile görünür (profil)."
+  },
+  "wellapps": {
+    "title": "WellApps'ten daha fazlası",
+    "worldHistory": "Dünya Tarihi",
+    "tagline": {
+      "mahjong": "Mahjong solitaire, düellolar ve Riichi",
+      "fixthemix": "Meyve suyu barında renk sıralama",
+      "anigosha": "Anime bilgi yarışması ve düellolar",
+      "swaply": "Kötü alışkanlıkları iyileriyle değiştir",
+      "weltgeschichte": "Çağlar, zaman çizelgesi ve quiz",
+      "watten": "Klasik Alp kart oyunları"
+    }
   }
 }

@@ -1661,5 +1661,17 @@
     "goalHint": "Used for the card and history",
     "noSource": "No source yet: turn on “Count steps” or Apple Health / Health Connect in your profile.",
     "olderOnlyHealth": "Older days are only available with Apple Health / Health Connect (profile)."
+  },
+  "wellapps": {
+    "title": "More from WellApps",
+    "worldHistory": "World History",
+    "tagline": {
+      "mahjong": "Mahjong solitaire, duels & Riichi",
+      "fixthemix": "Colour sorting at the juice bar",
+      "anigosha": "Anime quiz & duels",
+      "swaply": "Swap bad habits for good ones",
+      "weltgeschichte": "Eras, timeline & quiz",
+      "watten": "Classic Alpine card games"
+    }
   }
 }

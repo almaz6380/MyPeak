@@ -1666,5 +1666,17 @@
     "goalHint": "Dla karty i historii",
     "noSource": "Brak źródła: włącz „Licz kroki” lub Apple Health / Health Connect w profilu.",
     "olderOnlyHealth": "Starsze dni są dostępne tylko z Apple Health / Health Connect (profil)."
+  },
+  "wellapps": {
+    "title": "Więcej od WellApps",
+    "worldHistory": "Historia świata",
+    "tagline": {
+      "mahjong": "Mahjong pasjans, pojedynki i Riichi",
+      "fixthemix": "Sortowanie kolorów w barze z sokami",
+      "anigosha": "Quiz anime i pojedynki",
+      "swaply": "Zamień złe nawyki na dobre",
+      "weltgeschichte": "Epoki, oś czasu i quiz",
+      "watten": "Klasyczne alpejskie gry karciane"
+    }
   }
 }
