@@ -17,8 +17,8 @@ android {
         applicationId "at.gallab.mypeak"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 30
-        versionName "1.6.4"
+        versionCode 31
+        versionName "1.6.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

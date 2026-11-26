@@ -20,6 +20,11 @@ Chinesisch (vereinfacht) — **vollständig**, Oberfläche wie Inhaltsbibliothek
 
 ## Aktueller Stand
 
+### Version 1.6.5 (iOS Build 23 / Android vc31): „Mehr von WellApps“ in den Store-Apps (26.11.2026)
+
+Einziger neuer Inhalt: der Bereich „Mehr von WellApps“ im Profil (5747cfc), bis dahin nur im Web.
+`WHATS_NEW` + `WHATS_NEW_SPRACHEN` (13 Sprachen) in `scripts/asc.py`, Versionszeile im Profil.
+
 ### Version 1.6.4 (iOS Build 22 / Android vc30): Werbe-Technik + Foto-Kontingent (22.11.2026)
 
 Gemergt als PR #81, alles auf GitHub-Rechnern, je am Protokoll geprüft:

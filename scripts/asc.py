@@ -250,24 +250,24 @@ def setze_primaersprache(tok, locale):
 # appStoreVersions — plus der Text "Neu in dieser Version", der bei einem
 # Update Pflicht ist.
 
-WHATS_NEW = """Ruhigerer Start: kein Werbe-Einwilligungsdialog mehr während der Einrichtung und für Premium-Mitglieder, und Vollbildwerbung platzt nicht mehr verspätet in den nächsten Bildschirm. Die Foto-Analyse von Mahlzeiten hat jetzt ein faires Tageslimit (mehr mit Premium). Kleine Korrekturen."""
+WHATS_NEW = """Neu im Profil: „Mehr von WellApps“ mit unseren anderen Apps. Kleine Verbesserungen."""
 
 # "Neu in dieser Version" fuer die weiteren Sprachen der Store-Seite. Apple
 # verlangt den Text bei einem Update fuer JEDE Lokalisierung der Version —
 # lokalisieren() setzt ihn mit, sonst scheitert die Einreichung.
 WHATS_NEW_SPRACHEN = {
-    'en': 'Calmer start: no ad consent dialog during setup or for Premium members, and full-screen ads no longer pop up late in the next screen. Meal photo analysis now has a fair daily limit (more with Premium). Small fixes.',
-    'es': 'Inicio más tranquilo: sin diálogo de consentimiento publicitario durante la configuración ni para Premium, y los anuncios a pantalla completa ya no aparecen tarde en la pantalla siguiente. El análisis de fotos de comida tiene ahora un límite diario (más con Premium). Pequeñas correcciones.',
-    'fr': 'Démarrage plus calme : plus de fenêtre de consentement publicitaire pendant la configuration ni pour les membres Premium, et les publicités plein écran n’apparaissent plus en retard sur l’écran suivant. L’analyse photo des repas a désormais une limite quotidienne (plus avec Premium). Petites corrections.',
-    'pt': 'Início mais tranquilo: sem diálogo de consentimento de anúncios durante a configuração nem para Premium, e os anúncios em tela cheia não aparecem mais atrasados na tela seguinte. A análise de fotos de refeições agora tem um limite diário (mais com o Premium). Pequenas correções.',
-    'ar': 'بداية أهدأ: لا نافذة موافقة على الإعلانات أثناء الإعداد ولا لمشتركي بريميوم، ولم تعد الإعلانات بملء الشاشة تظهر متأخرة في الشاشة التالية. أصبح لتحليل صور الوجبات حد يومي (أكثر مع بريميوم). إصلاحات صغيرة.',
-    'nl': 'Rustigere start: geen advertentietoestemming meer tijdens het instellen of voor Premium, en schermvullende advertenties verschijnen niet meer te laat in het volgende scherm. De maaltijdfoto-analyse heeft nu een daglimiet (meer met Premium). Kleine verbeteringen.',
-    'pl': 'Spokojniejszy start: bez okna zgody na reklamy podczas konfiguracji i dla Premium, a reklamy pełnoekranowe nie pojawiają się już z opóźnieniem na kolejnym ekranie. Analiza zdjęć posiłków ma teraz dzienny limit (więcej w Premium). Drobne poprawki.',
-    'it': 'Avvio più tranquillo: niente richiesta di consenso pubblicitario durante la configurazione né per Premium, e gli annunci a schermo intero non compaiono più in ritardo nella schermata successiva. L’analisi delle foto dei pasti ha ora un limite giornaliero (di più con Premium). Piccole correzioni.',
-    'tr': 'Daha sakin başlangıç: kurulum sırasında ve Premium üyeler için reklam izni penceresi yok; tam ekran reklamlar artık sonraki ekranda geç çıkmıyor. Öğün fotoğrafı analizinin artık günlük sınırı var (Premium’da daha fazla). Küçük düzeltmeler.',
-    'ja': 'より落ち着いた起動：初期設定中やプレミアム会員には広告の同意ダイアログを表示しません。全画面広告が次の画面で遅れて出ることもなくなりました。食事写真の解析に1日の上限を設けました（プレミアムはより多く）。細かな修正。',
-    'ko': '더 차분한 시작: 설정 중이거나 프리미엄 회원에게는 광고 동의 창이 뜨지 않으며, 전면 광고가 다음 화면에서 늦게 나타나지 않습니다. 식사 사진 분석에 하루 한도가 생겼습니다(프리미엄은 더 많이). 소소한 수정.',
-    'zh': '启动更安静：设置过程中以及高级版会员不再弹出广告授权窗口，全屏广告也不会再延迟出现在下一个页面。餐食照片分析现在有每日上限（高级版更多）。小幅修复。',
+    'en': 'New in your profile: “More from WellApps” with our other apps. Small improvements.',
+    'es': 'Nuevo en el perfil: «Más de WellApps» con nuestras otras apps. Pequeñas mejoras.',
+    'fr': 'Nouveau dans le profil : « Plus de WellApps » avec nos autres applis. Petites améliorations.',
+    'pt': 'Novo no perfil: “Mais da WellApps” com nossos outros apps. Pequenas melhorias.',
+    'ar': 'جديد في الملف الشخصي: «المزيد من WellApps» مع تطبيقاتنا الأخرى. تحسينات صغيرة.',
+    'nl': 'Nieuw in je profiel: „Meer van WellApps” met onze andere apps. Kleine verbeteringen.',
+    'pl': 'Nowość w profilu: „Więcej od WellApps” z naszymi innymi aplikacjami. Drobne poprawki.',
+    'it': 'Novità nel profilo: «Altro da WellApps» con le nostre altre app. Piccoli miglioramenti.',
+    'tr': 'Profilde yeni: diğer uygulamalarımızla „WellApps’ten daha fazlası“. Küçük iyileştirmeler.',
+    'ja': 'プロフィールに新機能：「WellAppsのその他のアプリ」で他のアプリを紹介。細かな改善。',
+    'ko': '프로필에 새로 추가: 다른 앱을 소개하는 „WellApps의 다른 앱“. 소소한 개선.',
+    'zh': '个人资料新增：“更多 WellApps 应用”，介绍我们的其他应用。小幅改进。',
 }
 
 
