@@ -25,6 +25,12 @@ Chinesisch (vereinfacht) — **vollständig**, Oberfläche wie Inhaltsbibliothek
 Einziger neuer Inhalt: der Bereich „Mehr von WellApps“ im Profil (5747cfc), bis dahin nur im Web.
 `WHATS_NEW` + `WHATS_NEW_SPRACHEN` (13 Sprachen) in `scripts/asc.py`, Versionszeile im Profil.
 
+| | Stand |
+|---|---|
+| Web | live mit dem Merge (PR #84) |
+| Android | **vc31 (1.6.5) auf `production`, an alle** (`android-release` 45775598608), committet |
+| iOS | Build 23 hochgeladen (`ios-release` 45775602539) → `version-anlegen 1.6.5` → `lokalisieren` → `pruefnotiz` → `build 23` → **eingereicht**, Einreichung `6949be69-0a2c-4a94-a652-7afcc8b9f586`, `WAITING_FOR_REVIEW`. 1.6.4 war vorher freigegeben, Abos `APPROVED` |
+
 ### Version 1.6.4 (iOS Build 22 / Android vc30): Werbe-Technik + Foto-Kontingent (22.11.2026)
 
 Gemergt als PR #81, alles auf GitHub-Rechnern, je am Protokoll geprüft:
